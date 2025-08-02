@@ -13,7 +13,7 @@ export const products = [
     price: 2000,
     image: '/images/product2.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 3,
@@ -21,7 +21,7 @@ export const products = [
     price: 2300,
     image: '/images/product1.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 4,
@@ -49,7 +49,7 @@ export const products = [
   },
   {
     id: 7,
-    name: 'Palmerita',
+    name: 'Palmeritas x 100 gr',
     price: 1000,
     image: '/images/product1.jpg',
     active: true,
@@ -57,7 +57,7 @@ export const products = [
   },
   {
     id: 8,
-    name: 'Rosquillas',
+    name: 'Rosquillas x 100 gr',
     price: 1000,
     image: '/images/product2.jpg',
     active: true,
@@ -85,7 +85,7 @@ export const products = [
     price: 3400,
     image: '/images/product1.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 12,
@@ -93,7 +93,7 @@ export const products = [
     price: 2500,
     image: '/images/product2.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 13,
@@ -101,7 +101,7 @@ export const products = [
     price: 2000,
     image: '/images/product1.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 14,
@@ -133,7 +133,7 @@ export const products = [
     price: 10.99,
     image: '/images/product1.jpg',
     active: false,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 18,
@@ -181,7 +181,7 @@ export const products = [
     price: 2100,
     image: '/images/product1.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 24,
@@ -189,7 +189,7 @@ export const products = [
     price: 1800,
     image: '/images/product2.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 25,
@@ -229,7 +229,7 @@ export const products = [
     price: 5200,
     image: '/images/product1.jpg',
     active: true,
-    categories: 'Sandwichs',
+    categories: 'Pan para sanguchess',
   },
   {
     id: 30,
