@@ -105,7 +105,7 @@ export const products = [
   },
   {
     id: 14,
-    name: 'Tarta cabsha x 4 u.',
+    name: 'Mini tarta cabsha',
     price: 1500,
     image: '/images/product2.jpg',
     active: true,
@@ -113,7 +113,7 @@ export const products = [
   },
   {
     id: 15,
-    name: 'Alfajor maizena.',
+    name: 'Alfajor maizena',
     price: 1000,
     image: '/images/product1.jpg',
     active: true,
