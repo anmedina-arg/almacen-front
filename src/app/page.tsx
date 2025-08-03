@@ -191,7 +191,11 @@ export default function Home() {
 
     // Detectar ancho de pantalla para ajustar el formato
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-    const maxProductLength = isMobile ? 20 : 30; // Menos caracteres en móvil
+
+    // Definir anchos de columnas según el dispositivo
+    const quantityWidth = 8; // Columna de cantidad
+    const productWidth = isMobile ? 18 : 28; // Columna de producto
+    const priceWidth = 10; // Columna de precio
 
     let message = 'Hola! Quiero hacerte un pedido de:\n\n';
     let total = 0;
@@ -215,14 +219,16 @@ export default function Home() {
         quantityText = `${item.quantity}`;
       }
 
-      // Truncar nombre del producto
-      const productName = truncateProductName(item.name, maxProductLength);
+      // Truncar nombre del producto según el ancho de la columna
+      const productName = truncateProductName(item.name, productWidth);
 
-      // Formatear línea con alineación
-      const quantityPadded = quantityText.padEnd(8); // Espacio fijo para cantidad
-      const pricePadded = `$${itemTotal}`.padStart(8); // Espacio fijo para precio
+      // Formatear cada columna con ancho fijo
+      const quantityColumn = quantityText.padEnd(quantityWidth);
+      const productColumn = productName.padEnd(productWidth);
+      const priceColumn = `$${itemTotal}`.padStart(priceWidth);
 
-      message += `${quantityPadded} ${productName} ${pricePadded}\n`;
+      // Construir la línea con las tres columnas
+      message += `${quantityColumn}${productColumn}${priceColumn}\n`;
     });
 
     message += `\nTotal = $${total}`;
@@ -264,7 +270,12 @@ export default function Home() {
 
   // Título principal
   const title = (
-    <h1 className="text-2xl font-bold mb-6 text-center">Lista de precios y productos</h1>
+    <div className="text-center mb-6">
+      <h1 className="text-2xl font-bold mb-2">Lista de precios y productos</h1>
+      <p className="text-sm text-gray-600 max-w-md mx-auto">
+        Selecciona los productos que quieres pedir y luego envía tu pedido por WhatsApp
+      </p>
+    </div>
   );
 
   // Footer component
@@ -359,6 +370,24 @@ export default function Home() {
       <div className="font-sans flex flex-col min-h-screen">
         <div className="flex flex-col items-center justify-center p-8 gap-4 sm:p-2 flex-1">
           {title}
+
+          {/* Banner informativo cuando no hay productos */}
+          {cart.length === 0 && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 max-w-md w-full">
+              <div className="flex items-center gap-3">
+                <div className="text-blue-500 text-xl">💡</div>
+                <div>
+                  <p className="text-sm font-medium text-blue-800">¿Cómo hacer tu pedido?</p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    1. Agrega productos con los botones + y -<br />
+                    2. Haz clic en el botón verde de WhatsApp<br />
+                    3. Revisa tu pedido y confirma el envío
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeProducts.map((product) => (
             <ProductItem key={product.name} product={product} />
           ))}
@@ -367,20 +396,40 @@ export default function Home() {
         <Footer />
 
         {/* Botón flotante de WhatsApp */}
-        <button
-          onClick={openWhatsApp}
-          className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 z-50"
-          aria-label="Contactar por WhatsApp"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={openWhatsApp}
+            className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 relative"
+            aria-label="Contactar por WhatsApp"
           >
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-          </svg>
-        </button>
+            <svg
+              className="w-6 h-6"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+            </svg>
+
+            {/* Indicador de productos seleccionados */}
+            {cart.length > 0 && (
+              <div className="absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+                ✓
+              </div>
+            )}
+          </button>
+
+          {/* Tooltip informativo */}
+          {cart.length > 0 && (
+            <div className="absolute bottom-full right-0 mb-2 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap opacity-90">
+              <div className="flex items-center gap-2">
+                <span>📤 Enviar pedido por WhatsApp</span>
+                <span className="text-green-400">({cart.length} productos)</span>
+              </div>
+              <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+            </div>
+          )}
+        </div>
 
         {/* Popup de confirmación */}
         {showConfirmation && (
@@ -421,6 +470,24 @@ export default function Home() {
     <div className="font-sans flex flex-col min-h-screen">
       <div className="flex flex-col items-center justify-center p-4 gap-8 sm:p-2 flex-1">
         {title}
+
+        {/* Banner informativo cuando no hay productos */}
+        {cart.length === 0 && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 max-w-md w-full">
+            <div className="flex items-center gap-3">
+              <div className="text-blue-500 text-xl">💡</div>
+              <div>
+                <p className="text-sm font-medium text-blue-800">¿Cómo hacer tu pedido?</p>
+                <p className="text-xs text-blue-600 mt-1">
+                  1. Agrega productos con los botones + y -<br />
+                  2. Haz clic en el botón verde de WhatsApp<br />
+                  3. Revisa tu pedido y confirma el envío
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {categories.map((category) => (
           <div key={category} className="w-full">
             <h3 className="text-lg font-bold mb-2">{category}</h3>
@@ -438,20 +505,40 @@ export default function Home() {
       <Footer />
 
       {/* Botón flotante de WhatsApp */}
-      <button
-        onClick={openWhatsApp}
-        className="fixed bottom-6 right-6 bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 z-50"
-        aria-label="Contactar por WhatsApp"
-      >
-        <svg
-          className="w-6 h-6"
-          fill="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
+      <div className="fixed bottom-6 right-6 z-50">
+        <button
+          onClick={openWhatsApp}
+          className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 relative"
+          aria-label="Contactar por WhatsApp"
         >
-          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
-        </svg>
-      </button>
+          <svg
+            className="w-6 h-6"
+            fill="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488" />
+          </svg>
+
+          {/* Indicador de productos seleccionados */}
+          {cart.length > 0 && (
+            <div className="absolute -top-2 -right-2 bg-green-600 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold animate-pulse">
+              ✓
+            </div>
+          )}
+        </button>
+
+        {/* Tooltip informativo */}
+        {cart.length > 0 && (
+          <div className="absolute bottom-full right-0 mb-2 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap opacity-90">
+            <div className="flex items-center gap-2">
+              <span>📤 Enviar pedido por WhatsApp</span>
+              <span className="text-green-400">({cart.length} productos)</span>
+            </div>
+            <div className="absolute top-full right-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+          </div>
+        )}
+      </div>
 
       {/* Popup de confirmación */}
       {showConfirmation && (
