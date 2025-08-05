@@ -18,7 +18,7 @@ export default function Home() {
 
   return (
     <div className="font-sans flex flex-col min-h-screen">
-      {/* Título principal */}
+
       <div className="text-center mb-6 pt-8">
         <h1 className="text-2xl font-bold mb-2">Lista de precios y productos</h1>
         <p className="text-sm max-w-md mx-auto">
@@ -26,10 +26,7 @@ export default function Home() {
         </p>
       </div>
 
-      {/* Contenido principal */}
-      <div className="flex flex-col items-center justify-center p-4 gap-8 sm:p-2 flex-1">
-        {/* Banner informativo - se mostrará condicionalmente en el cliente */}
-        {/*<InfoBanner /> */}
+      <div className="flex flex-col items-center justify-center gap-8 sm:p-2 ">
 
         {/* Lista de productos con lógica del carrito */}
         <ProductListContainer
@@ -38,7 +35,6 @@ export default function Home() {
         />
       </div>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

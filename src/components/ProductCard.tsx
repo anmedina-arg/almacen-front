@@ -18,7 +18,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
 	return (
 		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg p-3 h-24 shadow-sm hover:shadow-md transition-shadow">
-			<div className="flex items-center gap-3 flex-1 min-w-0">
+			<div className="flex items-center gap-3">
 				<div className="flex-shrink-0">
 					<Image
 						src={product.image}
@@ -31,8 +31,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 						unoptimized
 					/>
 				</div>
-				<div className="flex-1 min-w-0">
-					<h2 className="text-sm font-bold truncate">
+				<div className="text-ellipsis">
+					<h2 className="text-sm font-bold">
 						{product.name}
 					</h2>
 					<p className="text-base font-semibold text-green-600">
