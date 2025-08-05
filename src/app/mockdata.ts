@@ -290,4 +290,58 @@ export const products = [
     active: true,
     categories: 'Galletas y variedades',
   },
+  {
+    id: 44,
+    name: 'Galleta de coco x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_2_dzodjo.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+  },
+  {
+    id: 45,
+    name: 'Galleta pepa x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_1_m320wt.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+  },
+  {
+    id: 46,
+    name: 'Grisines comunes x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417023/WhatsApp_Image_2025-08-05_at_14.18.20_2_pefrvk.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+  },
+  {
+    id: 47,
+    name: 'Grisines integrales x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,Q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.20_1_ximfo1.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+  },
+  {
+    id: 48,
+    name: 'Biscuit x 100 gr',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417024/WhatsApp_Image_2025-08-05_at_14.18.20_ab8ybs.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+  },
+  {
+    id: 49,
+    name: 'Pan de leche x unidad',
+    price: 1000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+  },
 ];
