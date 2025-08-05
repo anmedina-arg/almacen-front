@@ -3,7 +3,8 @@ export const products = [
     id: 1,
     name: 'Galleta Chip Chocolate x 100 gr',
     price: 800,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -11,7 +12,8 @@ export const products = [
     id: 2,
     name: 'Pan Hamburguesa Brioche c/semilla x 4 u.',
     price: 2000,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400444/Brioche_Buns_in_Natural_Light_odaipl.png',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -19,7 +21,8 @@ export const products = [
     id: 3,
     name: 'Pan Hamburguesa Brioche papa c/hebras x 4 u.',
     price: 2300,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397736/pan_ham_papa_queso_civzel.png',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -35,7 +38,8 @@ export const products = [
     id: 5,
     name: 'Pan lactal común negro',
     price: 2900,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
     active: true,
     categories: 'Panes lactales',
   },
@@ -44,14 +48,15 @@ export const products = [
     name: 'Pan lactal blanco con semilla',
     price: 3600,
     image: '/images/product2.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
   },
   {
     id: 7,
     name: 'Palmeritas x 100 gr',
     price: 1000,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338914/palmerita_c5bvfa.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -59,7 +64,8 @@ export const products = [
     id: 8,
     name: 'Rosquillas x 100 gr',
     price: 1000,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339225/rosquillas_sothh7.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -67,7 +73,8 @@ export const products = [
     id: 9,
     name: 'Semoladas c/semillas x 100 gr',
     price: 650,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -75,7 +82,8 @@ export const products = [
     id: 10,
     name: 'Semoladas comun x 100 gr',
     price: 650,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -83,7 +91,8 @@ export const products = [
     id: 11,
     name: 'Pan chip x 12 u.',
     price: 3400,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754342144/ChatGPT_Image_Aug_4_2025_06_15_29_PM_em6t2k.png',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -91,7 +100,8 @@ export const products = [
     id: 12,
     name: 'Pan pebete x 6 u.',
     price: 2500,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754348798/IMG_20250718_110828_genzx4.jpg',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -99,7 +109,8 @@ export const products = [
     id: 13,
     name: 'Pan Brioche Viena x 6 u.',
     price: 2000,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754348950/IMG_20250721_222031_fzj982.jpg',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -107,7 +118,8 @@ export const products = [
     id: 14,
     name: 'Mini tarta cabsha',
     price: 1500,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -115,7 +127,8 @@ export const products = [
     id: 15,
     name: 'Alfajor maizena',
     price: 1000,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -123,7 +136,8 @@ export const products = [
     id: 16,
     name: 'Bizcocho grasa x 100 gr',
     price: 700,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340174/IMG_20250725_135517_pqcv55.jpg',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -155,7 +169,8 @@ export const products = [
     id: 21,
     name: 'Pan lactal artesanal',
     price: 3900,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
     active: true,
     categories: 'Panes lactales',
   },
@@ -163,7 +178,8 @@ export const products = [
     id: 22,
     name: 'Pan lactal integral',
     price: 3900,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398462/IMG-20250724-WA0028_rtjcs3.jpg',
     active: true,
     categories: 'Panes lactales',
   },
@@ -171,7 +187,8 @@ export const products = [
     id: 23,
     name: 'Pan Hamburguesa tipo campo x 4 u.',
     price: 2100,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397482/pan_hamb_campo_ueohlv.png',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -179,7 +196,8 @@ export const products = [
     id: 24,
     name: 'Pan hamburguesa común x 4 u.',
     price: 1800,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754397946/pan_hamb_comun_vu3ngr.png',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -187,7 +205,8 @@ export const products = [
     id: 25,
     name: 'Patitas de pollo comunes GRANGYS x kg',
     price: 7000,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341604/patitas_1_ttdx5l.png',
     active: true,
     categories: 'Congelados',
   },
@@ -195,7 +214,8 @@ export const products = [
     id: 26,
     name: 'Patitas de pollo J y Q  GRANGYS x kg',
     price: 8000,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341500/patitajyq_tl6acn.png',
     active: true,
     categories: 'Congelados',
   },
@@ -212,7 +232,8 @@ export const products = [
     id: 28,
     name: 'Bocadito Calabaza y muzzarella GRANGYS x Kg',
     price: 6500,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341433/calabaza_ouir2b.png',
     active: true,
     categories: 'Congelados',
   },
@@ -220,7 +241,8 @@ export const products = [
     id: 29,
     name: 'Pan Chip Comun x 1kg',
     price: 5200,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402370/chip_comun_lemdjp.png',
     active: true,
     categories: 'Pan para sanguchess',
   },
@@ -228,7 +250,8 @@ export const products = [
     id: 30,
     name: 'Bocadito Papa y Queso GRANGYS x Kg',
     price: 6500,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754341674/papaymuzza_eukr8c.png',
     active: true,
     categories: 'Congelados',
   },
@@ -244,7 +267,8 @@ export const products = [
     id: 41,
     name: 'Mantecado',
     price: 500,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402610/mantecado_dixkls.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -252,7 +276,8 @@ export const products = [
     id: 42,
     name: 'Mini pastafrola',
     price: 1000,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340851/ChatGPT_Image_Aug_4_2025_05_53_46_PM_whchf1.png',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -260,7 +285,8 @@ export const products = [
     id: 43,
     name: 'tostadas dulces x 100 gr',
     price: 6500,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402420/tostadas_scvuom.png',
     active: true,
     categories: 'Galletas y variedades',
   },
