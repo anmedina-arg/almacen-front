@@ -259,7 +259,8 @@ export const products = [
     id: 40,
     name: 'Grisines c/semillas x 100 gr',
     price: 800,
-    image: '/images/product1.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.21_ccdyy2.jpg',
     active: true,
     categories: 'Galletas y variedades',
   },
@@ -322,7 +323,7 @@ export const products = [
     name: 'Grisines integrales x 100 gr',
     price: 800,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,Q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.20_1_ximfo1.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.20_1_ximfo1.jpg',
     active: true,
     categories: 'Galletas y variedades',
   },
