@@ -285,7 +285,7 @@ export const products = [
   {
     id: 43,
     name: 'tostadas dulces x 100 gr',
-    price: 6500,
+    price: 650,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402420/tostadas_scvuom.png',
     active: true,
