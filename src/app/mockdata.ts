@@ -433,7 +433,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'COMBO 3',
     price: 6250,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
     categories: 'Combos',
     mainCategory: 'combos',
@@ -441,5 +441,15 @@ export const products: ProductWithOptionalDescription[] = [
       { text: '4 Hamb. Paladini clasica (80 gr)' },
       { text: '4 Panes comunes' },
     ],
+  },
+  {
+    id: 41,
+    name: 'Bizcocho negro x 1 u.',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754699929/bizcocho_negro_edhnz0.png',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
 ];
