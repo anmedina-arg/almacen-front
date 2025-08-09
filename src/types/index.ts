@@ -6,7 +6,19 @@ export interface Product {
   image: string;
   active: boolean;
   categories: string;
+  mainCategory: 'panaderia' | 'congelados' | 'combos' | 'otros';
 }
+
+// description esctructurada
+export type ProductDescription = Array<{ text: string; subItems?: string[] }>;
+
+// extiendo Product para incluir descripción
+export interface ProductWithDescription extends Product {
+  description: ProductDescription;
+}
+
+// union de tipos para unificar productos con y sin descripción
+export type ProductWithOptionalDescription = Product | ProductWithDescription;
 
 export interface CartItem {
   id: number;
