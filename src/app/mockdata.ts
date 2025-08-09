@@ -1,4 +1,6 @@
-export const products = [
+import { ProductWithOptionalDescription } from '@/types';
+
+export const products: ProductWithOptionalDescription[] = [
   {
     id: 1,
     name: 'Galleta Chip Chocolate x 100 gr',
@@ -7,6 +9,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 2,
@@ -16,6 +19,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400444/Brioche_Buns_in_Natural_Light_odaipl.png',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 3,
@@ -25,6 +29,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397736/pan_ham_papa_queso_civzel.png',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 4,
@@ -33,6 +38,7 @@ export const products = [
     image: '/images/product2.jpg',
     active: true,
     categories: 'Panes lactales',
+    mainCategory: 'panaderia',
   },
   {
     id: 5,
@@ -42,6 +48,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
     active: true,
     categories: 'Panes lactales',
+    mainCategory: 'panaderia',
   },
   {
     id: 6,
@@ -50,6 +57,7 @@ export const products = [
     image: '/images/product2.jpg',
     active: false,
     categories: 'Panes lactales',
+    mainCategory: 'panaderia',
   },
   {
     id: 7,
@@ -59,6 +67,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338914/palmerita_c5bvfa.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 8,
@@ -68,6 +77,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339225/rosquillas_sothh7.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 9,
@@ -77,6 +87,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 10,
@@ -86,6 +97,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 11,
@@ -95,6 +107,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754342144/ChatGPT_Image_Aug_4_2025_06_15_29_PM_em6t2k.png',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 12,
@@ -104,6 +117,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754348798/IMG_20250718_110828_genzx4.jpg',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 13,
@@ -113,6 +127,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754348950/IMG_20250721_222031_fzj982.jpg',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 14,
@@ -122,6 +137,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 15,
@@ -131,6 +147,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 16,
@@ -140,6 +157,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340174/IMG_20250725_135517_pqcv55.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 17,
@@ -148,6 +166,7 @@ export const products = [
     image: '/images/product1.jpg',
     active: false,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 18,
@@ -156,6 +175,7 @@ export const products = [
     image: '/images/product2.jpg',
     active: false,
     categories: '',
+    mainCategory: 'otros',
   },
   {
     id: 19,
@@ -164,6 +184,7 @@ export const products = [
     image: '/images/product1.jpg',
     active: false,
     categories: '',
+    mainCategory: 'otros',
   },
   {
     id: 21,
@@ -173,6 +194,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
     active: true,
     categories: 'Panes lactales',
+    mainCategory: 'panaderia',
   },
   {
     id: 22,
@@ -182,6 +204,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398462/IMG-20250724-WA0028_rtjcs3.jpg',
     active: true,
     categories: 'Panes lactales',
+    mainCategory: 'panaderia',
   },
   {
     id: 23,
@@ -191,6 +214,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397482/pan_hamb_campo_ueohlv.png',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 24,
@@ -200,6 +224,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754397946/pan_hamb_comun_vu3ngr.png',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 25,
@@ -209,6 +234,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341604/patitas_1_ttdx5l.png',
     active: true,
     categories: 'Congelados',
+    mainCategory: 'congelados',
   },
   {
     id: 26,
@@ -218,6 +244,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341500/patitajyq_tl6acn.png',
     active: true,
     categories: 'Congelados',
+    mainCategory: 'congelados',
   },
   {
     id: 27,
@@ -227,6 +254,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754155369/nuggets-pollo_1_1_klayjk.png',
     active: true,
     categories: 'Congelados',
+    mainCategory: 'congelados',
   },
   {
     id: 28,
@@ -236,6 +264,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341433/calabaza_ouir2b.png',
     active: true,
     categories: 'Congelados',
+    mainCategory: 'congelados',
   },
   {
     id: 29,
@@ -245,6 +274,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402370/chip_comun_lemdjp.png',
     active: true,
     categories: 'Pan para sanguchess',
+    mainCategory: 'panaderia',
   },
   {
     id: 30,
@@ -254,6 +284,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754341674/papaymuzza_eukr8c.png',
     active: true,
     categories: 'Congelados',
+    mainCategory: 'congelados',
   },
   {
     id: 40,
@@ -263,6 +294,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.21_ccdyy2.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 41,
@@ -272,6 +304,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402610/mantecado_dixkls.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 42,
@@ -281,15 +314,17 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340851/ChatGPT_Image_Aug_4_2025_05_53_46_PM_whchf1.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 43,
     name: 'tostadas dulces x 100 gr',
-    price: 6500,
+    price: 650,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402420/tostadas_scvuom.png',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 44,
@@ -299,6 +334,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_2_dzodjo.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 45,
@@ -308,6 +344,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_1_m320wt.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 46,
@@ -317,6 +354,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417023/WhatsApp_Image_2025-08-05_at_14.18.20_2_pefrvk.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 47,
@@ -326,6 +364,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.20_1_ximfo1.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 48,
@@ -335,6 +374,7 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417024/WhatsApp_Image_2025-08-05_at_14.18.20_ab8ybs.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
   {
     id: 49,
@@ -344,5 +384,62 @@ export const products = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
     active: true,
     categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
+    id: 50,
+    name: 'COMBO 1',
+    price: 11500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combos',
+    mainCategory: 'combos',
+    description: [
+      { text: '4 Hamb swift CASERAS  (120 gr)' },
+      {
+        text: '4 Panes artesnales (a elegir):',
+        subItems: [
+          'Briocheo c/semilla',
+          'Pan de papa c/hebras de queso',
+          'Pan tipo mostaza',
+        ],
+      },
+    ],
+  },
+  {
+    id: 51,
+    name: 'COMBO 2',
+    price: 8000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combos',
+    mainCategory: 'combos',
+    description: [
+      { text: '4 Hamb Swift XL (125 gr)' },
+      {
+        text: '4 Panes artesnales (a elegir):',
+        subItems: [
+          'Briocheo c/semilla',
+          'Pan de papa c/hebras de queso',
+          'Pan tipo mostaza',
+        ],
+      },
+    ],
+  },
+  {
+    id: 52,
+    name: 'COMBO 3',
+    price: 6250,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combos',
+    mainCategory: 'combos',
+    description: [
+      { text: '4 Hamb. Paladini clasica (80 gr)' },
+      { text: '4 Panes comunes' },
+    ],
   },
 ];
