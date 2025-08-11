@@ -2,6 +2,26 @@ import { ProductWithOptionalDescription } from '@/types';
 
 export const products: ProductWithOptionalDescription[] = [
   {
+    id: 102,
+    name: 'Pañuelitos con dulce de leche x 1 u.',
+    price: 1200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754943587/Nuevo_Imagen_de_mapa_de_bits_2_m7pbi2.png',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
+    id: 101,
+    name: 'Bizcocho negro x 1 u.',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754699929/bizcocho_negro_edhnz0.png',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
     id: 1,
     name: 'Galleta Chip Chocolate x 100 gr',
     price: 800,
@@ -441,15 +461,5 @@ export const products: ProductWithOptionalDescription[] = [
       { text: '4 Hamb. Paladini clasica (80 gr)' },
       { text: '4 Panes comunes' },
     ],
-  },
-  {
-    id: 41,
-    name: 'Bizcocho negro x 1 u.',
-    price: 500,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754699929/bizcocho_negro_edhnz0.png',
-    active: true,
-    categories: 'Galletas y variedades',
-    mainCategory: 'panaderia',
   },
 ];
