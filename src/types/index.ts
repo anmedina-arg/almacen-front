@@ -73,10 +73,10 @@ export interface CartContextType {
 
 // Tipos para las props de componentes
 export interface ProductCardProps {
-  product: Product;
+  product: ProductWithOptionalDescription;
   quantity: number;
-  onAdd: (product: Product) => void;
-  onRemove: (product: Product) => void;
+  onAdd: (product: ProductWithOptionalDescription) => void;
+  onRemove: (product: ProductWithOptionalDescription) => void;
 }
 
 export interface ProductListProps {
@@ -101,7 +101,7 @@ export interface ProductUtils {
   isProductByWeight: (productName: string) => boolean;
   getWeightType: (productName: string) => WeightType;
   getQuantityPerClick: (productName: string) => number;
-  getUnitPrice: (product: Product) => number;
+  getUnitPrice: (product: ProductWithOptionalDescription) => number;
   calculateItemPrice: (item: CartItem) => number;
   truncateProductName: (name: string, maxLength: number) => string;
 }

@@ -23,7 +23,7 @@ export default function Home() {
   );
 
   return (
-    <div className="font-sans flex flex-col min-h-screen">
+    <div className="font-sans flex flex-col min-h-screen px-2">
 
       <div className="text-center mb-6 pt-8">
         <h1 className="text-2xl font-bold mb-2">Lista de precios y productos</h1>
@@ -31,10 +31,10 @@ export default function Home() {
           Selecciona los productos que quieres pedir y luego envía tu pedido por WhatsApp
         </p>
       </div>
-      <div className="flex justify-center gap-4 mb-6">
+      <div className="flex justify-center gap-2 mb-6">
         <button className="bg-orange-300 font-medium text-black p-1 rounded" onClick={() => setFilterType('panaderia')}>🍞 Panadería</button>
         <button className="bg-blue-300 font-medium text-black p-1 rounded" onClick={() => setFilterType('congelados')}>🍗 Congelados</button>
-        {/* <button className="bg-yellow-400 font-medium text-black p-1 rounded" onClick={() => setFilterType('combos')}>🍔 Combos</button> */}
+        <button className="bg-yellow-400 font-medium text-black p-1 rounded" onClick={() => setFilterType('combos')}>🍔 Combos</button>
       </div>
 
       <div className="flex flex-col items-center justify-center gap-8 sm:p-2 ">

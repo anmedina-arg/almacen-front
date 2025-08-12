@@ -17,8 +17,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 	const weightType = getWeightType(product.name);
 
 	return (
-		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg p-3 h-24 shadow-sm hover:shadow-md transition-shadow">
-			<div className="flex items-center gap-3">
+		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg p-3 min-h-24 shadow-sm hover:shadow-md transition-shadow">
+			<div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-center gap-3`}>
 				<div className="flex-shrink-0">
 					<Image
 						src={product.image}
@@ -38,6 +38,20 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 					<p className="text-base font-semibold text-green-600">
 						${product.price}
 					</p>
+					{'description' in product && (
+						<ul className="text-xs text-gray-300 mt-1">
+							{product.description.map((item, idx) => (
+								<li key={idx}>
+									{item.text}
+									{item.subItems && (
+										<ul>
+											{item.subItems.map((sub, i) => <li key={i} className="text-xs text-gray-500 mt-1">{sub}</li>)}
+										</ul>
+									)}
+								</li>
+							))}
+						</ul>
+					)}
 				</div>
 			</div>
 
