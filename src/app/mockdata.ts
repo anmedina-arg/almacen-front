@@ -406,60 +406,60 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
-  {
-    id: 50,
-    name: 'COMBO 1',
-    price: 11500,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: true,
-    categories: 'Combos',
-    mainCategory: 'combos',
-    description: [
-      { text: '4 Hamb swift CASERAS  (120 gr)' },
-      {
-        text: '4 Panes artesnales (a elegir):',
-        subItems: [
-          'Briocheo c/semilla',
-          'Pan de papa c/hebras de queso',
-          'Pan tipo mostaza',
-        ],
-      },
-    ],
-  },
-  {
-    id: 51,
-    name: 'COMBO 2',
-    price: 8000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: true,
-    categories: 'Combos',
-    mainCategory: 'combos',
-    description: [
-      { text: '4 Hamb Swift XL (125 gr)' },
-      {
-        text: '4 Panes artesnales (a elegir):',
-        subItems: [
-          'Briocheo c/semilla',
-          'Pan de papa c/hebras de queso',
-          'Pan tipo mostaza',
-        ],
-      },
-    ],
-  },
-  {
-    id: 52,
-    name: 'COMBO 3',
-    price: 6250,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: true,
-    categories: 'Combos',
-    mainCategory: 'combos',
-    description: [
-      { text: '4 Hamb. Paladini clasica (80 gr)' },
-      { text: '4 Panes comunes' },
-    ],
-  },
+  // {
+  //   id: 50,
+  //   name: 'COMBO 1',
+  //   price: 11500,
+  //   image:
+  //     'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+  //   active: true,
+  //   categories: 'Combos',
+  //   mainCategory: 'combos',
+  //   description: [
+  //     { text: '4 Hamb swift CASERAS  (120 gr)' },
+  //     {
+  //       text: '4 Panes artesnales (a elegir):',
+  //       subItems: [
+  //         'Briocheo c/semilla',
+  //         'Pan de papa c/hebras de queso',
+  //         'Pan tipo mostaza',
+  //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: 51,
+  //   name: 'COMBO 2',
+  //   price: 8000,
+  //   image:
+  //     'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+  //   active: true,
+  //   categories: 'Combos',
+  //   mainCategory: 'combos',
+  //   description: [
+  //     { text: '4 Hamb Swift XL (125 gr)' },
+  //     {
+  //       text: '4 Panes artesnales (a elegir):',
+  //       subItems: [
+  //         'Briocheo c/semilla',
+  //         'Pan de papa c/hebras de queso',
+  //         'Pan tipo mostaza',
+  //       ],
+  //     },
+  //   ],
+  // },
+  // {
+  //   id: 52,
+  //   name: 'COMBO 3',
+  //   price: 6250,
+  //   image:
+  //     'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+  //   active: true,
+  //   categories: 'Combos',
+  //   mainCategory: 'combos',
+  //   description: [
+  //     { text: '4 Hamb. Paladini clasica (80 gr)' },
+  //     { text: '4 Panes comunes' },
+  //   ],
+  // },
 ];
