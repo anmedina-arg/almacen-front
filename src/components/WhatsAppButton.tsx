@@ -11,7 +11,7 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ cartItems, onSendMessag
 		<div className="fixed bottom-6 right-6 z-50">
 			<button
 				onClick={onSendMessage}
-				className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-lg transition-all duration-300 relative"
+				className="bg-green-500 hover:bg-green-600 text-white rounded-full p-4 shadow-xl transition-all duration-300 relative"
 				aria-label="Contactar por WhatsApp"
 			>
 				<svg

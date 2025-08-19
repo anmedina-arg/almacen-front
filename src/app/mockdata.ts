@@ -134,7 +134,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Pan pebete x 6 u.',
     price: 2500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754348798/IMG_20250718_110828_genzx4.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754348798/IMG_20250718_110828_genzx4.jpg',
     active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
@@ -144,7 +144,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Pan Brioche Viena x 6 u.',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754348950/IMG_20250721_222031_fzj982.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754348950/IMG_20250721_222031_fzj982.jpg',
     active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
@@ -164,7 +164,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Alfajor maizena',
     price: 1000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
     active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
@@ -241,7 +241,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Pan hamburguesa común x 4 u.',
     price: 1800,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754397946/pan_hamb_comun_vu3ngr.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397946/pan_hamb_comun_vu3ngr.png',
     active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
@@ -301,7 +301,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Bocadito Papa y Queso GRANGYS x Kg',
     price: 6500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754341674/papaymuzza_eukr8c.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341674/papaymuzza_eukr8c.png',
     active: true,
     categories: 'Congelados',
     mainCategory: 'congelados',
@@ -406,60 +406,75 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
-  // {
-  //   id: 50,
-  //   name: 'COMBO 1',
-  //   price: 11500,
-  //   image:
-  //     'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-  //   active: true,
-  //   categories: 'Combos',
-  //   mainCategory: 'combos',
-  //   description: [
-  //     { text: '4 Hamb swift CASERAS  (120 gr)' },
-  //     {
-  //       text: '4 Panes artesnales (a elegir):',
-  //       subItems: [
-  //         'Briocheo c/semilla',
-  //         'Pan de papa c/hebras de queso',
-  //         'Pan tipo mostaza',
-  //       ],
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 51,
-  //   name: 'COMBO 2',
-  //   price: 8000,
-  //   image:
-  //     'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-  //   active: true,
-  //   categories: 'Combos',
-  //   mainCategory: 'combos',
-  //   description: [
-  //     { text: '4 Hamb Swift XL (125 gr)' },
-  //     {
-  //       text: '4 Panes artesnales (a elegir):',
-  //       subItems: [
-  //         'Briocheo c/semilla',
-  //         'Pan de papa c/hebras de queso',
-  //         'Pan tipo mostaza',
-  //       ],
-  //     },
-  //   ],
-  // },
-  // {
-  //   id: 52,
-  //   name: 'COMBO 3',
-  //   price: 6250,
-  //   image:
-  //     'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-  //   active: true,
-  //   categories: 'Combos',
-  //   mainCategory: 'combos',
-  //   description: [
-  //     { text: '4 Hamb. Paladini clasica (80 gr)' },
-  //     { text: '4 Panes comunes' },
-  //   ],
-  // },
+  {
+    id: 50,
+    name: 'COMBO 1',
+    price: 11500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combos',
+    mainCategory: 'combos',
+    description: [
+      { text: '4 Hamb swift CASERAS  (120 gr)' },
+      {
+        text: '4 Panes artesnales (a elegir):',
+        subItems: [
+          'Briocheo c/semilla',
+          'Pan de papa c/hebras de queso',
+          'Pan tipo mostaza',
+        ],
+      },
+    ],
+  },
+  {
+    id: 51,
+    name: 'COMBO 2',
+    price: 8000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combos',
+    mainCategory: 'combos',
+    description: [
+      { text: '4 Hamb Swift XL (125 gr)' },
+      {
+        text: '4 Panes artesnales (a elegir):',
+        subItems: [
+          'Briocheo c/semilla',
+          'Pan de papa c/hebras de queso',
+          'Pan tipo mostaza',
+        ],
+      },
+    ],
+  },
+  {
+    id: 52,
+    name: 'COMBO 3',
+    price: 6250,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combos',
+    mainCategory: 'combos',
+    description: [
+      { text: '4 Hamb. Paladini clasica (80 gr)' },
+      { text: '4 Panes comunes' },
+    ],
+  },
+  {
+    id: 53,
+    name: 'PROXIMAMENTE!!',
+    price: 0,
+    image: '',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+    description: [
+      { text: 'Papas Fritas!' },
+      { text: 'Chizitos' },
+      { text: 'Manies' },
+      { text: '... y mucho más' },
+    ],
+  },
 ];
