@@ -6,7 +6,7 @@ export interface Product {
   image: string;
   active: boolean;
   categories: string;
-  mainCategory: 'panaderia' | 'congelados' | 'combos' | 'otros';
+  mainCategory: 'panaderia' | 'congelados' | 'combos' | 'snaks' | 'otros';
 }
 
 // description esctructurada
