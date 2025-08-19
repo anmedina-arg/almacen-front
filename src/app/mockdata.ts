@@ -55,7 +55,8 @@ export const products: ProductWithOptionalDescription[] = [
     id: 4,
     name: 'Pan lactal común blanco',
     price: 2900,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
     active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
@@ -413,7 +414,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
-    categories: 'Combos',
+    categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
       { text: '4 Hamb swift CASERAS  (120 gr)' },
@@ -433,8 +434,8 @@ export const products: ProductWithOptionalDescription[] = [
     price: 8000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: true,
-    categories: 'Combos',
+    active: false,
+    categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
       { text: '4 Hamb Swift XL (125 gr)' },
@@ -449,13 +450,34 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 52,
-    name: 'COMBO 3',
-    price: 6250,
+    id: 54,
+    name: 'COMBO 4',
+    price: 7500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
-    categories: 'Combos',
+    categories: 'Combo Hamburguesas',
+    mainCategory: 'combos',
+    description: [
+      { text: '4 Hamb. Paladini clasica (80 gr)' },
+      {
+        text: '4 Panes artesnales (a elegir):',
+        subItems: [
+          'Briocheo c/semilla',
+          'Pan de papa c/hebras de queso',
+          'Pan tipo mostaza',
+        ],
+      },
+    ],
+  },
+  {
+    id: 52,
+    name: 'COMBO 3',
+    price: 6500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: false,
+    categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
       { text: '4 Hamb. Paladini clasica (80 gr)' },
@@ -463,18 +485,92 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 53,
-    name: 'PROXIMAMENTE!!',
-    price: 0,
-    image: '',
+    id: 55,
+    name: 'Papas fritas clasicas x 140 gr',
+    price: 2200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638381/papas-fritas-removebg-preview_gzpwci.png',
     active: true,
     categories: 'Snaks',
     mainCategory: 'snaks',
+  },
+  {
+    id: 56,
+    name: 'Chizitos de queso x 95 gr',
+    price: 1300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 60,
+    name: 'Papas fritas pay x 150 gr',
+    price: 2200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6y.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 57,
+    name: 'Mani sabor pizza x 250 gr',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 58,
+    name: 'Mani sabor jamon x 250 gr',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 59,
+    name: 'Mani frito salado s/piel x 250 gr',
+    price: 2400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 7001,
+    name: 'COMBO P.1',
+    price: 2900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combo Pancho',
+    mainCategory: 'combos',
     description: [
-      { text: 'Papas Fritas!' },
-      { text: 'Chizitos' },
-      { text: 'Manies' },
-      { text: '... y mucho más' },
+      { text: '6 salchichas La Blanca' },
+      { text: '6 Panes Viena Brioch' },
+    ],
+  },
+  {
+    id: 7002,
+    name: 'COMBO P.2',
+    price: 5200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
+    active: true,
+    categories: 'Combo Pancho',
+    mainCategory: 'combos',
+    description: [
+      { text: '6 salchichas La Blanca' },
+      { text: '6 Panes Viena Brioch' },
+      { text: '1 Papas pay Zingara x 150 grs' },
     ],
   },
 ];
