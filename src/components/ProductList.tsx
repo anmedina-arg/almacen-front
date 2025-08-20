@@ -67,8 +67,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 			<div className="flex flex-col gap-8">
 				{categories.map((category) => {
 					const categoryProducts = products
-						.filter((product) => product.categories === category)
-						.slice(0, visibleProducts);
+						.filter((product) => product.categories === category);
 
 					return (
 						<div key={category} className="w-full">
