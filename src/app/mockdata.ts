@@ -32,6 +32,26 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
+    id: 44,
+    name: 'Galleta de coco x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_2_dzodjo.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
+    id: 45,
+    name: 'Galleta pepa x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_1_m320wt.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
     id: 2,
     name: 'Pan Hamburguesa Brioche c/semilla x 4 u.',
     price: 2000,
@@ -56,7 +76,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Pan lactal común blanco',
     price: 2900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
     active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
@@ -308,16 +328,6 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 40,
-    name: 'Grisines c/semillas x 100 gr',
-    price: 800,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.21_ccdyy2.jpg',
-    active: true,
-    categories: 'Galletas y variedades',
-    mainCategory: 'panaderia',
-  },
-  {
     id: 41,
     name: 'Mantecado',
     price: 500,
@@ -348,31 +358,21 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 44,
-    name: 'Galleta de coco x 100 gr',
-    price: 800,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_2_dzodjo.jpg',
-    active: true,
-    categories: 'Galletas y variedades',
-    mainCategory: 'panaderia',
-  },
-  {
-    id: 45,
-    name: 'Galleta pepa x 100 gr',
-    price: 800,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_1_m320wt.jpg',
-    active: true,
-    categories: 'Galletas y variedades',
-    mainCategory: 'panaderia',
-  },
-  {
     id: 46,
     name: 'Grisines comunes x 100 gr',
     price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417023/WhatsApp_Image_2025-08-05_at_14.18.20_2_pefrvk.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
+    id: 40,
+    name: 'Grisines c/semillas x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.21_ccdyy2.jpg',
     active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
@@ -485,66 +485,6 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 55,
-    name: 'Papas fritas clasicas x 140 gr',
-    price: 2200,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638381/papas-fritas-removebg-preview_gzpwci.png',
-    active: true,
-    categories: 'Snaks',
-    mainCategory: 'snaks',
-  },
-  {
-    id: 56,
-    name: 'Chizitos de queso x 95 gr',
-    price: 1300,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
-    active: true,
-    categories: 'Snaks',
-    mainCategory: 'snaks',
-  },
-  {
-    id: 60,
-    name: 'Papas fritas pay x 150 gr',
-    price: 2200,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6y.png',
-    active: true,
-    categories: 'Snaks',
-    mainCategory: 'snaks',
-  },
-  {
-    id: 57,
-    name: 'Mani sabor pizza x 250 gr',
-    price: 2500,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
-    active: true,
-    categories: 'Snaks',
-    mainCategory: 'snaks',
-  },
-  {
-    id: 58,
-    name: 'Mani sabor jamon x 250 gr',
-    price: 2500,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
-    active: true,
-    categories: 'Snaks',
-    mainCategory: 'snaks',
-  },
-  {
-    id: 59,
-    name: 'Mani frito salado s/piel x 250 gr',
-    price: 2400,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6yAM.png',
-    active: true,
-    categories: 'Snaks',
-    mainCategory: 'snaks',
-  },
-  {
     id: 7001,
     name: 'COMBO P.1',
     price: 2900,
@@ -572,5 +512,65 @@ export const products: ProductWithOptionalDescription[] = [
       { text: '6 Panes Viena Brioch' },
       { text: '1 Papas pay Zingara x 150 grs' },
     ],
+  },
+  {
+    id: 55,
+    name: 'Papas fritas clasicas x 140 gr',
+    price: 2200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638381/papas-fritas-removebg-preview_gzpwci.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 56,
+    name: 'Chizitos de queso x 95 gr',
+    price: 1300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755700005/transparent-Photoroom__1_-removebg-preview_bz0u5u.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 60,
+    name: 'Papas fritas pay x 150 gr',
+    price: 2200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6y.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 57,
+    name: 'Mani sabor pizza x 250 gr',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755701408/WhatsApp_Image_2025-08-19_at_15.29.57-removebg-preview_tse7hb.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 58,
+    name: 'Mani sabor jamon x 250 gr',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755701408/WhatsApp_Image_2025-08-19_at_15.29.57-removebg-preview_tse7hb.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
+  },
+  {
+    id: 59,
+    name: 'Mani frito salado s/piel x 250 gr',
+    price: 2400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755701088/transparent-Photoroom__2_-removebg-preview_nmxjoz.png',
+    active: true,
+    categories: 'Snaks',
+    mainCategory: 'snaks',
   },
 ];
