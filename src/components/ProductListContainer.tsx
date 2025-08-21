@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { products } from "../app/mockdata";
 import { Product } from '@/types';
 import { useCart } from '@/hooks/useCart';
 import { generateWhatsAppMessage, openWhatsApp } from '@/utils/messageUtils';
@@ -9,18 +10,24 @@ import WhatsAppButton from './WhatsAppButton';
 import ConfirmationModal from './ConfirmationModal';
 import InfoBanner from './InfoBanner';
 
-interface ProductListContainerProps {
-	products: Product[];
-	categories: string[];
-}
+// interface ProductListContainerProps {
+// 	products: Product[];
+// 	categories: string[];
+// }
 
 /**
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
  */
-const ProductListContainer: React.FC<ProductListContainerProps> = ({
-	products,
-	categories
-}) => {
+const ProductListContainer: React.FC = () => {
+
+	// Filtrar productos activos
+	const activeProducts: Product[] = products.filter((product) => product.active);
+
+	// Obtener todas las categorías únicas (ignorando vacías)
+	const categories = Array.from(
+		new Set(products.map((p) => p.categories).filter((cat) => cat))
+	);
+
 	const { state, addToCart, removeFromCart, getItemQuantity } = useCart();
 	const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -53,13 +60,13 @@ const ProductListContainer: React.FC<ProductListContainerProps> = ({
 
 	// Crear productos con sus cantidades y funciones
 	const productsWithHandlers = useMemo(() => {
-		return products.map(product => ({
+		return activeProducts.map(product => ({
 			...product,
 			quantity: getItemQuantity(product.id),
 			onAdd: () => addToCart(product),
 			onRemove: () => removeFromCart(product),
 		}));
-	}, [products, getItemQuantity, addToCart, removeFromCart]);
+	}, [activeProducts, getItemQuantity, addToCart, removeFromCart]);
 
 	return (
 		<>

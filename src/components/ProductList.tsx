@@ -71,7 +71,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 						.filter((product) => product.categories === category);
 
 					return (
-						<div key={category} className="w-full">
+						<div key={category} id={category} className="w-full scroll-mt-24">
 							<h3 className="text-lg font-bold mb-2">
 								{category}
 							</h3>
