@@ -421,7 +421,7 @@ export const products: ProductWithOptionalDescription[] = [
       {
         text: '4 Panes artesnales (a elegir):',
         subItems: [
-          'Briocheo c/semilla',
+          'brioche c/semilla',
           'Pan de papa c/hebras de queso',
           'Pan tipo mostaza',
         ],
@@ -442,7 +442,7 @@ export const products: ProductWithOptionalDescription[] = [
       {
         text: '4 Panes artesnales (a elegir):',
         subItems: [
-          'Briocheo c/semilla',
+          'brioche c/semilla',
           'Pan de papa c/hebras de queso',
           'Pan tipo mostaza',
         ],
@@ -463,7 +463,7 @@ export const products: ProductWithOptionalDescription[] = [
       {
         text: '4 Panes artesnales (a elegir):',
         subItems: [
-          'Briocheo c/semilla',
+          'brioche c/semilla',
           'Pan de papa c/hebras de queso',
           'Pan tipo mostaza',
         ],
