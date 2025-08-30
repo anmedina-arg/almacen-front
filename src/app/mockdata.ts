@@ -490,7 +490,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: true,
+    active: false,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
@@ -504,7 +504,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 5200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: true,
+    active: false,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
