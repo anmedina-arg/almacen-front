@@ -75,7 +75,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 							<h3 className="text-lg font-bold mb-2">
 								{category}
 							</h3>
-							<div className="flex flex-col gap-2">
+							<div className="grid grid-cols-2 gap-2">
 								{categoryProducts.map((product) => (
 									<ProductCard
 										key={`${product.id}-${product.name}`}
