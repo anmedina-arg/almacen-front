@@ -27,6 +27,10 @@ export const getWeightType = (productName: string): WeightType => {
  * Obtiene la cantidad a agregar por click según el tipo de producto
  */
 export const getQuantityPerClick = (productName: string): number => {
+  const name = productName.toLowerCase();
+  if (name.includes('noisette')) {
+    return 1000; // 1000 gramos por click para productos "noisette"
+  }
   const weightType = getWeightType(productName);
 
   switch (weightType) {

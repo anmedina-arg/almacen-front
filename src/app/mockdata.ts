@@ -328,6 +328,26 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
+    id: 3001,
+    name: 'Bocadito de muzzarella GRANGYS x Kg',
+    price: 10900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669658/bocadito-muzza_zcwdeg.jpg',
+    active: true,
+    categories: 'Congelados',
+    mainCategory: 'congelados',
+  },
+  {
+    id: 3002,
+    name: 'Papas noisette GRANGYS x Kg',
+    price: 8900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669796/ChatGPT_Image_Aug_31_2025_04_49_10_PM_vyw34i.png',
+    active: true,
+    categories: 'Congelados',
+    mainCategory: 'congelados',
+  },
+  {
     id: 41,
     name: 'Mantecado',
     price: 500,
