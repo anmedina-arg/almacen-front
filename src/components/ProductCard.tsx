@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 				)
 				}
 				<div className="text-ellipsis">
-					<h2 className="text-sm font-bold">
+					<h2 className="text-xl">
 						{product.name}
 					</h2>
 					{product.price !== 0 && (
@@ -67,7 +67,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 				)}
 
 				{product.price !== 0 && (
-					<>
+					<div className='flex '>
 						<button
 							onClick={() => onRemove(product)}
 							className="bg-red-500 hover:bg-red-600 text-white rounded-full w-8 h-8 flex items-center justify-center text-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -84,7 +84,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 						>
 							+
 						</button>
-					</>
+					</div>
 
 				)}
 			</div>

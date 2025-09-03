@@ -29,7 +29,7 @@ export default function Home() {
   };
 
   return (
-    <div className="font-sans flex flex-col min-h-screen px-2">
+    <div className="font-barlow flex flex-col min-h-screen px-2">
 
       <div className="text-center mb-6 pt-8">
         <h1 className="text-2xl font-bold mb-2">Lista de precios y productos</h1>
