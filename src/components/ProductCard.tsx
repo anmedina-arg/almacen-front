@@ -31,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 					/>
 				</div>
 				<div className="text-ellipsis">
-					<h2 className="text-sm font-bold">
+					<h2 className="text-xl">
 						{product.name}
 					</h2>
 
