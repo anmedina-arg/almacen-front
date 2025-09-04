@@ -3,7 +3,7 @@ import { ProductWithOptionalDescription } from '@/types';
 export const products: ProductWithOptionalDescription[] = [
   {
     id: 102,
-    name: 'Pañuelitos con dulce de leche x 1 u.',
+    name: 'Pañuelitos c/dulce de leche x 1 u.',
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754943587/Nuevo_Imagen_de_mapa_de_bits_2_m7pbi2.png',
@@ -53,7 +53,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 2,
-    name: 'Pan Hamburguesa Brioche c/semilla x 4 u.',
+    name: 'Pan Hamb. Brioche c/semilla x 4 u.',
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400444/Brioche_Buns_in_Natural_Light_odaipl.png',
