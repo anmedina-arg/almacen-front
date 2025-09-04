@@ -8,13 +8,13 @@ export default function Home() {
   return (
     <div className="font-barlow flex flex-col min-h-screen px-2">
 
-      <div className="text-center mb-6 pt-8">
+      <div className="text-center mb-4">
         <h1 className="text-2xl font-bold mb-2">Lista de precios y productos</h1>
-        <p className="text-sm max-w-md mx-auto">
+        <p className="text-sm max-w-md mx-auto text-balance">
           Selecciona los productos que quieres pedir y luego envía tu pedido por WhatsApp <HelpButton />
         </p>
       </div>
-      <div className="sticky top-0 p-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl z-50 mb-6">
+      <div className="sticky top-0 p-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl z-50 mb-2">
         <FilterButtons />
       </div>
 
