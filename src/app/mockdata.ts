@@ -63,7 +63,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 3,
-    name: 'Pan Hamburguesa Brioche papa c/hebras x 4 u.',
+    name: 'Pan Hamb papa c/hebras queso x 4 u.',
     price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397736/pan_ham_papa_queso_civzel.png',
