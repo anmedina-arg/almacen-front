@@ -186,7 +186,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -263,7 +263,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397946/pan_hamb_comun_vu3ngr.png',
-    active: true,
+    active: false,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -309,7 +309,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 29,
-    name: 'Pan Chip Comun x 1kg',
+    name: 'Pan Chip Comun x 1kg (Por encargo)',
     price: 5200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402370/chip_comun_lemdjp.png',
@@ -413,7 +413,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417024/WhatsApp_Image_2025-08-05_at_14.18.20_ab8ybs.jpg',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
