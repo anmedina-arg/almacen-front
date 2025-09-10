@@ -233,7 +233,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -243,7 +243,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398462/IMG-20250724-WA0028_rtjcs3.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -323,7 +323,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 6500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341674/papaymuzza_eukr8c.png',
-    active: true,
+    active: false,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
