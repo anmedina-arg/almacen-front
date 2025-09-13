@@ -268,6 +268,36 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
+    id: 3004,
+    name: 'Milanesas de pollo GRANGYS x Kg',
+    price: 8000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777349/milapolloGRANGYS_vr0wm9.jpg',
+    active: true,
+    categories: 'Congelados',
+    mainCategory: 'congelados',
+  },
+  {
+    id: 3002,
+    name: 'Papas noisette GRANGYS x Kg',
+    price: 8900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669796/ChatGPT_Image_Aug_31_2025_04_49_10_PM_vyw34i.png',
+    active: true,
+    categories: 'Congelados',
+    mainCategory: 'congelados',
+  },
+  {
+    id: 3003,
+    name: 'Papas bastón Mc Cain x Kg',
+    price: 8000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777302/Papas-fritas-baston-McCain-Grande_e2dxth.jpg',
+    active: true,
+    categories: 'Congelados',
+    mainCategory: 'congelados',
+  },
+  {
     id: 25,
     name: 'Patitas de pollo comunes GRANGYS x kg',
     price: 7000,
@@ -323,7 +353,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 6500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341674/papaymuzza_eukr8c.png',
-    active: false,
+    active: true,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
@@ -333,16 +363,6 @@ export const products: ProductWithOptionalDescription[] = [
     price: 10900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669658/bocadito-muzza_zcwdeg.jpg',
-    active: true,
-    categories: 'Congelados',
-    mainCategory: 'congelados',
-  },
-  {
-    id: 3002,
-    name: 'Papas noisette GRANGYS x Kg',
-    price: 8900,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669796/ChatGPT_Image_Aug_31_2025_04_49_10_PM_vyw34i.png',
     active: true,
     categories: 'Congelados',
     mainCategory: 'congelados',
