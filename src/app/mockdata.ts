@@ -527,10 +527,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 7001,
     name: 'COMBO P.1',
-    price: 2900,
+    price: 3200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: false,
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
+    active: true,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
@@ -541,16 +541,16 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 7002,
     name: 'COMBO P.2',
-    price: 5200,
+    price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: false,
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
+    active: true,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
       { text: '6 salchichas La Blanca' },
-      { text: '6 Panes Viena Brioch' },
-      { text: '1 Papas pay Zingara x 150 grs' },
+      { text: '6 Panes comunes Albertus' },
+      // { text: '1 Papas pay Zingara x 150 grs' },
     ],
   },
   {
