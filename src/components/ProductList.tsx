@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Product } from '@/types';
-import ProductCard from './ProductCard';
+import ProductCard from './ProductSquareCard';
 interface ProductWithHandlers extends Product {
 	quantity: number;
 	onAdd: (product: Product) => void;
