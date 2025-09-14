@@ -2,7 +2,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Product } from '@/types';
-import ProductCard from './ProductSquareCard';
+import ProductCard from './ProductCard';
+import ProductSquareCard from './ProductSquareCard';
 interface ProductWithHandlers extends Product {
 	quantity: number;
 	onAdd: (product: Product) => void;
@@ -20,7 +21,10 @@ interface ProductListProps {
 const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 
 	const [visibleProducts, setVisibleProducts] = useState(10);
+	const [showList, setShowList] = useState<string>("list");
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+	console.log(showList)
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -47,15 +51,25 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 		return (
 			<>
 				<div className="flex flex-col gap-4">
-					{products.slice(0, visibleProducts).map((product) => (
-						<ProductCard
-							key={`${product.id}-${product.name}`}
-							product={product}
-							quantity={product.quantity}
-							onAdd={product.onAdd}
-							onRemove={product.onRemove}
-						/>
-					))}
+					{products.slice(0, visibleProducts).map((product) =>
+						showList === "list" ? (
+							<ProductCard
+								key={`${product.id}-${product.name}`}
+								product={product}
+								quantity={product.quantity}
+								onAdd={product.onAdd}
+								onRemove={product.onRemove}
+							/>
+						) : (
+							<ProductSquareCard
+								key={`${product.id}-${product.name}`}
+								product={product}
+								quantity={product.quantity}
+								onAdd={product.onAdd}
+								onRemove={product.onRemove}
+							/>
+						)
+					)}
 				</div>
 				<div ref={loadMoreRef} className="h-10" />
 			</>
@@ -77,13 +91,23 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 							</h3>
 							<div className="grid grid-cols-2 gap-2">
 								{categoryProducts.map((product) => (
-									<ProductCard
-										key={`${product.id}-${product.name}`}
-										product={product}
-										quantity={product.quantity}
-										onAdd={product.onAdd}
-										onRemove={product.onRemove}
-									/>
+									showList === "list" ? (
+										<ProductCard
+											key={`${product.id}-${product.name}`}
+											product={product}
+											quantity={product.quantity}
+											onAdd={product.onAdd}
+											onRemove={product.onRemove}
+										/>
+									) : (
+										<ProductSquareCard
+											key={`${product.id}-${product.name}`}
+											product={product}
+											quantity={product.quantity}
+											onAdd={product.onAdd}
+											onRemove={product.onRemove}
+										/>
+									)
 								))}
 							</div>
 						</div>

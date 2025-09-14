@@ -79,6 +79,6 @@ const ProductSquareCard: React.FC<ProductCardProps> = React.memo(
 	}
 );
 
-ProductSquareCard.displayName = 'ProductCard';
+ProductSquareCard.displayName = 'ProductSqueareCard';
 
 export default ProductSquareCard;
