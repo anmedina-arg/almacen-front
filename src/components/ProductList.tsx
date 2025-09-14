@@ -21,7 +21,7 @@ interface ProductListProps {
 const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 
 	const [visibleProducts, setVisibleProducts] = useState(10);
-	const [showList, setShowList] = useState<string>("list");
+	const [showList, setShowList] = useState<string>("list123");
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
 	console.log(showList)
