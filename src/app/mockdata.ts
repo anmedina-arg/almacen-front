@@ -516,7 +516,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 6500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: false,
+    active: true,
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
