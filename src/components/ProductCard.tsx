@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 				)
 				}
 				<div className="text-ellipsis">
-					<h2 className="text-sm font-bold">
+					<h2 className="text-sm font-bold ">
 						{product.name}
 					</h2>
 					{product.price !== 0 && (

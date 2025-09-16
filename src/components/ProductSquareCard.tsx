@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import { ProductCardProps } from '@/types';
 import { getWeightType, formatQuantity } from '@/utils/productUtils';
+import QuantityButton from './ui/QuantityButton';
 
 /**
  * Componente de tarjeta de producto optimizado
@@ -55,22 +56,10 @@ const ProductSquareCard: React.FC<ProductCardProps> = React.memo(
 							<p className="text-xl font-semibold text-green-600">
 								${product.price}
 							</p>
-							<button
-								onClick={() => onRemove(product)}
-								className="bg-red-500 hover:bg-red-600 text-white rounded-md w-6 h-6 flex items-center justify-center text-lg font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-								disabled={quantity === 0}
-								aria-label={`Quitar ${product.name}`}
-							>
-								-
-							</button>
 
-							<button
-								onClick={() => onAdd(product)}
-								className="bg-green-500 hover:bg-green-600 text-white rounded-md w-6 h-6 flex items-center justify-center text-lg font-bold transition-colors"
-								aria-label={`Agregar ${product.name}`}
-							>
-								+
-							</button>
+							<QuantityButton variant="decrement" onClick={() => onRemove(product)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
+
+							<QuantityButton variant="increment" onClick={() => onAdd(product)} aria-label={`Agregar ${product.name}`} />
 						</div>
 					</div>
 				</div>
@@ -79,6 +68,6 @@ const ProductSquareCard: React.FC<ProductCardProps> = React.memo(
 	}
 );
 
-ProductSquareCard.displayName = 'ProductSqueareCard';
+ProductSquareCard.displayName = 'ProductSquareCard';
 
 export default ProductSquareCard;
