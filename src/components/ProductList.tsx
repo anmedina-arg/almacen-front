@@ -21,7 +21,7 @@ interface ProductListProps {
 const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 
 	const [visibleProducts, setVisibleProducts] = useState(10);
-	const [showList, setShowList] = useState<string>("list123");
+	const [showList, setShowList] = useState<string>("list1");
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
 	console.log(showList)
@@ -79,6 +79,10 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 	// Si hay categorías, agrupar y mostrar por categoría
 	return (
 		<>
+			<div className='flex gap-2'>
+				<button onClick={() => setShowList("list")}>Lista</button>
+				<button onClick={() => setShowList("grid")}>Cuadrícula</button>
+			</div>
 			<div className="flex flex-col gap-8">
 				{categories.map((category) => {
 					const categoryProducts = products
@@ -89,7 +93,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 							<h3 className="text-lg font-bold mb-2">
 								{category}
 							</h3>
-							<div className="grid grid-cols-2 gap-2">
+							<div className={`${showList === "list" ? "flex flex-wrap gap-4" : "grid grid-cols-2 gap-2"}`}>
 								{categoryProducts.map((product) => (
 									showList === "list" ? (
 										<ProductCard
