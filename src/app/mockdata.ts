@@ -7,7 +7,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754943587/Nuevo_Imagen_de_mapa_de_bits_2_m7pbi2.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -73,17 +73,17 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 4,
-    name: 'Pan lactal común blanco',
+    name: 'Pan lactal blanco',
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
   {
     id: 5,
-    name: 'Pan lactal común negro',
+    name: 'Pan lactal negro',
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
@@ -96,7 +96,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Pan lactal blanco con semilla',
     price: 3600,
     image: '/images/product2.jpg',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
