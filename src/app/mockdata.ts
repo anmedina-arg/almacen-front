@@ -373,7 +373,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402610/mantecado_dixkls.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -383,7 +383,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340851/ChatGPT_Image_Aug_4_2025_05_53_46_PM_whchf1.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -662,5 +662,15 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
+  },
+  {
+    id: 750,
+    name: 'Galleta Chocolate x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
   },
 ];
