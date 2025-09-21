@@ -17,7 +17,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754699929/bizcocho_negro_edhnz0.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -27,7 +27,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -97,7 +97,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -156,7 +156,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3400,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754342144/ChatGPT_Image_Aug_4_2025_06_15_29_PM_em6t2k.png',
-    active: true,
+    active: false,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
