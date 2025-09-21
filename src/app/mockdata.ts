@@ -7,7 +7,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754943587/Nuevo_Imagen_de_mapa_de_bits_2_m7pbi2.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -612,5 +612,55 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Snaks',
     mainCategory: 'snaks',
+  },
+  {
+    id: 701,
+    name: 'Pepsi 2 L.',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758466924/pepsi_igudpw.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 702,
+    name: '7up 2 L.',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467012/7up_yqcefo.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 703,
+    name: 'Mirinda Manzana 2 L.',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467760/Mirinda_qacu7d.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 704,
+    name: 'Coca Cola Zero 2 L.',
+    price: 3300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 705,
+    name: 'Sprite 2 L.',
+    price: 3600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758468265/sprite_mjpppn.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
   },
 ];
