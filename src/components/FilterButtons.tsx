@@ -10,7 +10,7 @@ const FilterButtons: React.FC = () => {
 			<Link href="#Congelados" className="bg-blue-300 font-medium text-black p-1 rounded" >🍗 Congelados</Link>
 			<Link href="#Combo Hamburguesas" className="bg-orange-500 font-medium text-black p-1 rounded" >🍔 Combos</Link>
 			<Link href="#Snaks" className=" bg-yellow-400 font-medium text-black p-1 rounded" >🍟 Snaks</Link>
-			<Link href="#bebidas" className=" bg-yellow-400 font-medium text-black p-1 rounded" >🍹Bebidas</Link>
+			<Link href="#Bebidas" className=" bg-yellow-400 font-medium text-black p-1 rounded" >🍹Bebidas</Link>
 		</div>
 	)
 };
