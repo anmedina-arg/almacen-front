@@ -579,7 +579,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755700005/transparent-Photoroom__1_-removebg-preview_bz0u5u.png',
-    active: true,
+    active: false,
     categories: 'Snaks',
     mainCategory: 'snaks',
   },
