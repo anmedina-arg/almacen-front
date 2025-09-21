@@ -32,6 +32,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
+    id: 750,
+    name: 'Galleta Chocolate x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
     id: 44,
     name: 'Galleta de coco x 100 gr',
     price: 800,
@@ -662,15 +672,5 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
-  },
-  {
-    id: 750,
-    name: 'Galleta Chocolate x 100 gr',
-    price: 800,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
-    active: true,
-    categories: 'Galletas y variedades',
-    mainCategory: 'panaderia',
   },
 ];
