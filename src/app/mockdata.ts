@@ -540,7 +540,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
-    active: true,
+    active: false,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
@@ -554,7 +554,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
-    active: true,
+    active: false,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
