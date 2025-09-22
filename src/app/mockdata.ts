@@ -176,7 +176,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754348950/IMG_20250721_222031_fzj982.jpg',
-    active: true,
+    active: false,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
