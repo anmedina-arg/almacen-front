@@ -77,7 +77,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397736/pan_ham_papa_queso_civzel.png',
-    active: true,
+    active: false,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -672,5 +672,16 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
+  },
+  {
+    id: 706,
+    name: 'Fernet Branca 750 ml + Coca Cola 2 L. (zero o regular)',
+    price: 18000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+    // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
 ];
