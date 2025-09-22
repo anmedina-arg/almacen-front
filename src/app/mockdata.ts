@@ -87,7 +87,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
