@@ -7,7 +7,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754943587/Nuevo_Imagen_de_mapa_de_bits_2_m7pbi2.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -17,7 +17,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754699929/bizcocho_negro_edhnz0.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -27,7 +27,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -97,7 +97,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -156,7 +156,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3400,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754342144/ChatGPT_Image_Aug_4_2025_06_15_29_PM_em6t2k.png',
-    active: false,
+    active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -176,7 +176,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754348950/IMG_20250721_222031_fzj982.jpg',
-    active: false,
+    active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -186,7 +186,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -270,10 +270,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 24,
     name: 'Pan hamburguesa común x 4 u.',
-    price: 1800,
+    price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397946/pan_hamb_comun_vu3ngr.png',
-    active: false,
+    active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -383,7 +383,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402610/mantecado_dixkls.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -393,7 +393,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340851/ChatGPT_Image_Aug_4_2025_05_53_46_PM_whchf1.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -443,7 +443,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417024/WhatsApp_Image_2025-08-05_at_14.18.20_ab8ybs.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -453,7 +453,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -540,7 +540,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
-    active: false,
+    active: true,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
