@@ -116,7 +116,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338914/palmerita_c5bvfa.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -679,9 +679,39 @@ export const products: ProductWithOptionalDescription[] = [
     price: 18000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
-    active: true,
+    active: false,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
     // description: [{ text: 'Coca Zero / Coca Regular' }],
+  },
+  {
+    id: 707,
+    name: 'Baggio fresh Naranaja x 1.5 lts',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758928935/Baggio-naranja-dulce-1_m7zxsg.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 708,
+    name: 'Baggio fresh Manzana x 1.5 lts',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929091/13712666-1_qqdpxb.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 709,
+    name: 'Baggio fresh Mix-frutal x 1.5 lts',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929179/005-001-009_agua-saborizadas-baggio-fresh-x-15-lts-mix-frutal1-a9cc5dc0b14d303b9715884677221826-640-0_vh0uuv.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
   },
 ];
