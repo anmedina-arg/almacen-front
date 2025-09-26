@@ -104,7 +104,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 6,
     name: 'Pan lactal blanco con semilla',
-    price: 3600,
+    price: 3700,
     image: '/images/product2.jpg',
     active: true,
     categories: 'Panes lactales',
