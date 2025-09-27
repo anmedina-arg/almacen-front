@@ -77,7 +77,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397736/pan_ham_papa_queso_civzel.png',
-    active: false,
+    active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -116,7 +116,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338914/palmerita_c5bvfa.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -481,10 +481,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 51,
     name: 'COMBO 2',
-    price: 8000,
+    price: 8500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: false,
+    active: true,
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
