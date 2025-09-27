@@ -481,7 +481,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 51,
     name: 'COMBO 2',
-    price: 8500,
+    price: 9000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
