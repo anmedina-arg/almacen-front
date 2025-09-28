@@ -659,7 +659,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
-    active: true,
+    active: false,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
   },
