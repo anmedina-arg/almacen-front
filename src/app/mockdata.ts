@@ -153,7 +153,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 11,
     name: 'Pan chip x 12 u.',
-    price: 3400,
+    price: 4000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754342144/ChatGPT_Image_Aug_4_2025_06_15_29_PM_em6t2k.png',
     active: true,
