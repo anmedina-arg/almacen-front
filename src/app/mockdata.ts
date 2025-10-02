@@ -67,7 +67,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400444/Brioche_Buns_in_Natural_Light_odaipl.png',
-    active: false,
+    active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -97,7 +97,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -263,7 +263,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397482/pan_hamb_campo_ueohlv.png',
-    active: false,
+    active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
