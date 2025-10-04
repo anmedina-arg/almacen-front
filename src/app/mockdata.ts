@@ -634,6 +634,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
+    id: 711,
+    name: 'Pepsi BLACK 2 L.',
+    price: 3000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592118/black_utktlz.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
     id: 702,
     name: '7up 2 L.',
     price: 2000,
@@ -659,7 +669,17 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
-    active: false,
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 710,
+    name: 'Coca Cola Reg 1.5 L.',
+    price: 2900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
+    active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
   },
@@ -707,16 +727,6 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 709,
     name: 'Baggio fresh Mix-frutal x 1.5 lts',
-    price: 1500,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929179/005-001-009_agua-saborizadas-baggio-fresh-x-15-lts-mix-frutal1-a9cc5dc0b14d303b9715884677221826-640-0_vh0uuv.jpg',
-    active: true,
-    categories: 'Bebidas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 709,
-    name: 'Ferne',
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929179/005-001-009_agua-saborizadas-baggio-fresh-x-15-lts-mix-frutal1-a9cc5dc0b14d303b9715884677221826-640-0_vh0uuv.jpg',
