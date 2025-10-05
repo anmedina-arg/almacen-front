@@ -674,6 +674,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
+    id: 711,
+    name: 'Coca Cola Reg 2.25 L.',
+    price: 3300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
     id: 710,
     name: 'Coca Cola Reg 1.5 L.',
     price: 2900,
@@ -689,6 +699,16 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3600,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758468265/sprite_mjpppn.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 712,
+    name: 'Fanta Naranja 2 L.',
+    price: 3600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_aunto/v1759681406/fanta_hotw9i.webp',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
