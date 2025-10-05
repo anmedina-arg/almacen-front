@@ -708,7 +708,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Fanta Naranja 2 L.',
     price: 3600,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_aunto/v1759681406/fanta_hotw9i.webp',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681406/fanta_hotw9i.webp',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
