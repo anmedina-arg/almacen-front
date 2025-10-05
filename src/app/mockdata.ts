@@ -2,6 +2,16 @@ import { ProductWithOptionalDescription } from '@/types';
 
 export const products: ProductWithOptionalDescription[] = [
   {
+    id: 721,
+    name: 'Pan Dulce Artesanal (250 gr x porc)',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759682417/WhatsApp_Image_2025-10-04_at_15.47.40_betqqt.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
     id: 102,
     name: 'Pañuelitos con dulce de leche x 1 u.',
     price: 1200,
@@ -105,7 +115,8 @@ export const products: ProductWithOptionalDescription[] = [
     id: 6,
     name: 'Pan lactal blanco con semilla',
     price: 3700,
-    image: '/images/product2.jpg',
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
     active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
@@ -254,6 +265,16 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398462/IMG-20250724-WA0028_rtjcs3.jpg',
     active: false,
+    categories: 'Panes lactales',
+    mainCategory: 'panaderia',
+  },
+  {
+    id: 720,
+    name: 'Pan doble salvado',
+    price: 2800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681769/WhatsApp_Image_2025-10-04_at_15.47.39_nehaxu.jpg',
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
