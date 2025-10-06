@@ -2,6 +2,16 @@ import { ProductWithOptionalDescription } from '@/types';
 
 export const products: ProductWithOptionalDescription[] = [
   {
+    id: 721,
+    name: 'Pan Dulce Artesanal (250 gr x porc)',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759682417/WhatsApp_Image_2025-10-04_at_15.47.40_betqqt.jpg',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
     id: 102,
     name: 'Pañuelitos c/dulce de leche x 1 u.',
     price: 1200,
@@ -24,6 +34,16 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 1,
     name: 'Galleta Chip Chocolate x 100 gr',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
+    active: true,
+    categories: 'Galletas y variedades',
+    mainCategory: 'panaderia',
+  },
+  {
+    id: 750,
+    name: 'Galleta Chocolate x 100 gr',
     price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
@@ -73,7 +93,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 4,
-    name: 'Pan lactal común blanco',
+    name: 'Pan lactal blanco',
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
@@ -83,7 +103,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 5,
-    name: 'Pan lactal común negro',
+    name: 'Pan lactal negro',
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
@@ -94,9 +114,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 6,
     name: 'Pan lactal blanco con semilla',
-    price: 3600,
-    image: '/images/product2.jpg',
-    active: false,
+    price: 3700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -143,7 +164,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 11,
     name: 'Pan chip x 12 u.',
-    price: 3400,
+    price: 4000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754342144/ChatGPT_Image_Aug_4_2025_06_15_29_PM_em6t2k.png',
     active: true,
@@ -248,6 +269,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
+    id: 720,
+    name: 'Pan doble salvado',
+    price: 2800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681769/WhatsApp_Image_2025-10-04_at_15.47.39_nehaxu.jpg',
+    active: true,
+    categories: 'Panes lactales',
+    mainCategory: 'panaderia',
+  },
+  {
     id: 23,
     name: 'Pan Hamburguesa tipo campo x 4 u.',
     price: 2100,
@@ -260,10 +291,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 24,
     name: 'Pan hamburguesa común x 4 u.',
-    price: 1800,
+    price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397946/pan_hamb_comun_vu3ngr.png',
-    active: false,
+    active: true,
     categories: 'Pan para sanguchess',
     mainCategory: 'panaderia',
   },
@@ -433,7 +464,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417024/WhatsApp_Image_2025-08-05_at_14.18.20_ab8ybs.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -471,10 +502,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 51,
     name: 'COMBO 2',
-    price: 8000,
+    price: 9000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: false,
+    active: true,
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
@@ -516,7 +547,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 6500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: false,
+    active: true,
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
@@ -544,7 +575,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
-    active: true,
+    active: false,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
@@ -569,7 +600,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755700005/transparent-Photoroom__1_-removebg-preview_bz0u5u.png',
-    active: true,
+    active: false,
     categories: 'Snaks',
     mainCategory: 'snaks',
   },
@@ -612,5 +643,136 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Snaks',
     mainCategory: 'snaks',
+  },
+  {
+    id: 701,
+    name: 'Pepsi 2 L.',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758466924/pepsi_igudpw.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 711,
+    name: 'Pepsi BLACK 2 L.',
+    price: 3000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592118/black_utktlz.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 702,
+    name: '7up 2 L.',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467012/7up_yqcefo.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 703,
+    name: 'Mirinda Manzana 2 L.',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467760/Mirinda_qacu7d.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 704,
+    name: 'Coca Cola Zero 2 L.',
+    price: 3300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 711,
+    name: 'Coca Cola Reg 2.25 L.',
+    price: 3300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 710,
+    name: 'Coca Cola Reg 1.5 L.',
+    price: 2900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 705,
+    name: 'Sprite 2 L.',
+    price: 3600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758468265/sprite_mjpppn.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 712,
+    name: 'Fanta Naranja 2 L.',
+    price: 3600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681406/fanta_hotw9i.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 706,
+    name: 'Fernet Branca 750 ml + Coca Cola 2 L. (zero o regular)',
+    price: 18000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
+    active: false,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+    // description: [{ text: 'Coca Zero / Coca Regular' }],
+  },
+  {
+    id: 707,
+    name: 'Baggio fresh Naranaja x 1.5 lts',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758928935/Baggio-naranja-dulce-1_m7zxsg.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 708,
+    name: 'Baggio fresh Manzana x 1.5 lts',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929091/13712666-1_qqdpxb.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 709,
+    name: 'Baggio fresh Mix-frutal x 1.5 lts',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929179/005-001-009_agua-saborizadas-baggio-fresh-x-15-lts-mix-frutal1-a9cc5dc0b14d303b9715884677221826-640-0_vh0uuv.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
   },
 ];
