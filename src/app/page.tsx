@@ -14,7 +14,7 @@ export default function Home() {
           Selecciona los productos que quieres pedir y luego envía tu pedido por WhatsApp <HelpButton />
         </p>
       </div>
-      <div className="sticky top-0 p-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl z-50 mb-2">
+      <div className="sticky top-0 p-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl z-50">
         <FilterButtons />
       </div>
 

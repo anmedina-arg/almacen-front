@@ -6,11 +6,11 @@ const FilterButtons: React.FC = () => {
 
 	return (
 		<div className="flex justify-center gap-2 py-1 flex-wrap relative">
-			<Link href="#Galletas y variedades" className="bg-orange-300 font-medium text-black p-1 rounded flex flex-col items-center justify-center" ><span>🍞</span><span>Panadería</span> </Link>
-			<Link href="#Congelados" className="bg-blue-300 font-medium text-black p-1 rounded flex flex-col items-center justify-center" ><span>🍗</span><span>Congelados</span></Link>
-			<Link href="#Combo Hamburguesas" className="bg-orange-500 font-medium text-black p-1 rounded flex flex-col items-center justify-center" ><span>🍔</span><span>Combos</span></Link>
-			<Link href="#Snaks" className=" bg-yellow-400 font-medium text-black p-1 rounded flex flex-col items-center justify-center" ><span>🍟</span><span>Snaks</span></Link>
-			<Link href="#Bebidas" className=" bg-blue-800 text-white font-medium p-1 rounded flex flex-col items-center justify-center" ><span>🍹</span><span>Bebidas</span></Link>
+			<Link href="#Galletas y variedades" className="bg-orange-300 font-medium text-black p-1 rounded flex items-center justify-center" ><span>🍞</span><span>Panadería</span> </Link>
+			<Link href="#Congelados" className="bg-blue-300 font-medium text-black p-1 rounded flex items-center justify-center" ><span>🍗</span><span>Congelados</span></Link>
+			<Link href="#Combo Hamburguesas" className="bg-orange-500 font-medium text-black p-1 rounded flex items-center justify-center" ><span>🍔</span><span>Combos</span></Link>
+			<Link href="#Snaks" className=" bg-yellow-400 font-medium text-black p-1 rounded flex items-center justify-center" ><span>🍟</span><span>Snaks</span></Link>
+			<Link href="#Bebidas" className=" bg-blue-800 text-white font-medium p-1 rounded flex items-center justify-center" ><span>🍹</span><span>Bebidas</span></Link>
 		</div>
 	)
 };

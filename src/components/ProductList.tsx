@@ -79,7 +79,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 	// Si hay categorías, agrupar y mostrar por categoría
 	return (
 		<>
-			<div className='flex items-center gap-2 mb-2'>
+			<div className='flex items-center gap-2 px-4 py-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl'>
 				<span className="text-xs text-gray-300">Vista:</span>
 				<button
 					onClick={() => setShowList("list")}
@@ -115,7 +115,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 					<span className='text-xs'>Cuadricula</span>
 				</button>
 			</div>
-			<div className="flex flex-col gap-8">
+			<div className="flex flex-col gap-4">
 				{categories.map((category) => {
 					const categoryProducts = products
 						.filter((product) => product.categories === category);
