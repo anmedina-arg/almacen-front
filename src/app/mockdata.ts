@@ -74,7 +74,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 2,
     name: 'Pan Hamb. Brioche c/semilla x 4 u.',
-    price: 2000,
+    price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400444/Brioche_Buns_in_Natural_Light_odaipl.png',
     active: true,
@@ -84,7 +84,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 3,
     name: 'Pan Hamb papa c/hebras queso x 4 u.',
-    price: 2300,
+    price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397736/pan_ham_papa_queso_civzel.png',
     active: true,
@@ -281,7 +281,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 23,
     name: 'Pan Hamburguesa tipo campo x 4 u.',
-    price: 2100,
+    price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754397482/pan_hamb_campo_ueohlv.png',
     active: true,
@@ -607,7 +607,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 60,
     name: 'Papas fritas pay x 150 gr',
-    price: 2200,
+    price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638506/papas_pay__3_-removebg-preview_xw2l6y.png',
     active: true,
