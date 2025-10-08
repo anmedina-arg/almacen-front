@@ -530,7 +530,7 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
-      { text: '4 Hamb. Paladini clasica (80 gr)' },
+      { text: '4 Hamb. Paladini/Swift clasica (80 gr)' },
       {
         text: '4 Panes artesnales (a elegir):',
         subItems: [
@@ -551,7 +551,7 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
-      { text: '4 Hamb. Paladini clasica (80 gr)' },
+      { text: '4 Hamb. Paladini/Swift clasica (80 gr)' },
       { text: '4 Panes comunes' },
     ],
   },
