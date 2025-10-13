@@ -301,7 +301,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 3004,
     name: 'Milanesas de pollo GRANGYS x Kg',
-    price: 8000,
+    price: 8500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777349/milapolloGRANGYS_vr0wm9.jpg',
     active: true,
