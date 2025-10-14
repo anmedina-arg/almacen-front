@@ -7,7 +7,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759682417/WhatsApp_Image_2025-10-04_at_15.47.40_betqqt.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -197,7 +197,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -217,7 +217,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340174/IMG_20250725_135517_pqcv55.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -474,7 +474,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -502,10 +502,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 51,
     name: 'COMBO 2',
-    price: 9000,
+    price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: false,
+    active: true,
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
