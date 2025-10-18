@@ -107,7 +107,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -117,7 +117,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -127,7 +127,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338914/palmerita_c5bvfa.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -197,7 +197,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -274,7 +274,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681769/WhatsApp_Image_2025-10-04_at_15.47.39_nehaxu.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -474,7 +474,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
