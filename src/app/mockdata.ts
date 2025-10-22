@@ -107,7 +107,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -117,7 +117,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -127,7 +127,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338914/palmerita_c5bvfa.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -197,7 +197,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -260,11 +260,11 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 22,
-    name: 'Pan lactal integral',
+    name: 'Pan lactal integral (a pedido)',
     price: 3900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398462/IMG-20250724-WA0028_rtjcs3.jpg',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -414,7 +414,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340851/ChatGPT_Image_Aug_4_2025_05_53_46_PM_whchf1.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -464,7 +464,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417024/WhatsApp_Image_2025-08-05_at_14.18.20_ab8ybs.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -474,7 +474,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -647,7 +647,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 701,
     name: 'Pepsi 2 L.',
-    price: 2000,
+    price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758466924/pepsi_igudpw.jpg',
     active: true,
@@ -667,7 +667,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 702,
     name: '7up 2 L.',
-    price: 2000,
+    price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467012/7up_yqcefo.jpg',
     active: true,
@@ -676,8 +676,8 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 703,
-    name: 'Mirinda Manzana 2 L.',
-    price: 2000,
+    name: 'Mirinda Manzana 2.25 L.',
+    price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467760/Mirinda_qacu7d.webp',
     active: true,
@@ -687,7 +687,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 704,
     name: 'Coca Cola Zero 2 L.',
-    price: 3300,
+    price: 3600,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
     active: true,
@@ -697,7 +697,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 711,
     name: 'Coca Cola Reg 2.25 L.',
-    price: 3300,
+    price: 3600,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
     active: true,
@@ -707,7 +707,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 710,
     name: 'Coca Cola Reg 1.5 L.',
-    price: 2900,
+    price: 3200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
     active: true,
@@ -717,7 +717,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 705,
     name: 'Sprite 2 L.',
-    price: 3600,
+    price: 3800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758468265/sprite_mjpppn.webp',
     active: true,
@@ -727,7 +727,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 712,
     name: 'Fanta Naranja 2 L.',
-    price: 3600,
+    price: 3800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681406/fanta_hotw9i.webp',
     active: true,
