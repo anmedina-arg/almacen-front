@@ -207,7 +207,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
-    active: false,
+    active: true,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -454,7 +454,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.20_1_ximfo1.jpg',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -736,11 +736,11 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 706,
-    name: 'Fernet Branca 750 ml + Coca Cola 2 L. (zero o regular)',
+    name: 'Fernet Branca 750 ml + Coca Cola 2.25 L. (zero o regular)',
     price: 18000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
-    active: false,
+    active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
     // description: [{ text: 'Coca Zero / Coca Regular' }],
