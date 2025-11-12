@@ -279,6 +279,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
+    id: 713,
+    name: 'Fajitas para tacos x 12u',
+    price: 2700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1762956270/Chicken-Tacos-900x570-sRGB-Photoroom_1_r2mnxa.png',
+    active: true,
+    categories: 'fajitas',
+    mainCategory: 'panaderia',
+  },
+  {
     id: 23,
     name: 'Pan Hamburguesa tipo campo x 4 u.',
     price: 2300,
@@ -502,7 +512,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 51,
     name: 'COMBO 2',
-    price: 1000,
+    price: 10000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
@@ -686,7 +696,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 704,
-    name: 'Coca Cola Zero 2 L.',
+    name: 'Coca Cola Zero 2.25 L.',
     price: 3600,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
@@ -700,6 +710,26 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3600,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 714,
+    name: 'Coca Cola Reg 2 lt RETORNABLE',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1762957012/coca-reg-ret_iomymp.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 715,
+    name: 'Coca Cola Zero 2 lt RETORNABLE',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1762957012/coca-zero-ret_icmdun.png',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
