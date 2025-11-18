@@ -7,7 +7,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759682417/WhatsApp_Image_2025-10-04_at_15.47.40_betqqt.jpg',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -207,7 +207,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -717,7 +717,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 714,
     name: 'Coca Cola Reg 2 lt RETORNABLE',
-    price: 2500,
+    price: 2800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1762957012/coca-reg-ret_iomymp.jpg',
     active: true,
@@ -727,7 +727,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 715,
     name: 'Coca Cola Zero 2 lt RETORNABLE',
-    price: 2500,
+    price: 2800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1762957012/coca-zero-ret_icmdun.png',
     active: true,
