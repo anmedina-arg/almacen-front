@@ -10,8 +10,21 @@ const barlow = Barlow({
 });
 
 export const metadata: Metadata = {
-  title: "La proveduria - Lista de Precios y Productos",
-  description: "Catálogo de productos con sistema de pedidos por WhatsApp",
+  title: "Market del cevil",
+  description: "Catálogo de productos - tienda online",
+  openGraph: {
+    title: "Market del cevil",
+    description: "Catálogo de productos",
+    images: [
+      {
+        url: "https://market-del-cevil.vercel.app/logo-og.png",
+        width: 1200,
+        height: 630,
+      },
+    ],
+    url: "https://market-del-cevil.vercel.app",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
