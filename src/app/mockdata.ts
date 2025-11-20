@@ -805,4 +805,124 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Bebidas',
     mainCategory: 'bebidas',
   },
+  {
+    id: 716,
+    name: 'Yerba verdeflor x500grs',
+    price: 2250,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 717,
+    name: 'Yerba Amanda x500grs',
+    price: 2400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 718,
+    name: 'Yerba taragui x500grs',
+    price: 2250,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 719,
+    name: 'Harina Graciela real 000 x1kg',
+    price: 1020,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 720,
+    name: 'Pulpa de tomate x 520 gr',
+    price: 750,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 721,
+    name: 'Pure de tomate Noel x530 gr',
+    price: 1020,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 722,
+    name: 'Azucar x1kg',
+    price: 870,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 723,
+    name: 'Leche Ilolay Descremada',
+    price: 1950,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 724,
+    name: 'Leche Ilolay Entera',
+    price: 1950,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 725,
+    name: 'Leche tregar Descremada',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 726,
+    name: 'Leche tregar entera',
+    price: 1600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 727,
+    name: 'Leche tregar deslactosada',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
 ];

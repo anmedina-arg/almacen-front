@@ -12,7 +12,9 @@ export interface Product {
     | 'combos'
     | 'snaks'
     | 'otros'
-    | 'bebidas';
+    | 'bebidas'
+    | 'lacteos'
+    | 'almacen';
 }
 
 // description esctructurada

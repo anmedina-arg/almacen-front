@@ -11,7 +11,7 @@ export default function Home() {
 
       <div className="text-center mb-4 mt-2 justify-center items-center flex flex-col gap-2">
         <div className="flex items-center gap-2 ">
-          <Image src="https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png" alt="Market del cevil Logo" width={64} height={6} className="rounded-full" />
+          <Image src="https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png" alt="Market del cevil Logo" width={64} height={64} className="rounded-full" />
           <h1 className="text-2xl font-bold">Market del Cevil</h1>
         </div>
         <p className="text-sm max-w-md mx-auto text-balance">
