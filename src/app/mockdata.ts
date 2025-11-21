@@ -14,7 +14,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 102,
     name: 'Pañuelitos c/dulce de leche x 1 u.',
-    price: 1200,
+    price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754943587/Nuevo_Imagen_de_mapa_de_bits_2_m7pbi2.png',
     active: true,
@@ -24,7 +24,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 101,
     name: 'Bizcocho negro x 1 u.',
-    price: 500,
+    price: 550,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754699929/bizcocho_negro_edhnz0.png',
     active: true,
@@ -34,7 +34,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 1,
     name: 'Galleta Chip Chocolate x 100 gr',
-    price: 800,
+    price: 900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
     active: true,
@@ -44,7 +44,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 750,
     name: 'Galleta Chocolate x 100 gr',
-    price: 800,
+    price: 900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
     active: true,
@@ -54,7 +54,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 44,
     name: 'Galleta de coco x 100 gr',
-    price: 800,
+    price: 900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_2_dzodjo.jpg',
     active: true,
@@ -64,7 +64,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 45,
     name: 'Galleta pepa x 100 gr',
-    price: 800,
+    price: 900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_1_m320wt.jpg',
     active: true,
@@ -94,7 +94,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 4,
     name: 'Pan lactal blanco',
-    price: 2900,
+    price: 3200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
     active: true,
@@ -104,7 +104,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 5,
     name: 'Pan lactal negro',
-    price: 2900,
+    price: 3200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400359/ChatGPT_Image_Aug_5_2025_10_09_37_AM_nnt8e2.png',
     active: true,
@@ -114,7 +114,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 6,
     name: 'Pan lactal blanco con semilla',
-    price: 3700,
+    price: 4000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
     active: true,
@@ -124,7 +124,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 7,
     name: 'Palmeritas x 100 gr',
-    price: 1000,
+    price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338914/palmerita_c5bvfa.png',
     active: true,
@@ -134,7 +134,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 8,
     name: 'Rosquillas x 100 gr',
-    price: 1000,
+    price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339225/rosquillas_sothh7.png',
     active: true,
@@ -144,7 +144,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 9,
     name: 'Semoladas c/semillas x 100 gr',
-    price: 650,
+    price: 750,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
@@ -154,7 +154,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 10,
     name: 'Semoladas comun x 100 gr',
-    price: 650,
+    price: 750,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
@@ -174,7 +174,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 12,
     name: 'Pan pebete x 6 u.',
-    price: 2500,
+    price: 2800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754348798/IMG_20250718_110828_genzx4.jpg',
     active: true,
@@ -184,7 +184,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 13,
     name: 'Pan Brioche Viena x 6 u.',
-    price: 2000,
+    price: 2400,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754348950/IMG_20250721_222031_fzj982.jpg',
     active: true,
@@ -194,7 +194,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 14,
     name: 'Mini tarta cabsha',
-    price: 1500,
+    price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
     active: true,
@@ -204,7 +204,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 15,
     name: 'Alfajor maizena',
-    price: 1000,
+    price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341075/ChatGPT_Image_Aug_4_2025_05_57_37_PM_zpcivy.png',
     active: false,
@@ -214,7 +214,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 16,
     name: 'Bizcocho grasa x 100 gr',
-    price: 700,
+    price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340174/IMG_20250725_135517_pqcv55.jpg',
     active: true,
@@ -261,7 +261,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 22,
     name: 'Pan lactal integral (a pedido)',
-    price: 3900,
+    price: 4500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398462/IMG-20250724-WA0028_rtjcs3.jpg',
     active: true,
@@ -381,7 +381,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 29,
     name: 'Pan Chip Comun x 1kg (Por encargo)',
-    price: 5200,
+    price: 6000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402370/chip_comun_lemdjp.png',
     active: true,
@@ -411,7 +411,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 41,
     name: 'Mantecado',
-    price: 500,
+    price: 550,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402610/mantecado_dixkls.png',
     active: true,
@@ -421,7 +421,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 42,
     name: 'Mini pastafrola',
-    price: 1000,
+    price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340851/ChatGPT_Image_Aug_4_2025_05_53_46_PM_whchf1.png',
     active: true,
@@ -431,7 +431,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 43,
     name: 'tostadas dulces x 100 gr',
-    price: 650,
+    price: 750,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754402420/tostadas_scvuom.png',
     active: true,
@@ -441,7 +441,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 46,
     name: 'Grisines comunes x 100 gr',
-    price: 800,
+    price: 900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417023/WhatsApp_Image_2025-08-05_at_14.18.20_2_pefrvk.jpg',
     active: true,
@@ -451,7 +451,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 40,
     name: 'Grisines c/semillas x 100 gr',
-    price: 800,
+    price: 900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.21_ccdyy2.jpg',
     active: true,
@@ -461,7 +461,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 47,
     name: 'Grisines integrales x 100 gr',
-    price: 800,
+    price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_14.18.20_1_ximfo1.jpg',
     active: false,
@@ -481,7 +481,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 49,
     name: 'Pan de leche x unidad',
-    price: 1000,
+    price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
     active: true,
