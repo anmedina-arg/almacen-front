@@ -74,7 +74,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 2,
     name: 'Pan Hamb. Brioche c/semilla x 4 u.',
-    price: 2300,
+    price: 2700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754400444/Brioche_Buns_in_Natural_Light_odaipl.png',
     active: true,
