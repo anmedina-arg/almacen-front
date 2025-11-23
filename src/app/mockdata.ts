@@ -679,7 +679,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Paso de los toros Pomelo S/A x 2 lt',
     price: 2500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763910247/paso-de-los-toros_mxgtxu.jpg',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -699,14 +699,14 @@ export const products: ProductWithOptionalDescription[] = [
     name: '7up FREE 2 L.',
     price: 2500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467012/7up_yqcefo.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763912849/7upzero_zn98od.png',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
   },
   {
     id: 703,
-    name: 'Mirinda Manzana 2.25 L.',
+    name: 'Mirinda Manzana 2 L.',
     price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467760/Mirinda_qacu7d.webp',
@@ -769,7 +769,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Coca Cola Zero x 1,5 lt',
     price: 3200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763910806/coca-zero-uno-y-medio_scfior.jpg',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -820,7 +820,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Soda Sifon BENEDICTINO x 2 lts',
     price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763909916/soda_f2sdfi.png',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -980,7 +980,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Baggio Pronto x 1 lt Multifrutal',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763913305/baggio_wj0pkw.jpg',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
