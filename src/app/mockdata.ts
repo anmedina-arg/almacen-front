@@ -858,9 +858,9 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 716,
     name: 'Yerba verdeflor x500grs',
-    price: 2250,
+    price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763913759/verde-flor-yerbas-serranas_heeqdp.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -870,7 +870,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Yerba Amanda x500grs',
     price: 2400,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915256/yerba_amanda_odi2i5.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -878,9 +878,9 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 718,
     name: 'Yerba taragui x500grs',
-    price: 2250,
+    price: 2300,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915611/yerba-taragui_t0vszk.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -888,9 +888,9 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 719,
     name: 'Harina Graciela real 000 x1kg',
-    price: 1020,
+    price: 1000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763916896/harina_kuxx6s.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
