@@ -795,26 +795,6 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 753,
-    name: 'Agua Mineral San Miguel x 2 lts',
-    price: 1600,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681406/fanta_hotw9i.webp',
-    active: true,
-    categories: 'Bebidas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 754,
-    name: 'Soda Sifon BENEDICTINO x 2 lts',
-    price: 1600,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681406/fanta_hotw9i.webp',
-    active: true,
-    categories: 'Bebidas',
-    mainCategory: 'bebidas',
-  },
-  {
     id: 706,
     name: 'Fernet Branca 750 ml + Coca Cola 2.25 L. (zero o regular)',
     price: 18000,
@@ -824,6 +804,26 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Bebidas',
     mainCategory: 'bebidas',
     // description: [{ text: 'Coca Zero / Coca Regular' }],
+  },
+  {
+    id: 753,
+    name: 'Agua Mineral San Miguel x 2 lts',
+    price: 1600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 754,
+    name: 'Soda Sifon BENEDICTINO x 2 lts',
+    price: 1600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
   },
   {
     id: 707,
