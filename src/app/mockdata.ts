@@ -810,7 +810,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Agua Mineral San Miguel x 2 lts',
     price: 1600,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763907736/agua-san-miguel_1_qkzcdg.png',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -818,7 +818,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 754,
     name: 'Soda Sifon BENEDICTINO x 2 lts',
-    price: 1600,
+    price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
