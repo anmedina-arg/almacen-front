@@ -17,7 +17,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 	const weightType = getWeightType(product.name);
 
 	return (
-		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg p-3 min-h-24 shadow-sm hover:shadow-md transition-shadow">
+		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
 			<div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-center gap-3`}>
 				{product.price !== 0 && (
 					<div className="flex-shrink-0">
@@ -26,7 +26,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 							alt={product.name}
 							width={80}
 							height={80}
-							className="object-cover rounded-lg w-20 h-20"
+							className="object-cover rounded-tl-lg rounded-bl-lg w-20 h-20"
 							loading="lazy"
 							sizes="(max-width: 768px) 100vw, 80px"
 						/>

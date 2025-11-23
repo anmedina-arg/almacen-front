@@ -817,7 +817,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 754,
-    name: 'Soda Sifon BENEDICTINO x 2 lts',
+    name: 'Soda Sifón BENEDICTINO x 2 lts',
     price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763909916/soda_f2sdfi.png',
@@ -897,10 +897,20 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 720,
-    name: 'Pulpa de tomate x 520 gr',
+    name: 'Puré de tomate Sabores del Valle x 520 gr',
     price: 750,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763924733/pure-tomate-sabores-del-valle_savouf.jpg',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 755,
+    name: 'Pulpa de tomate Sabores del Valle x 520 gr',
+    price: 750,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763930118/pulpa-tomate-sabores-del-valle_nfktnl.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -908,9 +918,9 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 721,
     name: 'Pure de tomate Noel x530 gr',
-    price: 1020,
+    price: 1000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929873/pure-tomate-noel_lhowle.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -918,9 +928,9 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 722,
     name: 'Azucar x1kg',
-    price: 870,
+    price: 900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763930215/azucar-independencia-kilo_x5dsxe.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -930,7 +940,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Leche Ilolay Descremada',
     price: 1950,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929319/leche-u-a-t--ilolay-descremada-1000-cc--_exnzoh.jpg',
     active: true,
     categories: 'Lácteos',
     mainCategory: 'lacteos',
@@ -938,9 +948,9 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 724,
     name: 'Leche Ilolay Entera',
-    price: 1950,
+    price: 1900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929436/Leche-Ilolay-Entera-Nueva-Larga-Vida-1Lt_qehpuc.png',
     active: true,
     categories: 'Lácteos',
     mainCategory: 'lacteos',
@@ -950,7 +960,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Leche tregar Descremada',
     price: 1500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929556/leche-trgar-desc_z7m35f.jpg',
     active: true,
     categories: 'Lácteos',
     mainCategory: 'lacteos',
@@ -960,7 +970,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Leche tregar entera',
     price: 1600,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929661/leche-tregar-entera_rsfxtb.jpg',
     active: true,
     categories: 'Lácteos',
     mainCategory: 'lacteos',
@@ -970,7 +980,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Leche tregar deslactosada',
     price: 1900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929758/leche-tregar-deslactosada_fzxil5.png',
     active: true,
     categories: 'Lácteos',
     mainCategory: 'lacteos',
@@ -1000,7 +1010,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Aceite NATURA girasol x 900 ml',
     price: 3800,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925154/aceite-natura_jykows.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1010,7 +1020,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Arroz Molinos Ala No se pasa x 500 gr',
     price: 1000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925255/arroz-chico_h2csc5.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1020,7 +1030,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Arveja INALPA x 300 gr',
     price: 700,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925360/arveja-latajpg_gkegoi.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1030,7 +1040,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Edulcorante Si Diet Stevia x 200 cc',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925460/edulcarente_gj3jm2.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1040,17 +1050,17 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Fideo Rivoli entrefino x 500 gr',
     price: 1100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925562/rivoli-entrefino_cyneu3.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
     id: 737,
-    name: 'Fideo Tirabuzón x 500 gr',
+    name: 'Fideo Rivoli Tirabuzón x 500 gr',
     price: 1200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925697/rivoli-tirabuzon_e7ufah.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1060,7 +1070,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Giacomo Capeletini J+Q x 500 gr',
     price: 4500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925788/giacomo-j-q_cyo6d5.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1070,7 +1080,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Ketchuo Hellmans x 250 gr',
     price: 2100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925885/ketchup-hellmann-s-original-250-grs-_i0shg3.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1080,7 +1090,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Manteca La Tonadita x 200 gr',
     price: 3800,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925975/manteca_aoi9uz.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1090,7 +1100,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Mayonesa Hellmans x 273 gr',
     price: 1500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926076/Mayohellmans_vjdxmv.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1100,7 +1110,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Mermelada Dulcor CIRUELA x 500 gr',
     price: 1800,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926194/mermelada-ciruela_uowxhl.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1110,7 +1120,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Mermelada Dulcor FRUTILLA x 500 gr',
     price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926319/mermelada-frutilla_toa56d.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1120,7 +1130,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Mermelada Dulcor DURAZNO LIGHT x 420 gr',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926428/mermelada-light-durazno_prpfbz.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1130,7 +1140,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Mostaza Savora x 250 gr',
     price: 1500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926514/savora-chica_xebqti.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1140,17 +1150,17 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Queso Untable Port Salut Light Manfrey x 180 gr',
     price: 3000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928739/port-salut-manfrey_jdy4ul.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
     id: 747,
-    name: 'Puré papas KNOR x 125 gr',
+    name: 'Puré papas KNORR x 125 gr',
     price: 1900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928924/pure-knorr_xk6gzt.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1160,7 +1170,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Queso Untable CREMON Light x 280 gr',
     price: 3200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928998/cremon-light_q81gaa.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1170,7 +1180,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Salsa KNOR para pizza x 200 gr',
     price: 1000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929076/salsa-pizza_cqoyjt.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1180,7 +1190,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Té La Virginia x 25 saq',
     price: 1000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929139/te-virginia_opm2cp.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1190,7 +1200,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Mate en saquitos La Tranquera x 25 u',
     price: 1000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929245/mate-saquitos_ocqzln.jpg',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
