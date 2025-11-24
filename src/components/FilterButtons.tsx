@@ -1,6 +1,5 @@
 import Link from "next/link";
 
-//TODO - los botones de filtro salen del campo visual, por lo que solo sirven para filtrar al abrir la app. Cooregir para que siempre se vean
 //TODO - Los botones filtros deberian filtrar por "main category", actualmente no lo hacen asi.
 const FilterButtons: React.FC = () => {
 

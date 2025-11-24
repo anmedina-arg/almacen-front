@@ -1,3 +1,14 @@
+//Main categories:
+export type MainCategory =
+  | 'panaderia'
+  | 'congelados'
+  | 'combos'
+  | 'snaks'
+  | 'otros'
+  | 'bebidas'
+  | 'lacteos'
+  | 'almacen';
+
 // Tipos base
 export interface Product {
   id: number;
@@ -6,15 +17,7 @@ export interface Product {
   image: string;
   active: boolean;
   categories: string;
-  mainCategory:
-    | 'panaderia'
-    | 'congelados'
-    | 'combos'
-    | 'snaks'
-    | 'otros'
-    | 'bebidas'
-    | 'lacteos'
-    | 'almacen';
+  mainCategory: MainCategory;
 }
 
 // description esctructurada

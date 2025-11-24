@@ -1205,4 +1205,94 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
+  {
+    id: 756,
+    name: 'Aceitunas verdes descarozadas VANOLI x 140 gr',
+    price: 1000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 757,
+    name: 'Porroncito Heineken x 330 ml',
+    price: 3000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 764,
+    name: 'Heineken lata x 473 ml',
+    price: 3300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 758,
+    name: 'Imperial Gold lata x 473 ml',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 759,
+    name: 'Norte lata x 473 ml',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 760,
+    name: 'Schneider lata x 473 ml',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 761,
+    name: 'Salta Negra lata x 473 ml',
+    price: 2100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 762,
+    name: 'Quilmes lata x 473 ml',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 763,
+    name: 'Grolsch lata x 473 ml',
+    price: 2700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
 ];
