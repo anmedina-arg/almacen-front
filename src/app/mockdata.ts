@@ -491,7 +491,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 50,
     name: 'COMBO 1',
-    price: 11500,
+    price: 13000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
@@ -500,11 +500,11 @@ export const products: ProductWithOptionalDescription[] = [
     description: [
       { text: '4 Hamb swift CASERAS  (120 gr)' },
       {
-        text: '4 Panes artesnales (a elegir):',
+        text: '4 Panes artesnales:',
         subItems: [
           'brioche c/semilla',
-          'Pan de papa c/hebras de queso',
-          'Pan tipo mostaza',
+          // 'Pan de papa c/hebras de queso',
+          // 'Pan tipo mostaza',
         ],
       },
     ],
@@ -512,7 +512,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 51,
     name: 'COMBO 2',
-    price: 10000,
+    price: 11000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
@@ -521,11 +521,11 @@ export const products: ProductWithOptionalDescription[] = [
     description: [
       { text: '4 Hamb Swift XL (125 gr)' },
       {
-        text: '4 Panes artesnales (a elegir):',
+        text: '4 Panes artesnales:',
         subItems: [
           'brioche c/semilla',
-          'Pan de papa c/hebras de queso',
-          'Pan tipo mostaza',
+          // 'Pan de papa c/hebras de queso',
+          // 'Pan tipo mostaza',
         ],
       },
     ],
@@ -533,7 +533,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 54,
     name: 'COMBO 4',
-    price: 7500,
+    price: 8500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
     active: true,
@@ -542,11 +542,11 @@ export const products: ProductWithOptionalDescription[] = [
     description: [
       { text: '4 Hamb. Paladini/Swift clasica (80 gr)' },
       {
-        text: '4 Panes artesnales (a elegir):',
+        text: '4 Panes artesnales:',
         subItems: [
           'brioche c/semilla',
-          'Pan de papa c/hebras de queso',
-          'Pan tipo mostaza',
+          // 'Pan de papa c/hebras de queso',
+          // 'Pan tipo mostaza',
         ],
       },
     ],
@@ -568,7 +568,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 7001,
     name: 'COMBO P.1',
-    price: 3200,
+    price: 4000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
     active: true,
@@ -582,10 +582,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 7002,
     name: 'COMBO P.2',
-    price: 2200,
+    price: 2800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777760/panchos_azftf0.avif',
-    active: true,
+    active: false,
     categories: 'Combo Pancho',
     mainCategory: 'combos',
     description: [
