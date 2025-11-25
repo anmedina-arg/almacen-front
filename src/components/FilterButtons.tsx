@@ -5,6 +5,7 @@ const FilterButtons: React.FC = () => {
 
 	return (
 		<div className="flex justify-center gap-2 py-1 flex-wrap relative">
+			<Link href="#Fiambres" className=" bg-yellow-400 font-medium text-black py-0.5 px-1  rounded-xl flex items-center justify-center gap-1" ><span className="bg-white rounded-full p-0.25 ">❗</span><span>Fiambrería</span></Link>
 			<Link href="#Galletas y variedades" className="bg-orange-300 font-medium text-black py-0.5 px-1  rounded-xl flex items-center justify-center" ><span>🍞</span><span>Panadería</span> </Link>
 			<Link href="#Congelados" className="bg-blue-300 font-medium text-black py-0.5 px-1  rounded-xl flex items-center justify-center" ><span>🍗</span><span>Congelados</span></Link>
 			<Link href="#Combo Hamburguesas" className="bg-orange-500 font-medium text-black py-0.5 px-1  rounded-xl flex items-center justify-center" ><span>🍔</span><span>Combos</span></Link>

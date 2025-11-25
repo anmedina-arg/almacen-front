@@ -7,7 +7,8 @@ export type MainCategory =
   | 'otros'
   | 'bebidas'
   | 'lacteos'
-  | 'almacen';
+  | 'almacen'
+  | 'fiambres';
 
 // Tipos base
 export interface Product {

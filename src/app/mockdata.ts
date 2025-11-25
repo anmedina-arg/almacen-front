@@ -1345,4 +1345,34 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
+  {
+    id: 770,
+    name: 'Queso DAMBO TREMBLAY X 100 gr',
+    price: 1250,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764112723/queso-danbo_b0rc9v.png',
+    active: true,
+    categories: 'Fiambres',
+    mainCategory: 'fiambres',
+  },
+  {
+    id: 771,
+    name: 'Jamón la Piamontesa x 100 gr',
+    price: 1650,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764112429/jamon-piamontesa_q38ffl.png',
+    active: true,
+    categories: 'Fiambres',
+    mainCategory: 'fiambres',
+  },
+  {
+    id: 772,
+    name: 'Salame 66 x 100 gr',
+    price: 1300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764112587/salame-66_dwqfwu.webp',
+    active: true,
+    categories: 'Fiambres',
+    mainCategory: 'fiambres',
+  },
 ];
