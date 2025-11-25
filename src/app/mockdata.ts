@@ -1146,16 +1146,6 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 746,
-    name: 'Queso Untable Port Salut Light Manfrey x 180 gr',
-    price: 3000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928739/port-salut-manfrey_jdy4ul.jpg',
-    active: true,
-    categories: 'Almacén',
-    mainCategory: 'almacen',
-  },
-  {
     id: 747,
     name: 'Puré papas KNORR x 125 gr',
     price: 1900,
@@ -1172,8 +1162,8 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928998/cremon-light_q81gaa.jpg',
     active: true,
-    categories: 'Almacén',
-    mainCategory: 'almacen',
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
   },
   {
     id: 749,
@@ -1220,7 +1210,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Porroncito Heineken x 330 ml',
     price: 3000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764016627/botella-heinecken_lxmsyy.webp',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -1230,7 +1220,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Heineken lata x 473 ml',
     price: 3300,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764016577/heineken-lata_x2vlms.png',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -1270,7 +1260,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Salta Negra lata x 473 ml',
     price: 2100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764017172/salta-negrapng_gclgud.png',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -1290,9 +1280,69 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Grolsch lata x 473 ml',
     price: 2700,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764017762/grolsch-lata_tmqpnc.webp',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
+  },
+  {
+    id: 765,
+    name: 'Queso cuartirolo TREMBLAY x kg',
+    price: 8500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764072937/queso-cuartirolo-tremblay_hhzy44.webp',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 746,
+    name: 'Queso Untable Port Salut Light Manfrey x 180 gr',
+    price: 3000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928739/port-salut-manfrey_jdy4ul.jpg',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 766,
+    name: 'Queso AZUL untable MANFREY x 180 gr',
+    price: 2400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764073710/manfrey-untable-queso-azul_v8t0uw.png',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 767,
+    name: 'Queso JAMON untable MANFREY x 180 gr ',
+    price: 2400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764073709/manfrey-untable-jamon_mwrbyz.jpg',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 768,
+    name: 'Tapa empanada LA TUCUMANITA x 12 u',
+    price: 1200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764075851/tapa-empanada-tucumanita_psdexs.jpg',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 769,
+    name: 'Pascualina LA TUCUMANITA x 2 un CRIOLLA/HOJALDRADA',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764075812/Pascualina-Hojaldre-La-Tucumanita_jofodk.webp',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
   },
 ];
