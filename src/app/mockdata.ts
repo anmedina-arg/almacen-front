@@ -97,7 +97,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -311,7 +311,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 3004,
     name: 'Milanesas de pollo GRANGYS x Kg',
-    price: 8500,
+    price: 9500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777349/milapolloGRANGYS_vr0wm9.jpg',
     active: true,
@@ -324,7 +324,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 8900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669796/ChatGPT_Image_Aug_31_2025_04_49_10_PM_vyw34i.png',
-    active: true,
+    active: false,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
@@ -334,14 +334,14 @@ export const products: ProductWithOptionalDescription[] = [
     price: 8000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777302/Papas-fritas-baston-McCain-Grande_e2dxth.jpg',
-    active: true,
+    active: false,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
   {
     id: 25,
     name: 'Patitas de pollo comunes GRANGYS x kg',
-    price: 7000,
+    price: 7300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341604/patitas_1_ttdx5l.png',
     active: true,
@@ -351,7 +351,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 26,
     name: 'Patitas de pollo J y Q  GRANGYS x kg',
-    price: 8000,
+    price: 8400,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341500/patitajyq_tl6acn.png',
     active: true,
@@ -361,7 +361,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 27,
     name: 'Crocante de pollo GRANGYS x Kg',
-    price: 8700,
+    price: 9800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754155369/nuggets-pollo_1_1_klayjk.png',
     active: true,
@@ -371,7 +371,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 28,
     name: 'Bocadito Calabaza y muzzarella GRANGYS x Kg',
-    price: 6500,
+    price: 7000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341433/calabaza_ouir2b.png',
     active: true,
@@ -391,7 +391,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 30,
     name: 'Bocadito Papa y Queso GRANGYS x Kg',
-    price: 6500,
+    price: 7000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754341674/papaymuzza_eukr8c.png',
     active: true,
@@ -404,7 +404,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 10900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669658/bocadito-muzza_zcwdeg.jpg',
-    active: true,
+    active: false,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
@@ -600,7 +600,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638381/papas-fritas-removebg-preview_gzpwci.png',
-    active: true,
+    active: false,
     categories: 'Snaks',
     mainCategory: 'snaks',
   },
@@ -961,7 +961,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929556/leche-trgar-desc_z7m35f.jpg',
-    active: true,
+    active: false,
     categories: 'Lácteos',
     mainCategory: 'lacteos',
   },
