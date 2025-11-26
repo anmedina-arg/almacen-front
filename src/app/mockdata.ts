@@ -1375,4 +1375,44 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Fiambres',
     mainCategory: 'fiambres',
   },
+  {
+    id: 773,
+    name: 'Agua Tónica Secco x 2lt',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114473/seco-toinica-2l_m0xia9.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 774,
+    name: 'Agua Tónica Secco x 1,5 lt',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114472/seco-tonica-1-y-medio_lgc0ni.webp',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 775,
+    name: 'Agua Tónica Torasso x 1,5 lt',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114448/image_1_1764114424637_dcnx3s.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 776,
+    name: 'Agua Tónica S/A Paso de los Toros x 1,5 lt',
+    price: 3500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114473/paso-de-los-toros-s-a_zjvyjj.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
 ];
