@@ -1227,10 +1227,10 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 758,
-    name: 'Imperial Gold lata x 473 ml',
+    name: 'Imperial Golden lata x 473 ml',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764117671/imperial-golden_ejefrf.webp',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -1240,7 +1240,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Norte lata x 473 ml',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764117671/lata-norte_etzdgy.webp',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -1250,7 +1250,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Schneider lata x 473 ml',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764117671/lata-schneider_s1vlkf.jpg',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
@@ -1270,7 +1270,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Quilmes lata x 473 ml',
     price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764016577/quilmes-lata_k5jlp7.png',
     active: true,
     categories: 'Bebidas',
     mainCategory: 'bebidas',
