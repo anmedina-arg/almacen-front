@@ -47,7 +47,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754338286/galletas_chip_choco_v9gdxr.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -934,6 +934,16 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
+  },
+  {
+    id: 777,
+    name: 'Leche chocolatada La Serenisima x 1 lt',
+    price: 3500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764192672/chocolatada-ls_e5ttcj.webp',
+    active: true,
+    categories: 'Lácteos',
+    mainCategory: 'lacteos',
   },
   {
     id: 723,
