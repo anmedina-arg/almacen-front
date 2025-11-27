@@ -1425,4 +1425,24 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Bebidas',
     mainCategory: 'bebidas',
   },
+  {
+    id: 778,
+    name: 'Jugo BAGIO Pronto DURAZNO x 1 lt',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764202334/baggio-durazno_q8a6rm.jpg',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 779,
+    name: 'Jugo ADES manzana x 1 lt',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764203109/image_1_1764202979676_cudr64.png',
+    active: true,
+    categories: 'Bebidas',
+    mainCategory: 'bebidas',
+  },
 ];
