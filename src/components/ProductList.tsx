@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
-import { Product } from '@/types';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
+import type { Product, MainCategory } from '@/types';
 import ProductCard from './ProductCard';
 import ProductSquareCard from './ProductSquareCard';
+
 interface ProductWithHandlers extends Product {
 	quantity: number;
 	onAdd: (product: Product) => void;
@@ -12,25 +13,42 @@ interface ProductWithHandlers extends Product {
 
 interface ProductListProps {
 	products: ProductWithHandlers[];
-	categories?: string[];
+	mainCategories?: MainCategory[];
 }
 
 /**
  * Componente de lista de productos
  */
-const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
+const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) => {
 
 	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>("list");
+	const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-	console.log(showList)
+	console.log(showList);
+
+	// Inicializar expandedSubcategories con la primera subcategoría de cada mainCategory
+	useEffect(() => {
+		if (mainCategories && mainCategories.length > 0) {
+			const defaultExpanded = new Set<string>();
+			mainCategories.forEach((main) => {
+				const mainProducts = products.filter((p) => p.mainCategory === main);
+				if (mainProducts.length > 0) {
+					const firstSubLabel = (mainProducts[0].categories ?? 'Sin categoría').toString().trim();
+					const key = `${String(main)}-${firstSubLabel.toLowerCase()}`;
+					defaultExpanded.add(key);
+				}
+			});
+			setExpandedSubcategories(defaultExpanded);
+		}
+	}, [mainCategories, products]);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
 			entries => {
 				if (entries[0].isIntersecting) {
-					setVisibleProducts(prev => prev + 10); // Carga 10 más
+					setVisibleProducts(prev => prev + 10);
 				}
 			},
 			{ rootMargin: '200px' }
@@ -46,37 +64,41 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 		};
 	}, []);
 
-	// Si no hay categorías, mostrar todos los productos sin agrupar
-	if (!categories || categories.length === 0) {
-		return (
-			<>
-				<div className="flex flex-col gap-4">
-					{products.slice(0, visibleProducts).map((product) =>
-						showList === "list" ? (
-							<ProductCard
-								key={`${product.id}-${product.name}`}
-								product={product}
-								quantity={product.quantity}
-								onAdd={product.onAdd}
-								onRemove={product.onRemove}
-							/>
-						) : (
-							<ProductSquareCard
-								key={`${product.id}-${product.name}`}
-								product={product}
-								quantity={product.quantity}
-								onAdd={product.onAdd}
-								onRemove={product.onRemove}
-							/>
-						)
-					)}
-				</div>
-				<div ref={loadMoreRef} className="h-10" />
-			</>
-		);
-	}
+	const toggleSubcategory = (key: string) => {
+		setExpandedSubcategories(prev => {
+			const newSet = new Set(prev);
+			if (newSet.has(key)) {
+				newSet.delete(key);
+			} else {
+				newSet.add(key);
+			}
+			return newSet;
+		});
+	};
 
-	// Si hay categorías, agrupar y mostrar por categoría
+	const grouped = useMemo(() => {
+		if (!mainCategories) return [];
+
+		return mainCategories.map((main) => {
+			const mainProducts = products.filter((p) => p.mainCategory === main);
+
+			const subMap = new Map<string, ProductWithHandlers[]>();
+			mainProducts.forEach((p) => {
+				const subLabel = (p.categories ?? 'Sin categoría').toString().trim();
+				if (!subMap.has(subLabel)) subMap.set(subLabel, []);
+				subMap.get(subLabel)!.push(p);
+			});
+
+			const subcategories = Array.from(subMap.entries()).map(([label, items]) => ({
+				key: label.toLowerCase(),
+				label,
+				products: items,
+			}));
+
+			return { main, subcategories };
+		});
+	}, [products, mainCategories]);
+
 	return (
 		<>
 			<div className='flex items-center gap-2 px-4 py-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl'>
@@ -115,41 +137,60 @@ const ProductList: React.FC<ProductListProps> = ({ products, categories }) => {
 					<span className='text-xs'>Cuadricula</span>
 				</button>
 			</div>
-			<div className="flex flex-col gap-4">
-				{categories.map((category) => {
-					const categoryProducts = products
-						.filter((product) => product.categories === category);
 
-					return (
-						<div key={category} id={category} className="w-full scroll-mt-28">
-							<h3 className="text-lg font-bold mb-2">
-								{category}
-							</h3>
-							<div className={`${showList === "list" ? "flex flex-wrap gap-4" : "grid grid-cols-2 gap-2"}`}>
-								{categoryProducts.map((product) => (
-									showList === "list" ? (
-										<ProductCard
-											key={`${product.id}-${product.name}`}
-											product={product}
-											quantity={product.quantity}
-											onAdd={product.onAdd}
-											onRemove={product.onRemove}
-										/>
-									) : (
-										<ProductSquareCard
-											key={`${product.id}-${product.name}`}
-											product={product}
-											quantity={product.quantity}
-											onAdd={product.onAdd}
-											onRemove={product.onRemove}
-										/>
-									)
-								))}
-							</div>
-						</div>
-					);
-				})}
+			<div className="flex flex-col gap-4">
+				{grouped.map(({ main, subcategories }) => (
+					<div key={String(main)} id={String(main)} className="w-full scroll-mt-28">
+						<h3 className="text-lg font-bold mb-2 capitalize">{String(main)}</h3>
+
+						{subcategories.map((sub) => {
+							const isExpanded = expandedSubcategories.has(`${String(main)}-${sub.key}`);
+							return (
+								<section key={`${String(main)}-${sub.key}`} className="mb-4">
+									<button
+										onClick={() => toggleSubcategory(`${String(main)}-${sub.key}`)}
+										className="flex items-center gap-2 w-full text-md font-semibold mb-2 hover:opacity-80 transition-opacity"
+									>
+										<span>{sub.label}</span>
+										<svg
+											xmlns="http://www.w3.org/2000/svg"
+											viewBox="0 0 24 24"
+											className={`w-5 h-5 fill-current transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+										>
+											<path d="M7 10l5 5 5-5z" />
+										</svg>
+									</button>
+
+									{isExpanded && (
+										<div className={`${showList === "list" ? "flex flex-wrap gap-4" : "grid grid-cols-2 gap-2"}`}>
+											{sub.products.map((product) =>
+												showList === "list" ? (
+													<ProductCard
+														key={`${product.id}-${product.name}`}
+														product={product}
+														quantity={product.quantity}
+														onAdd={product.onAdd}
+														onRemove={product.onRemove}
+													/>
+												) : (
+													<ProductSquareCard
+														key={`${product.id}-${product.name}`}
+														product={product}
+														quantity={product.quantity}
+														onAdd={product.onAdd}
+														onRemove={product.onRemove}
+													/>
+												)
+											)}
+										</div>
+									)}
+								</section>
+							);
+						})}
+					</div>
+				))}
 			</div>
+
 			<div ref={loadMoreRef} className="h-10" />
 		</>
 	);

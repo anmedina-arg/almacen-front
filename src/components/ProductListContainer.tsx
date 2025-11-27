@@ -10,11 +10,6 @@ import WhatsAppButton from './WhatsAppButton';
 import ConfirmationModal from './ConfirmationModal';
 import InfoBanner from './InfoBanner';
 
-// interface ProductListContainerProps {
-// 	products: Product[];
-// 	categories: string[];
-// }
-
 /**
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
  */
@@ -24,8 +19,8 @@ const ProductListContainer: React.FC = () => {
 	const activeProducts: Product[] = products.filter((product) => product.active);
 
 	// Obtener todas las categorías únicas (ignorando vacías)
-	const categories = Array.from(
-		new Set(products.map((p) => p.categories).filter((cat) => cat))
+	const mainCategories = Array.from(
+		new Set(products.map((p) => p.mainCategory).filter((cat) => cat))
 	);
 
 	const { state, addToCart, removeFromCart, getItemQuantity } = useCart();
@@ -76,7 +71,7 @@ const ProductListContainer: React.FC = () => {
 			{/* Lista de productos */}
 			<ProductList
 				products={productsWithHandlers}
-				categories={categories}
+				mainCategories={mainCategories}
 			/>
 
 			{/* Botón flotante de WhatsApp */}
