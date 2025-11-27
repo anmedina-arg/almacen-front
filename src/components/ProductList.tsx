@@ -140,7 +140,11 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 
 			<div className="flex flex-col gap-4">
 				{grouped.map(({ main, subcategories }) => (
-					<div key={String(main)} id={String(main)} className="w-full scroll-mt-28">
+					<div
+						key={String(main)}
+						id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
+						className="w-full scroll-mt-28"
+					>
 						<h3 className="text-lg font-bold mb-2 capitalize">{String(main)}</h3>
 
 						{subcategories.map((sub) => {
@@ -149,9 +153,9 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 								<section key={`${String(main)}-${sub.key}`} className="mb-4">
 									<button
 										onClick={() => toggleSubcategory(`${String(main)}-${sub.key}`)}
-										className="flex items-center gap-2 w-full text-md font-semibold mb-2 hover:opacity-80 transition-opacity"
+										className="flex items-center gap-2 w-full text-md font-semibold mb-2 hover:opacity-80 transition-opacity border-b-1 border-gray-700"
 									>
-										<span>{sub.label}</span>
+										<span>{sub.label}</span><span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{sub.products.length} Productos</span>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											viewBox="0 0 24 24"

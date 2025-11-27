@@ -1,5 +1,7 @@
 import { ProductWithOptionalDescription } from '@/types';
 
+// sub categorias de bebidas: Gaseosas, Jugos, Cervezas, Aguas tónicas, Aguas saborizadas
+
 export const products: ProductWithOptionalDescription[] = [
   {
     id: 721,
@@ -1222,7 +1224,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764016627/botella-heinecken_lxmsyy.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
@@ -1232,7 +1234,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764016577/heineken-lata_x2vlms.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
@@ -1242,7 +1244,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764117671/imperial-golden_ejefrf.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
@@ -1252,7 +1254,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764117671/lata-norte_etzdgy.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
@@ -1262,7 +1264,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764117671/lata-schneider_s1vlkf.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
@@ -1272,7 +1274,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764017172/salta-negrapng_gclgud.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
@@ -1282,7 +1284,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764016577/quilmes-lata_k5jlp7.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
@@ -1292,7 +1294,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764017762/grolsch-lata_tmqpnc.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
   {
