@@ -145,7 +145,10 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 						id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
 						className="w-full scroll-mt-28"
 					>
-						<h3 className="text-lg font-bold mb-2 capitalize">{String(main)}</h3>
+						<div className='flex gap-2 items-baseline'>
+							<span className="text-lg font-bold mb-2 capitalize">{String(main)}</span>
+							<span className=" font-light text-xs px-1 py-0.5 rounded-md flex items-center justify-center h-auto">({subcategories.length} Categorias)</span>
+						</div>
 
 						{subcategories.map((sub) => {
 							const isExpanded = expandedSubcategories.has(`${String(main)}-${sub.key}`);
@@ -155,7 +158,8 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 										onClick={() => toggleSubcategory(`${String(main)}-${sub.key}`)}
 										className="flex items-center gap-2 w-full text-md font-semibold mb-2 hover:opacity-80 transition-opacity border-b-1 border-gray-700"
 									>
-										<span>{sub.label}</span><span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{sub.products.length} Productos</span>
+										<span>{sub.label}</span>
+										<span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{sub.products.length} Productos</span>
 										<svg
 											xmlns="http://www.w3.org/2000/svg"
 											viewBox="0 0 24 24"

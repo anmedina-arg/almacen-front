@@ -1,6 +1,6 @@
 import { ProductWithOptionalDescription } from '@/types';
 
-// sub categorias de bebidas: Gaseosas, Jugos, Cervezas, Aguas tónicas, Aguas saborizadas
+// sub categorias de bebidas: Gaseosas, Jugos y Aguas saborizadas, Cervezas, Aguas tónicas, Aguas saborizadas, Aguas minerales y soda
 
 export const products: ProductWithOptionalDescription[] = [
   {
@@ -663,7 +663,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758466924/pepsi_igudpw.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -673,7 +673,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592118/black_utktlz.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -683,7 +683,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763910247/paso-de-los-toros_mxgtxu.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -693,7 +693,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467012/7up_yqcefo.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -703,7 +703,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763912849/7upzero_zn98od.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -713,7 +713,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467760/Mirinda_qacu7d.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -723,7 +723,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -733,7 +733,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -743,7 +743,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1762957012/coca-reg-ret_iomymp.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -753,7 +753,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1762957012/coca-zero-ret_icmdun.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -763,7 +763,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -773,7 +773,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763910806/coca-zero-uno-y-medio_scfior.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -783,7 +783,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758468265/sprite_mjpppn.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -793,7 +793,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759681406/fanta_hotw9i.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Gaseosas',
     mainCategory: 'bebidas',
   },
   {
@@ -803,7 +803,18 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Fernet',
+    mainCategory: 'bebidas',
+    // description: [{ text: 'Coca Zero / Coca Regular' }],
+  },
+  {
+    id: 780,
+    name: 'Fernet Branca 750 ml ',
+    price: 16000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
+    active: true,
+    categories: 'Fernet',
     mainCategory: 'bebidas',
     // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
@@ -814,7 +825,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763907736/agua-san-miguel_1_qkzcdg.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Aguas minerales y soda',
     mainCategory: 'bebidas',
   },
   {
@@ -824,7 +835,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763909916/soda_f2sdfi.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Aguas minerales y soda',
     mainCategory: 'bebidas',
   },
   {
@@ -834,7 +845,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758928935/Baggio-naranja-dulce-1_m7zxsg.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
@@ -844,7 +855,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929091/13712666-1_qqdpxb.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
@@ -854,7 +865,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929179/005-001-009_agua-saborizadas-baggio-fresh-x-15-lts-mix-frutal1-a9cc5dc0b14d303b9715884677221826-640-0_vh0uuv.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
@@ -944,7 +955,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764192672/chocolatada-ls_e5ttcj.webp',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Chocolatadas',
     mainCategory: 'lacteos',
   },
   {
@@ -954,7 +965,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929319/leche-u-a-t--ilolay-descremada-1000-cc--_exnzoh.jpg',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Leches',
     mainCategory: 'lacteos',
   },
   {
@@ -964,7 +975,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929436/Leche-Ilolay-Entera-Nueva-Larga-Vida-1Lt_qehpuc.png',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Leches',
     mainCategory: 'lacteos',
   },
   {
@@ -974,7 +985,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929556/leche-trgar-desc_z7m35f.jpg',
     active: false,
-    categories: 'Lácteos',
+    categories: 'Leches',
     mainCategory: 'lacteos',
   },
   {
@@ -984,7 +995,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929661/leche-tregar-entera_rsfxtb.jpg',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Leches',
     mainCategory: 'lacteos',
   },
   {
@@ -994,7 +1005,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929758/leche-tregar-deslactosada_fzxil5.png',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Leches',
     mainCategory: 'lacteos',
   },
   {
@@ -1004,7 +1015,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763913305/baggio_wj0pkw.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
@@ -1089,7 +1100,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 739,
-    name: 'Ketchuo Hellmans x 250 gr',
+    name: 'Ketchup Hellmans x 250 gr',
     price: 2100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925885/ketchup-hellmann-s-original-250-grs-_i0shg3.jpg',
@@ -1304,7 +1315,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764072937/queso-cuartirolo-tremblay_hhzy44.webp',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Quesos',
     mainCategory: 'lacteos',
   },
   {
@@ -1314,7 +1325,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928739/port-salut-manfrey_jdy4ul.jpg',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Quesos untables',
     mainCategory: 'lacteos',
   },
   {
@@ -1324,7 +1335,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764073710/manfrey-untable-queso-azul_v8t0uw.png',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Quesos untables',
     mainCategory: 'lacteos',
   },
   {
@@ -1334,7 +1345,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764073709/manfrey-untable-jamon_mwrbyz.jpg',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Quesos untables',
     mainCategory: 'lacteos',
   },
   {
@@ -1394,7 +1405,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114473/seco-toinica-2l_m0xia9.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Aguas tónicas',
     mainCategory: 'bebidas',
   },
   {
@@ -1404,7 +1415,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114472/seco-tonica-1-y-medio_lgc0ni.webp',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Aguas tónicas',
     mainCategory: 'bebidas',
   },
   {
@@ -1414,7 +1425,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114448/image_1_1764114424637_dcnx3s.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Aguas tónicas',
     mainCategory: 'bebidas',
   },
   {
@@ -1424,7 +1435,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114473/paso-de-los-toros-s-a_zjvyjj.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Aguas tónicas',
     mainCategory: 'bebidas',
   },
   {
@@ -1434,7 +1445,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764202334/baggio-durazno_q8a6rm.jpg',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
@@ -1444,7 +1455,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764203109/image_1_1764202979676_cudr64.png',
     active: true,
-    categories: 'Bebidas',
+    categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
 ];
