@@ -24,13 +24,14 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>("list");
 	const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
+	const [isInitialized, setIsInitialized] = useState(false);
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
 	console.log(showList);
 
-	// Inicializar expandedSubcategories con la primera subcategoría de cada mainCategory
+	// Inicializar expandedSubcategories con la primera subcategoría de cada mainCategory (solo una vez)
 	useEffect(() => {
-		if (mainCategories && mainCategories.length > 0) {
+		if (!isInitialized && mainCategories && mainCategories.length > 0) {
 			const defaultExpanded = new Set<string>();
 			mainCategories.forEach((main) => {
 				const mainProducts = products.filter((p) => p.mainCategory === main);
@@ -41,8 +42,9 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 				}
 			});
 			setExpandedSubcategories(defaultExpanded);
+			setIsInitialized(true);
 		}
-	}, [mainCategories, products]);
+	}, [isInitialized, mainCategories, products]);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(

@@ -1171,7 +1171,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 747,
     name: 'Puré papas KNORR x 125 gr',
-    price: 1900,
+    price: 2100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928924/pure-knorr_xk6gzt.webp',
     active: true,
