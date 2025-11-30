@@ -332,10 +332,10 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 3003,
-    name: 'Papas bastón Mc Cain x Kg',
+    name: 'Papas bastón BEM BRASIL x Kg',
     price: 8000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1757777302/Papas-fritas-baston-McCain-Grande_e2dxth.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764460814/papas-baston_cppdvx.png',
     active: false,
     categories: 'Congelados',
     mainCategory: 'congelados',
@@ -803,7 +803,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
     active: true,
-    categories: 'Fernet',
+    categories: 'Promos Bebidas con Alcohol',
     mainCategory: 'bebidas',
     // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
@@ -812,9 +812,9 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Fernet Branca 750 ml ',
     price: 16000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764458109/fernet_branca_veie4s.jpg',
     active: true,
-    categories: 'Fernet',
+    categories: 'Aperitivos con alcohol',
     mainCategory: 'bebidas',
     // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
@@ -1451,11 +1451,33 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 779,
     name: 'Jugo ADES manzana x 1 lt',
-    price: 2000,
+    price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764203109/image_1_1764202979676_cudr64.png',
     active: true,
     categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
+  },
+  {
+    id: 781,
+    name: 'Aperol 750 ml + Cepitas x 1 lt',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764455956/aperol-cepita_mz61mg.png',
+    active: false,
+    categories: 'Promos Bebidas con Alcohol',
+    mainCategory: 'bebidas',
+    // description: [{ text: 'Coca Zero / Coca Regular' }],
+  },
+  {
+    id: 782,
+    name: 'Aperol 750 ml',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764458109/aperol_ltaw5g.jpg',
+    active: false,
+    categories: 'Aperitivos con alcohol',
+    mainCategory: 'bebidas',
+    // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
 ];
