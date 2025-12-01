@@ -875,7 +875,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763913759/verde-flor-yerbas-serranas_heeqdp.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'mate, té y café',
     mainCategory: 'almacen',
   },
   {
@@ -885,7 +885,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915256/yerba_amanda_odi2i5.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'mate, té y café',
     mainCategory: 'almacen',
   },
   {
@@ -895,7 +895,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915611/yerba-taragui_t0vszk.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'mate, té y café',
     mainCategory: 'almacen',
   },
   {
@@ -915,7 +915,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763924733/pure-tomate-sabores-del-valle_savouf.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'salsas y puré de tomate',
     mainCategory: 'almacen',
   },
   {
@@ -925,7 +925,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763930118/pulpa-tomate-sabores-del-valle_nfktnl.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'salsas y puré de tomate',
     mainCategory: 'almacen',
   },
   {
@@ -934,8 +934,8 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929873/pure-tomate-noel_lhowle.jpg',
-    active: true,
-    categories: 'Almacén',
+    active: false,
+    categories: 'salsas y puré de tomate',
     mainCategory: 'almacen',
   },
   {
@@ -994,7 +994,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1600,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929661/leche-tregar-entera_rsfxtb.jpg',
-    active: true,
+    active: false,
     categories: 'Leches',
     mainCategory: 'lacteos',
   },
@@ -1045,7 +1045,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925255/arroz-chico_h2csc5.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1055,7 +1055,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925360/arveja-latajpg_gkegoi.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -1075,7 +1075,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925562/rivoli-entrefino_cyneu3.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1085,7 +1085,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925697/rivoli-tirabuzon_e7ufah.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1095,7 +1095,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925788/giacomo-j-q_cyo6d5.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1105,7 +1105,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925885/ketchup-hellmann-s-original-250-grs-_i0shg3.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'aderezos',
     mainCategory: 'almacen',
   },
   {
@@ -1125,7 +1125,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926076/Mayohellmans_vjdxmv.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'aderezos',
     mainCategory: 'almacen',
   },
   {
@@ -1135,7 +1135,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926194/mermelada-ciruela_uowxhl.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
   {
@@ -1145,7 +1145,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926319/mermelada-frutilla_toa56d.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
   {
@@ -1155,7 +1155,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926428/mermelada-light-durazno_prpfbz.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
   {
@@ -1165,7 +1165,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926514/savora-chica_xebqti.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'aderezos',
     mainCategory: 'almacen',
   },
   {
@@ -1185,7 +1185,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928998/cremon-light_q81gaa.jpg',
     active: true,
-    categories: 'Lácteos',
+    categories: 'Quesos untables',
     mainCategory: 'lacteos',
   },
   {
@@ -1195,7 +1195,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929076/salsa-pizza_cqoyjt.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'salsas y puré de tomate',
     mainCategory: 'almacen',
   },
   {
@@ -1205,7 +1205,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929139/te-virginia_opm2cp.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'mate, té y café',
     mainCategory: 'almacen',
   },
   {
@@ -1215,7 +1215,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929245/mate-saquitos_ocqzln.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'mate, té y café',
     mainCategory: 'almacen',
   },
   {
@@ -1472,7 +1472,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 782,
     name: 'Aperol 750 ml',
-    price: 1,
+    price: 12000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764458109/aperol_ltaw5g.jpg',
     active: false,
