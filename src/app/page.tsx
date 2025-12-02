@@ -12,7 +12,7 @@ export default function Home() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 80);
+      setIsScrolled(window.scrollY > 50);
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -23,7 +23,7 @@ export default function Home() {
     <div className="font-barlow flex flex-col min-h-screen px-2">
       {/* Header inicial (completo) */}
       <div
-        className={`text-center justify-center items-center flex gap-2 transition-all duration-300 ${isScrolled ? "opacity-0 h-0 p-0" : "mb-4 mt-2 py-2"
+        className={`text-center justify-center items-center flex gap-2 transition-all duration-300 ${isScrolled ? "opacity-0 h-0 p-0" : "mb-0 mt-2 py-2"
           }`}
       >
         <Image
@@ -65,7 +65,7 @@ export default function Home() {
         </div>
 
         {/* FilterButtons */}
-        <div className="p-1 border-t border-gray-700 mt-2">
+        <div className="p-1 border-t border-gray-700 mt-0">
           <span className="flex justify-end w-full text-sm text-gray-300 px-4">
             más categorías 👉
           </span>
