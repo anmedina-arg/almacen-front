@@ -3,7 +3,7 @@ import Link from "next/link";
 const FilterButtons: React.FC = () => {
 
 	return (
-		<div className="flex justify-center gap-2 py-1 flex-wrap relative">
+		<div className="flex gap-2 py-1 relative overflow-x-auto">
 			<Link href="#Fiambres" className="bg-yellow-400 font-medium text-black py-0.5 px-1 rounded-xl flex items-center justify-center gap-1">
 				<span className="bg-white rounded-full p-0.25">❗</span>
 				<span>Fiambrería</span>
