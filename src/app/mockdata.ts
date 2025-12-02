@@ -719,7 +719,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 704,
     name: 'Coca Cola Zero 2.25 L.',
-    price: 3600,
+    price: 4000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758467971/cocazero_wnwiti.webp',
     active: true,
@@ -729,7 +729,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 711,
     name: 'Coca Cola Reg 2.25 L.',
-    price: 3600,
+    price: 4000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1759592177/coca-cola-coca-cola-thumbnail_j5ikdn.png',
     active: true,
@@ -1467,7 +1467,6 @@ export const products: ProductWithOptionalDescription[] = [
     active: false,
     categories: 'Promos Bebidas con Alcohol',
     mainCategory: 'bebidas',
-    // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
   {
     id: 782,
@@ -1478,6 +1477,5 @@ export const products: ProductWithOptionalDescription[] = [
     active: false,
     categories: 'Aperitivos con alcohol',
     mainCategory: 'bebidas',
-    // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
 ];
