@@ -145,7 +145,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 					<div
 						key={String(main)}
 						id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
-						className="w-full scroll-mt-28"
+						className="w-full scroll-mt-36"
 					>
 						<div className='flex gap-2 items-baseline'>
 							<span className="text-lg font-bold mb-2 capitalize">{String(main)}</span>
