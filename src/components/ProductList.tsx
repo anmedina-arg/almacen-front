@@ -104,17 +104,17 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 	return (
 		<>
 			<div className='flex items-center gap-2 px-4 py-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl'>
-				<span className="text-xs text-gray-300">Vista:</span>
+				<span className="text-xs text-gray-700">Vista:</span>
 				<button
 					onClick={() => setShowList("list")}
 					aria-label="Vista lista"
-					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors ${showList === "list"
-						? "bg-gray-800 text-white border-gray-500"
-						: "bg-transparent text-gray-300 border-transparent"
+					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === "list"
+						? " border-gray-500"
+						: " border-transparent"
 						}`}
 				>
 					{/* Botón vista lista */}
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-4 h-4 fill-white stroke-white">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-4 h-4 fill-white stroke-gray-700">
 						<rect x="5" y="7" width="22" height="4" rx="2" />
 						<rect x="5" y="14" width="22" height="4" rx="2" />
 						<rect x="5" y="21" width="22" height="4" rx="2" />
@@ -124,13 +124,13 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 				<button
 					onClick={() => setShowList("grid")}
 					aria-label="Vista grilla"
-					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors ${showList === "grid"
-						? "bg-gray-800 text-white border-gray-500"
-						: "bg-transparent text-gray-300 border-transparent"
+					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === "grid"
+						? "  border-gray-500"
+						: "  border-transparent"
 						}`}
 				>
 					{/* Botón vista grilla */}
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-4 h-4 fill-white stroke-white">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-4 h-4 fill-white stroke-gray-700">
 						<rect x="5" y="7" width="8" height="8" rx="2" />
 						<rect x="19" y="7" width="8" height="8" rx="2" />
 						<rect x="5" y="17" width="8" height="8" rx="2" />

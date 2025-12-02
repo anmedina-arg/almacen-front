@@ -41,8 +41,8 @@ export default function Home() {
           </p>
         </div>
       </div>
-      <div className="p-1 border-t border-gray-700 mt-2">
-        <span className="flex justify-end w-full text-sm text-gray-300 px-4">
+      <div className="p-1  mt-2">
+        <span className="flex justify-end w-full text-sm text-gray-700 px-4">
           más categorías 👉
         </span>
         <FilterButtons />
@@ -50,7 +50,7 @@ export default function Home() {
 
       {/* Header sticky (reducido) */}
       <div
-        className={`sticky top-0 z-50 bg-black/80 backdrop-blur-md transition-all duration-300 ${isScrolled ? "py-2" : "opacity-0 h-0 p-0 pointer-events-none"
+        className={`sticky top-0 z-50 bg-white/80 backdrop-blur-md transition-all duration-300 ${isScrolled ? "py-2" : "opacity-0 h-0 p-0 pointer-events-none"
           }`}
       >
         <div className="flex items-center gap-2 px-2">
@@ -65,8 +65,8 @@ export default function Home() {
         </div>
 
         {/* FilterButtons */}
-        <div className="p-1 border-t border-gray-700 mt-0">
-          <span className="flex justify-end w-full text-sm text-gray-300 px-4">
+        <div className="p-1 mt-0">
+          <span className="flex justify-end w-full text-sm text-gray-700 px-4">
             más categorías 👉
           </span>
           <FilterButtons />
