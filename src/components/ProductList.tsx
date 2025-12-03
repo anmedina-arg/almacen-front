@@ -27,7 +27,6 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 	const [isInitialized, setIsInitialized] = useState(false);
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-	console.log(showList);
 
 	// cuando hay búsqueda activa, expandir automáticamente las subcategorías que contienen resultados
 	useEffect(() => {
@@ -131,11 +130,19 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 		});
 	}, [products, mainCategories]);
 
-	const fixHeight = (
-		typeof window !== 'undefined' &&
-		window.scrollY > 50 &&
-		Boolean(searchQuery)
-	);
+	const [fixHeight, setFixHeight] = useState(false);
+
+	useEffect(() => {
+		if (typeof window !== 'undefined' &&
+			window.scrollY > 50 &&
+			Boolean(searchQuery)) {
+			setFixHeight(true);
+		}
+
+		return () => { setFixHeight(false) };
+	}, [searchQuery])
+
+	console.log(fixHeight);
 
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
@@ -176,12 +183,12 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 				</button>
 			</div>
 
-			<div className={`flex flex-col gap-4 ${fixHeight ? 'relative' : ''}`}>
+			<div className={`flex flex-col gap-4 ${fixHeight ? 'mt-48' : ''}`}>
 				{grouped.map(({ main, subcategories }) => (
 					<div
 						key={String(main)}
 						id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
-						className="w-full scroll-mt-36"
+						className="w-full scroll-mt-48"
 					>
 						<div className='flex gap-2 items-baseline'>
 							<span className="text-lg font-bold mb-2 capitalize">{String(main)}</span>
