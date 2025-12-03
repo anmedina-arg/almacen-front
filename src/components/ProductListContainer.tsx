@@ -108,7 +108,7 @@ const ProductListContainer: React.FC = () => {
 
 			{/* Lista de productos (recibe los productos filtrados y sus mainCategories) */}
 			{productsWithHandlers.length === 0 ? (
-				<div className="w-full max-w-xl mx-auto p-4 text-center text-sm text-gray-200 bg-red-50 rounded-md">
+				<div className="w-full max-w-xl mx-auto p-4 text-center text-sm text-gray-700 bg-orange-400 rounded-md">
 					<p>
 						no hemos encontrado el producto, por favor contactate con Andrés o Maria. Gracias. Andrés: +5493816713512
 					</p>

@@ -170,7 +170,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 				</button>
 			</div>
 
-			<div className="flex flex-col gap-4">
+			<div className={`flex flex-col gap-4 ${searchQuery ? 'top-58' : ''}`}>
 				{grouped.map(({ main, subcategories }) => (
 					<div
 						key={String(main)}
