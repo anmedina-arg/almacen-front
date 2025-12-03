@@ -132,7 +132,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 	}, [products, mainCategories]);
 
 	return (
-		<>
+		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
 			<div className='flex items-center gap-2 px-4 py-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl'>
 				<span className="text-xs text-gray-700">Vista:</span>
 				<button
@@ -170,7 +170,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 				</button>
 			</div>
 
-			<div className={`flex flex-col gap-4 ${searchQuery ? 'top-58' : ''}`}>
+			<div className={`flex flex-col gap-4 `}>
 				{grouped.map(({ main, subcategories }) => (
 					<div
 						key={String(main)}
@@ -232,7 +232,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 			</div>
 
 			<div ref={loadMoreRef} className="h-10" />
-		</>
+		</ div>
 	);
 };
 

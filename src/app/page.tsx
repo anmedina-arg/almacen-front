@@ -73,9 +73,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="flex flex-col items-center justify-center gap-8 sm:p-2">
-        <ProductListContainer />
-      </div>
+      <ProductListContainer />
 
       <Footer />
     </div>
