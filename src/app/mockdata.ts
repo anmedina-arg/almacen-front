@@ -875,7 +875,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929139/te-virginia_opm2cp.webp',
     active: true,
-    categories: 'mate, té y café',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -885,7 +885,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763913759/verde-flor-yerbas-serranas_heeqdp.webp',
     active: true,
-    categories: 'mate, té y café',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -895,7 +895,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915256/yerba_amanda_odi2i5.webp',
     active: true,
-    categories: 'mate, té y café',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -905,7 +905,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915611/yerba-taragui_t0vszk.jpg',
     active: true,
-    categories: 'mate, té y café',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -925,7 +925,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763924733/pure-tomate-sabores-del-valle_savouf.jpg',
     active: true,
-    categories: 'salsas y puré de tomate',
+    categories: 'Salsas y puré de tomate',
     mainCategory: 'almacen',
   },
   {
@@ -935,7 +935,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763930118/pulpa-tomate-sabores-del-valle_nfktnl.jpg',
     active: true,
-    categories: 'salsas y puré de tomate',
+    categories: 'Salsas y puré de tomate',
     mainCategory: 'almacen',
   },
   {
@@ -945,7 +945,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929873/pure-tomate-noel_lhowle.jpg',
     active: false,
-    categories: 'salsas y puré de tomate',
+    categories: 'Salsas y puré de tomate',
     mainCategory: 'almacen',
   },
   {
@@ -1055,7 +1055,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925255/arroz-chico_h2csc5.webp',
     active: true,
-    categories: 'fideos y arroz',
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1065,7 +1065,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764788843/arroz-53_orstst.jpg',
     active: true,
-    categories: 'fideos y arroz',
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1095,7 +1095,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925562/rivoli-entrefino_cyneu3.webp',
     active: true,
-    categories: 'fideos y arroz',
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1105,7 +1105,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925697/rivoli-tirabuzon_e7ufah.webp',
     active: true,
-    categories: 'fideos y arroz',
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1115,7 +1115,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925788/giacomo-j-q_cyo6d5.webp',
     active: true,
-    categories: 'fideos y arroz',
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
@@ -1125,7 +1125,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925885/ketchup-hellmann-s-original-250-grs-_i0shg3.jpg',
     active: true,
-    categories: 'aderezos',
+    categories: 'Aderezos',
     mainCategory: 'almacen',
   },
   {
@@ -1145,7 +1145,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926076/Mayohellmans_vjdxmv.webp',
     active: true,
-    categories: 'aderezos',
+    categories: 'Aderezos',
     mainCategory: 'almacen',
   },
   {
@@ -1185,7 +1185,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763926514/savora-chica_xebqti.jpg',
     active: true,
-    categories: 'aderezos',
+    categories: 'Aderezos',
     mainCategory: 'almacen',
   },
   {
@@ -1215,7 +1215,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929076/salsa-pizza_cqoyjt.webp',
     active: true,
-    categories: 'salsas y puré de tomate',
+    categories: 'Salsas y puré de tomate',
     mainCategory: 'almacen',
   },
 
@@ -1226,7 +1226,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764787932/la-tranquera-500gr_oqgwfe.webp',
     active: true,
-    categories: 'mate, té y café',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -1236,7 +1236,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929245/mate-saquitos_ocqzln.jpg',
     active: true,
-    categories: 'mate, té y café',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -1526,7 +1526,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764787742/celusal_w1fnxh.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1536,7 +1536,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796267/Avena-Instantanea-La-Espaniola-X-400-Gr_tmimtx.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1546,7 +1546,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796266/Burgol-La-Espaniola-Gourmet-500-Gr_ojtwli.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1556,7 +1556,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796591/chocolino_kgu1sd.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1564,9 +1564,9 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Cacao Nesquik x 180 gr',
     price: 2600,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764799723/Nesquik_oghvrm.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1574,9 +1574,9 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Café inst La Virginia Doy Pack Clásico x 170 gr',
     price: 7800,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764799934/cafe-lv_os7drz.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -1584,9 +1584,9 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Caldo Knor Carne x 1 u.',
     price: 300,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800029/caldos-knor_stxklp.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1594,9 +1594,9 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Caldo Knor Verdura x 1 u.',
     price: 300,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800029/caldos-knor_stxklp.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1604,9 +1604,9 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Caldo Knor Gallina x 1 u.',
     price: 300,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800029/caldos-knor_stxklp.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1614,139 +1614,139 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Choclo INALPA en grano x 300 gr',
     price: 1500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800138/choclo_hwhguq.webp',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 843,
     name: 'Crema de leche doble TREGAR 350cc',
-    price: 1,
+    price: 4500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764800208/crema-dolecrema-350cc-Tregar_oxg8p3.webp',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 844,
     name: 'Dulce de leche MANFREY Clásico x 400 gr',
-    price: 1,
+    price: 2500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800309/ddl-man_evw9io.jpg',
+    active: true,
+    categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 845,
     name: 'Fideo RIVOLI Moñito x 500 gr',
-    price: 1,
+    price: 1400,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800544/riv-mon_czja4l.webp',
+    active: true,
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 846,
     name: 'Fideo RIVOLI Mostacholi x 500 gr',
-    price: 1,
+    price: 1100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800544/fideo_rivoli_mostachol_aqckhs.png',
+    active: true,
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 847,
     name: 'Mermelada ARCOR Ciruela x 454 gr',
-    price: 1,
+    price: 3600,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801230/mermelada-arcor-ciruela_szy2nx.jpg',
+    active: true,
+    categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 848,
     name: 'Mermelada ARCOR Light Ciruela x 390 gr',
-    price: 1,
+    price: 3900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801391/mmld-arcor-ciruela-light_wrizjw.webp',
+    active: true,
+    categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 849,
     name: 'Fideo RIVOLI Tallarines Verdura x 500 gr',
-    price: 1,
+    price: 1600,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800543/CINTA_VERDE_RIVOLI_ldkwyr.png',
+    active: true,
+    categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 850,
     name: 'Mermelada ARCOR Light Durazno x 390 gr',
-    price: 1,
+    price: 3900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764801476/mermelada-arcor-durazno-light_fjkqt5.webp',
+    active: true,
+    categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 851,
     name: 'Queso rallado MANFREY x 40 gr',
     price: 1,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 852,
     name: 'Repelente VAIS Kids spray x 200 ml',
-    price: 1,
+    price: 5500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801764/rep-vais-kid_rrw3xp.jpg',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 853,
     name: 'Repelente VAIS spray x 200 ml',
-    price: 1,
+    price: 5000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801590/rep-vais_fj9qkc.webp',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 854,
     name: 'Rollo de cocina FELPITA Bco 3 x 40u',
-    price: 1,
+    price: 2100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801874/rollo-cocina-felpita_v9rn0b.jpg',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 855,
     name: 'Sal Parrillera CELUSAL x 1 kg',
-    price: 1,
+    price: 2000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801952/celusal-parr_xzm3ey.jpg',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1756,27 +1756,27 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 856,
     name: 'Vitina clásica x 250 gr',
-    price: 1,
+    price: 1900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764802048/vitina_ruypi4.jpg',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 857,
     name: 'Gancia sin  alcohol lata x 473 ml',
-    price: 1,
+    price: 2700,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: false,
-    categories: 'almacen',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764802163/gancia-s-a_x6u8d3.webp',
+    active: true,
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1786,7 +1786,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1796,7 +1796,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1806,7 +1806,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1816,7 +1816,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1826,7 +1826,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793982/te-boldo_zp7i6w.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -1836,7 +1836,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1846,7 +1846,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1856,7 +1856,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1866,7 +1866,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1876,7 +1876,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1886,7 +1886,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1896,7 +1896,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1906,7 +1906,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796267/Lentejas-La-Espa-ola-400-Gr-1-23741_itbjh9.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1916,7 +1916,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796000/Limpiador-Liquido-Antigrasa-Bora-500-Cc_c2ce1e.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1926,7 +1926,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793982/Te-La-Virginia-Manzamilla-25saq_q8hfwf.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -1936,7 +1936,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764795207/Pan-Rallado-Preferido-X-500-Gr_chb7vs.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1946,7 +1946,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795769/PANIO-ABSORBENTE-MEDIA-NARANJA_ceab0w.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1956,7 +1956,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795632/Pate-de-Foie-Swift-90-Gr-_1_vgi4wg.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1966,7 +1966,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795633/Picadillo-De-Carne-Swift_eqmr0b.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1976,7 +1976,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795465/polvo-de-hornear-royal-x-50-gr_roz0d5.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1986,7 +1986,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -1996,7 +1996,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795208/REBOZADOR-PREFERIDO-X-500-GR_lozekv.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2006,7 +2006,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795061/rejilla_m6ekxp.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2016,7 +2016,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764794868/vais-baby_goh4ho.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2026,7 +2026,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764794406/insecticida-raid-tabletas-24un_up1heu.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2036,7 +2036,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793983/te-tilo_ncymf6.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
   {
@@ -2046,7 +2046,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793799/trapo-piso_ajlx2h.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2056,7 +2056,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764793654/frau-alcohol-etilico-250cc-_avsctj.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2066,7 +2066,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun-desmenuzado-aceite_d3ojvl.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2076,7 +2076,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793349/atun-desmenuzado-agua_pvp1xj.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2086,7 +2086,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun-lomito-aceite_owbiul.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2096,7 +2096,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun_f6x8ij.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2106,7 +2106,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793225/Jugo-Cepita-Del-Valle-Durazno-Delicioso_cee9f5.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2116,7 +2116,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793049/champignon-bahi_rx69ka.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2126,7 +2126,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792881/clight-lim_ewefhg.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2136,7 +2136,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792882/clight-mand_nujxs8.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2146,7 +2146,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792882/clight-nar_wyevsm.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2156,7 +2156,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764792672/Detergente-Liquido-Ala-Limon-450_zquird.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2166,7 +2166,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792552/alco-durazno_qn7b7q.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2176,7 +2176,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792106/higienol-80_x2pqsd.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2186,7 +2186,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792022/condensada-desc_aizz73.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2196,7 +2196,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791799/condensada-entera_wziye1.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2206,7 +2206,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791705/palmito_wj6uis.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2216,7 +2216,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791535/quesso-ray-ls_kptikx.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2226,7 +2226,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791365/SODA-IBERA-SIFON-DESCARTABLE-2-L_ppmxau.png',
     active: true,
-    categories: 'sodas y aguas',
+    categories: 'Aguas minerales y soda',
     mainCategory: 'bebidas',
   },
   {
@@ -2236,7 +2236,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2246,7 +2246,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2256,7 +2256,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2266,7 +2266,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2276,7 +2276,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2286,7 +2286,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2296,7 +2296,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790976/jardinera_gle1bl.webp',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2306,7 +2306,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790835/anchoa_vynwxh.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
@@ -2316,7 +2316,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790718/vainillin_rhh3en.jpg',
     active: true,
-    categories: 'almacen',
+    categories: 'Almacén',
     mainCategory: 'almacen',
   },
   {
