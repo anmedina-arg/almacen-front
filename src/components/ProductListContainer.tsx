@@ -89,6 +89,43 @@ const ProductListContainer: React.FC = () => {
 		}));
 	}, [activeProducts, getItemQuantity, addToCart, removeFromCart]);
 
+	// productsWithHandlers ya calculado más arriba
+	// debouncedSearch también está disponible
+
+	// Cuando hay búsqueda y hay resultados, hacer scroll al primer resultado visible
+	useEffect(() => {
+		if (!debouncedSearch || debouncedSearch.trim() === '') return;
+		if (!productsWithHandlers || productsWithHandlers.length === 0) return;
+
+		// tomar primer producto filtrado y construir el id de la sección target
+		const first = productsWithHandlers[0];
+		const main = first.mainCategory ?? '';
+		const sub = (first.categories ?? 'sin-categoria').toString().trim().toLowerCase();
+		const targetId = `section-${String(main)}-${sub}`;
+
+		// esperar un tick para que ProductList haya actualizado/expandido la subcategoria
+		const t = setTimeout(() => {
+			const header = document.querySelector('header');
+			const headerHeight = header ? header.getBoundingClientRect().height : 0;
+
+			const el = document.getElementById(targetId);
+			if (el) {
+				const top = window.scrollY + el.getBoundingClientRect().top - headerHeight - 8; // 8px padding
+				window.scrollTo({ top, behavior: 'smooth' });
+				return;
+			}
+
+			// fallback: scroll al root del listado
+			const root = document.getElementById('product-list-root');
+			if (root) {
+				const top = window.scrollY + root.getBoundingClientRect().top - headerHeight - 8;
+				window.scrollTo({ top, behavior: 'smooth' });
+			}
+		}, 120);
+
+		return () => clearTimeout(t);
+	}, [debouncedSearch, productsWithHandlers]);
+
 	return (
 		<>
 			{/* Banner informativo cuando no hay productos */}
