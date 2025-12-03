@@ -95,7 +95,7 @@ const ProductListContainer: React.FC = () => {
 			{state.items.length === 0 && <InfoBanner />}
 
 			{/* Buscador */}
-			<div className="w-full flex justify-center px-4 py-2 sticky top-42 z-50 bg-white/80 backdrop-blur-md transition-all duration-300">
+			<div className="w-full flex justify-center px-4 py-2 sticky top-42 z-30 bg-white/80 backdrop-blur-md transition-all duration-300">
 				<input
 					type="search"
 					value={search}
@@ -107,11 +107,19 @@ const ProductListContainer: React.FC = () => {
 			</div>
 
 			{/* Lista de productos (recibe los productos filtrados y sus mainCategories) */}
-			<ProductList
-				products={productsWithHandlers}
-				mainCategories={mainCategories}
-				searchQuery={debouncedSearch}
-			/>
+			{productsWithHandlers.length === 0 ? (
+				<div className="w-full max-w-xl mx-auto p-4 text-center text-sm text-gray-200 bg-red-50 rounded-md">
+					<p>
+						no hemos encontrado el producto, por favor contactate con Andrés o Maria. Gracias. Andrés: +5493816713512
+					</p>
+				</div>
+			) : (
+				<ProductList
+					products={productsWithHandlers}
+					mainCategories={mainCategories}
+					searchQuery={debouncedSearch}
+				/>
+			)}
 
 			{/* Botón flotante de WhatsApp */}
 			<WhatsAppButton
