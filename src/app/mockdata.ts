@@ -869,6 +869,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
+    id: 750,
+    name: 'Té La Virginia x 25 saq',
+    price: 1000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929139/te-virginia_opm2cp.webp',
+    active: true,
+    categories: 'mate, té y café',
+    mainCategory: 'almacen',
+  },
+  {
     id: 716,
     name: 'Yerba verdeflor x500grs',
     price: 2200,
@@ -1049,6 +1059,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
+    id: 788,
+    name: 'Arroz 53 largo fino x 500 gr',
+    price: 850,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764788843/arroz-53_orstst.jpg',
+    active: true,
+    categories: 'fideos y arroz',
+    mainCategory: 'almacen',
+  },
+  {
     id: 734,
     name: 'Arveja INALPA x 300 gr',
     price: 700,
@@ -1198,12 +1218,13 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'salsas y puré de tomate',
     mainCategory: 'almacen',
   },
+
   {
-    id: 750,
-    name: 'Té La Virginia x 25 saq',
-    price: 1000,
+    id: 784,
+    name: 'Yerba La Tranquera x 500grs',
+    price: 2300,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929139/te-virginia_opm2cp.webp',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764787932/la-tranquera-500gr_oqgwfe.webp',
     active: true,
     categories: 'mate, té y café',
     mainCategory: 'almacen',
@@ -1221,9 +1242,29 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 756,
     name: 'Aceitunas verdes descarozadas VANOLI x 140 gr',
-    price: 1000,
+    price: 2500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764788241/aceituna-desc_ws53le.webp',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 785,
+    name: 'Aceitunas verdes descarozadas VANOLI x 80 gr',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764788371/Aceitunas-Verdes-des-80gr_hrlvr1.webp',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 786,
+    name: 'Aceitunas verdes rellenas VANOLI x 140 gr',
+    price: 3000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764788577/Aceitunas-Verdes-rell_hpdobg.webp',
     active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
@@ -1474,18 +1515,830 @@ export const products: ProductWithOptionalDescription[] = [
     price: 12000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764458109/aperol_ltaw5g.jpg',
-    active: false,
+    active: true,
     categories: 'Aperitivos con alcohol',
     mainCategory: 'bebidas',
   },
   {
     id: 783,
-    name: '',
+    name: 'Sal fina celusal x 500gr',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764787742/celusal_w1fnxh.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 834,
+    name: 'Avena LA ESPAÑOLA inst. x 300 gr',
+    price: 1300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796267/Avena-Instantanea-La-Espaniola-X-400-Gr_tmimtx.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 835,
+    name: 'Burgol LA ESPAÑOLA x 500 gr',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796266/Burgol-La-Espaniola-Gourmet-500-Gr_ojtwli.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 836,
+    name: 'Cacao chocolino x 180 gr',
+    price: 2200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796591/chocolino_kgu1sd.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 837,
+    name: 'Cacao Nesquik x 180 gr',
+    price: 2600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 838,
+    name: 'Café inst La Virginia Doy Pack Clásico x 170 gr',
+    price: 7800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 839,
+    name: 'Caldo Knor Carne x 1 u.',
+    price: 300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 840,
+    name: 'Caldo Knor Verdura x 1 u.',
+    price: 300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 841,
+    name: 'Caldo Knor Gallina x 1 u.',
+    price: 300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 842,
+    name: 'Choclo INALPA en grano x 300 gr',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Crema de leche doble TREGAR 350cc',
     price: 1,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764458109/aperol_ltaw5g.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: false,
-    categories: 'Aperitivos con alcohol',
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Dulce de leche MANFREY Clásico x 400 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Fideo RIVOLI Moñito x 500 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Fideo RIVOLI Mostacholi x 500 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Mermelada ARCOR Ciruela x 454 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Mermelada ARCOR Light Ciruela x 390 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Fideo RIVOLI Tallarines Verdura x 500 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Mermelada ARCOR Light Durazno x 390 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Queso rallado MANFREY x 40 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Repelente VAIS Kids spray x 200 ml',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Repelente VAIS spray x 200 ml',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Rollo de cocina FELPITA Bco 3 x 40u',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Sal Parrillera CELUSAL x 1 kg',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'soda TORASSO sifón x 2 lt',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Vitina clásica x 250 gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Gancia sin  alcohol lata x 473 ml',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Queso DANBO La paulina x 100gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Jamon cocido Recreo',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Salchichas carcaraña',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Mani tostado salado c/piel x 250gr',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 822,
+    name: 'Boldo la virginia x 25saq',
+    price: 2100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793982/te-boldo_zp7i6w.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Cerveza Imperial Golden x330 ml',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'CIF Desinfectante Bioact dp x380 ml',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Coctel de fruta Alco (lata) x820g',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Desodorante de piso Aroma Jardin x900 cc',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Espiral Raid x 12u',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Franela la ponderosa x1u',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 789,
+    name: 'Lana Acero Ok 40 g (virulana)',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: false,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 833,
+    name: 'Lenteja la española x 400gr',
+    price: 1900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796267/Lentejas-La-Espa-ola-400-Gr-1-23741_itbjh9.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 832,
+    name: 'Limpiador Antigrasa Bora',
+    price: 1800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764796000/Limpiador-Liquido-Antigrasa-Bora-500-Cc_c2ce1e.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 821,
+    name: 'Cajita de tè de manzanilla La virginia 25 sq',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793982/Te-La-Virginia-Manzamilla-25saq_q8hfwf.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 826,
+    name: 'Pan rallado Preferido 500 gr',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764795207/Pan-Rallado-Preferido-X-500-Gr_chb7vs.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 831,
+    name: 'Paño Media naranja Multiuso',
+    price: 1000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795769/PANIO-ABSORBENTE-MEDIA-NARANJA_ceab0w.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 830,
+    name: 'Pate Swift x 90g',
+    price: 1200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795632/Pate-de-Foie-Swift-90-Gr-_1_vgi4wg.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 829,
+    name: 'Picadillo Swift x9 g',
+    price: 1200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795633/Picadillo-De-Carne-Swift_eqmr0b.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 828,
+    name: 'Polvo para hornear royal',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795465/polvo-de-hornear-royal-x-50-gr_roz0d5.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 827,
+    name: 'Ravioles Madoni 4 quesos x 500g',
+    price: 2800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 826,
+    name: 'Rebozador preferido x500gr',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795208/REBOZADOR-PREFERIDO-X-500-GR_lozekv.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 825,
+    name: 'Rejilla Media naranja',
+    price: 1100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795061/rejilla_m6ekxp.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 824,
+    name: 'repelente Vais bebes crema 100 ml',
+    price: 8600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764794868/vais-baby_goh4ho.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 823,
+    name: 'Tabletas raid x24u',
+    price: 7300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764794406/insecticida-raid-tabletas-24un_up1heu.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 820,
+    name: 'Te de tilo LV x 25saq',
+    price: 3300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793983/te-tilo_ncymf6.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 819,
+    name: 'Trapo de piso Sacchi gris 47x57',
+    price: 2200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793799/trapo-piso_ajlx2h.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 818,
+    name: 'Alcohol Frau x 250cc',
+    price: 1200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764793654/frau-alcohol-etilico-250cc-_avsctj.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 817,
+    name: 'Atùn CUMANA desmenuzado 170g aceite',
+    price: 1800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun-desmenuzado-aceite_d3ojvl.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 816,
+    name: 'Atùn CUMANA desmenuzado 170g natural',
+    price: 1800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793349/atun-desmenuzado-agua_pvp1xj.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 815,
+    name: 'Atùn CUMANA lomito 170g Aceite',
+    price: 3700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun-lomito-aceite_owbiul.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 814,
+    name: 'Atùn CUMANA lomito 170g natural',
+    price: 3700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun_f6x8ij.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 813,
+    name: 'Jugo cepita durazno del valle a 1,5l',
+    price: 3500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793225/Jugo-Cepita-Del-Valle-Durazno-Delicioso_cee9f5.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 812,
+    name: 'Champiniones Bahia enteros 400 g',
+    price: 4000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793049/champignon-bahi_rx69ka.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 809,
+    name: 'Jugo para preparar Clight 20 sobre LIMONADA',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792881/clight-lim_ewefhg.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 810,
+    name: 'Jugo para preparar Clight 20 sobre MANDARINA',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792882/clight-mand_nujxs8.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 811,
+    name: 'Jugo para preparar Clight 20 sobre NARANJA',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792882/clight-nar_wyevsm.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 808,
+    name: 'Detergente Ala concentrado repuesto 450 ml',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764792672/Detergente-Liquido-Ala-Limon-450_zquird.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 807,
+    name: 'Lata de Durazno ALCO mitad x 820 g',
+    price: 2300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792552/alco-durazno_qn7b7q.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 806,
+    name: 'Papel hig Higienol max 4 x 80m',
+    price: 4600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792106/higienol-80_x2pqsd.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 805,
+    name: 'Leche Condensada descremada Nestle 395gr',
+    price: 4800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792022/condensada-desc_aizz73.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 804,
+    name: 'Leche Condensada entera Nestle 395gr',
+    price: 4800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791799/condensada-entera_wziye1.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 803,
+    name: 'Palmitos en trozos CUMANA 400gr',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791705/palmito_wj6uis.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 802,
+    name: 'Queso rallado LA SERENISIMA 35gr',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791535/quesso-ray-ls_kptikx.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 801,
+    name: 'Soda Iberá sifón x 2lt',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791365/SODA-IBERA-SIFON-DESCARTABLE-2-L_ppmxau.png',
+    active: true,
+    categories: 'sodas y aguas',
     mainCategory: 'bebidas',
   },
+  {
+    id: 800,
+    name: 'Condimentos Pimenton Extra dulce x 50gr',
+    price: 550,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 799,
+    name: 'Condimentos Curcuma x 50 gr',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 798,
+    name: 'Adobo para pizza x 50 gr',
+    price: 600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 797,
+    name: 'Pimienta blanca  Molida x 50 gr',
+    price: 550,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 796,
+    name: 'Provenzal x 50 gr',
+    price: 700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 795,
+    name: 'oregano en hojas x 50 gr',
+    price: 550,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 794,
+    name: 'jardinera Inalpa x 300grs',
+    price: 1100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790976/jardinera_gle1bl.webp',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 793,
+    name: 'Filete de anchoas Marvellas',
+    price: 7100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790835/anchoa_vynwxh.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 792,
+    name: 'Vainillin alicante x 100cc',
+    price: 2100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790718/vainillin_rhh3en.jpg',
+    active: true,
+    categories: 'almacen',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 791,
+    name: 'Yogur cerro tucumano sachet x 1lt Frutilla',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790598/yogurt-frutilla_k9nuv0.jpg',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 790,
+    name: 'Yogurt cerro tucumano sachet x 1lt Vainilla',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790356/yogurt-vainilla_xcxryd.webp',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
+  },
 ];
+
+//      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
