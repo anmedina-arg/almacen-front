@@ -1478,4 +1478,14 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Aperitivos con alcohol',
     mainCategory: 'bebidas',
   },
+  {
+    id: 783,
+    name: '',
+    price: 1,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764458109/aperol_ltaw5g.jpg',
+    active: false,
+    categories: 'Aperitivos con alcohol',
+    mainCategory: 'bebidas',
+  },
 ];

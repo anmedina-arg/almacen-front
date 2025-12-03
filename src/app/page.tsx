@@ -74,7 +74,6 @@ export default function Home() {
       </div>
 
       <div className="flex flex-col items-center justify-center gap-8 sm:p-2">
-        {/* Lista de productos con lógica del carrito */}
         <ProductListContainer />
       </div>
 

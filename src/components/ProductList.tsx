@@ -14,13 +14,13 @@ interface ProductWithHandlers extends Product {
 interface ProductListProps {
 	products: ProductWithHandlers[];
 	mainCategories?: MainCategory[];
+	searchQuery?: string;
 }
 
 /**
  * Componente de lista de productos
  */
-const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) => {
-
+const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, searchQuery }) => {
 	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>("list");
 	const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
@@ -28,6 +28,36 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories }) =
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
 	console.log(showList);
+
+	// cuando hay búsqueda activa, expandir automáticamente las subcategorías que contienen resultados
+	useEffect(() => {
+		if (!searchQuery || searchQuery.trim() === '') return;
+		// construyo las claves de subcategorías presentes en el grouping actual
+		const keysToOpen = new Set<string>();
+		if (mainCategories) {
+			mainCategories.forEach((main) => {
+				const mainProducts = products.filter((p) => p.mainCategory === main);
+				const subMap = new Map<string, ProductWithHandlers[]>();
+				mainProducts.forEach((p) => {
+					const subLabel = (p.categories ?? 'Sin categoría').toString().trim();
+					if (!subMap.has(subLabel)) subMap.set(subLabel, []);
+					subMap.get(subLabel)!.push(p);
+				});
+				Array.from(subMap.keys()).forEach(label => {
+					keysToOpen.add(`${String(main)}-${label.toLowerCase()}`);
+				});
+			});
+		}
+		// merge: mantener prev abiertos y añadir los que tienen resultados
+		if (keysToOpen.size > 0) {
+			setExpandedSubcategories(prev => {
+				const merged = new Set(prev);
+				for (const k of keysToOpen) merged.add(k);
+				return merged;
+			});
+		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [searchQuery, products, mainCategories]);
 
 	// Inicializar expandedSubcategories con la primera subcategoría de cada mainCategory (solo una vez)
 	useEffect(() => {
