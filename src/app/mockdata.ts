@@ -1345,7 +1345,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764017762/grolsch-lata_tmqpnc.webp',
-    active: true,
+    active: false,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
