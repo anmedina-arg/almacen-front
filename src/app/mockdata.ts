@@ -602,7 +602,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638381/papas-fritas-removebg-preview_gzpwci.png',
-    active: false,
+    active: true,
     categories: 'Snaks',
     mainCategory: 'snaks',
   },
