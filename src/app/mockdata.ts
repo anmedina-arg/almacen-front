@@ -326,17 +326,17 @@ export const products: ProductWithOptionalDescription[] = [
     price: 8900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669796/ChatGPT_Image_Aug_31_2025_04_49_10_PM_vyw34i.png',
-    active: false,
+    active: true,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
   {
     id: 3003,
     name: 'Papas bastón BEM BRASIL x Kg',
-    price: 8000,
+    price: 6000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764460814/papas-baston_cppdvx.png',
-    active: false,
+    active: true,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
@@ -1435,7 +1435,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764112587/salame-66_dwqfwu.webp',
-    active: true,
+    active: false,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
   },
