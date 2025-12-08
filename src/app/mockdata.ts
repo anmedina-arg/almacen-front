@@ -599,7 +599,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 55,
     name: 'Papas fritas clasicas x 140 gr',
-    price: 2200,
+    price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755638381/papas-fritas-removebg-preview_gzpwci.png',
     active: true,
