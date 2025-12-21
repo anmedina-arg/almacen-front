@@ -57,9 +57,9 @@ const ProductSquareCard: React.FC<ProductCardProps> = React.memo(
 								${product.price}
 							</p>
 
-							<QuantityButton variant="decrement" onClick={() => onRemove(product)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
+							<QuantityButton variant="decrement" onClick={() => onRemove(product.id)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
 
-							<QuantityButton variant="increment" onClick={() => onAdd(product)} aria-label={`Agregar ${product.name}`} />
+							<QuantityButton variant="increment" onClick={() => onAdd(product.id)} aria-label={`Agregar ${product.name}`} />
 						</div>
 					</div>
 				</div>
