@@ -14,6 +14,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 }) => {
 	const weightType = getWeightType(product.name);
 
+	console.count(`ProductCard ${product.id} render`);
+
 	return (
 		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
 			<div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-center gap-3`}>

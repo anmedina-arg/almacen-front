@@ -1,7 +1,6 @@
 'use client';
 
-import React, { useState, useMemo, useEffect } from 'react';
-import { products } from "../app/mockdata";
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Product } from '@/types';
 import { useCart } from '@/hooks/useCart';
 import { generateWhatsAppMessage, openWhatsApp } from '@/utils/messageUtils';
@@ -9,11 +8,14 @@ import ProductList from './ProductList';
 import WhatsAppButton from './WhatsAppButton';
 import ConfirmationModal from './ConfirmationModal';
 import InfoBanner from './InfoBanner';
+import { useProducts } from '@/hooks/useProducts';
 
 /**
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
  */
 const ProductListContainer: React.FC = () => {
+
+	const { products, isLoading } = useProducts();
 
 	// Filtrar productos activos (sin search)
 	const activeProductsAll: Product[] = products.filter((product) => product.active);
@@ -80,14 +82,40 @@ const ProductListContainer: React.FC = () => {
 	};
 
 	// Crear productos con sus cantidades y funciones (a partir de activeProducts filtrados)
-	const productsWithHandlers = useMemo(() => {
+
+	const productsById = useMemo(() => {
+		return new Map(products.map(p => [p.id, p]));
+	}, [products]);
+
+	const onAdd = useCallback((id: number) => {
+		const product = productsById.get(id);
+		if (product) addToCart(product);
+	}, [addToCart, productsById]);
+
+	const onRemove = useCallback((id: number) => {
+		const product = productsById.get(id);
+		if (product) removeFromCart(product);
+	}, [removeFromCart, productsById]);
+
+	const productsWithQuantity = useMemo(() => {
 		return activeProducts.map(product => ({
 			...product,
 			quantity: getItemQuantity(product.id),
-			onAdd: () => addToCart(product),
-			onRemove: () => removeFromCart(product),
+			// onAdd: () => addToCart(product),
+			// onRemove: () => removeFromCart(product),
 		}));
 	}, [activeProducts, getItemQuantity, addToCart, removeFromCart]);
+
+	console.count('ProductListContainer render');
+
+
+	if (isLoading) {
+		return (
+			<div className="w-full p-4 text-center text-sm text-gray-500">
+				Cargando productos...
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -107,7 +135,7 @@ const ProductListContainer: React.FC = () => {
 			</div>
 
 			{/* Lista de productos (recibe los productos filtrados y sus mainCategories) */}
-			{productsWithHandlers.length === 0 ? (
+			{activeProducts.length === 0 ? (
 				<div className="w-full max-w-xl mx-auto p-4 text-center text-sm text-gray-700 bg-orange-400 rounded-md">
 					<p>
 						no hemos encontrado el producto, por favor contactate con Andrés o Maria. Gracias. Andrés: +5493816713512
@@ -115,7 +143,9 @@ const ProductListContainer: React.FC = () => {
 				</div>
 			) : (
 				<ProductList
-					products={productsWithHandlers}
+					products={productsWithQuantity}
+					onAdd={onAdd}
+					onRemove={onRemove}
 					mainCategories={mainCategories}
 					searchQuery={debouncedSearch}
 				/>

@@ -5,14 +5,14 @@ import type { Product, MainCategory } from '@/types';
 import ProductCard from './ProductCard';
 import ProductSquareCard from './ProductSquareCard';
 
-interface ProductWithHandlers extends Product {
+interface ProductWithQuantity extends Product {
 	quantity: number;
-	onAdd: (product: Product) => void;
-	onRemove: (product: Product) => void;
 }
 
 interface ProductListProps {
-	products: ProductWithHandlers[];
+	products: ProductWithQuantity[];
+	onAdd: (id: number) => void;
+	onRemove: (id: number) => void;
 	mainCategories?: MainCategory[];
 	searchQuery?: string;
 }
@@ -20,7 +20,7 @@ interface ProductListProps {
 /**
  * Componente de lista de productos
  */
-const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, searchQuery }) => {
+const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, searchQuery, onAdd, onRemove }) => {
 	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>("list");
 	const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
@@ -36,7 +36,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 		if (mainCategories) {
 			mainCategories.forEach((main) => {
 				const mainProducts = products.filter((p) => p.mainCategory === main);
-				const subMap = new Map<string, ProductWithHandlers[]>();
+				const subMap = new Map<string, ProductWithQuantity[]>();
 				mainProducts.forEach((p) => {
 					const subLabel = (p.categories ?? 'Sin categoría').toString().trim();
 					if (!subMap.has(subLabel)) subMap.set(subLabel, []);
@@ -113,7 +113,7 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 		return mainCategories.map((main) => {
 			const mainProducts = products.filter((p) => p.mainCategory === main);
 
-			const subMap = new Map<string, ProductWithHandlers[]>();
+			const subMap = new Map<string, ProductWithQuantity[]>();
 			mainProducts.forEach((p) => {
 				const subLabel = (p.categories ?? 'Sin categoría').toString().trim();
 				if (!subMap.has(subLabel)) subMap.set(subLabel, []);
@@ -143,6 +143,8 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 	}, [searchQuery])
 
 	console.log(fixHeight);
+
+	console.count('ProductList render');
 
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
@@ -222,16 +224,16 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 														key={`${product.id}-${product.name}`}
 														product={product}
 														quantity={product.quantity}
-														onAdd={product.onAdd}
-														onRemove={product.onRemove}
+														onAdd={() => onAdd(product.id)}
+														onRemove={() => onRemove(product.id)}
 													/>
 												) : (
 													<ProductSquareCard
 														key={`${product.id}-${product.name}`}
 														product={product}
 														quantity={product.quantity}
-														onAdd={product.onAdd}
-														onRemove={product.onRemove}
+														onAdd={onAdd}
+														onRemove={onRemove}
 													/>
 												)
 											)}

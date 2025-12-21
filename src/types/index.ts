@@ -87,8 +87,8 @@ export interface CartContextType {
 export interface ProductCardProps {
   product: ProductWithOptionalDescription;
   quantity: number;
-  onAdd: (product: ProductWithOptionalDescription) => void;
-  onRemove: (product: ProductWithOptionalDescription) => void;
+  onAdd: (id: number) => void;
+  onRemove: (id: number) => void;
 }
 
 export interface ProductListProps {
