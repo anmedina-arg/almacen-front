@@ -799,7 +799,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 706,
     name: 'Fernet Branca 750 ml + Coca Cola 2.25 L. (zero o regular)',
-    price: 18000,
+    price: 20000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758504698/fernet-con-coca_p5xhgo.jpg',
     active: true,
@@ -2338,6 +2338,16 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'lacteos',
     mainCategory: 'lacteos',
+  },
+  {
+    id: 857,
+    name: 'Gancia sin  alcohol lata x 473 ml',
+    price: 2700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764802163/gancia-s-a_x6u8d3.webp',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
   },
 ];
 
