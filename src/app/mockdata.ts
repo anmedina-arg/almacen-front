@@ -99,7 +99,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: false,
+    active: true,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -119,7 +119,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 4000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754398259/IMG_20250802_181555_1_dznytj.jpg',
-    active: true,
+    active: false,
     categories: 'Panes lactales',
     mainCategory: 'panaderia',
   },
@@ -1345,7 +1345,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764017762/grolsch-lata_tmqpnc.webp',
-    active: false,
+    active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
   },
@@ -1431,11 +1431,11 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 772,
-    name: 'Salame 66 x 100 gr',
-    price: 1300,
+    name: 'Salame Casapueblo x 100 gr',
+    price: 1800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764112587/salame-66_dwqfwu.webp',
-    active: false,
+    active: true,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
   },
