@@ -538,7 +538,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 8500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754612528/WhatsApp_Image_2025-08-07_at_20.16.17_qjfhyr.jpg',
-    active: true,
+    active: false,
     categories: 'Combo Hamburguesas',
     mainCategory: 'combos',
     description: [
@@ -821,7 +821,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 753,
     name: 'Agua Mineral San Miguel x 2 lts',
-    price: 1600,
+    price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763907736/agua-san-miguel_1_qkzcdg.png',
     active: true,
@@ -834,7 +834,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763909916/soda_f2sdfi.png',
-    active: true,
+    active: false,
     categories: 'Aguas minerales y soda',
     mainCategory: 'bebidas',
   },
@@ -1756,8 +1756,8 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'Almacén',
-    mainCategory: 'almacen',
+    categories: 'Aguas minerales y soda',
+    mainCategory: 'bebidas',
   },
   {
     id: 856,
@@ -2500,7 +2500,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 813,
+    id: 874,
     name: 'Jugo Cepita del valle Naranja 1,5l',
     price: 3500,
     image:
@@ -2509,6 +2509,36 @@ export const products: ProductWithOptionalDescription[] = [
     categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
+  {
+    id: 875,
+    name: 'Soda BIO SPORT sifón x 2 lt',
+    price: 1300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Aguas minerales y soda',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 876,
+    name: 'Agua Mineral Nestlé x 2 lts',
+    price: 1200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Aguas minerales y soda',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 877,
+    name: 'Agua Mineral Palau x 2 lts',
+    price: 1000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'Aguas minerales y soda',
+    mainCategory: 'bebidas',
+  },
 ];
 
-//      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763609292/SIN_IMAGEN_qrdys8.png',
+//      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
