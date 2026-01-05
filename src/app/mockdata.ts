@@ -841,7 +841,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 707,
     name: 'Baggio fresh Naranaja x 1.5 lts',
-    price: 1500,
+    price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758928935/Baggio-naranja-dulce-1_m7zxsg.jpg',
     active: true,
@@ -851,7 +851,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 708,
     name: 'Baggio fresh Manzana x 1.5 lts',
-    price: 1500,
+    price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929091/13712666-1_qqdpxb.png',
     active: true,
@@ -861,7 +861,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 709,
     name: 'Baggio fresh Mix-frutal x 1.5 lts',
-    price: 1500,
+    price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929179/005-001-009_agua-saborizadas-baggio-fresh-x-15-lts-mix-frutal1-a9cc5dc0b14d303b9715884677221826-640-0_vh0uuv.jpg',
     active: true,
@@ -1781,7 +1781,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 870,
-    name: 'Queso en fetas La Verona x 100gr',
+    name: 'Queso en fetas La Verona x 100 gr',
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
@@ -2597,6 +2597,86 @@ export const products: ProductWithOptionalDescription[] = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646708/sour_green_z2licv.webp',
     active: true,
     categories: 'energizantes y más',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 883,
+    name: 'Galletas Granix Sin Sal 3 x 200 grs',
+    price: 4600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767648224/granix-ssal-fliar_xeeksa.jpg',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 884,
+    name: 'Galletas Granix Salvado 720 grs',
+    price: 5400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767648757/granix-salvado_jx0vo7.webp',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 885,
+    name: 'Galletas Granix Salvado sin sal 690 grs',
+    price: 5000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767648757/salvado-ssal_mutjq1.webp',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 886,
+    name: 'Galletas Sandwiches Granix x 600 grs',
+    price: 4500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767648757/granix-sandwich_vybtqx.webp',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 887,
+    name: 'Galletas media tarde',
+    price: 1800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767649792/media-tarde-x-3_pvmflg.jpg',
+    active: false,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 888,
+    name: 'Galletas la providencia x3u',
+    price: 1400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767650039/galleta-providencia-x-3_umptpw.webp',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 889,
+    name: 'Galletas Traviata x3u',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767649792/traviata-x-3_qydsq9.jpg',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 790,
+    name: 'Baggio fresh Limonada x 1.5 lts',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767651024/bagio-fresh-limonada_thxnwv.webp',
+    active: true,
+    categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
 ];
