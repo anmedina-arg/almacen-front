@@ -844,7 +844,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758928935/Baggio-naranja-dulce-1_m7zxsg.jpg',
-    active: false,
+    active: true,
     categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
   },
@@ -1661,7 +1661,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 847,
-    name: 'Mermelada ARCOR Ciruela x 454 gr',
+    name: 'Mermelada Ciruela ARCOR x 454 gr',
     price: 3600,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801230/mermelada-arcor-ciruela_szy2nx.jpg',
@@ -1671,7 +1671,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 848,
-    name: 'Mermelada ARCOR Light Ciruela x 390 gr',
+    name: 'Mermelada Ciruela Light ARCOR x 390 gr',
     price: 3900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764801391/mmld-arcor-ciruela-light_wrizjw.webp',
@@ -1691,11 +1691,11 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 850,
-    name: 'Mermelada ARCOR Light Durazno x 390 gr',
+    name: 'Mermelada Durazno Light ARCOR x 390 gr',
     price: 3900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764801476/mermelada-arcor-durazno-light_fjkqt5.webp',
-    active: true,
+    active: false,
     categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
   },
@@ -2165,7 +2165,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792552/alco-durazno_qn7b7q.jpg',
-    active: true,
+    active: false,
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
@@ -2537,6 +2537,66 @@ export const products: ProductWithOptionalDescription[] = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
     categories: 'Aguas minerales y soda',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 878,
+    name: 'Monster Mango x 473 ml',
+    price: 3200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646270/monster-mango_yxvtqx.webp',
+    active: true,
+    categories: 'energizantes y más',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 879,
+    name: 'Monster original x 473 ml',
+    price: 3200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646117/monster-original_pzheui.webp',
+    active: true,
+    categories: 'energizantes y más',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 879,
+    name: 'Monster original x 473 ml',
+    price: 3200,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646117/monster-original_pzheui.webp',
+    active: true,
+    categories: 'energizantes y más',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 880,
+    name: 'Powerade frutas tropicales x 500cc',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646855/powerade_frutas_a10ty6.webp',
+    active: true,
+    categories: 'energizantes y más',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 881,
+    name: 'Powerade uva x 500cc',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646779/uva_q9e3hn.jpg',
+    active: true,
+    categories: 'energizantes y más',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 882,
+    name: 'Powerade Sour green x 500cc',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646708/sour_green_z2licv.webp',
+    active: true,
+    categories: 'energizantes y más',
     mainCategory: 'bebidas',
   },
 ];
