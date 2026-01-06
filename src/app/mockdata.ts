@@ -1415,7 +1415,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1250,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764112723/queso-danbo_b0rc9v.png',
-    active: true,
+    active: false,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
   },
@@ -1424,7 +1424,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Jamón Cocido Cagnoli x 100 gr',
     price: 1500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725428/Los_4_hermanos_14_q18tiu.png',
     active: true,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
@@ -1434,7 +1434,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Salame Casapueblo x 100 gr',
     price: 1800,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764112587/salame-66_dwqfwu.webp',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725724/Los_4_hermanos_7_fzgmcu.jpg',
     active: true,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
@@ -1625,7 +1625,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 4500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1764800208/crema-dolecrema-350cc-Tregar_oxg8p3.webp',
-    active: true,
+    active: false,
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
@@ -1784,7 +1784,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Queso en fetas La Verona x 100 gr',
     price: 1200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725536/Los_4_hermanos_6_wdvaiy.jpg',
     active: true,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
@@ -2331,7 +2331,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 790,
-    name: 'Yogurt cerro tucumano sachet x 1lt Vainilla',
+    name: 'Yogur cerro tucumano sachet x 1lt Vainilla',
     price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790356/yogurt-vainilla_xcxryd.webp',
@@ -2560,16 +2560,6 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 879,
-    name: 'Monster original x 473 ml',
-    price: 3200,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767646117/monster-original_pzheui.webp',
-    active: true,
-    categories: 'energizantes y más',
-    mainCategory: 'bebidas',
-  },
-  {
     id: 880,
     name: 'Powerade frutas tropicales x 500cc',
     price: 2000,
@@ -2670,7 +2660,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 790,
+    id: 890,
     name: 'Baggio fresh Limonada x 1.5 lts',
     price: 1700,
     image:
@@ -2678,6 +2668,126 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
+  },
+  {
+    id: 891,
+    name: 'Pizza muzzarella',
+    price: 6500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767724248/pizza-muzza_wg5h5k.jpg',
+    active: true,
+    categories: 'pizzas',
+    mainCategory: 'pizzas',
+  },
+  {
+    id: 892,
+    name: 'Pizza especial',
+    price: 7500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767724247/pizza-especial_sjuehf.jpg',
+    active: true,
+    categories: 'pizzas',
+    mainCategory: 'pizzas',
+  },
+  {
+    id: 893,
+    name: 'Pizza ternera',
+    price: 8000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767724247/pizza-ternera_cckk6h.jpg',
+    active: true,
+    categories: 'pizzas',
+    mainCategory: 'pizzas',
+  },
+  {
+    id: 894,
+    name: 'Pizza roquefort',
+    price: 8000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767724247/Pizza-Roquefort_li8awg.png',
+    active: true,
+    categories: 'pizzas',
+    mainCategory: 'pizzas',
+  },
+  {
+    id: 895,
+    name: 'Pizza cantimpalo',
+    price: 8000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1767724247/pizza-cantimpalo_avwba9.jpg',
+    active: true,
+    categories: 'pizzas',
+    mainCategory: 'pizzas',
+  },
+  {
+    id: 896,
+    name: 'Lomo ahumado suizo luvianca SIN GLUTEN x 100 gr',
+    price: 1800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1767725245/Los_4_hermanos_4_oar4vt.jpg',
+    active: true,
+    categories: 'Fiambres',
+    mainCategory: 'fiambres',
+  },
+  {
+    id: 897,
+    name: 'Bondiola 214 SIN GLUTEN',
+    price: 2600,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725845/bondiola_hsj9sv.png',
+    active: true,
+    categories: 'Fiambres',
+    mainCategory: 'fiambres',
+  },
+  {
+    id: 898,
+    name: 'Mortadela Champion SIN GLUTEN x 100 gr',
+    price: 900,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725428/mortadela-champion_innfkn.jpg',
+    active: true,
+    categories: 'Fiambres',
+    mainCategory: 'fiambres',
+  },
+  {
+    id: 899,
+    name: 'Yogur gran compra sachet x 1lt Frutilla',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767726534/gran-compra-frutilla_bltavf.webp',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 900,
+    name: 'Yogur gran compra sachet x 1lt Vainilla',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767726534/gran-compra-vainilla_soe0gh.webp',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 901,
+    name: 'Crema de leche tonadita x350cc',
+    price: 4000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767727234/crema-de-leche-tonadita-400_epdss5.webp',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 902,
+    name: 'Crema de leche tonadita x200cc',
+    price: 2100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767727235/crema-de-leche_mjtnt9.webp',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
   },
 ];
 

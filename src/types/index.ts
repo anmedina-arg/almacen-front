@@ -8,7 +8,8 @@ export type MainCategory =
   | 'bebidas'
   | 'lacteos'
   | 'almacen'
-  | 'fiambres';
+  | 'fiambres'
+  | 'pizzas';
 
 // Tipos base
 export interface Product {

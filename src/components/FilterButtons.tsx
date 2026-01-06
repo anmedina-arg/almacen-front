@@ -4,6 +4,7 @@ const FilterButtons: React.FC = () => {
 
 	return (
 		<div className="flex gap-2 py-1 relative overflow-x-auto">
+			<Chips to="#Pizzas" label="Pizzas" icons="🍕" />
 			<Chips to="#Fiambres" label="Fiambrería" icons="🧀" />
 			<Chips to="#Panaderia" label="Panadería" icons="🍞" />
 			<Chips to="#Congelados" label="Congelados" icons="🍗" />
