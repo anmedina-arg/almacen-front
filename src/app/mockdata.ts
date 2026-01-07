@@ -1665,6 +1665,16 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800309/ddl-man_evw9io.jpg',
+    active: false,
+    categories: 'Mermeladas y dulce de leche',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 907,
+    name: 'Dulce de leche Cerros Tucumanos Clásico x 400 gr',
+    price: 2300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767823000/nano-banana-1767822953359_euw7xg.jpg',
     active: true,
     categories: 'Mermeladas y dulce de leche',
     mainCategory: 'almacen',
