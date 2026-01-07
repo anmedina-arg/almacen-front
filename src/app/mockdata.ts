@@ -199,7 +199,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340354/ChatGPT_Image_Aug_4_2025_05_45_35_PM_l1rn70.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -426,7 +426,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754340851/ChatGPT_Image_Aug_4_2025_05_53_46_PM_whchf1.png',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -486,7 +486,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754417022/WhatsApp_Image_2025-08-05_at_13.33.50_gvftqk.jpg',
-    active: true,
+    active: false,
     categories: 'Galletas y variedades',
     mainCategory: 'panaderia',
   },
@@ -824,7 +824,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763907736/agua-san-miguel_1_qkzcdg.png',
-    active: true,
+    active: false,
     categories: 'Aguas minerales y soda',
     mainCategory: 'bebidas',
   },
@@ -869,6 +869,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
+    id: 890,
+    name: 'Baggio fresh Limonada x 1.5 lts',
+    price: 1700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767651024/bagio-fresh-limonada_thxnwv.webp',
+    active: true,
+    categories: 'Jugos y Aguas saborizadas',
+    mainCategory: 'bebidas',
+  },
+  {
     id: 750,
     name: 'Té La Virginia x 25 saq',
     price: 1000,
@@ -894,7 +904,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2400,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915256/yerba_amanda_odi2i5.webp',
-    active: true,
+    active: false,
     categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
@@ -1017,6 +1027,16 @@ export const products: ProductWithOptionalDescription[] = [
     active: true,
     categories: 'Leches',
     mainCategory: 'lacteos',
+  },
+  {
+    id: 779,
+    name: 'Jugo ADES manzana x 1 lt',
+    price: 2500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764203109/image_1_1764202979676_cudr64.png',
+    active: true,
+    categories: 'Jugos y Aguas saborizadas',
+    mainCategory: 'bebidas',
   },
   {
     id: 729,
@@ -1225,7 +1245,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764787932/la-tranquera-500gr_oqgwfe.webp',
-    active: true,
+    active: false,
     categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
@@ -1280,6 +1300,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
+    id: 789,
+    name: 'Cerveza Imperial Gold x330 ml',
+    price: 2000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1767794992/nano-banana-1767794910601_wlxu4g.jpg',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
     id: 764,
     name: 'Heineken lata x 473 ml',
     price: 3200,
@@ -1294,7 +1324,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Imperial Golden lata x 473 ml',
     price: 1900,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764117671/imperial-golden_ejefrf.webp',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767794675/lata-imp-golden_owlrxp.webp',
     active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
@@ -1342,7 +1372,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 763,
     name: 'Grolsch lata x 473 ml',
-    price: 2700,
+    price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764017762/grolsch-lata_tmqpnc.webp',
     active: true,
@@ -1485,16 +1515,6 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764202334/baggio-durazno_q8a6rm.jpg',
-    active: true,
-    categories: 'Jugos y Aguas saborizadas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 779,
-    name: 'Jugo ADES manzana x 1 lt',
-    price: 2500,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764203109/image_1_1764202979676_cudr64.png',
     active: true,
     categories: 'Jugos y Aguas saborizadas',
     mainCategory: 'bebidas',
@@ -1831,16 +1851,6 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 789,
-    name: 'Cerveza Imperial Gold x330 ml',
-    price: 2000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: true,
-    categories: 'Cervezas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 789,
     name: 'CIF Desinfectante Bioact dp x380 ml',
     price: 2300,
     image:
@@ -2100,16 +2110,6 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 813,
-    name: 'Jugo cepita del valle durazno 1,5l',
-    price: 3500,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793225/Jugo-Cepita-Del-Valle-Durazno-Delicioso_cee9f5.webp',
-    active: true,
-    categories: 'Jugos y Aguas saborizadas',
-    mainCategory: 'bebidas',
-  },
-  {
     id: 812,
     name: 'Champiniones Bahia enteros 400 g',
     price: 4000,
@@ -2162,10 +2162,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 807,
     name: 'Lata de Durazno ALCO mitad x 820 g',
-    price: 2300,
+    price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792552/alco-durazno_qn7b7q.jpg',
-    active: false,
+    active: true,
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
@@ -2225,7 +2225,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764791365/SODA-IBERA-SIFON-DESCARTABLE-2-L_ppmxau.png',
-    active: true,
+    active: false,
     categories: 'Aguas minerales y soda',
     mainCategory: 'bebidas',
   },
@@ -2350,71 +2350,11 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 858,
-    name: 'SIX PACK Heineken lata x 473 ml',
-    price: 18000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764016577/heineken-lata_x2vlms.png',
-    active: true,
-    categories: 'Cervezas',
-    mainCategory: 'bebidas',
-  },
-  {
     id: 859,
     name: 'Corona lata x 473 ml',
     price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: true,
-    categories: 'Cervezas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 860,
-    name: 'SIX PACK Corona lata x 473 ml',
-    price: 13000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: true,
-    categories: 'Cervezas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 861,
-    name: 'SIX PACK Imperial Golden lata x 473 ml',
-    price: 10000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: true,
-    categories: 'Cervezas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 862,
-    name: 'SIX PACK Roja Imperial lata x 473 ml',
-    price: 12000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: true,
-    categories: 'Cervezas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 863,
-    name: 'SIX PACK APA Imperial lata x 473 ml',
-    price: 12000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: true,
-    categories: 'Cervezas',
-    mainCategory: 'bebidas',
-  },
-  {
-    id: 864,
-    name: 'SIX PACK IPA Imperial lata x 473 ml',
-    price: 12000,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/lata-corona_mo6spk.webp',
     active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
@@ -2424,7 +2364,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Imperial Roja lata x 473 ml',
     price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/lata-imp-roja_kniteg.webp',
     active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
@@ -2434,7 +2374,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Imperial APA lata x 473 ml',
     price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/lata-imp-APA_tzhztu.jpg',
     active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
@@ -2444,7 +2384,7 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Imperial IPA lata x 473 ml',
     price: 2200,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/lata-imp-IPA_ovfuv4.jpg',
     active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
@@ -2454,7 +2394,57 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'Stella Artois lata x 473 ml',
     price: 2500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/lata-stella_tlmx85.jpg',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 860,
+    name: 'SIX PACK Corona lata x 473 ml',
+    price: 13000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792663/sixpack-corona_d45ih2.webp',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 861,
+    name: 'SIX PACK Imperial Golden lata x 473 ml',
+    price: 10500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767794995/sixpack-imp-golden_vzxkeo.webp',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 862,
+    name: 'SIX PACK Roja Imperial lata x 473 ml',
+    price: 13000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/sixpack-imp-roja_t1qb2z.webp',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 863,
+    name: 'SIX PACK APA Imperial lata x 473 ml',
+    price: 13000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/six-pack-imp-APA_fjx3wz.jpg',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 864,
+    name: 'SIX PACK IPA Imperial lata x 473 ml',
+    price: 13000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/sixpack-imp-IPA_n0xuy8.webp',
     active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
@@ -2464,7 +2454,37 @@ export const products: ProductWithOptionalDescription[] = [
     name: 'SIX PACK - Stella Artois lata x 473 ml',
     price: 14000,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792662/sixpack-stella_mdsnvn.jpg',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 858,
+    name: 'SIX PACK Heineken lata x 473 ml',
+    price: 18000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767792781/heineken-473-ml-six-pack_pk8cmw.webp',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 905,
+    name: 'SIX PACK Grolsch lata x 473 ml',
+    price: 14000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767796086/six-pack-grolsh_wy6dgy.png',
+    active: true,
+    categories: 'Cervezas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 906,
+    name: 'SIX PACK Quilmes lata x 473 ml',
+    price: 11000,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767796369/six-pack-quilmes_e9ntn1.webp',
     active: true,
     categories: 'Cervezas',
     mainCategory: 'bebidas',
@@ -2510,6 +2530,16 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
+    id: 813,
+    name: 'Jugo cepita del valle durazno 1,5l',
+    price: 3500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793225/Jugo-Cepita-Del-Valle-Durazno-Delicioso_cee9f5.webp',
+    active: true,
+    categories: 'Jugos y Aguas saborizadas',
+    mainCategory: 'bebidas',
+  },
+  {
     id: 875,
     name: 'Soda BIO SPORT sifón x 2 lt',
     price: 1300,
@@ -2525,7 +2555,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
-    active: true,
+    active: false,
     categories: 'Aguas minerales y soda',
     mainCategory: 'bebidas',
   },
@@ -2660,16 +2690,6 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 890,
-    name: 'Baggio fresh Limonada x 1.5 lts',
-    price: 1700,
-    image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767651024/bagio-fresh-limonada_thxnwv.webp',
-    active: true,
-    categories: 'Jugos y Aguas saborizadas',
-    mainCategory: 'bebidas',
-  },
-  {
     id: 891,
     name: 'Pizza muzzarella',
     price: 6500,
@@ -2787,6 +2807,26 @@ export const products: ProductWithOptionalDescription[] = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767727235/crema-de-leche_mjtnt9.webp',
     active: true,
     categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 903,
+    name: 'Queso rallado La Paulina x 40 gr',
+    price: 1500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767790750/rallado-la-paulina_az2u3m.jpg',
+    active: true,
+    categories: 'Almacén',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 904,
+    name: 'Yerba Nobleza Gaucha x 500 grs',
+    price: 2400,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767790633/nobleza-gaucha_q77b2w.webp',
+    active: true,
+    categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
 ];
