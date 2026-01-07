@@ -678,7 +678,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 730,
-    name: 'Paso de los toros Pomelo S/A x 2 lt',
+    name: 'Paso de los toros Pomelo x 1.5 lt',
     price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763910247/paso-de-los-toros_mxgtxu.jpg',
@@ -1074,7 +1074,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925255/arroz-chico_h2csc5.webp',
-    active: true,
+    active: false,
     categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
@@ -1084,6 +1084,16 @@ export const products: ProductWithOptionalDescription[] = [
     price: 850,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764788843/arroz-53_orstst.jpg',
+    active: true,
+    categories: 'Fideos y arroz',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 907,
+    name: 'Arroz Gallo Oro x 500 gr',
+    price: 1450,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767821419/gallo-oro_lwqt68.jpg',
     active: true,
     categories: 'Fideos y arroz',
     mainCategory: 'almacen',
@@ -1114,7 +1124,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925562/rivoli-entrefino_cyneu3.webp',
-    active: true,
+    active: false,
     categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
@@ -1234,7 +1244,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929076/salsa-pizza_cqoyjt.webp',
-    active: true,
+    active: false,
     categories: 'Salsas y puré de tomate',
     mainCategory: 'almacen',
   },
@@ -1405,7 +1415,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2400,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764073710/manfrey-untable-queso-azul_v8t0uw.png',
-    active: true,
+    active: false,
     categories: 'Quesos untables',
     mainCategory: 'lacteos',
   },
@@ -1505,7 +1515,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764114473/paso-de-los-toros-s-a_zjvyjj.jpg',
-    active: true,
+    active: false,
     categories: 'Aguas tónicas',
     mainCategory: 'bebidas',
   },
@@ -1665,7 +1675,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1400,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800544/riv-mon_czja4l.webp',
-    active: true,
+    active: false,
     categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
@@ -1866,7 +1876,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -1966,7 +1976,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795632/Pate-de-Foie-Swift-90-Gr-_1_vgi4wg.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -1976,7 +1986,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764795633/Picadillo-De-Carne-Swift_eqmr0b.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -2076,7 +2086,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun-desmenuzado-aceite_d3ojvl.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -2086,7 +2096,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793349/atun-desmenuzado-agua_pvp1xj.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -2096,7 +2106,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun-lomito-aceite_owbiul.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -2106,7 +2116,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793350/atun_f6x8ij.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -2116,7 +2126,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793049/champignon-bahi_rx69ka.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -2166,7 +2176,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764792552/alco-durazno_qn7b7q.jpg',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
@@ -2296,7 +2306,7 @@ export const products: ProductWithOptionalDescription[] = [
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790976/jardinera_gle1bl.webp',
     active: true,
-    categories: 'Almacén',
+    categories: 'Enlatados',
     mainCategory: 'almacen',
   },
   {
