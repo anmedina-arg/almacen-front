@@ -2715,7 +2715,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 6500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767724248/pizza-muzza_wg5h5k.jpg',
-    active: true,
+    active: false,
     categories: 'pizzas',
     mainCategory: 'pizzas',
   },
