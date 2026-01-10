@@ -954,7 +954,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929873/pure-tomate-noel_lhowle.jpg',
-    active: false,
+    active: true,
     categories: 'Salsas y puré de tomate',
     mainCategory: 'almacen',
   },
@@ -1071,10 +1071,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 733,
     name: 'Arroz Molinos Ala No se pasa x 500 gr',
-    price: 1000,
+    price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925255/arroz-chico_h2csc5.webp',
-    active: false,
+    active: true,
     categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
@@ -1120,11 +1120,11 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 736,
-    name: 'Fideo Rivoli entrefino x 500 gr',
-    price: 1100,
+    name: 'Fideo entrefino Rivoli x 500 gr',
+    price: 1250,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925562/rivoli-entrefino_cyneu3.webp',
-    active: false,
+    active: true,
     categories: 'Fideos y arroz',
     mainCategory: 'almacen',
   },
@@ -1241,10 +1241,10 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 749,
     name: 'Salsa KNOR para pizza x 200 gr',
-    price: 1000,
+    price: 1150,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763929076/salsa-pizza_cqoyjt.webp',
-    active: false,
+    active: true,
     categories: 'Salsas y puré de tomate',
     mainCategory: 'almacen',
   },
@@ -1255,7 +1255,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764787932/la-tranquera-500gr_oqgwfe.webp',
-    active: false,
+    active: true,
     categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
@@ -1670,7 +1670,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 907,
+    id: 908,
     name: 'Dulce de leche Cerros Tucumanos Clásico x 400 gr',
     price: 2300,
     image:
@@ -1691,8 +1691,8 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 846,
-    name: 'Fideo RIVOLI Mostacholi x 500 gr',
-    price: 1100,
+    name: 'Fideo Mostacholi RIVOLI x 500 gr',
+    price: 1250,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764800544/fideo_rivoli_mostachol_aqckhs.png',
     active: true,
@@ -2335,7 +2335,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764790718/vainillin_rhh3en.jpg',
-    active: true,
+    active: false,
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
@@ -2847,6 +2847,106 @@ export const products: ProductWithOptionalDescription[] = [
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767790633/nobleza-gaucha_q77b2w.webp',
     active: true,
     categories: 'Yerbas, tés y cafés',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 909,
+    name: 'Fideo codito Rivoli x 500 gr',
+    price: 1250,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925562/rivoli-entrefino_cyneu3.webp',
+    active: true,
+    categories: 'Fideos y arroz',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 910,
+    name: 'Fideo dedalito Rivoli x 500 gr',
+    price: 1250,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763925562/rivoli-entrefino_cyneu3.webp',
+    active: true,
+    categories: 'Fideos y arroz',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 911,
+    name: 'Jugo Pera Big C x 200 ml',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'jugos y aguas saborizadas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 912,
+    name: 'Jugo durazno Big C x 200 ml',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'jugos y aguas saborizadas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 913,
+    name: 'Jugo manzana Big C x 200 ml',
+    price: 500,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'jugos y aguas saborizadas',
+    mainCategory: 'bebidas',
+  },
+  {
+    id: 914,
+    name: 'Galletas Vocacion x 141 gr',
+    price: 1100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 915,
+    name: 'Galletas Pack Vocacion vainilla 3 x 141 gr',
+    price: 2700,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 916,
+    name: 'Caritas negras Don Satur x 200 gr',
+    price: 1100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 917,
+    name: 'Bizcochos dulces Don Satur x 200 gr',
+    price: 1100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'galletas',
+    mainCategory: 'almacen',
+  },
+  {
+    id: 918,
+    name: 'Bizcochitos de grasa Don Satur x 200 gr',
+    price: 1100,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+    active: true,
+    categories: 'galletas',
     mainCategory: 'almacen',
   },
 ];
