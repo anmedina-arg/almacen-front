@@ -10,7 +10,7 @@ export function useProducts() {
   useEffect(() => {
     let mounted = true;
 
-    import('@/app/mockdata').then((mod) => {
+    import('@/app/mockdata_fixed_ids').then((mod) => {
       if (mounted) {
         setProducts(mod.products);
         setIsLoading(false);

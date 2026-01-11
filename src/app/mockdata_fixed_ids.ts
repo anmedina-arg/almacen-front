@@ -1,10 +1,10 @@
 import { ProductWithOptionalDescription } from '@/types';
 
-// sub categorias de bebidas: Gaseosas, Jugos y Aguas saborizadas, Cervezas, Aguas tónicas, Aguas saborizadas, Aguas minerales y soda
+// sub categorias de bebidas: Gaseosas, jugos y aguas saborizadas, Cervezas, Aguas tónicas, Aguas saborizadas, Aguas minerales y soda
 
 export const products: ProductWithOptionalDescription[] = [
   {
-    id: 721,
+    id: 1,
     name: 'Pan Dulce Artesanal (250 gr x porc)',
     price: 2000,
     image:
@@ -14,7 +14,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 102,
+    id: 2,
     name: 'Pañuelitos c/dulce de leche x 1 u.',
     price: 1500,
     image:
@@ -24,7 +24,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 101,
+    id: 3,
     name: 'Bizcocho negro x 1 u.',
     price: 600,
     image:
@@ -34,7 +34,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 1,
+    id: 4,
     name: 'Galleta Chip Chocolate x 100 gr',
     price: 900,
     image:
@@ -44,7 +44,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 750,
+    id: 5,
     name: 'Galleta Chocolate x 100 gr',
     price: 900,
     image:
@@ -54,7 +54,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 44,
+    id: 6,
     name: 'Galleta de coco x 100 gr',
     price: 900,
     image:
@@ -64,7 +64,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 45,
+    id: 7,
     name: 'Galleta pepa x 100 gr',
     price: 900,
     image:
@@ -74,7 +74,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 2,
+    id: 8,
     name: 'Pan Hamb. Brioche c/semilla x 4 u.',
     price: 2700,
     image:
@@ -84,7 +84,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 3,
+    id: 9,
     name: 'Pan Hamb papa c/hebras queso x 4 u.',
     price: 2500,
     image:
@@ -94,7 +94,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 4,
+    id: 10,
     name: 'Pan lactal blanco',
     price: 3200,
     image:
@@ -104,7 +104,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 5,
+    id: 11,
     name: 'Pan lactal negro',
     price: 3200,
     image:
@@ -114,7 +114,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 6,
+    id: 12,
     name: 'Pan lactal blanco con semilla',
     price: 4000,
     image:
@@ -124,7 +124,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 7,
+    id: 13,
     name: 'Palmeritas x 100 gr',
     price: 1100,
     image:
@@ -134,7 +134,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 8,
+    id: 14,
     name: 'Rosquillas x 100 gr',
     price: 1100,
     image:
@@ -144,7 +144,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 9,
+    id: 15,
     name: 'Semoladas c/semillas x 100 gr',
     price: 750,
     image:
@@ -154,7 +154,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 10,
+    id: 16,
     name: 'Semoladas comun x 100 gr',
     price: 750,
     image:
@@ -164,7 +164,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 11,
+    id: 17,
     name: 'Pan chip x 12 u.',
     price: 4000,
     image:
@@ -174,7 +174,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 12,
+    id: 18,
     name: 'Pan pebete x 6 u.',
     price: 2800,
     image:
@@ -184,7 +184,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 13,
+    id: 19,
     name: 'Pan Brioche Viena x 6 u.',
     price: 2400,
     image:
@@ -194,7 +194,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 14,
+    id: 20,
     name: 'Mini tarta cabsha',
     price: 1700,
     image:
@@ -204,7 +204,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 15,
+    id: 21,
     name: 'Alfajor maizena',
     price: 1100,
     image:
@@ -214,7 +214,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 16,
+    id: 22,
     name: 'Bizcocho grasa x 100 gr',
     price: 800,
     image:
@@ -224,7 +224,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 17,
+    id: 23,
     name: 'Hamburguesa Paladini 2x80gr (pack)',
     price: 10.99,
     image: '/images/product1.jpg',
@@ -233,7 +233,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 18,
+    id: 24,
     name: 'Mostaza Danica Fiesta x 220gr',
     price: 12.99,
     image: '/images/product2.jpg',
@@ -242,7 +242,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'otros',
   },
   {
-    id: 19,
+    id: 25,
     name: 'Mayones Hellmans x 237gr',
     price: 10.99,
     image: '/images/product1.jpg',
@@ -251,7 +251,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'otros',
   },
   {
-    id: 21,
+    id: 26,
     name: 'Pan lactal artesanal',
     price: 3900,
     image:
@@ -261,7 +261,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 22,
+    id: 27,
     name: 'Pan lactal integral (a pedido)',
     price: 4500,
     image:
@@ -271,7 +271,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 720,
+    id: 28,
     name: 'Pan doble salvado',
     price: 2800,
     image:
@@ -281,7 +281,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 713,
+    id: 29,
     name: 'Fajitas para tacos x 12u',
     price: 2700,
     image:
@@ -291,7 +291,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 23,
+    id: 30,
     name: 'Pan Hamburguesa tipo campo x 4 u.',
     price: 2300,
     image:
@@ -301,7 +301,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 24,
+    id: 31,
     name: 'Pan hamburguesa común x 4 u.',
     price: 1500,
     image:
@@ -311,7 +311,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 3004,
+    id: 32,
     name: 'Milanesas de pollo GRANGYS x Kg',
     price: 9500,
     image:
@@ -321,17 +321,17 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 3002,
+    id: 33,
     name: 'Papas noisette GRANGYS x Kg',
     price: 8900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1756669796/ChatGPT_Image_Aug_31_2025_04_49_10_PM_vyw34i.png',
-    active: true,
+    active: false,
     categories: 'Congelados',
     mainCategory: 'congelados',
   },
   {
-    id: 3003,
+    id: 34,
     name: 'Papas bastón BEM BRASIL x Kg',
     price: 6000,
     image:
@@ -341,7 +341,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 25,
+    id: 35,
     name: 'Patitas de pollo comunes GRANGYS x kg',
     price: 7300,
     image:
@@ -351,7 +351,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 26,
+    id: 36,
     name: 'Patitas de pollo J y Q  GRANGYS x kg',
     price: 8400,
     image:
@@ -361,7 +361,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 27,
+    id: 37,
     name: 'Crocante de pollo GRANGYS x Kg',
     price: 9800,
     image:
@@ -371,7 +371,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 28,
+    id: 38,
     name: 'Bocadito Calabaza y muzzarella GRANGYS x Kg',
     price: 7000,
     image:
@@ -381,7 +381,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 29,
+    id: 39,
     name: 'Pan Chip Comun x 1kg (Por encargo)',
     price: 6000,
     image:
@@ -391,7 +391,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 30,
+    id: 40,
     name: 'Bocadito Papa y Queso GRANGYS x Kg',
     price: 7000,
     image:
@@ -401,7 +401,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 3001,
+    id: 41,
     name: 'Bocadito de muzzarella GRANGYS x Kg',
     price: 10900,
     image:
@@ -411,7 +411,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'congelados',
   },
   {
-    id: 41,
+    id: 42,
     name: 'Mantecado',
     price: 600,
     image:
@@ -421,7 +421,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 42,
+    id: 43,
     name: 'Mini pastafrola',
     price: 1100,
     image:
@@ -431,7 +431,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 43,
+    id: 44,
     name: 'tostadas dulces x 100 gr',
     price: 750,
     image:
@@ -441,7 +441,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 46,
+    id: 45,
     name: 'Grisines comunes x 100 gr',
     price: 900,
     image:
@@ -451,7 +451,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'panaderia',
   },
   {
-    id: 40,
+    id: 46,
     name: 'Grisines c/semillas x 100 gr',
     price: 900,
     image:
@@ -533,7 +533,7 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 54,
+    id: 52,
     name: 'COMBO 4',
     price: 8500,
     image:
@@ -554,7 +554,7 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 52,
+    id: 53,
     name: 'COMBO 3',
     price: 6500,
     image:
@@ -568,7 +568,7 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 7001,
+    id: 54,
     name: 'COMBO P.1',
     price: 4000,
     image:
@@ -582,7 +582,7 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 7002,
+    id: 55,
     name: 'COMBO P.2',
     price: 2800,
     image:
@@ -597,7 +597,7 @@ export const products: ProductWithOptionalDescription[] = [
     ],
   },
   {
-    id: 55,
+    id: 56,
     name: 'Papas fritas clasicas x 140 gr',
     price: 2500,
     image:
@@ -607,7 +607,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'snaks',
   },
   {
-    id: 56,
+    id: 57,
     name: 'Chizitos de queso x 95 gr',
     price: 1300,
     image:
@@ -617,7 +617,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'snaks',
   },
   {
-    id: 60,
+    id: 58,
     name: 'Papas fritas pay x 150 gr',
     price: 2300,
     image:
@@ -627,7 +627,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'snaks',
   },
   {
-    id: 57,
+    id: 59,
     name: 'Mani sabor pizza x 250 gr',
     price: 2500,
     image:
@@ -637,7 +637,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'snaks',
   },
   {
-    id: 58,
+    id: 60,
     name: 'Mani sabor jamon x 250 gr',
     price: 2500,
     image:
@@ -647,7 +647,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'snaks',
   },
   {
-    id: 59,
+    id: 61,
     name: 'Mani frito salado s/piel x 250 gr',
     price: 2400,
     image:
@@ -657,7 +657,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'snaks',
   },
   {
-    id: 701,
+    id: 62,
     name: 'Pepsi 2 L.',
     price: 2500,
     image:
@@ -667,7 +667,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 7111,
+    id: 63,
     name: 'Pepsi BLACK 2 L.',
     price: 3000,
     image:
@@ -677,7 +677,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 730,
+    id: 64,
     name: 'Paso de los toros Pomelo x 1.5 lt',
     price: 2500,
     image:
@@ -687,7 +687,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 702,
+    id: 65,
     name: '7up 2 L.',
     price: 2500,
     image:
@@ -697,7 +697,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 752,
+    id: 66,
     name: '7up FREE 2 L.',
     price: 2500,
     image:
@@ -707,7 +707,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 703,
+    id: 67,
     name: 'Mirinda Manzana 2 L.',
     price: 2500,
     image:
@@ -717,7 +717,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 704,
+    id: 68,
     name: 'Coca Cola Zero 2.25 L.',
     price: 4000,
     image:
@@ -727,7 +727,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 711,
+    id: 69,
     name: 'Coca Cola Reg 2.25 L.',
     price: 4000,
     image:
@@ -737,7 +737,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 714,
+    id: 70,
     name: 'Coca Cola Reg 2 lt RETORNABLE',
     price: 2800,
     image:
@@ -747,7 +747,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 715,
+    id: 71,
     name: 'Coca Cola Zero 2 lt RETORNABLE',
     price: 2800,
     image:
@@ -757,7 +757,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 710,
+    id: 72,
     name: 'Coca Cola Reg 1.5 L.',
     price: 3200,
     image:
@@ -767,7 +767,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 728,
+    id: 73,
     name: 'Coca Cola Zero x 1,5 lt',
     price: 3200,
     image:
@@ -777,7 +777,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 705,
+    id: 74,
     name: 'Sprite 2.25 L.',
     price: 3800,
     image:
@@ -787,7 +787,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 712,
+    id: 75,
     name: 'Fanta Naranja 2 L.',
     price: 3800,
     image:
@@ -797,7 +797,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 706,
+    id: 76,
     name: 'Fernet Branca 750 ml + Coca Cola 2.25 L. (zero o regular)',
     price: 20000,
     image:
@@ -808,7 +808,7 @@ export const products: ProductWithOptionalDescription[] = [
     // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
   {
-    id: 780,
+    id: 77,
     name: 'Fernet Branca 750 ml ',
     price: 16000,
     image:
@@ -819,7 +819,7 @@ export const products: ProductWithOptionalDescription[] = [
     // description: [{ text: 'Coca Zero / Coca Regular' }],
   },
   {
-    id: 753,
+    id: 78,
     name: 'Agua Mineral San Miguel x 2 lts',
     price: 1200,
     image:
@@ -829,7 +829,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 754,
+    id: 79,
     name: 'Soda Sifón BENEDICTINO x 2 lts',
     price: 2200,
     image:
@@ -839,47 +839,47 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 707,
+    id: 80,
     name: 'Baggio fresh Naranaja x 1.5 lts',
     price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758928935/Baggio-naranja-dulce-1_m7zxsg.jpg',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 708,
+    id: 81,
     name: 'Baggio fresh Manzana x 1.5 lts',
     price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929091/13712666-1_qqdpxb.png',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 709,
+    id: 82,
     name: 'Baggio fresh Mix-frutal x 1.5 lts',
     price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1758929179/005-001-009_agua-saborizadas-baggio-fresh-x-15-lts-mix-frutal1-a9cc5dc0b14d303b9715884677221826-640-0_vh0uuv.jpg',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 890,
+    id: 83,
     name: 'Baggio fresh Limonada x 1.5 lts',
     price: 1700,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767651024/bagio-fresh-limonada_thxnwv.webp',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 750,
+    id: 84,
     name: 'Té La Virginia x 25 saq',
     price: 1000,
     image:
@@ -889,7 +889,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 716,
+    id: 85,
     name: 'Yerba verdeflor x500grs',
     price: 2200,
     image:
@@ -899,7 +899,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 717,
+    id: 86,
     name: 'Yerba Amanda x500grs',
     price: 2400,
     image:
@@ -909,7 +909,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 718,
+    id: 87,
     name: 'Yerba taragui x500grs',
     price: 2300,
     image:
@@ -919,7 +919,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 719,
+    id: 88,
     name: 'Harina Graciela real 000 x1kg',
     price: 1000,
     image:
@@ -929,7 +929,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 720,
+    id: 89,
     name: 'Puré de tomate Sabores del Valle x 520 gr',
     price: 750,
     image:
@@ -939,7 +939,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 755,
+    id: 90,
     name: 'Pulpa de tomate Sabores del Valle x 520 gr',
     price: 750,
     image:
@@ -949,7 +949,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 721,
+    id: 91,
     name: 'Pure de tomate Noel x530 gr',
     price: 1000,
     image:
@@ -959,7 +959,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 722,
+    id: 92,
     name: 'Azucar x1kg',
     price: 900,
     image:
@@ -969,7 +969,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 777,
+    id: 93,
     name: 'Leche chocolatada La Serenisima x 1 lt',
     price: 3500,
     image:
@@ -979,7 +979,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 723,
+    id: 94,
     name: 'Leche Ilolay Descremada',
     price: 1950,
     image:
@@ -989,7 +989,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 724,
+    id: 95,
     name: 'Leche Ilolay Entera',
     price: 1900,
     image:
@@ -999,7 +999,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 725,
+    id: 96,
     name: 'Leche tregar Descremada',
     price: 1800,
     image:
@@ -1009,7 +1009,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 726,
+    id: 97,
     name: 'Leche tregar entera',
     price: 1600,
     image:
@@ -1019,7 +1019,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 727,
+    id: 98,
     name: 'Leche tregar deslactosada',
     price: 1900,
     image:
@@ -1029,27 +1029,27 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 779,
+    id: 99,
     name: 'Jugo ADES manzana x 1 lt',
     price: 2500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764203109/image_1_1764202979676_cudr64.png',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 729,
+    id: 100,
     name: 'Baggio Pronto x 1 lt Multifrutal',
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763913305/baggio_wj0pkw.jpg',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 731,
+    id: 101,
     name: 'Fritolim COCINERO 120gr',
     price: 4000,
     image:
@@ -1059,7 +1059,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 732,
+    id: 102,
     name: 'Aceite NATURA girasol x 900 ml',
     price: 3800,
     image:
@@ -1069,7 +1069,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 733,
+    id: 103,
     name: 'Arroz Molinos Ala No se pasa x 500 gr',
     price: 1200,
     image:
@@ -1079,7 +1079,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 788,
+    id: 104,
     name: 'Arroz 53 largo fino x 500 gr',
     price: 850,
     image:
@@ -1089,7 +1089,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 907,
+    id: 105,
     name: 'Arroz Gallo Oro x 500 gr',
     price: 1450,
     image:
@@ -1099,7 +1099,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 734,
+    id: 106,
     name: 'Arveja INALPA x 300 gr',
     price: 700,
     image:
@@ -1109,7 +1109,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 735,
+    id: 107,
     name: 'Edulcorante Si Diet Stevia x 200 cc',
     price: 2000,
     image:
@@ -1119,7 +1119,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 736,
+    id: 108,
     name: 'Fideo entrefino Rivoli x 500 gr',
     price: 1250,
     image:
@@ -1129,7 +1129,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 737,
+    id: 109,
     name: 'Fideo Rivoli Tirabuzón x 500 gr',
     price: 1200,
     image:
@@ -1139,7 +1139,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 738,
+    id: 110,
     name: 'Giacomo Capeletini J+Q x 500 gr',
     price: 4500,
     image:
@@ -1149,7 +1149,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 739,
+    id: 111,
     name: 'Ketchup Hellmans x 250 gr',
     price: 2100,
     image:
@@ -1159,7 +1159,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 740,
+    id: 112,
     name: 'Manteca La Tonadita x 200 gr',
     price: 3800,
     image:
@@ -1169,7 +1169,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 741,
+    id: 113,
     name: 'Mayonesa Hellmans x 273 gr',
     price: 1500,
     image:
@@ -1179,7 +1179,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 742,
+    id: 114,
     name: 'Mermelada Dulcor CIRUELA x 500 gr',
     price: 1800,
     image:
@@ -1189,7 +1189,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 743,
+    id: 115,
     name: 'Mermelada Dulcor FRUTILLA x 500 gr',
     price: 2200,
     image:
@@ -1199,7 +1199,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 744,
+    id: 116,
     name: 'Mermelada Dulcor DURAZNO LIGHT x 420 gr',
     price: 2000,
     image:
@@ -1209,7 +1209,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 745,
+    id: 117,
     name: 'Mostaza Savora x 250 gr',
     price: 1500,
     image:
@@ -1219,7 +1219,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 747,
+    id: 118,
     name: 'Puré papas KNORR x 125 gr',
     price: 2100,
     image:
@@ -1229,7 +1229,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 748,
+    id: 119,
     name: 'Queso Untable CREMON Light x 280 gr',
     price: 3200,
     image:
@@ -1239,7 +1239,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 749,
+    id: 120,
     name: 'Salsa KNOR para pizza x 200 gr',
     price: 1150,
     image:
@@ -1250,7 +1250,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
 
   {
-    id: 784,
+    id: 121,
     name: 'Yerba La Tranquera x 500grs',
     price: 2300,
     image:
@@ -1260,7 +1260,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 751,
+    id: 122,
     name: 'Mate en saquitos La Tranquera x 25 u',
     price: 1000,
     image:
@@ -1270,7 +1270,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 756,
+    id: 123,
     name: 'Aceitunas verdes descarozadas VANOLI x 140 gr',
     price: 2500,
     image:
@@ -1280,7 +1280,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 785,
+    id: 124,
     name: 'Aceitunas verdes descarozadas VANOLI x 80 gr',
     price: 1700,
     image:
@@ -1290,7 +1290,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 786,
+    id: 125,
     name: 'Aceitunas verdes rellenas VANOLI x 140 gr',
     price: 3000,
     image:
@@ -1300,7 +1300,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 757,
+    id: 126,
     name: 'Porroncito Heineken x 330 ml',
     price: 2700,
     image:
@@ -1310,7 +1310,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 789,
+    id: 127,
     name: 'Cerveza Imperial Gold x330 ml',
     price: 2000,
     image:
@@ -1320,7 +1320,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 764,
+    id: 128,
     name: 'Heineken lata x 473 ml',
     price: 3200,
     image:
@@ -1330,7 +1330,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 758,
+    id: 129,
     name: 'Imperial Golden lata x 473 ml',
     price: 1900,
     image:
@@ -1340,7 +1340,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 759,
+    id: 130,
     name: 'Norte lata x 473 ml',
     price: 2000,
     image:
@@ -1350,7 +1350,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 760,
+    id: 131,
     name: 'Schneider lata x 473 ml',
     price: 2000,
     image:
@@ -1360,7 +1360,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 761,
+    id: 132,
     name: 'Salta Negra lata x 473 ml',
     price: 2100,
     image:
@@ -1370,7 +1370,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 762,
+    id: 133,
     name: 'Quilmes lata x 473 ml',
     price: 2000,
     image:
@@ -1380,7 +1380,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 763,
+    id: 134,
     name: 'Grolsch lata x 473 ml',
     price: 2500,
     image:
@@ -1390,7 +1390,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 765,
+    id: 135,
     name: 'Queso cuartirolo TREMBLAY x kg',
     price: 8500,
     image:
@@ -1400,7 +1400,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 746,
+    id: 136,
     name: 'Queso Untable Port Salut Light Manfrey x 180 gr',
     price: 3000,
     image:
@@ -1410,7 +1410,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 766,
+    id: 137,
     name: 'Queso AZUL untable MANFREY x 180 gr',
     price: 2400,
     image:
@@ -1420,7 +1420,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 767,
+    id: 138,
     name: 'Queso JAMON untable MANFREY x 180 gr ',
     price: 2400,
     image:
@@ -1430,7 +1430,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 768,
+    id: 139,
     name: 'Tapa empanada LA TUCUMANITA x 12 u',
     price: 1200,
     image:
@@ -1440,7 +1440,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 769,
+    id: 140,
     name: 'Pascualina LA TUCUMANITA x 2 un CRIOLLA/HOJALDRADA',
     price: 1500,
     image:
@@ -1450,7 +1450,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 770,
+    id: 141,
     name: 'Queso DAMBO TREMBLAY X 100 gr',
     price: 1250,
     image:
@@ -1460,7 +1460,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'fiambres',
   },
   {
-    id: 771,
+    id: 142,
     name: 'Jamón Cocido Cagnoli x 100 gr',
     price: 1500,
     image:
@@ -1470,17 +1470,17 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'fiambres',
   },
   {
-    id: 919,
+    id: 293,
     name: 'Paleta Cagnoli x 100 gr',
     price: 1050,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725428/Los_4_hermanos_14_q18tiu.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768064513/paleta-cagnoli_tdr9zx.png',
     active: true,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
   },
   {
-    id: 772,
+    id: 143,
     name: 'Salame Casapueblo x 100 gr',
     price: 1800,
     image:
@@ -1490,17 +1490,17 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'fiambres',
   },
   {
-    id: 920,
+    id: 292,
     name: 'Salame Champion x 100 gr',
     price: 1500,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725724/Los_4_hermanos_7_fzgmcu.jpg',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768064424/salame-champion_bvgnqg.png',
     active: true,
     categories: 'Fiambres',
     mainCategory: 'fiambres',
   },
   {
-    id: 773,
+    id: 144,
     name: 'Agua Tónica Secco x 2lt',
     price: 2500,
     image:
@@ -1510,7 +1510,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 774,
+    id: 145,
     name: 'Agua Tónica Secco x 1,5 lt',
     price: 2000,
     image:
@@ -1520,7 +1520,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 775,
+    id: 146,
     name: 'Agua Tónica Torasso x 1,5 lt',
     price: 1500,
     image:
@@ -1530,7 +1530,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 776,
+    id: 147,
     name: 'Agua Tónica S/A Paso de los Toros x 1,5 lt',
     price: 3500,
     image:
@@ -1540,17 +1540,17 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 778,
+    id: 148,
     name: 'BAGGIO Pronto DURAZNO x 1 lt',
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764202334/baggio-durazno_q8a6rm.jpg',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 781,
+    id: 149,
     name: 'Aperol 750 ml + Cepitas x 1 lt',
     price: 1,
     image:
@@ -1560,7 +1560,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 782,
+    id: 150,
     name: 'Aperol 750 ml',
     price: 12000,
     image:
@@ -1570,7 +1570,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 783,
+    id: 151,
     name: 'Sal fina celusal x 500gr',
     price: 1500,
     image:
@@ -1580,7 +1580,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 834,
+    id: 152,
     name: 'Avena LA ESPAÑOLA inst. x 300 gr',
     price: 1300,
     image:
@@ -1590,7 +1590,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 835,
+    id: 153,
     name: 'Burgol LA ESPAÑOLA x 500 gr',
     price: 1500,
     image:
@@ -1600,7 +1600,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 836,
+    id: 154,
     name: 'Cacao chocolino x 180 gr',
     price: 2200,
     image:
@@ -1610,7 +1610,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 837,
+    id: 155,
     name: 'Cacao Nesquik x 180 gr',
     price: 2600,
     image:
@@ -1620,7 +1620,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 838,
+    id: 156,
     name: 'Café inst La Virginia Doy Pack Clásico x 170 gr',
     price: 7800,
     image:
@@ -1630,7 +1630,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 839,
+    id: 157,
     name: 'Caldo Knor Carne x 1 u.',
     price: 300,
     image:
@@ -1640,7 +1640,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 840,
+    id: 158,
     name: 'Caldo Knor Verdura x 1 u.',
     price: 300,
     image:
@@ -1650,7 +1650,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 841,
+    id: 159,
     name: 'Caldo Knor Gallina x 1 u.',
     price: 300,
     image:
@@ -1660,7 +1660,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 842,
+    id: 160,
     name: 'Choclo INALPA en grano x 300 gr',
     price: 1500,
     image:
@@ -1670,7 +1670,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 843,
+    id: 161,
     name: 'Crema de leche doble TREGAR 350cc',
     price: 4500,
     image:
@@ -1680,7 +1680,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 844,
+    id: 162,
     name: 'Dulce de leche MANFREY Clásico x 400 gr',
     price: 2500,
     image:
@@ -1690,7 +1690,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 908,
+    id: 163,
     name: 'Dulce de leche Cerros Tucumanos Clásico x 400 gr',
     price: 2300,
     image:
@@ -1700,7 +1700,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 845,
+    id: 164,
     name: 'Fideo RIVOLI Moñito x 500 gr',
     price: 1400,
     image:
@@ -1710,7 +1710,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 846,
+    id: 165,
     name: 'Fideo Mostacholi RIVOLI x 500 gr',
     price: 1250,
     image:
@@ -1720,7 +1720,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 847,
+    id: 166,
     name: 'Mermelada Ciruela ARCOR x 454 gr',
     price: 3600,
     image:
@@ -1730,7 +1730,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 848,
+    id: 167,
     name: 'Mermelada Ciruela Light ARCOR x 390 gr',
     price: 3900,
     image:
@@ -1740,7 +1740,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 849,
+    id: 168,
     name: 'Fideo RIVOLI Tallarines Verdura x 500 gr',
     price: 1600,
     image:
@@ -1750,7 +1750,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 850,
+    id: 169,
     name: 'Mermelada Durazno Light ARCOR x 390 gr',
     price: 3900,
     image:
@@ -1760,7 +1760,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 851,
+    id: 170,
     name: 'Queso rallado MANFREY x 40 gr',
     price: 1,
     image:
@@ -1770,7 +1770,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 852,
+    id: 171,
     name: 'Repelente VAIS Kids spray x 200 ml',
     price: 5500,
     image:
@@ -1780,7 +1780,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 853,
+    id: 172,
     name: 'Repelente VAIS spray x 200 ml',
     price: 5000,
     image:
@@ -1790,7 +1790,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 854,
+    id: 173,
     name: 'Rollo de cocina FELPITA Bco 3 x 40u',
     price: 2100,
     image:
@@ -1800,7 +1800,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 855,
+    id: 174,
     name: 'Sal Parrillera CELUSAL x 1 kg',
     price: 2000,
     image:
@@ -1810,7 +1810,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 175,
     name: 'Soda TORASSO sifón x 2 lt',
     price: 1500,
     image:
@@ -1820,7 +1820,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 856,
+    id: 176,
     name: 'Vitina clásica x 250 gr',
     price: 1900,
     image:
@@ -1830,7 +1830,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 8571,
+    id: 177,
     name: 'Gancia sin  alcohol lata x 473 ml',
     price: 2700,
     image:
@@ -1840,7 +1840,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 870,
+    id: 178,
     name: 'Queso en fetas La Verona x 100 gr',
     price: 1200,
     image:
@@ -1850,7 +1850,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'fiambres',
   },
   {
-    id: 789,
+    id: 179,
     name: 'Jamon cocido Recreo',
     price: 1,
     image:
@@ -1860,7 +1860,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 180,
     name: 'Salchichas carcaraña',
     price: 1,
     image:
@@ -1870,7 +1870,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 181,
     name: 'Mani tostado salado c/piel x 250gr',
     price: 2500,
     image:
@@ -1880,7 +1880,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'snaks',
   },
   {
-    id: 822,
+    id: 182,
     name: 'Boldo la virginia x 25saq',
     price: 2100,
     image:
@@ -1890,7 +1890,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 183,
     name: 'CIF Desinfectante Bioact dp x380 ml',
     price: 2300,
     image:
@@ -1900,7 +1900,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 184,
     name: 'Coctel de fruta Alco (lata) x820g',
     price: 3200,
     image:
@@ -1910,7 +1910,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 185,
     name: 'Desodorante de piso Aroma Jardin x900 cc',
     price: 1500,
     image:
@@ -1920,7 +1920,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 186,
     name: 'Espiral Raid x 12u',
     price: 3500,
     image:
@@ -1930,7 +1930,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 187,
     name: 'Franela la ponderosa x1u',
     price: 1950,
     image:
@@ -1940,7 +1940,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 789,
+    id: 188,
     name: 'Lana Acero Ok 40 g (virulana)',
     price: 850,
     image:
@@ -1950,7 +1950,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 833,
+    id: 189,
     name: 'Lenteja la española x 400gr',
     price: 1900,
     image:
@@ -1960,7 +1960,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 832,
+    id: 190,
     name: 'Limpiador Antigrasa Bora',
     price: 1800,
     image:
@@ -1970,7 +1970,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 821,
+    id: 191,
     name: 'Cajita de tè de manzanilla La virginia 25 sq',
     price: 1700,
     image:
@@ -1980,7 +1980,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 826,
+    id: 192,
     name: 'Pan rallado Preferido 500 gr',
     price: 2000,
     image:
@@ -1990,7 +1990,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 831,
+    id: 193,
     name: 'Paño Media naranja Multiuso',
     price: 1000,
     image:
@@ -2000,7 +2000,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 830,
+    id: 194,
     name: 'Pate Swift x 90g',
     price: 1200,
     image:
@@ -2010,7 +2010,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 829,
+    id: 195,
     name: 'Picadillo Swift x9 g',
     price: 1200,
     image:
@@ -2020,7 +2020,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 828,
+    id: 196,
     name: 'Polvo para hornear royal',
     price: 1700,
     image:
@@ -2030,7 +2030,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 827,
+    id: 197,
     name: 'Ravioles Madoni 4 quesos x 500g',
     price: 2800,
     image:
@@ -2040,7 +2040,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 826,
+    id: 198,
     name: 'Rebozador preferido x500gr',
     price: 2000,
     image:
@@ -2050,7 +2050,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 825,
+    id: 199,
     name: 'Rejilla Media naranja',
     price: 1100,
     image:
@@ -2060,7 +2060,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 824,
+    id: 200,
     name: 'repelente Vais bebes crema 100 ml',
     price: 8600,
     image:
@@ -2070,7 +2070,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 823,
+    id: 201,
     name: 'Tabletas raid x24u',
     price: 7300,
     image:
@@ -2080,7 +2080,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 820,
+    id: 202,
     name: 'Te de tilo LV x 25saq',
     price: 3300,
     image:
@@ -2090,7 +2090,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 819,
+    id: 203,
     name: 'Trapo de piso Sacchi gris 47x57',
     price: 2200,
     image:
@@ -2100,7 +2100,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 818,
+    id: 204,
     name: 'Alcohol Frau x 250cc',
     price: 1200,
     image:
@@ -2110,7 +2110,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 817,
+    id: 205,
     name: 'Atùn CUMANA desmenuzado 170g aceite',
     price: 1800,
     image:
@@ -2120,7 +2120,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 816,
+    id: 206,
     name: 'Atùn CUMANA desmenuzado 170g natural',
     price: 1800,
     image:
@@ -2130,7 +2130,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 815,
+    id: 207,
     name: 'Atùn CUMANA lomito 170g Aceite',
     price: 3700,
     image:
@@ -2140,7 +2140,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 814,
+    id: 208,
     name: 'Atùn CUMANA lomito 170g natural',
     price: 3700,
     image:
@@ -2150,7 +2150,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 812,
+    id: 209,
     name: 'Champiniones Bahia enteros 400 g',
     price: 4000,
     image:
@@ -2160,7 +2160,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 809,
+    id: 210,
     name: 'Jugo para preparar Clight 20 sobre LIMONADA',
     price: 500,
     image:
@@ -2170,7 +2170,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 810,
+    id: 211,
     name: 'Jugo para preparar Clight 20 sobre MANDARINA',
     price: 500,
     image:
@@ -2180,7 +2180,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 811,
+    id: 212,
     name: 'Jugo para preparar Clight 20 sobre NARANJA',
     price: 500,
     image:
@@ -2190,7 +2190,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 808,
+    id: 213,
     name: 'Detergente Ala concentrado repuesto 450 ml',
     price: 2500,
     image:
@@ -2200,7 +2200,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 807,
+    id: 214,
     name: 'Lata de Durazno ALCO mitad x 820 g',
     price: 2500,
     image:
@@ -2210,7 +2210,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 806,
+    id: 215,
     name: 'Papel hig Higienol max 4 x 80m',
     price: 4600,
     image:
@@ -2220,7 +2220,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 805,
+    id: 216,
     name: 'Leche Condensada descremada Nestle 395gr',
     price: 4800,
     image:
@@ -2230,7 +2230,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 804,
+    id: 217,
     name: 'Leche Condensada entera Nestle 395gr',
     price: 4800,
     image:
@@ -2240,7 +2240,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 803,
+    id: 218,
     name: 'Palmitos en trozos CUMANA 400gr',
     price: 2500,
     image:
@@ -2250,7 +2250,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 802,
+    id: 219,
     name: 'Queso rallado LA SERENISIMA 35gr',
     price: 1700,
     image:
@@ -2260,7 +2260,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 801,
+    id: 220,
     name: 'Soda Iberá sifón x 2lt',
     price: 1500,
     image:
@@ -2270,8 +2270,8 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 800,
-    name: 'Condimentos Pimenton Extra dulce x 50gr',
+    id: 221,
+    name: 'Pimenton Extra dulce x 50gr',
     price: 550,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
@@ -2280,8 +2280,8 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 799,
-    name: 'Condimentos Curcuma x 50 gr',
+    id: 222,
+    name: 'Curcuma x 50 gr',
     price: 500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
@@ -2290,7 +2290,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 798,
+    id: 223,
     name: 'Adobo para pizza x 50 gr',
     price: 600,
     image:
@@ -2300,7 +2300,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 797,
+    id: 224,
     name: 'Pimienta blanca  Molida x 50 gr',
     price: 550,
     image:
@@ -2310,7 +2310,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 796,
+    id: 225,
     name: 'Provenzal x 50 gr',
     price: 700,
     image:
@@ -2320,7 +2320,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 795,
+    id: 226,
     name: 'oregano en hojas x 50 gr',
     price: 550,
     image:
@@ -2330,7 +2330,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 794,
+    id: 227,
     name: 'jardinera Inalpa x 300grs',
     price: 1100,
     image:
@@ -2340,7 +2340,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 793,
+    id: 228,
     name: 'Filete de anchoas Marvellas',
     price: 7100,
     image:
@@ -2350,7 +2350,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 792,
+    id: 229,
     name: 'Vainillin alicante x 100cc',
     price: 2100,
     image:
@@ -2360,7 +2360,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 791,
+    id: 230,
     name: 'Yogur cerro tucumano sachet x 1lt Frutilla',
     price: 1700,
     image:
@@ -2370,7 +2370,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 790,
+    id: 231,
     name: 'Yogur cerro tucumano sachet x 1lt Vainilla',
     price: 1700,
     image:
@@ -2380,7 +2380,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 857,
+    id: 232,
     name: 'Gancia sin  alcohol lata x 473 ml',
     price: 2700,
     image:
@@ -2390,7 +2390,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 859,
+    id: 233,
     name: 'Corona lata x 473 ml',
     price: 2200,
     image:
@@ -2400,7 +2400,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 865,
+    id: 234,
     name: 'Imperial Roja lata x 473 ml',
     price: 2200,
     image:
@@ -2410,7 +2410,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 866,
+    id: 235,
     name: 'Imperial APA lata x 473 ml',
     price: 2200,
     image:
@@ -2420,7 +2420,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 867,
+    id: 236,
     name: 'Imperial IPA lata x 473 ml',
     price: 2200,
     image:
@@ -2430,7 +2430,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 868,
+    id: 237,
     name: 'Stella Artois lata x 473 ml',
     price: 2500,
     image:
@@ -2440,7 +2440,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 860,
+    id: 238,
     name: 'SIX PACK Corona lata x 473 ml',
     price: 13000,
     image:
@@ -2450,7 +2450,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 861,
+    id: 239,
     name: 'SIX PACK Imperial Golden lata x 473 ml',
     price: 10500,
     image:
@@ -2460,7 +2460,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 862,
+    id: 240,
     name: 'SIX PACK Roja Imperial lata x 473 ml',
     price: 13000,
     image:
@@ -2470,7 +2470,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 863,
+    id: 241,
     name: 'SIX PACK APA Imperial lata x 473 ml',
     price: 13000,
     image:
@@ -2480,7 +2480,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 864,
+    id: 242,
     name: 'SIX PACK IPA Imperial lata x 473 ml',
     price: 13000,
     image:
@@ -2490,7 +2490,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 869,
+    id: 243,
     name: 'SIX PACK - Stella Artois lata x 473 ml',
     price: 14000,
     image:
@@ -2500,7 +2500,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 858,
+    id: 244,
     name: 'SIX PACK Heineken lata x 473 ml',
     price: 18000,
     image:
@@ -2510,7 +2510,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 905,
+    id: 245,
     name: 'SIX PACK Grolsch lata x 473 ml',
     price: 14000,
     image:
@@ -2520,7 +2520,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 906,
+    id: 246,
     name: 'SIX PACK Quilmes lata x 473 ml',
     price: 11000,
     image:
@@ -2530,57 +2530,57 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 871,
+    id: 247,
     name: 'BAGGIO Pronto MANZANA x 1 lt',
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764202334/baggio-durazno_q8a6rm.jpg',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 872,
+    id: 248,
     name: 'BAGGIO Pronto NARANJA x 1 lt',
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764202334/baggio-durazno_q8a6rm.jpg',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 873,
+    id: 249,
     name: 'BAGGIO Pronto MIX FRUTAL x 1 lt',
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764202334/baggio-durazno_q8a6rm.jpg',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 874,
+    id: 250,
     name: 'Jugo Cepita del valle Naranja 1,5l',
     price: 3500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793225/Jugo-Cepita-Del-Valle-Durazno-Delicioso_cee9f5.webp',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 813,
+    id: 251,
     name: 'Jugo cepita del valle durazno 1,5l',
     price: 3500,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764793225/Jugo-Cepita-Del-Valle-Durazno-Delicioso_cee9f5.webp',
     active: true,
-    categories: 'Jugos y Aguas saborizadas',
+    categories: 'jugos y aguas saborizadas',
     mainCategory: 'bebidas',
   },
   {
-    id: 875,
+    id: 252,
     name: 'Soda BIO SPORT sifón x 2 lt',
     price: 1300,
     image:
@@ -2590,7 +2590,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 876,
+    id: 253,
     name: 'Agua Mineral Nestlé x 2 lts',
     price: 1200,
     image:
@@ -2600,7 +2600,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 877,
+    id: 254,
     name: 'Agua Mineral Palau x 2 lts',
     price: 1000,
     image:
@@ -2610,7 +2610,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 878,
+    id: 255,
     name: 'Monster Mango x 473 ml',
     price: 3200,
     image:
@@ -2620,7 +2620,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 879,
+    id: 256,
     name: 'Monster original x 473 ml',
     price: 3200,
     image:
@@ -2630,7 +2630,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 880,
+    id: 257,
     name: 'Powerade frutas tropicales x 500cc',
     price: 2000,
     image:
@@ -2640,7 +2640,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 881,
+    id: 258,
     name: 'Powerade uva x 500cc',
     price: 2000,
     image:
@@ -2650,7 +2650,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 882,
+    id: 259,
     name: 'Powerade Sour green x 500cc',
     price: 2000,
     image:
@@ -2660,7 +2660,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 883,
+    id: 260,
     name: 'Galletas Granix Sin Sal 3 x 200 grs',
     price: 4600,
     image:
@@ -2670,7 +2670,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 884,
+    id: 261,
     name: 'Galletas Granix Salvado 720 grs',
     price: 5400,
     image:
@@ -2680,7 +2680,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 885,
+    id: 262,
     name: 'Galletas Granix Salvado sin sal 690 grs',
     price: 5000,
     image:
@@ -2690,7 +2690,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 886,
+    id: 263,
     name: 'Galletas Sandwiches Granix x 600 grs',
     price: 4500,
     image:
@@ -2700,7 +2700,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 887,
+    id: 264,
     name: 'Galletas media tarde',
     price: 1800,
     image:
@@ -2710,7 +2710,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 888,
+    id: 265,
     name: 'Galletas la providencia x3u',
     price: 1400,
     image:
@@ -2720,7 +2720,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 889,
+    id: 266,
     name: 'Galletas Traviata x3u',
     price: 2500,
     image:
@@ -2730,7 +2730,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 891,
+    id: 267,
     name: 'Pizza muzzarella',
     price: 6500,
     image:
@@ -2740,7 +2740,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'pizzas',
   },
   {
-    id: 892,
+    id: 268,
     name: 'Pizza especial',
     price: 7500,
     image:
@@ -2750,7 +2750,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'pizzas',
   },
   {
-    id: 893,
+    id: 269,
     name: 'Pizza ternera',
     price: 8000,
     image:
@@ -2760,7 +2760,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'pizzas',
   },
   {
-    id: 894,
+    id: 270,
     name: 'Pizza roquefort',
     price: 8000,
     image:
@@ -2770,7 +2770,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'pizzas',
   },
   {
-    id: 895,
+    id: 271,
     name: 'Pizza cantimpalo',
     price: 8000,
     image:
@@ -2780,7 +2780,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'pizzas',
   },
   {
-    id: 896,
+    id: 272,
     name: 'Lomo ahumado suizo luvianca SIN GLUTEN x 100 gr',
     price: 1800,
     image:
@@ -2790,7 +2790,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'fiambres',
   },
   {
-    id: 897,
+    id: 273,
     name: 'Bondiola 214 SIN GLUTEN',
     price: 2600,
     image:
@@ -2800,7 +2800,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'fiambres',
   },
   {
-    id: 898,
+    id: 274,
     name: 'Mortadela Champion SIN GLUTEN x 100 gr',
     price: 900,
     image:
@@ -2810,7 +2810,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'fiambres',
   },
   {
-    id: 899,
+    id: 275,
     name: 'Yogur gran compra sachet x 1lt Frutilla',
     price: 2000,
     image:
@@ -2820,7 +2820,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 900,
+    id: 276,
     name: 'Yogur gran compra sachet x 1lt Vainilla',
     price: 2000,
     image:
@@ -2830,7 +2830,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'lacteos',
   },
   {
-    id: 901,
+    id: 277,
     name: 'Crema de leche tonadita x350cc',
     price: 4000,
     image:
@@ -2840,7 +2840,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 902,
+    id: 278,
     name: 'Crema de leche tonadita x200cc',
     price: 2100,
     image:
@@ -2850,7 +2850,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 903,
+    id: 279,
     name: 'Queso rallado La Paulina x 40 gr',
     price: 1500,
     image:
@@ -2860,7 +2860,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 904,
+    id: 280,
     name: 'Yerba Nobleza Gaucha x 500 grs',
     price: 2400,
     image:
@@ -2870,7 +2870,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 909,
+    id: 281,
     name: 'Fideo codito Rivoli x 500 gr',
     price: 1250,
     image:
@@ -2880,7 +2880,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 910,
+    id: 282,
     name: 'Fideo dedalito Rivoli x 500 gr',
     price: 1250,
     image:
@@ -2890,7 +2890,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'almacen',
   },
   {
-    id: 911,
+    id: 283,
     name: 'Jugo Pera Big C x 200 ml',
     price: 500,
     image:
@@ -2900,7 +2900,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 912,
+    id: 284,
     name: 'Jugo durazno Big C x 200 ml',
     price: 500,
     image:
@@ -2910,7 +2910,7 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 913,
+    id: 285,
     name: 'Jugo manzana Big C x 200 ml',
     price: 500,
     image:
@@ -2920,54 +2920,104 @@ export const products: ProductWithOptionalDescription[] = [
     mainCategory: 'bebidas',
   },
   {
-    id: 914,
+    id: 286,
     name: 'Galletas Vocacion x 141 gr',
     price: 1100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768056201/Vovacion-x-1_ekephj.webp',
     active: true,
     categories: 'galletas',
     mainCategory: 'almacen',
   },
   {
-    id: 915,
+    id: 287,
     name: 'Galletas Pack Vocacion vainilla 3 x 141 gr',
     price: 2700,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768056201/Vovacion-x-3_hfuodz.webp',
     active: true,
     categories: 'galletas',
     mainCategory: 'almacen',
   },
   {
-    id: 916,
+    id: 288,
     name: 'Caritas negras Don Satur x 200 gr',
     price: 1100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768056202/don-satur-negras_fmyzsi.webp',
     active: true,
     categories: 'galletas',
     mainCategory: 'almacen',
   },
   {
-    id: 917,
+    id: 289,
     name: 'Bizcochos dulces Don Satur x 200 gr',
     price: 1100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768056201/don-satur-dulces_oocsks.webp',
     active: true,
     categories: 'galletas',
     mainCategory: 'almacen',
   },
   {
-    id: 918,
+    id: 290,
     name: 'Bizcochitos de grasa Don Satur x 200 gr',
     price: 1100,
     image:
-      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763609292/SIN_IMAGEN_qrdys8.png',
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768056201/don-satur-bizcocho-grasa_mzjcd6.jpg',
     active: true,
     categories: 'galletas',
     mainCategory: 'almacen',
+  },
+  {
+    id: 291,
+    name: 'Paleta Cagnoli x 100 gr',
+    price: 1050,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767725428/Los_4_hermanos_14_q18tiu.png',
+    active: true,
+    categories: 'Fiambres',
+    mainCategory: 'fiambres',
+  },
+  {
+    id: 294,
+    name: 'Yogur firme frutilla Gran Compra x 120 g',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768065194/gra-compra-firme_zwp8fs.jpg',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 295,
+    name: 'Yogur firme vainilla Gran Compra x 120 g',
+    price: 800,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768065194/Yogur-Entero-Firme-Vainilla-Gran-Compra-120-gr-1-14381_lnyo3y.webp',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 296,
+    name: 'Yogur frutilla LS Clasico Bat descremado x 120 gr',
+    price: 1300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768065193/LS-firme-desc-frut_bdrvdf.jpg',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
+  },
+  {
+    id: 296,
+    name: 'Yogur vainilla LS Clasico Bat descremado x 120 gr',
+    price: 1300,
+    image:
+      'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768065193/LS-firme-desc-vainilla_t9htku.jpg',
+    active: true,
+    categories: 'lacteos',
+    mainCategory: 'lacteos',
   },
 ];
 
