@@ -914,7 +914,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763915611/yerba-taragui_t0vszk.jpg',
-    active: true,
+    active: false,
     categories: 'Yerbas, tés y cafés',
     mainCategory: 'almacen',
   },
@@ -1405,7 +1405,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 3000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1763928739/port-salut-manfrey_jdy4ul.jpg',
-    active: true,
+    active: false,
     categories: 'Quesos untables',
     mainCategory: 'lacteos',
   },
@@ -1435,7 +1435,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1200,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764075851/tapa-empanada-tucumanita_psdexs.jpg',
-    active: true,
+    active: false,
     categories: 'Almacén',
     mainCategory: 'almacen',
   },
@@ -2815,7 +2815,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767726534/gran-compra-frutilla_bltavf.webp',
-    active: true,
+    active: false,
     categories: 'lacteos',
     mainCategory: 'lacteos',
   },
@@ -2825,7 +2825,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 2000,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1767726534/gran-compra-vainilla_soe0gh.webp',
-    active: true,
+    active: false,
     categories: 'lacteos',
     mainCategory: 'lacteos',
   },
