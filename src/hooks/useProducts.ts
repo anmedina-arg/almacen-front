@@ -2,6 +2,7 @@
 
 import { Product } from '@/types';
 import { useEffect, useState } from 'react';
+import { productsDataSource } from '@/data/products.datasource.provider';
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -10,9 +11,9 @@ export function useProducts() {
   useEffect(() => {
     let mounted = true;
 
-    import('@/app/mockdata_fixed_ids').then((mod) => {
+    productsDataSource.getAll().then((data) => {
       if (mounted) {
-        setProducts(mod.products);
+        setProducts(data);
         setIsLoading(false);
       }
     });
