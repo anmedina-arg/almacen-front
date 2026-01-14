@@ -1,0 +1,8 @@
+{
+  "features": {
+    "backend": false,
+    "stock": false,
+    "variants": false,
+    "pwa": false
+  }
+}
