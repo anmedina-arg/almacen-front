@@ -1,27 +1,39 @@
 'use client';
 
-import { Product } from '@/types';
 import { useEffect, useState } from 'react';
-import { productsDataSource } from '@/data/products.datasource.provider';
+import { Product } from '@/types';
+import { productDataSource } from '@/data/products';
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
 
-    productsDataSource.getAll().then((data) => {
-      if (mounted) {
-        setProducts(data);
-        setIsLoading(false);
-      }
-    });
+    productDataSource
+      .getAll()
+      .then((data) => {
+        if (mounted) {
+          setProducts(data);
+        }
+      })
+      .catch(() => {
+        if (mounted) {
+          setError('Error loading products');
+        }
+      })
+      .finally(() => {
+        if (mounted) {
+          setIsLoading(false);
+        }
+      });
 
     return () => {
       mounted = false;
     };
   }, []);
 
-  return { products, isLoading };
+  return { products, isLoading, error };
 }
