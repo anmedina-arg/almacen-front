@@ -2955,7 +2955,7 @@ export const products: ProductWithOptionalDescription[] = [
     price: 1100,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1768056201/don-satur-dulces_oocsks.webp',
-    active: true,
+    active: false,
     categories: 'galletas',
     mainCategory: 'almacen',
   },
