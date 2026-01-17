@@ -146,7 +146,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 15,
     name: 'Semoladas c/semillas x 100 gr',
-    price: 750,
+    price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
@@ -156,7 +156,7 @@ export const products: ProductWithOptionalDescription[] = [
   {
     id: 16,
     name: 'Semoladas comun x 100 gr',
-    price: 750,
+    price: 800,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1754339610/semoladas_ycdhyp.png',
     active: true,
@@ -1391,8 +1391,8 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 135,
-    name: 'Queso cuartirolo TREMBLAY x kg',
-    price: 8500,
+    name: 'Queso cuartirolo La Paulina x kg',
+    price: 8900,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1764072937/queso-cuartirolo-tremblay_hhzy44.webp',
     active: true,
