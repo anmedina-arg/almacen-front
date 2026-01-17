@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Barlow } from "next/font/google";
 import "./globals.css";
 import { Analytics } from '@vercel/analytics/react';
+import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -34,10 +35,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#000000" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Market Cevil" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+      </head>
       <body
         className={`${barlow.variable} antialiased`}
       >
         {children}
+        <ServiceWorkerRegistration />
         <Analytics />
       </body>
     </html>
