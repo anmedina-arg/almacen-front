@@ -3,6 +3,7 @@ import { Barlow } from "next/font/google";
 import "./globals.css";
 import { Analytics } from '@vercel/analytics/react';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
+import InstallPWAButton from '@/components/InstallPWAButton';
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -50,6 +51,7 @@ export default function RootLayout({
         className={`${barlow.variable} antialiased`}
       >
         {children}
+        <InstallPWAButton />
         <ServiceWorkerRegistration />
         <Analytics />
       </body>

@@ -48,6 +48,12 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Skip caching for product API requests - always fetch from Supabase
+  if (event.request.url.includes('/api/products')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
