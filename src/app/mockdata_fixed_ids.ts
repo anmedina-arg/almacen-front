@@ -608,7 +608,7 @@ export const products: ProductWithOptionalDescription[] = [
   },
   {
     id: 57,
-    name: 'Chizitos de queso x 95 gr',
+    name: 'Chizitos de queso x 95gr',
     price: 1300,
     image:
       'https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto/v1755700005/transparent-Photoroom__1_-removebg-preview_bz0u5u.png',
