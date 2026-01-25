@@ -1,6 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import {
+  trackPWAInstall,
+  trackPWAPromptShown,
+  trackPWAInstallAccepted,
+  trackPWAInstallDismissed,
+} from '@/utils/analytics';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -33,15 +39,28 @@ const InstallPWAButton: React.FC = () => {
     }, 2000);
 
     // Escuchar el evento beforeinstallprompt para capturar el prompt
-    const handler = (e: Event) => {
+    const beforeInstallHandler = (e: Event) => {
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
+      // Track que el prompt está disponible
+      trackPWAPromptShown();
     };
 
-    window.addEventListener('beforeinstallprompt', handler);
+    // Escuchar el evento appinstalled
+    const appInstalledHandler = () => {
+      console.log('PWA instalada exitosamente');
+      localStorage.setItem('pwa-installed', 'true');
+      setShowButton(false);
+      // Track instalación exitosa
+      trackPWAInstall();
+    };
+
+    window.addEventListener('beforeinstallprompt', beforeInstallHandler);
+    window.addEventListener('appinstalled', appInstalledHandler);
 
     return () => {
-      window.removeEventListener('beforeinstallprompt', handler);
+      window.removeEventListener('beforeinstallprompt', beforeInstallHandler);
+      window.removeEventListener('appinstalled', appInstalledHandler);
     };
   }, []);
 
@@ -59,11 +78,15 @@ const InstallPWAButton: React.FC = () => {
     const { outcome } = await deferredPrompt.userChoice;
 
     if (outcome === 'accepted') {
-      console.log('PWA instalada exitosamente');
+      console.log('Usuario aceptó la instalación');
       localStorage.setItem('pwa-installed', 'true');
+      // Track aceptación (la instalación real se trackea en el evento 'appinstalled')
+      trackPWAInstallAccepted();
     } else {
       console.log('Usuario rechazó la instalación');
       localStorage.setItem('pwa-install-dismissed', 'true');
+      // Track rechazo
+      trackPWAInstallDismissed('user_rejected');
     }
 
     // Limpiar el prompt
@@ -76,6 +99,8 @@ const InstallPWAButton: React.FC = () => {
     localStorage.setItem('pwa-install-dismissed', 'true');
     setShowButton(false);
     setShowTooltip(false);
+    // Track que el usuario descartó el botón
+    trackPWAInstallDismissed('button_dismissed');
   };
 
   if (!showButton) return null;
