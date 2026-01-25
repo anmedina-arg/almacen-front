@@ -4,6 +4,7 @@ import "./globals.css";
 import { Analytics } from '@vercel/analytics/react';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import InstallPWAButton from '@/components/InstallPWAButton';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
 
 const barlow = Barlow({
   variable: "--font-barlow",
@@ -53,6 +54,7 @@ export default function RootLayout({
         {children}
         <InstallPWAButton />
         <ServiceWorkerRegistration />
+        <GoogleAnalytics />
         <Analytics />
       </body>
     </html>
