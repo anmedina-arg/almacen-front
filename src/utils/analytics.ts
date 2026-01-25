@@ -22,10 +22,17 @@ export const sendGAEvent = (
   eventName: string,
   eventParams?: Record<string, unknown>
 ) => {
+  console.log('[GA4 Debug] sendGAEvent called:', eventName, eventParams);
+  console.log('[GA4 Debug] window.gtag exists:', typeof window !== 'undefined' && typeof window.gtag !== 'undefined');
+
   if (typeof window !== 'undefined' && window.gtag) {
+    console.log('[GA4 Debug] Sending event to GA4:', eventName);
     window.gtag('event', eventName, eventParams);
+    console.log('[GA4 Debug] Event sent successfully');
   } else {
-    console.warn('Google Analytics not initialized');
+    console.warn('[GA4 Debug] Google Analytics not initialized - event NOT sent:', eventName);
+    console.warn('[GA4 Debug] window exists:', typeof window !== 'undefined');
+    console.warn('[GA4 Debug] window.gtag exists:', typeof window !== 'undefined' && typeof window.gtag !== 'undefined');
   }
 };
 
@@ -33,16 +40,21 @@ export const sendGAEvent = (
  * Track PWA installation
  */
 export const trackPWAInstall = () => {
+  console.log('[GA4 Debug] trackPWAInstall called');
+
   const displayMode = window.matchMedia('(display-mode: standalone)').matches
     ? 'standalone'
     : 'browser';
 
-  sendGAEvent('pwa_install', {
+  const eventData = {
     timestamp: new Date().toISOString(),
     user_agent: navigator.userAgent,
     display_mode: displayMode,
     platform: navigator.platform,
-  });
+  };
+
+  console.log('[GA4 Debug] PWA Install event data:', eventData);
+  sendGAEvent('pwa_install', eventData);
 };
 
 /**

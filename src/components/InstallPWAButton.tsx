@@ -19,18 +19,26 @@ const InstallPWAButton: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
+    console.log('[PWA Button] InstallPWAButton component mounted');
+
     // Verificar si ya está instalada o si el usuario rechazó la instalación
     const isInstalled = window.matchMedia('(display-mode: standalone)').matches;
     const userDismissed = localStorage.getItem('pwa-install-dismissed');
     const userInstalled = localStorage.getItem('pwa-installed');
 
+    console.log('[PWA Button] Is installed (standalone):', isInstalled);
+    console.log('[PWA Button] User dismissed:', userDismissed);
+    console.log('[PWA Button] User installed (localStorage):', userInstalled);
+
     // Si ya está instalada o fue rechazada, no mostrar el botón
     if (isInstalled || userDismissed || userInstalled) {
+      console.log('[PWA Button] Hiding button - already installed or dismissed');
       setShowButton(false);
       return;
     }
 
     // Mostrar el botón siempre (no depender del evento)
+    console.log('[PWA Button] Showing install button');
     setShowButton(true);
 
     // Mostrar tooltip después de 2 segundos
@@ -40,52 +48,55 @@ const InstallPWAButton: React.FC = () => {
 
     // Escuchar el evento beforeinstallprompt para capturar el prompt
     const beforeInstallHandler = (e: Event) => {
+      console.log('[PWA Button] beforeinstallprompt event detected');
       e.preventDefault();
       setDeferredPrompt(e as BeforeInstallPromptEvent);
       // Track que el prompt está disponible
+      console.log('[PWA Button] Calling trackPWAPromptShown');
       trackPWAPromptShown();
     };
 
-    // Escuchar el evento appinstalled
-    const appInstalledHandler = () => {
-      console.log('PWA instalada exitosamente');
-      localStorage.setItem('pwa-installed', 'true');
-      setShowButton(false);
-      // Track instalación exitosa
-      trackPWAInstall();
-    };
-
     window.addEventListener('beforeinstallprompt', beforeInstallHandler);
-    window.addEventListener('appinstalled', appInstalledHandler);
+    console.log('[PWA Button] beforeinstallprompt listener registered');
 
     return () => {
+      console.log('[PWA Button] Removing beforeinstallprompt listener');
       window.removeEventListener('beforeinstallprompt', beforeInstallHandler);
-      window.removeEventListener('appinstalled', appInstalledHandler);
     };
   }, []);
 
   const handleInstallClick = async () => {
+    console.log('[PWA Button] Install button clicked');
+    console.log('[PWA Button] Deferred prompt available:', !!deferredPrompt);
+
     if (!deferredPrompt) {
       // Si no hay prompt disponible, informar al usuario
+      console.warn('[PWA Button] No deferred prompt available');
       alert('La instalación no está disponible en este momento. Intenta desde Chrome, Edge o Safari.');
       return;
     }
 
     // Mostrar el prompt de instalación
+    console.log('[PWA Button] Showing install prompt...');
     deferredPrompt.prompt();
 
     // Esperar la respuesta del usuario
+    console.log('[PWA Button] Waiting for user choice...');
     const { outcome } = await deferredPrompt.userChoice;
+    console.log('[PWA Button] User choice outcome:', outcome);
 
     if (outcome === 'accepted') {
-      console.log('Usuario aceptó la instalación');
+      console.log('[PWA Button] ✅ User ACCEPTED installation');
       localStorage.setItem('pwa-installed', 'true');
-      // Track aceptación (la instalación real se trackea en el evento 'appinstalled')
+      // Track aceptación (la instalación real se trackea en PWAInstallTracker)
+      console.log('[PWA Button] Calling trackPWAInstallAccepted');
       trackPWAInstallAccepted();
+      console.log('[PWA Button] Note: Actual installation will be tracked by PWAInstallTracker');
     } else {
-      console.log('Usuario rechazó la instalación');
+      console.log('[PWA Button] ❌ User REJECTED installation');
       localStorage.setItem('pwa-install-dismissed', 'true');
       // Track rechazo
+      console.log('[PWA Button] Calling trackPWAInstallDismissed');
       trackPWAInstallDismissed('user_rejected');
     }
 
