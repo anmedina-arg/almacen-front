@@ -1,34 +1,21 @@
-import type { Metadata } from "next";
+'use client';
+
 import { Barlow } from "next/font/google";
 import "./globals.css";
 import { Analytics } from '@vercel/analytics/react';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import InstallPWAButton from '@/components/InstallPWAButton';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { queryClient } from '@/lib/queryClient';
+import { AuthProvider } from '@/features/auth/components/AuthProvider';
 
 const barlow = Barlow({
   variable: "--font-barlow",
   subsets: ["latin"],
   weight: ["300", "500", "700"]
 });
-
-export const metadata: Metadata = {
-  title: "Market del cevil",
-  description: "Catálogo de productos - tienda online",
-  openGraph: {
-    title: "Market del cevil",
-    description: "Catálogo de productos",
-    images: [
-      {
-        url: "https://market-del-cevil.vercel.app/logo-og.png",
-        width: 1200,
-        height: 630,
-      },
-    ],
-    url: "https://market-del-cevil.vercel.app",
-    type: "website",
-  },
-};
 
 export default function RootLayout({
   children,
@@ -51,7 +38,12 @@ export default function RootLayout({
       <body
         className={`${barlow.variable} antialiased`}
       >
-        {children}
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+          {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
+        </QueryClientProvider>
         <InstallPWAButton />
         <ServiceWorkerRegistration />
         <GoogleAnalytics />
