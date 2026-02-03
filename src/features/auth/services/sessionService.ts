@@ -1,10 +1,7 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { supabaseBrowser } from '@/lib/supabase/client';
 import { useAuthStore } from '../stores/authStore';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-
-const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+const supabase = supabaseBrowser;
 
 export async function syncSupabaseSession() {
   const store = useAuthStore.getState();
