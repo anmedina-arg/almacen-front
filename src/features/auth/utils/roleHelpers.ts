@@ -29,13 +29,13 @@ export async function verifyAdminAuth(): Promise<{
     }
   );
 
-  // Verificar sesión
+  // Verificar usuario (más seguro que getSession en servidor)
   const {
-    data: { session },
-    error: sessionError,
-  } = await supabase.auth.getSession();
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
 
-  if (sessionError || !session) {
+  if (userError || !user) {
     return { isAdmin: false, userId: null, error: 'No authenticated' };
   }
 
@@ -43,16 +43,16 @@ export async function verifyAdminAuth(): Promise<{
   const { data: profile, error: profileError } = await supabase
     .from('profiles')
     .select('role')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single();
 
   if (profileError || !profile) {
-    return { isAdmin: false, userId: session.user.id, error: 'Profile not found' };
+    return { isAdmin: false, userId: user.id, error: 'Profile not found' };
   }
 
   return {
     isAdmin: profile.role === 'admin',
-    userId: session.user.id,
+    userId: user.id,
     error: null,
   };
 }

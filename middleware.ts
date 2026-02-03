@@ -30,8 +30,8 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refrescar sesión si existe
-  const { data: { session } } = await supabase.auth.getSession();
+  // Verificar usuario autenticado (más seguro que getSession)
+  const { data: { user } } = await supabase.auth.getUser();
 
   const pathname = request.nextUrl.pathname;
 
@@ -44,14 +44,14 @@ export async function middleware(request: NextRequest) {
   const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
   // Redirigir a login si intenta acceder a ruta protegida sin sesión
-  if (isProtectedRoute && !session) {
+  if (isProtectedRoute && !user) {
     const redirectUrl = new URL('/login', request.url);
     redirectUrl.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
   // Redirigir a home si intenta acceder a login/register estando autenticado
-  if ((pathname === '/login' || pathname === '/register') && session) {
+  if ((pathname === '/login' || pathname === '/register') && user) {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
