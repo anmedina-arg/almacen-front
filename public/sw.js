@@ -1,5 +1,5 @@
-const CACHE_NAME = 'market-cevil-v1';
-const RUNTIME_CACHE = 'market-cevil-runtime';
+const CACHE_NAME = 'market-cevil-v2';
+const RUNTIME_CACHE = 'market-cevil-runtime-v2';
 
 // Assets to cache on install
 const PRECACHE_URLS = [
@@ -48,8 +48,16 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip caching for product API requests - always fetch from Supabase
-  if (event.request.url.includes('/api/products')) {
+  // Skip caching for API requests - always fetch from server
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // Skip caching for authentication routes - critical for OAuth flow
+  if (event.request.url.includes('/auth/') ||
+      event.request.url.includes('/login') ||
+      event.request.url.includes('/register')) {
     event.respondWith(fetch(event.request));
     return;
   }
