@@ -3,10 +3,12 @@
 import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { useAuthStore } from '@/features/auth/stores/authStore';
 
 function AuthCallbackContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const login = useAuthStore((state) => state.login);
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -17,12 +19,17 @@ function AuthCallbackContent() {
 
       if (code) {
         // Intercambiar código por sesión
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
         if (error) {
           console.error('Auth callback error:', error);
           router.push('/login?error=callback_failed');
           return;
+        }
+
+        // Actualizar el store de Zustand con el usuario y sesión
+        if (data.user && data.session) {
+          login(data.user, data.session);
         }
       }
 
@@ -31,7 +38,7 @@ function AuthCallbackContent() {
     };
 
     handleCallback();
-  }, [router, searchParams]);
+  }, [router, searchParams, login]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
