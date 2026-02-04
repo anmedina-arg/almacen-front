@@ -23,57 +23,8 @@ interface ProductListProps {
 const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, searchQuery, onAdd, onRemove }) => {
 	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>("list");
-	const [expandedSubcategories, setExpandedSubcategories] = useState<Set<string>>(new Set());
-	const [isInitialized, setIsInitialized] = useState(false);
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
-
-	// cuando hay búsqueda activa, expandir automáticamente las subcategorías que contienen resultados
-	useEffect(() => {
-		if (!searchQuery || searchQuery.trim() === '') return;
-		// construyo las claves de subcategorías presentes en el grouping actual
-		const keysToOpen = new Set<string>();
-		if (mainCategories) {
-			mainCategories.forEach((main) => {
-				const mainProducts = products.filter((p) => p.mainCategory === main);
-				const subMap = new Map<string, ProductWithQuantity[]>();
-				mainProducts.forEach((p) => {
-					const subLabel = (p.categories ?? 'Sin categoría').toString().trim();
-					if (!subMap.has(subLabel)) subMap.set(subLabel, []);
-					subMap.get(subLabel)!.push(p);
-				});
-				Array.from(subMap.keys()).forEach(label => {
-					keysToOpen.add(`${String(main)}-${label.toLowerCase()}`);
-				});
-			});
-		}
-		// merge: mantener prev abiertos y añadir los que tienen resultados
-		if (keysToOpen.size > 0) {
-			setExpandedSubcategories(prev => {
-				const merged = new Set(prev);
-				for (const k of keysToOpen) merged.add(k);
-				return merged;
-			});
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [searchQuery, products, mainCategories]);
-
-	// Inicializar expandedSubcategories con la primera subcategoría de cada mainCategory (solo una vez)
-	useEffect(() => {
-		if (!isInitialized && mainCategories && mainCategories.length > 0) {
-			const defaultExpanded = new Set<string>();
-			mainCategories.forEach((main) => {
-				const mainProducts = products.filter((p) => p.mainCategory === main);
-				if (mainProducts.length > 0) {
-					const firstSubLabel = (mainProducts[0].categories ?? 'Sin categoría').toString().trim();
-					const key = `${String(main)}-${firstSubLabel.toLowerCase()}`;
-					defaultExpanded.add(key);
-				}
-			});
-			setExpandedSubcategories(defaultExpanded);
-			setIsInitialized(true);
-		}
-	}, [isInitialized, mainCategories, products]);
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -95,17 +46,6 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 		};
 	}, []);
 
-	const toggleSubcategory = (key: string) => {
-		setExpandedSubcategories(prev => {
-			const newSet = new Set(prev);
-			if (newSet.has(key)) {
-				newSet.delete(key);
-			} else {
-				newSet.add(key);
-			}
-			return newSet;
-		});
-	};
 
 	const grouped = useMemo(() => {
 		if (!mainCategories) return [];
@@ -198,47 +138,34 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 						</div>
 
 						{subcategories.map((sub) => {
-							const isExpanded = expandedSubcategories.has(`${String(main)}-${sub.key}`);
 							return (
 								<section key={`${String(main)}-${sub.key}`} className="mb-4">
-									<button
-										onClick={() => toggleSubcategory(`${String(main)}-${sub.key}`)}
-										className="flex items-center gap-2 w-full text-md font-semibold mb-2 hover:opacity-80 transition-opacity border-b-1 border-gray-700"
-									>
+									<div className="flex items-center gap-2 w-full text-md font-semibold mb-2 border-b-1 border-gray-700">
 										<span>{sub.label}</span>
 										<span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{sub.products.length} Productos</span>
-										<svg
-											xmlns="http://www.w3.org/2000/svg"
-											viewBox="0 0 24 24"
-											className={`w-5 h-5 fill-current transition-transform ${isExpanded ? 'rotate-180' : ''}`}
-										>
-											<path d="M7 10l5 5 5-5z" />
-										</svg>
-									</button>
+									</div>
 
-									{isExpanded && (
-										<div className={`${showList === "list" ? "flex flex-wrap gap-4" : "grid grid-cols-2 gap-2"}`}>
-											{sub.products.map((product) =>
-												showList === "list" ? (
-													<ProductCard
-														key={`${product.id}-${product.name}`}
-														product={product}
-														quantity={product.quantity}
-														onAdd={() => onAdd(product.id)}
-														onRemove={() => onRemove(product.id)}
-													/>
-												) : (
-													<ProductSquareCard
-														key={`${product.id}-${product.name}`}
-														product={product}
-														quantity={product.quantity}
-														onAdd={onAdd}
-														onRemove={onRemove}
-													/>
-												)
-											)}
-										</div>
-									)}
+									<div className={`${showList === "list" ? "flex flex-wrap gap-4" : "grid grid-cols-2 gap-2"}`}>
+										{sub.products.map((product) =>
+											showList === "list" ? (
+												<ProductCard
+													key={`${product.id}-${product.name}`}
+													product={product}
+													quantity={product.quantity}
+													onAdd={() => onAdd(product.id)}
+													onRemove={() => onRemove(product.id)}
+												/>
+											) : (
+												<ProductSquareCard
+													key={`${product.id}-${product.name}`}
+													product={product}
+													quantity={product.quantity}
+													onAdd={onAdd}
+													onRemove={onRemove}
+												/>
+											)
+										)}
+									</div>
 								</section>
 							);
 						})}

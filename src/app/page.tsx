@@ -2,6 +2,7 @@ import ProductListContainer from "@/components/ProductListContainer";
 import Footer from "@/components/Footer";
 import FilterButtons from "@/components/FilterButtons";
 import Header from "@/components/Header";
+import { AdminPanelLink } from "@/components/AdminPanelLink";
 
 export default function Home() {
 
@@ -11,6 +12,8 @@ export default function Home() {
     <div className="font-barlow flex flex-col min-h-screen px-2">
 
       <Header />
+
+      <AdminPanelLink />
 
       <div className="p-1 mt-0 sticky top-9 z-50 bg-white/80 backdrop-blur-md transition-all duration-300">
         <span className="flex justify-end w-full text-sm text-gray-700 px-4">
