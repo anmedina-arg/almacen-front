@@ -36,9 +36,16 @@ export const authService = {
   },
 
   async signInWithGoogle() {
-    // Usar variable de entorno en producción, fallback a window.location.origin
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ||
-                    (typeof window !== 'undefined' ? window.location.origin : '');
+    // En preview/dev de Vercel, usar el origen actual
+    // En producción, usar NEXT_PUBLIC_SITE_URL si está definida
+    const isVercelPreview = typeof window !== 'undefined' &&
+                           window.location.hostname.includes('vercel.app') &&
+                           !window.location.hostname.startsWith('market-del-cevil');
+
+    const baseUrl = isVercelPreview
+      ? (typeof window !== 'undefined' ? window.location.origin : '')
+      : (process.env.NEXT_PUBLIC_SITE_URL ||
+         (typeof window !== 'undefined' ? window.location.origin : ''));
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
