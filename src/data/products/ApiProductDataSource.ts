@@ -3,8 +3,14 @@ import { ProductDataSource } from './ProductDataSource';
 
 export class ApiProductDataSource implements ProductDataSource {
   async getAll(): Promise<Product[]> {
-    const res = await fetch('/api/products', {
+    // Add timestamp to prevent browser caching
+    const timestamp = new Date().getTime();
+    const res = await fetch(`/api/products?_t=${timestamp}`, {
       cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
     });
 
     if (!res.ok) {
@@ -15,8 +21,14 @@ export class ApiProductDataSource implements ProductDataSource {
   }
 
   async getActive(): Promise<Product[]> {
-    const res = await fetch('/api/products', {
+    // Add timestamp to prevent browser caching
+    const timestamp = new Date().getTime();
+    const res = await fetch(`/api/products?_t=${timestamp}`, {
       cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
     });
 
     if (!res.ok) {
@@ -28,8 +40,14 @@ export class ApiProductDataSource implements ProductDataSource {
   }
 
   async getById(id: number): Promise<Product | null> {
-    const res = await fetch(`/api/products/${id}`, {
+    // Add timestamp to prevent browser caching
+    const timestamp = new Date().getTime();
+    const res = await fetch(`/api/products/${id}?_t=${timestamp}`, {
       cache: 'no-store',
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
     });
 
     if (res.status === 404) {

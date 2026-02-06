@@ -75,7 +75,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data as Product[]);
+    // Return with no-cache headers to prevent browser/PWA caching
+    return NextResponse.json(data as Product[], {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error('Error in GET /api/products:', error);
     return NextResponse.json(
