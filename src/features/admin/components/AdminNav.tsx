@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -12,15 +13,25 @@ const navItems = [
     href: '/admin/stock',
     label: 'Control de Stock',
   },
+  {
+    href: '/admin/orders',
+    label: 'Pedidos',
+  },
 ];
 
 export function AdminNav() {
   const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <nav className="flex space-x-1 border-b border-gray-200">
       {navItems.map((item) => {
-        const isActive = pathname.startsWith(item.href);
+        // Solo calcular isActive después de que el componente esté montado en el cliente
+        const isActive = mounted && pathname.startsWith(item.href);
         return (
           <Link
             key={item.href}

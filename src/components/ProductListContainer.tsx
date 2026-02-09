@@ -9,6 +9,7 @@ import WhatsAppButton from './WhatsAppButton';
 import ConfirmationModal from './ConfirmationModal';
 import InfoBanner from './InfoBanner';
 import { useProducts } from '@/hooks/useProducts';
+import { orderService } from '@/features/admin/services/orderService';
 
 /**
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
@@ -51,8 +52,10 @@ const ProductListContainer: React.FC = () => {
 		return Array.from(new Set(activeProducts.map((p) => p.mainCategory).filter((cat) => cat)));
 	}, [activeProducts]);
 
-	const { state, addToCart, removeFromCart, getItemQuantity } = useCart();
+	const { state, addToCart, removeFromCart, clearCart, getItemQuantity } = useCart();
 	const [showConfirmation, setShowConfirmation] = useState(false);
+	const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+	const [orderError, setOrderError] = useState<string | null>(null);
 
 	// Memoizar el mensaje de WhatsApp
 	const whatsAppMessage = useMemo(() => {
@@ -71,9 +74,45 @@ const ProductListContainer: React.FC = () => {
 	};
 
 	// Función para confirmar y enviar pedido
-	const handleConfirmOrder = () => {
-		openWhatsApp(whatsAppMessage);
-		setShowConfirmation(false);
+	const handleConfirmOrder = async () => {
+		setIsCreatingOrder(true);
+		setOrderError(null);
+
+		try {
+			// 1. Create order in the database
+			await orderService.createOrder({
+				whatsapp_message: whatsAppMessage,
+				items: state.items.map((item) => ({
+					product_id: item.id,
+					product_name: item.name,
+					quantity: item.quantity,
+					unit_price: item.unitPrice,
+					is_by_weight: item.isByWeight,
+				})),
+			});
+
+			// 2. Open WhatsApp with the message
+			openWhatsApp(whatsAppMessage);
+
+			// 3. Clear the cart
+			clearCart();
+
+			// 4. Close the modal
+			setShowConfirmation(false);
+		} catch (error) {
+			console.error('Error creating order:', error);
+			setOrderError(
+				error instanceof Error
+					? error.message
+					: 'Error al crear el pedido. Se abrira WhatsApp de todas formas.'
+			);
+
+			// Still open WhatsApp even if order creation fails
+			openWhatsApp(whatsAppMessage);
+			setShowConfirmation(false);
+		} finally {
+			setIsCreatingOrder(false);
+		}
 	};
 
 	// Función para cancelar confirmación
@@ -157,12 +196,28 @@ const ProductListContainer: React.FC = () => {
 				onSendMessage={handleSendMessage}
 			/>
 
+			{/* Error toast */}
+			{orderError && (
+				<div className="fixed top-4 right-4 z-50 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-lg max-w-sm">
+					<div className="flex items-start gap-2">
+						<p className="text-sm">{orderError}</p>
+						<button
+							onClick={() => setOrderError(null)}
+							className="text-red-600 hover:text-red-800 font-bold text-lg leading-none"
+						>
+							x
+						</button>
+					</div>
+				</div>
+			)}
+
 			{/* Modal de confirmación */}
 			<ConfirmationModal
 				isOpen={showConfirmation}
 				message={whatsAppMessage}
 				onConfirm={handleConfirmOrder}
 				onCancel={handleCancelOrder}
+				isLoading={isCreatingOrder}
 			/>
 		</>
 	);

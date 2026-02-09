@@ -9,4 +9,9 @@ export const adminKeys = {
   stockList: () => [...adminKeys.stock(), 'list'] as const,
   stockHistory: (productId: number) => [...adminKeys.stock(), 'history', productId] as const,
   lowStock: () => [...adminKeys.stock(), 'low-stock'] as const,
+
+  // Orders query keys
+  orders: () => [...adminKeys.all, 'orders'] as const,
+  ordersList: () => [...adminKeys.orders(), 'list'] as const,
+  orderDetail: (id: number) => [...adminKeys.orders(), id] as const,
 };

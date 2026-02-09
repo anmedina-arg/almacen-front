@@ -11,6 +11,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 	message,
 	onConfirm,
 	onCancel,
+	isLoading = false,
 }) => {
 	if (!isOpen) return null;
 
@@ -31,15 +32,17 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 				<div className="flex gap-3">
 					<button
 						onClick={onCancel}
-						className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded transition-colors font-medium"
+						disabled={isLoading}
+						className="flex-1 bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 					>
 						Modificar
 					</button>
 					<button
 						onClick={onConfirm}
-						className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition-colors font-medium"
+						disabled={isLoading}
+						className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 					>
-						Confirmar
+						{isLoading ? 'Enviando...' : 'Confirmar'}
 					</button>
 				</div>
 			</div>

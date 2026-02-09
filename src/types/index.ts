@@ -107,6 +107,7 @@ export interface ConfirmationModalProps {
   message: string;
   onConfirm: () => void;
   onCancel: () => void;
+  isLoading?: boolean;
 }
 
 // Tipos para utilidades
