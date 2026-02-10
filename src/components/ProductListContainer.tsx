@@ -75,6 +75,15 @@ const ProductListContainer: React.FC = () => {
 
 	// Función para confirmar y enviar pedido
 	const handleConfirmOrder = async () => {
+		// CRITICAL: Open WhatsApp window immediately (synchronously) to prevent iOS Safari blocking
+		// iOS requires window.open() to be called directly in response to user interaction
+		const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5491112345678';
+		const encodedMessage = encodeURIComponent(whatsAppMessage);
+		const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+		// Open a blank window immediately (synchronous, won't be blocked by iOS)
+		const whatsappWindow = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null;
+
 		setIsCreatingOrder(true);
 		setOrderError(null);
 
@@ -91,8 +100,13 @@ const ProductListContainer: React.FC = () => {
 				})),
 			});
 
-			// 2. Open WhatsApp with the message
-			openWhatsApp(whatsAppMessage);
+			// 2. Redirect the already-opened window to WhatsApp
+			if (whatsappWindow && !whatsappWindow.closed) {
+				whatsappWindow.location.href = whatsappUrl;
+			} else {
+				// Fallback: try direct navigation if popup was blocked or closed
+				window.location.href = whatsappUrl;
+			}
 
 			// 3. Clear the cart
 			clearCart();
@@ -108,7 +122,11 @@ const ProductListContainer: React.FC = () => {
 			);
 
 			// Still open WhatsApp even if order creation fails
-			openWhatsApp(whatsAppMessage);
+			if (whatsappWindow && !whatsappWindow.closed) {
+				whatsappWindow.location.href = whatsappUrl;
+			} else {
+				window.location.href = whatsappUrl;
+			}
 			setShowConfirmation(false);
 		} finally {
 			setIsCreatingOrder(false);
