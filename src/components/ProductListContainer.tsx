@@ -73,34 +73,34 @@ const ProductListContainer: React.FC = () => {
 
 	// Función para confirmar y enviar pedido
 	const handleConfirmOrder = () => {
-		// CRITICAL for iOS Safari: Open WhatsApp FIRST (synchronously), then create order in background
-		// iOS Safari blocks window.open() if there's ANY async operation before it
+		// CRITICAL for iOS Safari: Open WhatsApp FIRST without ANY state changes
+		// State changes cause React re-renders that interfere with window.open()
 
-		// 1. Open WhatsApp immediately (synchronous, works on iOS)
+		// 1. Open WhatsApp immediately (synchronous, no state changes yet)
 		openWhatsApp(whatsAppMessage);
 
-		// 2. Close modal and clear cart immediately
-		setShowConfirmation(false);
-		clearCart();
+		// 2. Delay state changes to avoid interfering with window.open()
+		// This ensures window.open() completes before React re-renders
+		setTimeout(() => {
+			setShowConfirmation(false);
+			clearCart();
 
-		// 3. Create order in background (fire-and-forget)
-		// This happens after WhatsApp opens, so it doesn't block the redirect
-		orderService
-			.createOrder({
-				whatsapp_message: whatsAppMessage,
-				items: state.items.map((item) => ({
-					product_id: item.id,
-					product_name: item.name,
-					quantity: item.quantity,
-					unit_price: item.unitPrice,
-					is_by_weight: item.isByWeight,
-				})),
-			})
-			.catch((error) => {
-				console.error('Error creating order in background:', error);
-				// Don't show error to user since WhatsApp already opened
-				// Order creation is a nice-to-have, not critical for UX
-			});
+			// 3. Create order in background (fire-and-forget)
+			orderService
+				.createOrder({
+					whatsapp_message: whatsAppMessage,
+					items: state.items.map((item) => ({
+						product_id: item.id,
+						product_name: item.name,
+						quantity: item.quantity,
+						unit_price: item.unitPrice,
+						is_by_weight: item.isByWeight,
+					})),
+				})
+				.catch((error) => {
+					console.error('Error creating order in background:', error);
+				});
+		}, 0);
 	};
 
 	// Función para cancelar confirmación
