@@ -54,8 +54,6 @@ const ProductListContainer: React.FC = () => {
 
 	const { state, addToCart, removeFromCart, clearCart, getItemQuantity } = useCart();
 	const [showConfirmation, setShowConfirmation] = useState(false);
-	const [isCreatingOrder, setIsCreatingOrder] = useState(false);
-	const [orderError, setOrderError] = useState<string | null>(null);
 
 	// Memoizar el mensaje de WhatsApp
 	const whatsAppMessage = useMemo(() => {
@@ -74,22 +72,21 @@ const ProductListContainer: React.FC = () => {
 	};
 
 	// Función para confirmar y enviar pedido
-	const handleConfirmOrder = async () => {
-		// CRITICAL: Open WhatsApp window immediately (synchronously) to prevent iOS Safari blocking
-		// iOS requires window.open() to be called directly in response to user interaction
-		const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5491112345678';
-		const encodedMessage = encodeURIComponent(whatsAppMessage);
-		const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+	const handleConfirmOrder = () => {
+		// CRITICAL for iOS Safari: Open WhatsApp FIRST (synchronously), then create order in background
+		// iOS Safari blocks window.open() if there's ANY async operation before it
 
-		// Open a blank window immediately (synchronous, won't be blocked by iOS)
-		const whatsappWindow = typeof window !== 'undefined' ? window.open('about:blank', '_blank') : null;
+		// 1. Open WhatsApp immediately (synchronous, works on iOS)
+		openWhatsApp(whatsAppMessage);
 
-		setIsCreatingOrder(true);
-		setOrderError(null);
+		// 2. Close modal and clear cart immediately
+		setShowConfirmation(false);
+		clearCart();
 
-		try {
-			// 1. Create order in the database
-			await orderService.createOrder({
+		// 3. Create order in background (fire-and-forget)
+		// This happens after WhatsApp opens, so it doesn't block the redirect
+		orderService
+			.createOrder({
 				whatsapp_message: whatsAppMessage,
 				items: state.items.map((item) => ({
 					product_id: item.id,
@@ -98,39 +95,12 @@ const ProductListContainer: React.FC = () => {
 					unit_price: item.unitPrice,
 					is_by_weight: item.isByWeight,
 				})),
+			})
+			.catch((error) => {
+				console.error('Error creating order in background:', error);
+				// Don't show error to user since WhatsApp already opened
+				// Order creation is a nice-to-have, not critical for UX
 			});
-
-			// 2. Redirect the already-opened window to WhatsApp
-			if (whatsappWindow && !whatsappWindow.closed) {
-				whatsappWindow.location.href = whatsappUrl;
-			} else {
-				// Fallback: try direct navigation if popup was blocked or closed
-				window.location.href = whatsappUrl;
-			}
-
-			// 3. Clear the cart
-			clearCart();
-
-			// 4. Close the modal
-			setShowConfirmation(false);
-		} catch (error) {
-			console.error('Error creating order:', error);
-			setOrderError(
-				error instanceof Error
-					? error.message
-					: 'Error al crear el pedido. Se abrira WhatsApp de todas formas.'
-			);
-
-			// Still open WhatsApp even if order creation fails
-			if (whatsappWindow && !whatsappWindow.closed) {
-				whatsappWindow.location.href = whatsappUrl;
-			} else {
-				window.location.href = whatsappUrl;
-			}
-			setShowConfirmation(false);
-		} finally {
-			setIsCreatingOrder(false);
-		}
 	};
 
 	// Función para cancelar confirmación
@@ -214,28 +184,12 @@ const ProductListContainer: React.FC = () => {
 				onSendMessage={handleSendMessage}
 			/>
 
-			{/* Error toast */}
-			{orderError && (
-				<div className="fixed top-4 right-4 z-50 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-lg max-w-sm">
-					<div className="flex items-start gap-2">
-						<p className="text-sm">{orderError}</p>
-						<button
-							onClick={() => setOrderError(null)}
-							className="text-red-600 hover:text-red-800 font-bold text-lg leading-none"
-						>
-							x
-						</button>
-					</div>
-				</div>
-			)}
-
 			{/* Modal de confirmación */}
 			<ConfirmationModal
 				isOpen={showConfirmation}
 				message={whatsAppMessage}
 				onConfirm={handleConfirmOrder}
 				onCancel={handleCancelOrder}
-				isLoading={isCreatingOrder}
 			/>
 		</>
 	);
