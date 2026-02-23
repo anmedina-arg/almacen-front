@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createSupabaseClient();
 
-    // Construir query
+    // Query 1: productos
     let query = supabase
       .from('products')
       .select(
@@ -58,7 +58,8 @@ export async function GET(request: NextRequest) {
         image,
         active,
         categories,
-        mainCategory:main_category
+        mainCategory:main_category,
+        sale_type
       `
       )
       .order('name', { ascending: true });
@@ -75,8 +76,22 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Query 2: stock — query separada para evitar problemas con PostgREST JOIN + RLS
+    const { data: stockData } = await supabase
+      .from('product_stock')
+      .select('product_id, quantity');
+
+    const stockMap = new Map<number, number>(
+      (stockData ?? []).map((s) => [s.product_id, s.quantity])
+    );
+
+    const products = (data ?? []).map((p) => ({
+      ...p,
+      stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
+    }));
+
     // Return with no-cache headers to prevent browser/PWA caching
-    return NextResponse.json(data as Product[], {
+    return NextResponse.json(products as Product[], {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
         'Pragma': 'no-cache',
@@ -129,6 +144,7 @@ export async function POST(request: NextRequest) {
           main_category: normalizedCategory,
           categories: body.categories || '',
           active: body.active ?? true,
+          sale_type: body.sale_type ?? 'unit',
         },
       ])
       .select(
@@ -139,7 +155,8 @@ export async function POST(request: NextRequest) {
         image,
         active,
         categories,
-        mainCategory:main_category
+        mainCategory:main_category,
+        sale_type
       `
       )
       .single();

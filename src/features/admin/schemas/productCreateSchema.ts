@@ -20,6 +20,9 @@ export const productCreateSchema = z.object({
   }),
   categories: z.string().optional().default(''),
   active: z.boolean().default(true),
+  sale_type: z.enum(['unit', '100gr', 'kg'], {
+    errorMap: () => ({ message: 'Tipo de venta inválido' }),
+  }).default('unit'),
 });
 
 export type ProductCreateInput = z.infer<typeof productCreateSchema>;

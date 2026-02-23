@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useOrderDetail } from '../../hooks/useOrderDetail';
 import { useConfirmOrder } from '../../hooks/useConfirmOrder';
+import { useCancelOrder } from '../../hooks/useCancelOrder';
 import { useUpdateOrder } from '../../hooks/useUpdateOrder';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
@@ -15,6 +16,7 @@ interface OrderDetailModalProps {
 export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   const { data: order, isLoading, error } = useOrderDetail(orderId);
   const confirmOrder = useConfirmOrder();
+  const cancelOrder = useCancelOrder();
   const updateOrder = useUpdateOrder();
 
   const [showWhatsAppMessage, setShowWhatsAppMessage] = useState(false);
@@ -25,11 +27,8 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   };
 
   const handleCancel = () => {
-    if (!confirm('Cancelar este pedido?')) return;
-    updateOrder.mutate({
-      orderId,
-      updates: { status: 'cancelled' },
-    });
+    if (!confirm('Cancelar este pedido? Se devolverá el stock de todos los productos.')) return;
+    cancelOrder.mutate(orderId);
   };
 
   const formatDate = (dateStr: string) => {
@@ -185,10 +184,10 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                   </button>
                   <button
                     onClick={handleCancel}
-                    disabled={updateOrder.isPending}
+                    disabled={cancelOrder.isPending}
                     className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {updateOrder.isPending
+                    {cancelOrder.isPending
                       ? 'Cancelando...'
                       : 'Cancelar pedido'}
                   </button>

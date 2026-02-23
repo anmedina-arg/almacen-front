@@ -3,37 +3,28 @@ import { Product, CartItem, WeightType } from '@/types';
 /**
  * Detecta si un producto se vende por peso
  */
-export const isProductByWeight = (productName: string): boolean => {
-  const name = productName.toLowerCase();
-  return name.includes('x 100 gr') || name.includes('x kg');
+export const isProductByWeight = (product: Pick<Product, 'sale_type'>): boolean => {
+  return product.sale_type !== 'unit';
 };
 
 /**
  * Obtiene el tipo de producto por peso
  */
-export const getWeightType = (productName: string): WeightType => {
-  const name = productName.toLowerCase();
-
-  if (name.includes('x 100 gr')) {
-    return '100gr';
-  } else if (name.includes('x kg')) {
-    return 'kg';
-  } else {
-    return 'unit';
-  }
+export const getWeightType = (product: Pick<Product, 'sale_type'>): WeightType => {
+  return product.sale_type;
 };
 
 /**
- * Obtiene la cantidad a agregar por click según el tipo de producto
+ * Obtiene la cantidad a agregar por click según el tipo de producto.
+ * Caso especial: productos "noisette" (tipo kg) usan 1000g por click en lugar de 500g.
  */
-export const getQuantityPerClick = (productName: string): number => {
-  const name = productName.toLowerCase();
-  if (name.includes('noisette')) {
-    return 1000; // 1000 gramos por click para productos "noisette"
+export const getQuantityPerClick = (product: Pick<Product, 'name' | 'sale_type'>): number => {
+  // TODO: reemplazar con columna quantity_per_click en DB cuando se requieran más casos especiales
+  if (product.name.toLowerCase().includes('noisette')) {
+    return 1000; // 1000 gramos por click
   }
-  const weightType = getWeightType(productName);
 
-  switch (weightType) {
+  switch (product.sale_type) {
     case '100gr':
       return 100; // 100 gramos por click
     case 'kg':
@@ -56,9 +47,7 @@ export const getUnitPrice = (product: Product): number => {
  * Calcula el precio total de un item del carrito
  */
 export const calculateItemPrice = (item: CartItem): number => {
-  const weightType = getWeightType(item.name);
-
-  switch (weightType) {
+  switch (item.saleType) {
     case '100gr':
       // Para productos por 100gr: (cantidad en gr / 100) * precio por 100gr
       return (item.quantity / 100) * item.unitPrice;

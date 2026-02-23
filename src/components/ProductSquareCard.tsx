@@ -6,13 +6,14 @@ import { ProductCardProps } from '@/types';
 import { getWeightType, formatQuantity } from '@/utils/productUtils';
 import QuantityButton from './ui/QuantityButton';
 
-/**
- * Componente de tarjeta de producto optimizado
- */
 const ProductSquareCard: React.FC<ProductCardProps> = React.memo(
 	({ product, quantity, onAdd, onRemove }) => {
-		const weightType = getWeightType(product.name);
-		//${'description' in product ? 'flex-col' : 'flex-row'}
+		const weightType = getWeightType(product);
+		const isOutOfStock = product.stock_quantity === 0;
+		const isAtStockLimit = product.stock_quantity !== undefined &&
+			product.stock_quantity > 0 &&
+			quantity >= product.stock_quantity;
+
 		return (
 			<div className="flex flex-col items-center w-full border border-gray-200 rounded-lg min-h-64 shadow-sm hover:shadow-md transition-shadow">
 				<Image
@@ -45,23 +46,41 @@ const ProductSquareCard: React.FC<ProductCardProps> = React.memo(
 							))}
 						</ul>
 					)}
-					<div className="flex items-center gap-2 flex-shrink-0 flex-col">
-						{quantity > 0 && (
-							<span className="text-sm font-bold text-green-700 min-w-[50px] text-center bg-green-50 px-2 py-0.5 rounded-md">
-								{formatQuantity(quantity, weightType)}
-							</span>
-						)}
 
-						<div className="flex items-center gap-2">
+					{isOutOfStock ? (
+						<div className="flex items-center gap-2 flex-shrink-0 flex-col">
 							<p className="text-xl font-semibold text-green-600">
 								${product.price}
 							</p>
-
-							<QuantityButton variant="decrement" onClick={() => onRemove(product.id)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
-
-							<QuantityButton variant="increment" onClick={() => onAdd(product.id)} aria-label={`Agregar ${product.name}`} />
+							<span className="text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-md">
+								Sin Stock
+							</span>
 						</div>
-					</div>
+					) : (
+						<div className="flex items-center gap-2 flex-shrink-0 flex-col">
+							{quantity > 0 && (
+								<span className="text-sm font-bold text-green-700 min-w-[50px] text-center bg-green-50 px-2 py-0.5 rounded-md">
+									{formatQuantity(quantity, weightType)}
+								</span>
+							)}
+
+							<div className="flex items-center gap-2">
+								<p className="text-xl font-semibold text-green-600">
+									${product.price}
+								</p>
+
+								<QuantityButton variant="decrement" onClick={() => onRemove(product.id)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
+
+								<QuantityButton variant="increment" onClick={() => onAdd(product.id)} disabled={isAtStockLimit} aria-label={`Agregar ${product.name}`} />
+							</div>
+
+							{isAtStockLimit && (
+								<span className="text-xs text-orange-500 font-medium text-center leading-tight">
+									Máx. disponible
+								</span>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 		);

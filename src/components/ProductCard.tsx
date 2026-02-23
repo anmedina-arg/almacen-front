@@ -12,9 +12,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 	onAdd,
 	onRemove
 }) => {
-	const weightType = getWeightType(product.name);
-
-	console.count(`ProductCard ${product.id} render`);
+	const weightType = getWeightType(product);
+	const isOutOfStock = product.stock_quantity === 0;
+	const isAtStockLimit = product.stock_quantity !== undefined &&
+		product.stock_quantity > 0 &&
+		quantity >= product.stock_quantity;
 
 	return (
 		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -60,20 +62,32 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 			</div>
 
 			<div className="flex items-center gap-2 flex-shrink-0">
-				{quantity > 0 && (
-					<span className="text-sm font-bold text-green-700 min-w-[50px] text-center bg-green-50 px-2 py-1 rounded-md">
-						{formatQuantity(quantity, weightType)}
+				{isOutOfStock ? (
+					<span className="text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-md">
+						Sin Stock
 					</span>
-				)}
+				) : (
+					<>
+						{quantity > 0 && (
+							<span className="text-sm font-bold text-green-700 min-w-[50px] text-center bg-green-50 px-2 py-1 rounded-md">
+								{formatQuantity(quantity, weightType)}
+							</span>
+						)}
 
-				{product.price !== 0 && (
-					<div className='flex flex-col gap-1'>
-						{quantity > 0 &&
-							<QuantityButton variant="decrement" onClick={() => onRemove(product.id)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
-						}
-						<QuantityButton variant="increment" onClick={() => onAdd(product.id)} aria-label={`Agregar ${product.name}`} />
-					</div>
-
+						{product.price !== 0 && (
+							<div className='flex flex-col gap-1 items-center'>
+								{quantity > 0 &&
+									<QuantityButton variant="decrement" onClick={() => onRemove(product.id)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
+								}
+								<QuantityButton variant="increment" onClick={() => onAdd(product.id)} disabled={isAtStockLimit} aria-label={`Agregar ${product.name}`} />
+								{isAtStockLimit && (
+									<span className="text-xs text-orange-500 font-medium text-center leading-tight">
+										Máx. disponible
+									</span>
+								)}
+							</div>
+						)}
+					</>
 				)}
 			</div>
 		</div>
@@ -82,4 +96,4 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
 ProductCard.displayName = 'ProductCard';
 
-export default ProductCard; 
+export default ProductCard;

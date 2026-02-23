@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { Product } from '@/types';
 import { productDataSource } from '@/data/products';
 
@@ -9,31 +9,21 @@ export function useProducts() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    let mounted = true;
-
+  const load = useCallback((showSpinner: boolean) => {
+    if (showSpinner) setIsLoading(true);
     productDataSource
       .getAll()
-      .then((data) => {
-        if (mounted) {
-          setProducts(data);
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setError('Error loading products');
-        }
-      })
-      .finally(() => {
-        if (mounted) {
-          setIsLoading(false);
-        }
-      });
-
-    return () => {
-      mounted = false;
-    };
+      .then((data) => setProducts(data))
+      .catch(() => setError('Error loading products'))
+      .finally(() => { if (showSpinner) setIsLoading(false); });
   }, []);
 
-  return { products, isLoading, error };
+  useEffect(() => {
+    load(true);
+  }, [load]);
+
+  // Refetch silencioso: actualiza el stock sin mostrar spinner
+  const refetch = useCallback(() => load(false), [load]);
+
+  return { products, isLoading, error, refetch };
 }

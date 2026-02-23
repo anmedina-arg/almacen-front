@@ -20,6 +20,8 @@ export interface Product {
   active: boolean;
   categories: string;
   mainCategory: MainCategory;
+  sale_type: WeightType;
+  stock_quantity?: number; // undefined = no stock record (treat as available)
 }
 
 // description esctructurada
@@ -40,6 +42,7 @@ export interface CartItem {
   quantity: number;
   unitPrice: number;
   isByWeight: boolean;
+  saleType: WeightType;
 }
 
 // Tipos para el sistema de pesos
@@ -112,9 +115,9 @@ export interface ConfirmationModalProps {
 
 // Tipos para utilidades
 export interface ProductUtils {
-  isProductByWeight: (productName: string) => boolean;
-  getWeightType: (productName: string) => WeightType;
-  getQuantityPerClick: (productName: string) => number;
+  isProductByWeight: (product: Pick<Product, 'sale_type'>) => boolean;
+  getWeightType: (product: Pick<Product, 'sale_type'>) => WeightType;
+  getQuantityPerClick: (product: Pick<Product, 'name' | 'sale_type'>) => number;
   getUnitPrice: (product: ProductWithOptionalDescription) => number;
   calculateItemPrice: (item: CartItem) => number;
   truncateProductName: (name: string, maxLength: number) => string;

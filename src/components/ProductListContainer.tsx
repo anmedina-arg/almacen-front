@@ -16,7 +16,7 @@ import { orderService } from '@/features/admin/services/orderService';
  */
 const ProductListContainer: React.FC = () => {
 
-	const { products, isLoading } = useProducts();
+	const { products, isLoading, refetch } = useProducts();
 
 	// Filtrar productos activos (sin search)
 	const activeProductsAll: Product[] = products.filter((product) => product.active);
@@ -79,7 +79,7 @@ const ProductListContainer: React.FC = () => {
 		setOrderError(null);
 
 		try {
-			// 1. Create order in the database
+			// 1. Create order in the database (deducts stock atomically)
 			await orderService.createOrder({
 				whatsapp_message: whatsAppMessage,
 				items: state.items.map((item) => ({
@@ -99,17 +99,41 @@ const ProductListContainer: React.FC = () => {
 
 			// 4. Close the modal
 			setShowConfirmation(false);
+
+			// 5. Refresh products to reflect updated stock (silent, no spinner)
+			refetch();
 		} catch (error) {
+			setShowConfirmation(false);
+
+			// Check if the server returned a structured insufficient_stock error
+			if (error instanceof Error) {
+				try {
+					const parsed = JSON.parse(error.message);
+					if (parsed?.error === 'insufficient_stock' && Array.isArray(parsed.products)) {
+						const productList = parsed.products
+							.map((p: { name: string; available: number }) =>
+								`• ${p.name} (disponible: ${p.available})`
+							)
+							.join('\n');
+						setOrderError(
+							`Algunos productos ya no tienen stock suficiente. Revisá tu pedido:\n\n${productList}`
+						);
+						// Don't open WhatsApp — the order was not created
+						return;
+					}
+				} catch {
+					// Not a JSON error — fall through
+				}
+			}
+
+			// Generic error: still open WhatsApp as graceful fallback
 			console.error('Error creating order:', error);
 			setOrderError(
 				error instanceof Error
 					? error.message
-					: 'Error al crear el pedido. Se abrira WhatsApp de todas formas.'
+					: 'Error al registrar el pedido.'
 			);
-
-			// Still open WhatsApp even if order creation fails
 			openWhatsApp(whatsAppMessage);
-			setShowConfirmation(false);
 		} finally {
 			setIsCreatingOrder(false);
 		}
@@ -144,9 +168,6 @@ const ProductListContainer: React.FC = () => {
 			// onRemove: () => removeFromCart(product),
 		}));
 	}, [activeProducts, getItemQuantity, addToCart, removeFromCart]);
-
-	console.count('ProductListContainer render');
-
 
 	if (isLoading) {
 		return (

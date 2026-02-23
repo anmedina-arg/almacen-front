@@ -82,10 +82,6 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 		return () => { setFixHeight(false) };
 	}, [searchQuery])
 
-	console.log(fixHeight);
-
-	console.count('ProductList render');
-
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
 			<div className='flex items-center gap-2 px-4 py-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl'>

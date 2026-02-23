@@ -15,6 +15,7 @@ export { useOrders } from './useOrders';
 export { useOrderDetail } from './useOrderDetail';
 export { useUpdateOrder } from './useUpdateOrder';
 export { useConfirmOrder } from './useConfirmOrder';
+export { useCancelOrder } from './useCancelOrder';
 export { useAddOrderItem } from './useAddOrderItem';
 export { useRemoveOrderItem } from './useRemoveOrderItem';
 export { useUpdateOrderItem } from './useUpdateOrderItem';
