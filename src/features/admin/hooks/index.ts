@@ -9,6 +9,8 @@ export { useProductStock } from './useProductStock';
 export { useStockHistory } from './useStockHistory';
 export { useUpsertStock } from './useUpsertStock';
 export { useLowStock } from './useLowStock';
+export { useStockEntry } from './useStockEntry';
+export { useBatchIncrementStock } from './useBatchIncrementStock';
 
 // Order hooks
 export { useOrders } from './useOrders';
