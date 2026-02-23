@@ -1,14 +1,14 @@
 'use client';
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Product } from '@/types';
-import { useCart } from '@/hooks/useCart';
-import { generateWhatsAppMessage, openWhatsApp } from '@/utils/messageUtils';
+import { Product } from '../types';
+import { useCart } from '../hooks/useCart';
+import { generateWhatsAppMessage, openWhatsApp } from '../utils/messageUtils';
 import ProductList from './ProductList';
 import WhatsAppButton from './WhatsAppButton';
 import ConfirmationModal from './ConfirmationModal';
 import InfoBanner from './InfoBanner';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '../hooks/useProducts';
 import { orderService } from '@/features/admin/services/orderService';
 
 /**

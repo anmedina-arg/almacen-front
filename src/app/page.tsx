@@ -1,6 +1,6 @@
-import ProductListContainer from "@/components/ProductListContainer";
+import ProductListContainer from "@/features/catalog/components/ProductListContainer";
 import Footer from "@/components/Footer";
-import FilterButtons from "@/components/FilterButtons";
+import FilterButtons from "@/features/catalog/components/FilterButtons";
 import Header from "@/components/Header";
 import { AdminPanelLink } from "@/components/AdminPanelLink";
 

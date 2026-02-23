@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { WhatsAppButtonProps } from '@/types';
+import { WhatsAppButtonProps } from '../types';
 
 /**
  * Componente del botón flotante de WhatsApp

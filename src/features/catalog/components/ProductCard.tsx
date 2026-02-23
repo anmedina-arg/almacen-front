@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { ProductCardProps } from '@/types';
-import { getWeightType, formatQuantity } from '@/utils/productUtils';
-import QuantityButton from './ui/QuantityButton';
+import { ProductCardProps } from '../types';
+import { getWeightType, formatQuantity } from '../utils/productUtils';
+import QuantityButton from '@/components/ui/QuantityButton';
 
 const ProductCard: React.FC<ProductCardProps> = React.memo(({
 	product,

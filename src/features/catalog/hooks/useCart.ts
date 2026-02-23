@@ -1,10 +1,10 @@
 import { useReducer, useCallback, useMemo } from 'react';
-import { CartState, CartAction, Product, CartItem } from '@/types';
+import { CartState, CartAction, Product, CartItem } from '../types';
 import {
   isProductByWeight,
   getQuantityPerClick,
   getUnitPrice,
-} from '@/utils/productUtils';
+} from '../utils/productUtils';
 
 // Estado inicial del carrito
 const initialState: CartState = {

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { ConfirmationModalProps } from '@/types';
+import { ConfirmationModalProps } from '../types';
 
 /**
  * Componente modal de confirmación

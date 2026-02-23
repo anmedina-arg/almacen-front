@@ -1,4 +1,4 @@
-import { Product, CartItem, WeightType } from '@/types';
+import { Product, CartItem, WeightType } from '../types';
 
 /**
  * Detecta si un producto se vende por peso

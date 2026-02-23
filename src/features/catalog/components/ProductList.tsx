@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import type { Product, MainCategory } from '@/types';
+import type { Product, MainCategory } from '../types';
 import ProductCard from './ProductCard';
 import ProductSquareCard from './ProductSquareCard';
 

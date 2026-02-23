@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { Product } from '@/types';
-import { productDataSource } from '@/data/products';
+import { Product } from '../types';
+import { productDataSource } from '../services';
 
 export function useProducts() {
   const [products, setProducts] = useState<Product[]>([]);
