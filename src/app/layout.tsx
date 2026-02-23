@@ -1,22 +1,48 @@
-'use client';
-
-import { Barlow } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Barlow } from 'next/font/google';
+import './globals.css';
 import { Analytics } from '@vercel/analytics/react';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
 import InstallPWAButton from '@/components/InstallPWAButton';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import PWAInstallTracker from '@/components/PWAInstallTracker';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { queryClient } from '@/lib/queryClient';
-import { AuthProvider } from '@/features/auth/components/AuthProvider';
+import { Providers } from '@/components/Providers';
 
 const barlow = Barlow({
-  variable: "--font-barlow",
-  subsets: ["latin"],
-  weight: ["300", "500", "700"]
+  variable: '--font-barlow',
+  subsets: ['latin'],
+  weight: ['300', '500', '700'],
 });
+
+export const metadata: Metadata = {
+  title: 'Market del cevil',
+  description: 'Catálogo de productos - tienda online',
+  manifest: '/manifest.json',
+  themeColor: '#000000',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Market Cevil',
+  },
+  openGraph: {
+    title: 'Market del cevil',
+    description: 'Catálogo de productos',
+    url: 'https://market-del-cevil.vercel.app',
+    type: 'website',
+    images: [
+      {
+        url: 'https://market-del-cevil.vercel.app/logo-og.png',
+      },
+    ],
+  },
+  icons: {
+    apple: '/apple-touch-icon.png',
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+  },
+};
 
 export default function RootLayout({
   children,
@@ -25,35 +51,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <title>Market del cevil</title>
-        <meta name="description" content="Catálogo de productos - tienda online" />
-        <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Market Cevil" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
-
-        {/* OpenGraph tags */}
-        <meta property="og:title" content="Market del cevil" />
-        <meta property="og:description" content="Catálogo de productos" />
-        <meta property="og:image" content="https://market-del-cevil.vercel.app/logo-og.png" />
-        <meta property="og:url" content="https://market-del-cevil.vercel.app" />
-        <meta property="og:type" content="website" />
-      </head>
-      <body
-        className={`${barlow.variable} antialiased`}
-      >
-        <QueryClientProvider client={queryClient}>
-          <AuthProvider>
-            {children}
-          </AuthProvider>
-          {process.env.NODE_ENV === 'development' && <ReactQueryDevtools />}
-        </QueryClientProvider>
+      <body className={`${barlow.variable} antialiased`}>
+        <Providers>
+          {children}
+        </Providers>
         <InstallPWAButton />
         <PWAInstallTracker />
         <ServiceWorkerRegistration />
