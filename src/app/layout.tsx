@@ -3,9 +3,9 @@ import { Barlow } from 'next/font/google';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/react';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
-import InstallPWAButton from '@/components/InstallPWAButton';
-import GoogleAnalytics from '@/components/GoogleAnalytics';
-import PWAInstallTracker from '@/components/PWAInstallTracker';
+import { InstallPWAButton } from '@/components/InstallPWAButton';
+import { GoogleAnalytics } from '@/components/GoogleAnalytics';
+import { PWAInstallTracker } from '@/components/PWAInstallTracker';
 import { Providers } from '@/components/Providers';
 
 const barlow = Barlow({

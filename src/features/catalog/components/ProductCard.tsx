@@ -1,17 +1,17 @@
 'use client';
 
-import React from 'react';
+import { memo } from 'react';
 import Image from 'next/image';
-import { ProductCardProps } from '../types';
+import type { ProductCardProps } from '../types';
 import { getWeightType, formatQuantity } from '../utils/productUtils';
-import QuantityButton from '@/components/ui/QuantityButton';
+import { QuantityButton } from '@/components/ui/QuantityButton';
 
-const ProductCard: React.FC<ProductCardProps> = React.memo(({
+function ProductCardBase({
 	product,
 	quantity,
 	onAdd,
-	onRemove
-}) => {
+	onRemove,
+}: ProductCardProps) {
 	const weightType = getWeightType(product);
 	const isOutOfStock = product.stock_quantity === 0;
 	const isAtStockLimit = product.stock_quantity !== undefined &&
@@ -33,8 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 							sizes="(max-width: 768px) 100vw, 80px"
 						/>
 					</div>
-				)
-				}
+				)}
 				<div className="text-ellipsis">
 					<h2 className="text-sm font-bold ">
 						{product.name}
@@ -92,8 +91,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 			</div>
 		</div>
 	);
-});
+}
 
+export const ProductCard = memo(ProductCardBase);
 ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

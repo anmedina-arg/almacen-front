@@ -7,7 +7,7 @@ import { trackPWAInstall } from '@/utils/analytics';
  * Component that tracks PWA installation events globally
  * This component should always be mounted to capture the 'appinstalled' event
  */
-export default function PWAInstallTracker() {
+export function PWAInstallTracker() {
   useEffect(() => {
     console.log('[PWA Tracker] PWAInstallTracker component mounted');
     console.log('[PWA Tracker] Registering appinstalled event listener');

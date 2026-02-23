@@ -1,21 +1,20 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Product } from '../types';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import type { Product } from '../types';
 import { useCart } from '../hooks/useCart';
 import { generateWhatsAppMessage, openWhatsApp } from '../utils/messageUtils';
-import ProductList from './ProductList';
-import WhatsAppButton from './WhatsAppButton';
-import ConfirmationModal from './ConfirmationModal';
-import InfoBanner from './InfoBanner';
+import { ProductList } from './ProductList';
+import { WhatsAppButton } from './WhatsAppButton';
+import { ConfirmationModal } from './ConfirmationModal';
+import { InfoBanner } from './InfoBanner';
 import { useProducts } from '../hooks/useProducts';
 import { orderService } from '@/features/admin/services/orderService';
 
 /**
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
  */
-const ProductListContainer: React.FC = () => {
-
+export function ProductListContainer() {
 	const { products, isLoading, refetch } = useProducts();
 
 	// Filtrar productos activos (sin search)
@@ -144,8 +143,6 @@ const ProductListContainer: React.FC = () => {
 		setShowConfirmation(false);
 	};
 
-	// Crear productos con sus cantidades y funciones (a partir de activeProducts filtrados)
-
 	const productsById = useMemo(() => {
 		return new Map(products.map(p => [p.id, p]));
 	}, [products]);
@@ -164,10 +161,8 @@ const ProductListContainer: React.FC = () => {
 		return activeProducts.map(product => ({
 			...product,
 			quantity: getItemQuantity(product.id),
-			// onAdd: () => addToCart(product),
-			// onRemove: () => removeFromCart(product),
 		}));
-	}, [activeProducts, getItemQuantity, addToCart, removeFromCart]);
+	}, [activeProducts, getItemQuantity]);
 
 	if (isLoading) {
 		return (
@@ -242,6 +237,6 @@ const ProductListContainer: React.FC = () => {
 			/>
 		</>
 	);
-};
+}
 
 export default ProductListContainer;

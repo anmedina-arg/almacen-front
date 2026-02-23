@@ -1,18 +1,17 @@
 'use client';
 
-import React from 'react';
-import { ConfirmationModalProps } from '../types';
+import type { ConfirmationModalProps } from '../types';
 
 /**
  * Componente modal de confirmación
  */
-const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
+export function ConfirmationModal({
 	isOpen,
 	message,
 	onConfirm,
 	onCancel,
 	isLoading = false,
-}) => {
+}: ConfirmationModalProps) {
 	if (!isOpen) return null;
 
 	return (
@@ -48,6 +47,6 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 			</div>
 		</div>
 	);
-};
+}
 
-export default ConfirmationModal; 
+export default ConfirmationModal;

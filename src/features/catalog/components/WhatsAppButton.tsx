@@ -1,12 +1,11 @@
 'use client';
 
-import React from 'react';
-import { WhatsAppButtonProps } from '../types';
+import type { WhatsAppButtonProps } from '../types';
 
 /**
  * Componente del botón flotante de WhatsApp
  */
-const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ cartItems, onSendMessage }) => {
+export function WhatsAppButton({ cartItems, onSendMessage }: WhatsAppButtonProps) {
 	return (
 		<div className="fixed bottom-6 right-6 z-50">
 			<button
@@ -43,6 +42,6 @@ const WhatsAppButton: React.FC<WhatsAppButtonProps> = ({ cartItems, onSendMessag
 			)}
 		</div>
 	);
-};
+}
 
-export default WhatsAppButton; 
+export default WhatsAppButton;

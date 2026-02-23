@@ -1,5 +1,5 @@
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { AdminPanelLink } from '@/components/AdminPanelLink';
 import CategoryNav from '@/features/catalog/components/CategoryNav';
 import ProductListContainer from '@/features/catalog/components/ProductListContainer';
