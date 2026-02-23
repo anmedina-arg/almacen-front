@@ -1,17 +1,19 @@
-import React, { useState, useEffect } from "react";
+'use client';
 
-const InfoBanner: React.FC = () => {
+import { useState, useEffect } from 'react';
+
+export function InfoBanner() {
 	const [showPopup, setShowPopup] = useState(false);
 
 	useEffect(() => {
-		const hasSeenPopup = localStorage.getItem("hasSeenPopup");
+		const hasSeenPopup = localStorage.getItem('hasSeenPopup');
 		if (!hasSeenPopup) {
 			setShowPopup(true);
 		}
 	}, []);
 
 	const handleClose = () => {
-		localStorage.setItem("hasSeenPopup", "true");
+		localStorage.setItem('hasSeenPopup', 'true');
 		setShowPopup(false);
 	};
 
@@ -47,6 +49,6 @@ const InfoBanner: React.FC = () => {
 			</div>
 		</div>
 	);
-};
+}
 
 export default InfoBanner;

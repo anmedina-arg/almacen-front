@@ -1,5 +1,3 @@
-'use client';
-
 interface LowStockBadgeProps {
   isLowStock: boolean;
   quantity: number | null;

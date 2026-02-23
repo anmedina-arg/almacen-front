@@ -1,5 +1,3 @@
-'use client';
-
 import type { OrderStatus } from '../../types/order.types';
 
 const STATUS_CONFIG: Record<

@@ -3,6 +3,8 @@ import type {
   StockMovement,
   LowStockProduct,
   UpsertStockInput,
+  StockEntryInput,
+  StockEntryResult,
 } from '../types/stock.types';
 
 // ============================================================================
@@ -70,5 +72,24 @@ export const stockService = {
       throw new Error(error.error || 'Error al obtener alertas de stock bajo');
     }
     return res.json();
+  },
+
+  /**
+   * Increment stock for multiple products in a single batch.
+   * Calls the RPC function increment_product_stock for each entry.
+   * Uses best-effort: errors per item do not stop the rest.
+   */
+  async incrementStock(entries: StockEntryInput[]): Promise<StockEntryResult[]> {
+    const res = await fetch('/api/stock/entry', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entries }),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || 'Error al registrar el ingreso de stock');
+    }
+    const data = await res.json();
+    return data.results as StockEntryResult[];
   },
 };

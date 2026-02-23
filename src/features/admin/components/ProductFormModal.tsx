@@ -24,6 +24,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
     mainCategory: product?.mainCategory || 'almacen',
     categories: product?.categories || '',
     active: product?.active ?? true,
+    sale_type: product?.sale_type || 'unit',
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -38,6 +39,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
         mainCategory: product.mainCategory,
         categories: product.categories,
         active: product.active,
+        sale_type: product.sale_type,
       });
     }
   }, [product]);
@@ -169,6 +171,25 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
               <option value="otros">Otros</option>
             </select>
             {errors.mainCategory && <p className="mt-1 text-sm text-red-600">{errors.mainCategory}</p>}
+          </div>
+
+          {/* Tipo de venta */}
+          <div>
+            <label htmlFor="sale_type" className="block text-sm font-medium text-gray-700 mb-1">
+              Tipo de venta *
+            </label>
+            <select
+              id="sale_type"
+              value={formData.sale_type}
+              onChange={(e) => setFormData({ ...formData, sale_type: e.target.value as ProductCreateInput['sale_type'] })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+              disabled={isPending}
+            >
+              <option value="unit">Por unidad</option>
+              <option value="100gr">Por 100 gramos</option>
+              <option value="kg">Por kilo</option>
+            </select>
+            {errors.sale_type && <p className="mt-1 text-sm text-red-600">{errors.sale_type}</p>}
           </div>
 
           {/* Categorías adicionales */}

@@ -1,22 +1,21 @@
 'use client';
 
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Product } from '@/types';
-import { useCart } from '@/hooks/useCart';
-import { generateWhatsAppMessage, openWhatsApp } from '@/utils/messageUtils';
-import ProductList from './ProductList';
-import WhatsAppButton from './WhatsAppButton';
-import ConfirmationModal from './ConfirmationModal';
-import InfoBanner from './InfoBanner';
-import { useProducts } from '@/hooks/useProducts';
+import { useState, useMemo, useEffect, useCallback } from 'react';
+import type { Product } from '../types';
+import { useCart } from '../hooks/useCart';
+import { generateWhatsAppMessage, openWhatsApp } from '../utils/messageUtils';
+import { ProductList } from './ProductList';
+import { WhatsAppButton } from './WhatsAppButton';
+import { ConfirmationModal } from './ConfirmationModal';
+import { InfoBanner } from './InfoBanner';
+import { useProducts } from '../hooks/useProducts';
 import { orderService } from '@/features/admin/services/orderService';
 
 /**
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
  */
-const ProductListContainer: React.FC = () => {
-
-	const { products, isLoading } = useProducts();
+export function ProductListContainer() {
+	const { products, isLoading, refetch } = useProducts();
 
 	// Filtrar productos activos (sin search)
 	const activeProductsAll: Product[] = products.filter((product) => product.active);
@@ -54,6 +53,8 @@ const ProductListContainer: React.FC = () => {
 
 	const { state, addToCart, removeFromCart, clearCart, getItemQuantity } = useCart();
 	const [showConfirmation, setShowConfirmation] = useState(false);
+	const [isCreatingOrder, setIsCreatingOrder] = useState(false);
+	const [orderError, setOrderError] = useState<string | null>(null);
 
 	// Memoizar el mensaje de WhatsApp
 	const whatsAppMessage = useMemo(() => {
@@ -72,21 +73,13 @@ const ProductListContainer: React.FC = () => {
 	};
 
 	// Función para confirmar y enviar pedido
-	const handleConfirmOrder = () => {
-		// CRITICAL for iOS Safari: Open WhatsApp FIRST (synchronously), then create order in background
-		// iOS Safari blocks window.open() if there's ANY async operation before it
+	const handleConfirmOrder = async () => {
+		setIsCreatingOrder(true);
+		setOrderError(null);
 
-		// 1. Open WhatsApp immediately (synchronous, works on iOS)
-		openWhatsApp(whatsAppMessage);
-
-		// 2. Close modal and clear cart immediately
-		setShowConfirmation(false);
-		clearCart();
-
-		// 3. Create order in background (fire-and-forget)
-		// This happens after WhatsApp opens, so it doesn't block the redirect
-		orderService
-			.createOrder({
+		try {
+			// 1. Create order in the database (deducts stock atomically)
+			await orderService.createOrder({
 				whatsapp_message: whatsAppMessage,
 				items: state.items.map((item) => ({
 					product_id: item.id,
@@ -95,20 +88,60 @@ const ProductListContainer: React.FC = () => {
 					unit_price: item.unitPrice,
 					is_by_weight: item.isByWeight,
 				})),
-			})
-			.catch((error) => {
-				console.error('Error creating order in background:', error);
-				// Don't show error to user since WhatsApp already opened
-				// Order creation is a nice-to-have, not critical for UX
 			});
+
+			// 2. Open WhatsApp with the message
+			openWhatsApp(whatsAppMessage);
+
+			// 3. Clear the cart
+			clearCart();
+
+			// 4. Close the modal
+			setShowConfirmation(false);
+
+			// 5. Refresh products to reflect updated stock (silent, no spinner)
+			refetch();
+		} catch (error) {
+			setShowConfirmation(false);
+
+			// Check if the server returned a structured insufficient_stock error
+			if (error instanceof Error) {
+				try {
+					const parsed = JSON.parse(error.message);
+					if (parsed?.error === 'insufficient_stock' && Array.isArray(parsed.products)) {
+						const productList = parsed.products
+							.map((p: { name: string; available: number }) =>
+								`• ${p.name} (disponible: ${p.available})`
+							)
+							.join('\n');
+						setOrderError(
+							`Algunos productos ya no tienen stock suficiente. Revisá tu pedido:\n\n${productList}`
+						);
+						// Don't open WhatsApp — the order was not created
+						return;
+					}
+				} catch {
+					// Not a JSON error — fall through
+				}
+			}
+
+			// Generic error: still open WhatsApp as graceful fallback
+			console.error('Error creating order:', error);
+			setOrderError(
+				error instanceof Error
+					? error.message
+					: 'Error al registrar el pedido.'
+			);
+			openWhatsApp(whatsAppMessage);
+		} finally {
+			setIsCreatingOrder(false);
+		}
 	};
 
 	// Función para cancelar confirmación
 	const handleCancelOrder = () => {
 		setShowConfirmation(false);
 	};
-
-	// Crear productos con sus cantidades y funciones (a partir de activeProducts filtrados)
 
 	const productsById = useMemo(() => {
 		return new Map(products.map(p => [p.id, p]));
@@ -128,13 +161,8 @@ const ProductListContainer: React.FC = () => {
 		return activeProducts.map(product => ({
 			...product,
 			quantity: getItemQuantity(product.id),
-			// onAdd: () => addToCart(product),
-			// onRemove: () => removeFromCart(product),
 		}));
-	}, [activeProducts, getItemQuantity, addToCart, removeFromCart]);
-
-	console.count('ProductListContainer render');
-
+	}, [activeProducts, getItemQuantity]);
 
 	if (isLoading) {
 		return (
@@ -184,15 +212,31 @@ const ProductListContainer: React.FC = () => {
 				onSendMessage={handleSendMessage}
 			/>
 
+			{/* Error toast */}
+			{orderError && (
+				<div className="fixed top-4 right-4 z-50 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-lg max-w-sm">
+					<div className="flex items-start gap-2">
+						<p className="text-sm">{orderError}</p>
+						<button
+							onClick={() => setOrderError(null)}
+							className="text-red-600 hover:text-red-800 font-bold text-lg leading-none"
+						>
+							x
+						</button>
+					</div>
+				</div>
+			)}
+
 			{/* Modal de confirmación */}
 			<ConfirmationModal
 				isOpen={showConfirmation}
 				message={whatsAppMessage}
 				onConfirm={handleConfirmOrder}
 				onCancel={handleCancelOrder}
+				isLoading={isCreatingOrder}
 			/>
 		</>
 	);
-};
+}
 
 export default ProductListContainer;

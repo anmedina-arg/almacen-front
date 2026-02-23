@@ -1,12 +1,6 @@
-import React from 'react';
-
-/**
- * Componente Footer
- */
-const Footer: React.FC = () => {
-
+export function Footer() {
 	const phoneNumberAM = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER_AM;
-	const encodedMessageAM = `Hola Andrés me interesa el sistema de ventas por Whatsapp, me contas un poco más?`
+	const encodedMessageAM = `Hola Andrés me interesa el sistema de ventas por Whatsapp, me contas un poco más?`;
 
 	return (
 		<footer className="bg-gray-100 border-t border-gray-200 mt-12 pb-20">
@@ -38,6 +32,4 @@ const Footer: React.FC = () => {
 			</div>
 		</footer>
 	);
-};
-
-export default Footer; 
+}

@@ -95,3 +95,39 @@ export interface StockFilters {
   stockFilter: 'all' | 'with_stock' | 'no_stock' | 'low_stock';
   categoryFilter: string;
 }
+
+// ============================================================================
+// Stock Entry Types (Ingreso de Stock / Compra-Reposición)
+// ============================================================================
+
+/**
+ * Represents a pending entry for a single product in the stock entry flow.
+ * Used by the useStockEntry reducer hook.
+ */
+export interface StockEntryItem {
+  product_id: number;
+  product_name: string;
+  product_image: string;
+  sale_type: string;
+  current_stock: number | null;
+  increment: number;
+  notes: string;
+}
+
+/**
+ * Input for the POST /api/stock/entry endpoint (per item).
+ */
+export interface StockEntryInput {
+  product_id: number;
+  increment: number;
+  notes: string;
+}
+
+/**
+ * Result for each item returned by POST /api/stock/entry.
+ */
+export interface StockEntryResult {
+  product_id: number;
+  success: boolean;
+  error?: string;
+}

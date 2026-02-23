@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
-import Image from "next/image";
-import { useState, useEffect } from "react";
-import Link from "next/link";
-import HelpButton from "./HelpButton";
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
+import Link from 'next/link';
+import HelpButton from './HelpButton';
 import { useIsAuthenticated } from '@/features/auth/stores/authStore';
 import { UserAvatar } from '@/features/auth/components/UserAvatar';
 import { LogoutButton } from '@/features/auth/components/LogoutButton';
 
-const Header = () => {
+export function Header() {
 	const [isScrolled, setIsScrolled] = useState(false);
 	const isAuthenticated = useIsAuthenticated();
 
@@ -17,14 +17,15 @@ const Header = () => {
 			setIsScrolled(window.scrollY > 50);
 		};
 
-		window.addEventListener("scroll", handleScroll);
-		return () => window.removeEventListener("scroll", handleScroll);
+		window.addEventListener('scroll', handleScroll);
+		return () => window.removeEventListener('scroll', handleScroll);
 	}, []);
+
 	return (
 		<>
 			{/* Header inicial (completo) */}
 			<div
-				className={`text-center justify-center items-center flex gap-2 transition-all duration-300 ${isScrolled ? "opacity-0 h-0 p-0" : "mb-0 mt-2 py-2"
+				className={`text-center justify-center items-center flex gap-2 transition-all duration-300 ${isScrolled ? 'opacity-0 h-0 p-0' : 'mb-0 mt-2 py-2'
 					}`}
 			>
 				<Image
@@ -61,7 +62,7 @@ const Header = () => {
 
 			{/* Header sticky (reducido) */}
 			<div
-				className={`sticky top-0 z-50 bg-white/80 backdrop-blur-md transition-all duration-300 ${isScrolled ? "py-2" : "opacity-0 h-0 p-0 pointer-events-none"
+				className={`sticky top-0 z-50 bg-white/80 backdrop-blur-md transition-all duration-300 ${isScrolled ? 'py-2' : 'opacity-0 h-0 p-0 pointer-events-none'
 					}`}
 			>
 				<div className="flex items-center justify-between w-full px-2">
@@ -94,7 +95,5 @@ const Header = () => {
 				</div>
 			</div>
 		</>
-	)
-};
-
-export default Header;
+	);
+}

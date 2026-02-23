@@ -1,4 +1,4 @@
-import { Product } from '@/types';
+import { Product } from '../types';
 import { ProductDataSource } from './ProductDataSource';
 
 export class ApiProductDataSource implements ProductDataSource {

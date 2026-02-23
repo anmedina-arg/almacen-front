@@ -52,7 +52,8 @@ export async function GET(
         image,
         active,
         categories,
-        mainCategory:main_category
+        mainCategory:main_category,
+        sale_type
       `
       )
       .eq('id', id)
@@ -124,6 +125,7 @@ export async function PUT(
     if (body.mainCategory !== undefined) updates.main_category = body.mainCategory.toLowerCase();
     if (body.categories !== undefined) updates.categories = body.categories;
     if (body.active !== undefined) updates.active = body.active;
+    if (body.sale_type !== undefined) updates.sale_type = body.sale_type;
 
     const supabase = await createSupabaseClient();
 
@@ -139,7 +141,8 @@ export async function PUT(
         image,
         active,
         categories,
-        mainCategory:main_category
+        mainCategory:main_category,
+        sale_type
       `
       )
       .single();

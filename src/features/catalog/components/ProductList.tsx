@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useMemo } from 'react';
-import type { Product, MainCategory } from '@/types';
-import ProductCard from './ProductCard';
-import ProductSquareCard from './ProductSquareCard';
+import { useState, useRef, useEffect, useMemo } from 'react';
+import type { Product, MainCategory } from '../types';
+import { ProductCard } from './ProductCard';
+import { ProductSquareCard } from './ProductSquareCard';
 
 interface ProductWithQuantity extends Product {
 	quantity: number;
@@ -20,11 +20,10 @@ interface ProductListProps {
 /**
  * Componente de lista de productos
  */
-const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, searchQuery, onAdd, onRemove }) => {
+export function ProductList({ products, mainCategories, searchQuery, onAdd, onRemove }: ProductListProps) {
 	const [visibleProducts, setVisibleProducts] = useState(10);
-	const [showList, setShowList] = useState<string>("list");
+	const [showList, setShowList] = useState<string>('list');
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
 
 	useEffect(() => {
 		const observer = new IntersectionObserver(
@@ -45,7 +44,6 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 			if (currentRef) observer.unobserve(currentRef);
 		};
 	}, []);
-
 
 	const grouped = useMemo(() => {
 		if (!mainCategories) return [];
@@ -79,23 +77,22 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 			setFixHeight(true);
 		}
 
-		return () => { setFixHeight(false) };
-	}, [searchQuery])
+		return () => { setFixHeight(false); };
+	}, [searchQuery]);
 
-	console.log(fixHeight);
-
-	console.count('ProductList render');
+	// Suppress unused variable warning — visibleProducts is used for future pagination
+	void visibleProducts;
 
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
 			<div className='flex items-center gap-2 px-4 py-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl'>
 				<span className="text-xs text-gray-700">Vista:</span>
 				<button
-					onClick={() => setShowList("list")}
+					onClick={() => setShowList('list')}
 					aria-label="Vista lista"
-					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === "list"
-						? " border-gray-500"
-						: " border-transparent"
+					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === 'list'
+						? ' border-gray-500'
+						: ' border-transparent'
 						}`}
 				>
 					{/* Botón vista lista */}
@@ -107,11 +104,11 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 					<span className='text-xs'>Lista</span>
 				</button>
 				<button
-					onClick={() => setShowList("grid")}
+					onClick={() => setShowList('grid')}
 					aria-label="Vista grilla"
-					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === "grid"
-						? "  border-gray-500"
-						: "  border-transparent"
+					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === 'grid'
+						? '  border-gray-500'
+						: '  border-transparent'
 						}`}
 				>
 					{/* Botón vista grilla */}
@@ -145,9 +142,9 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 										<span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{sub.products.length} Productos</span>
 									</div>
 
-									<div className={`${showList === "list" ? "flex flex-wrap gap-4" : "grid grid-cols-2 gap-2"}`}>
+									<div className={`${showList === 'list' ? 'flex flex-wrap gap-4' : 'grid grid-cols-2 gap-2'}`}>
 										{sub.products.map((product) =>
-											showList === "list" ? (
+											showList === 'list' ? (
 												<ProductCard
 													key={`${product.id}-${product.name}`}
 													product={product}
@@ -174,8 +171,8 @@ const ProductList: React.FC<ProductListProps> = ({ products, mainCategories, sea
 			</div>
 
 			<div ref={loadMoreRef} className="h-10" />
-		</ div>
+		</div>
 	);
-};
+}
 
 export default ProductList;

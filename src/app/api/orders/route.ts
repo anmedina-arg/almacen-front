@@ -45,6 +45,19 @@ export async function POST(request: NextRequest) {
     });
 
     if (error) {
+      // Check if it's an insufficient_stock error from the RPC
+      try {
+        const parsed = JSON.parse(error.message);
+        if (parsed.error === 'insufficient_stock') {
+          return NextResponse.json(
+            { error: 'insufficient_stock', products: parsed.products },
+            { status: 409 }
+          );
+        }
+      } catch {
+        // Not JSON — fall through to generic error
+      }
+
       console.error('Error creating order via RPC:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }

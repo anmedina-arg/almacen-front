@@ -1,10 +1,10 @@
 import { useReducer, useCallback, useMemo } from 'react';
-import { CartState, CartAction, Product, CartItem } from '@/types';
+import { CartState, CartAction, Product, CartItem } from '../types';
 import {
   isProductByWeight,
   getQuantityPerClick,
   getUnitPrice,
-} from '@/utils/productUtils';
+} from '../utils/productUtils';
 
 // Estado inicial del carrito
 const initialState: CartState = {
@@ -19,6 +19,14 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'ADD_ITEM': {
       const { product, quantity } = action.payload;
       const existingItem = state.items.find((item) => item.id === product.id);
+
+      // Stock guard: reject if adding would exceed available stock
+      if (product.stock_quantity !== undefined) {
+        const currentQty = existingItem?.quantity ?? 0;
+        if (product.stock_quantity === 0 || currentQty >= product.stock_quantity) {
+          return state;
+        }
+      }
 
       if (existingItem) {
         // Si ya existe, aumentar cantidad
@@ -42,7 +50,8 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
           price: product.price,
           quantity: quantity,
           unitPrice: getUnitPrice(product),
-          isByWeight: isProductByWeight(product.name),
+          isByWeight: isProductByWeight(product),
+          saleType: product.sale_type,
         };
 
         return {
@@ -125,13 +134,13 @@ export const useCart = () => {
 
   // Función para agregar producto al carrito
   const addToCart = useCallback((product: Product) => {
-    const quantity = getQuantityPerClick(product.name);
+    const quantity = getQuantityPerClick(product);
     dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
   }, []);
 
   // Función para quitar producto del carrito
   const removeFromCart = useCallback((product: Product) => {
-    const quantity = getQuantityPerClick(product.name);
+    const quantity = getQuantityPerClick(product);
     dispatch({ type: 'REMOVE_ITEM', payload: { product, quantity } });
   }, []);
 

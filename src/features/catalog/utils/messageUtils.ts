@@ -1,6 +1,5 @@
-import { CartItem } from '@/types';
+import { CartItem } from '../types';
 import {
-  getWeightType,
   calculateItemPrice,
   truncateProductName,
 } from './productUtils';
@@ -28,12 +27,11 @@ export const generateWhatsAppMessage = (cartItems: CartItem[]): string => {
     const itemTotal = calculateItemPrice(item);
     total += itemTotal;
 
-    const weightType = getWeightType(item.name);
     let quantityText = '';
 
-    if (weightType === '100gr') {
+    if (item.saleType === '100gr') {
       quantityText = `${item.quantity}gr`;
-    } else if (weightType === 'kg') {
+    } else if (item.saleType === 'kg') {
       if (item.quantity >= 1000) {
         quantityText = `${item.quantity / 1000}kg`;
       } else {

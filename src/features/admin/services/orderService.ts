@@ -24,8 +24,12 @@ export const orderService = {
       body: JSON.stringify(input),
     });
     if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.error || 'Error al crear el pedido');
+      const body = await res.json();
+      // Preserve structured errors (e.g. insufficient_stock) as JSON in the message
+      if (body.error === 'insufficient_stock') {
+        throw new Error(JSON.stringify(body));
+      }
+      throw new Error(body.error || 'Error al crear el pedido');
     }
     return res.json();
   },
@@ -84,6 +88,19 @@ export const orderService = {
     if (!res.ok) {
       const error = await res.json();
       throw new Error(error.error || 'Error al confirmar el pedido');
+    }
+  },
+
+  /**
+   * Cancel an order and return its stock (admin only).
+   */
+  async cancelOrder(orderId: number): Promise<void> {
+    const res = await fetch(`/api/orders/${orderId}/cancel`, {
+      method: 'PUT',
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || 'Error al cancelar el pedido');
     }
   },
 

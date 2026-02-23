@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 import { useProductStock } from '../../hooks/useProductStock';
 import { useLowStock } from '../../hooks/useLowStock';
 import { LowStockBadge } from './LowStockBadge';
@@ -122,26 +123,34 @@ export function StockManagement() {
             Gestion de inventario de productos
           </p>
         </div>
-        {lowStockCount > 0 && (
-          <button
-            onClick={() =>
-              setFilters((prev) => ({
-                ...prev,
-                stockFilter: prev.stockFilter === 'low_stock' ? 'all' : 'low_stock',
-              }))
-            }
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              filters.stockFilter === 'low_stock'
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
-            }`}
+        <div className="flex items-center gap-2 flex-wrap">
+          <Link
+            href="/admin/stock/entry"
+            className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
           >
-            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-200 text-red-800 text-xs font-bold">
-              {lowStockCount}
-            </span>
-            Alertas de stock bajo
-          </button>
-        )}
+            Ingresar Stock
+          </Link>
+          {lowStockCount > 0 && (
+            <button
+              onClick={() =>
+                setFilters((prev) => ({
+                  ...prev,
+                  stockFilter: prev.stockFilter === 'low_stock' ? 'all' : 'low_stock',
+                }))
+              }
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                filters.stockFilter === 'low_stock'
+                  ? 'bg-red-600 text-white hover:bg-red-700'
+                  : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
+              }`}
+            >
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-200 text-red-800 text-xs font-bold">
+                {lowStockCount}
+              </span>
+              Alertas de stock bajo
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Filtros */}
