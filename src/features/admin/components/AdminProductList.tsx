@@ -174,7 +174,7 @@ export function AdminProductList() {
                       <input
                         type="checkbox"
                         checked={product.active}
-                        onChange={() => toggleMutation.mutate(product.id)}
+                        onChange={() => toggleMutation.mutate({ id: product.id, newActive: !product.active })}
                         disabled={toggleMutation.isPending}
                         className="w-4 h-4 accent-green-600 cursor-pointer disabled:cursor-not-allowed"
                         aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}
@@ -243,7 +243,7 @@ export function AdminProductList() {
                     <input
                       type="checkbox"
                       checked={product.active}
-                      onChange={() => toggleMutation.mutate(product.id)}
+                      onChange={() => toggleMutation.mutate({ id: product.id, newActive: !product.active })}
                       disabled={toggleMutation.isPending}
                       className="w-4 h-4 accent-green-600 cursor-pointer disabled:cursor-not-allowed"
                       aria-label={`${product.active ? 'Desactivar' : 'Activar'} ${product.name}`}

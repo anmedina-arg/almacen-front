@@ -3,42 +3,45 @@ import { adminKeys } from '../constants/queryKeys';
 import { adminProductService } from '../services/adminProductService';
 import type { Product } from '@/types';
 
+interface ToggleActiveInput {
+  id: number;
+  newActive: boolean;
+}
+
+/**
+ * Mutation hook para activar o desactivar un producto.
+ *
+ * Recibe { id, newActive } en lugar de solo id para evitar que mutationFn
+ * lea el cache DESPUÉS de que onMutate ya lo modificó (lo que causaría que
+ * se calculara !product.active sobre el valor ya toggleado, invirtiendo la acción).
+ */
 export function useToggleProductActive() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
-      const products = queryClient.getQueryData<Product[]>(adminKeys.productsList());
-      const product = products?.find((p) => p.id === id);
-      if (!product) throw new Error('Product not found');
+    mutationFn: ({ id, newActive }: ToggleActiveInput) =>
+      adminProductService.update(id, { active: newActive }),
 
-      return adminProductService.update(id, { active: !product.active });
-    },
-
-    onMutate: async (id) => {
-      // Cancelar queries en curso
+    onMutate: async ({ id, newActive }) => {
       await queryClient.cancelQueries({ queryKey: adminKeys.productsList() });
 
-      // Snapshot del estado anterior
       const previousProducts = queryClient.getQueryData<Product[]>(adminKeys.productsList());
 
-      // Toggle optimista
+      // Actualización optimista con el valor correcto
       queryClient.setQueryData<Product[]>(adminKeys.productsList(), (old) =>
-        old?.map((p) => (p.id === id ? { ...p, active: !p.active } : p))
+        old?.map((p) => (p.id === id ? { ...p, active: newActive } : p))
       );
 
       return { previousProducts };
     },
 
-    onError: (err, variables, context) => {
-      // Rollback en caso de error
+    onError: (_err, _variables, context) => {
       if (context?.previousProducts) {
         queryClient.setQueryData(adminKeys.productsList(), context.previousProducts);
       }
     },
 
     onSuccess: () => {
-      // Invalidar para sincronizar con servidor
       queryClient.invalidateQueries({ queryKey: adminKeys.productsList() });
     },
   });

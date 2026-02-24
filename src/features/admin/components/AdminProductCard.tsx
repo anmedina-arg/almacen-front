@@ -24,7 +24,7 @@ export function AdminProductCard({ product, onEdit }: AdminProductCardProps) {
   };
 
   const handleToggle = () => {
-    toggleMutation.mutate(product.id);
+    toggleMutation.mutate({ id: product.id, newActive: !product.active });
   };
 
   return (
