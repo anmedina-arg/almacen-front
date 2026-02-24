@@ -53,8 +53,6 @@ export function ProductListContainer() {
 
 	const { state, addToCart, removeFromCart, clearCart, getItemQuantity } = useCart();
 	const [showConfirmation, setShowConfirmation] = useState(false);
-	const [isCreatingOrder, setIsCreatingOrder] = useState(false);
-	const [orderError, setOrderError] = useState<string | null>(null);
 
 	// Memoizar el mensaje de WhatsApp
 	const whatsAppMessage = useMemo(() => {
@@ -73,13 +71,21 @@ export function ProductListContainer() {
 	};
 
 	// Función para confirmar y enviar pedido
-	const handleConfirmOrder = async () => {
-		setIsCreatingOrder(true);
-		setOrderError(null);
+	const handleConfirmOrder = () => {
+		// CRITICAL for iOS Safari: Open WhatsApp FIRST (synchronously), then create order in background.
+		// iOS Safari blocks window.open() if there is ANY async operation before it.
 
-		try {
-			// 1. Create order in the database (deducts stock atomically)
-			await orderService.createOrder({
+		// 1. Open WhatsApp immediately (synchronous — required for iOS)
+		openWhatsApp(whatsAppMessage);
+
+		// 2. Close modal and clear cart immediately
+		setShowConfirmation(false);
+		clearCart();
+
+		// 3. Create order in background (fire-and-forget)
+		// Happens after WhatsApp opens so it never blocks the redirect.
+		orderService
+			.createOrder({
 				whatsapp_message: whatsAppMessage,
 				items: state.items.map((item) => ({
 					product_id: item.id,
@@ -88,54 +94,15 @@ export function ProductListContainer() {
 					unit_price: item.unitPrice,
 					is_by_weight: item.isByWeight,
 				})),
+			})
+			.then(() => {
+				// Refresh stock silently after order is confirmed
+				refetch();
+			})
+			.catch((error) => {
+				console.error('Error creating order in background:', error);
+				// WhatsApp is already open — no user-facing error shown
 			});
-
-			// 2. Open WhatsApp with the message
-			openWhatsApp(whatsAppMessage);
-
-			// 3. Clear the cart
-			clearCart();
-
-			// 4. Close the modal
-			setShowConfirmation(false);
-
-			// 5. Refresh products to reflect updated stock (silent, no spinner)
-			refetch();
-		} catch (error) {
-			setShowConfirmation(false);
-
-			// Check if the server returned a structured insufficient_stock error
-			if (error instanceof Error) {
-				try {
-					const parsed = JSON.parse(error.message);
-					if (parsed?.error === 'insufficient_stock' && Array.isArray(parsed.products)) {
-						const productList = parsed.products
-							.map((p: { name: string; available: number }) =>
-								`• ${p.name} (disponible: ${p.available})`
-							)
-							.join('\n');
-						setOrderError(
-							`Algunos productos ya no tienen stock suficiente. Revisá tu pedido:\n\n${productList}`
-						);
-						// Don't open WhatsApp — the order was not created
-						return;
-					}
-				} catch {
-					// Not a JSON error — fall through
-				}
-			}
-
-			// Generic error: still open WhatsApp as graceful fallback
-			console.error('Error creating order:', error);
-			setOrderError(
-				error instanceof Error
-					? error.message
-					: 'Error al registrar el pedido.'
-			);
-			openWhatsApp(whatsAppMessage);
-		} finally {
-			setIsCreatingOrder(false);
-		}
 	};
 
 	// Función para cancelar confirmación
@@ -212,28 +179,12 @@ export function ProductListContainer() {
 				onSendMessage={handleSendMessage}
 			/>
 
-			{/* Error toast */}
-			{orderError && (
-				<div className="fixed top-4 right-4 z-50 bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg shadow-lg max-w-sm">
-					<div className="flex items-start gap-2">
-						<p className="text-sm">{orderError}</p>
-						<button
-							onClick={() => setOrderError(null)}
-							className="text-red-600 hover:text-red-800 font-bold text-lg leading-none"
-						>
-							x
-						</button>
-					</div>
-				</div>
-			)}
-
 			{/* Modal de confirmación */}
 			<ConfirmationModal
 				isOpen={showConfirmation}
 				message={whatsAppMessage}
 				onConfirm={handleConfirmOrder}
 				onCancel={handleCancelOrder}
-				isLoading={isCreatingOrder}
 			/>
 		</>
 	);
