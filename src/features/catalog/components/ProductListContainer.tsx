@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react';
 import type { Product } from '../types';
 import { useCart } from '../hooks/useCart';
 import { generateWhatsAppMessage, openWhatsApp } from '../utils/messageUtils';
+import { calculateItemPrice } from '../utils/productUtils';
 import { ProductList } from './ProductList';
 import { WhatsAppButton } from './WhatsAppButton';
 import { ConfirmationModal } from './ConfirmationModal';
@@ -91,7 +92,13 @@ export function ProductListContainer() {
 					product_id: item.id,
 					product_name: item.name,
 					quantity: item.quantity,
-					unit_price: item.unitPrice,
+					// Normalize to price-per-base-unit so the DB formula
+					// (quantity × unit_price) produces the correct subtotal.
+					// calculateItemPrice already applies the sale_type conversion
+					// (÷1000 for kg, ÷100 for 100gr, ×1 for unit).
+					unit_price: item.quantity > 0
+						? calculateItemPrice(item) / item.quantity
+						: item.unitPrice,
 					is_by_weight: item.isByWeight,
 				})),
 			})
