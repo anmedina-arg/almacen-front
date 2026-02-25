@@ -47,9 +47,10 @@ export function ProductListContainer() {
 		return activeProductsAll.filter((p) => normalize(p.name).includes(q));
 	}, [activeProductsAll, debouncedSearch]);
 
-	// Obtener todas las categorías únicas (ignorando vacías) a partir de los productos filtrados
-	const mainCategories = useMemo(() => {
-		return Array.from(new Set(activeProducts.map((p) => p.mainCategory).filter((cat) => cat)));
+	// Obtener todas las categorías únicas para mostrar (nuevo sistema con fallback al legado)
+	const displayCategories = useMemo(() => {
+		const cats = activeProducts.map((p) => p.category_name ?? String(p.mainCategory));
+		return Array.from(new Set(cats)).filter(Boolean);
 	}, [activeProducts]);
 
 	const { state, addToCart, removeFromCart, clearCart, getItemQuantity } = useCart();
@@ -175,7 +176,7 @@ export function ProductListContainer() {
 					products={productsWithQuantity}
 					onAdd={onAdd}
 					onRemove={onRemove}
-					mainCategories={mainCategories}
+					mainCategories={displayCategories}
 					searchQuery={debouncedSearch}
 				/>
 			)}

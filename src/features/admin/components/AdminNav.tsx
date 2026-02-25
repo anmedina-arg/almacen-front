@@ -10,6 +10,10 @@ const navItems = [
     label: 'Productos',
   },
   {
+    href: '/admin/categories',
+    label: 'Categorías',
+  },
+  {
     href: '/admin/stock',
     label: 'Control de Stock',
   },

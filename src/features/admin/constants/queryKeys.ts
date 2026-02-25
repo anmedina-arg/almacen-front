@@ -14,4 +14,9 @@ export const adminKeys = {
   orders: () => [...adminKeys.all, 'orders'] as const,
   ordersList: () => [...adminKeys.orders(), 'list'] as const,
   orderDetail: (id: number) => [...adminKeys.orders(), id] as const,
+
+  // Categories query keys
+  categories: () => [...adminKeys.all, 'categories'] as const,
+  categoriesList: () => [...adminKeys.categories(), 'list'] as const,
+  categorySubcategories: (id: number) => [...adminKeys.categories(), 'subcategories', id] as const,
 };

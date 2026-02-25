@@ -17,12 +17,14 @@ export const productCreateSchema = z.object({
     'pizzas',
   ], {
     errorMap: () => ({ message: 'Categoría inválida' }),
-  }),
+  }).optional().default('otros'),
   categories: z.string().optional().default(''),
   active: z.boolean().default(true),
   sale_type: z.enum(['unit', '100gr', 'kg'], {
     errorMap: () => ({ message: 'Tipo de venta inválido' }),
   }).default('unit'),
+  category_id: z.number().int().positive().nullable().optional(),
+  subcategory_id: z.number().int().positive().nullable().optional(),
 });
 
 export type ProductCreateInput = z.infer<typeof productCreateSchema>;

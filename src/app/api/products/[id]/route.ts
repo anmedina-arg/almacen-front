@@ -53,7 +53,11 @@ export async function GET(
         active,
         categories,
         mainCategory:main_category,
-        sale_type
+        sale_type,
+        category_id,
+        subcategory_id,
+        cat:categories!products_category_id_fkey(id, name),
+        sub:subcategories!products_subcategory_id_fkey(id, name)
       `
       )
       .eq('id', id)
@@ -67,7 +71,12 @@ export async function GET(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    const product = data as Product;
+    const { cat: fetchedCat, sub: fetchedSub, ...fetchedRest } = data as typeof data & { cat?: { id: number; name: string } | null; sub?: { id: number; name: string } | null };
+    const product = {
+      ...fetchedRest,
+      category_name: fetchedCat?.name ?? null,
+      subcategory_name: fetchedSub?.name ?? null,
+    } as Product;
 
     // Si el producto está inactivo, solo admins pueden verlo
     if (!product.active) {
@@ -126,6 +135,9 @@ export async function PUT(
     if (body.categories !== undefined) updates.categories = body.categories;
     if (body.active !== undefined) updates.active = body.active;
     if (body.sale_type !== undefined) updates.sale_type = body.sale_type;
+    // FK-based category fields (Phase 2)
+    if ('category_id' in body) updates.category_id = body.category_id ?? null;
+    if ('subcategory_id' in body) updates.subcategory_id = body.subcategory_id ?? null;
 
     const supabase = await createSupabaseClient();
 
@@ -142,7 +154,11 @@ export async function PUT(
         active,
         categories,
         mainCategory:main_category,
-        sale_type
+        sale_type,
+        category_id,
+        subcategory_id,
+        cat:categories!products_category_id_fkey(id, name),
+        sub:subcategories!products_subcategory_id_fkey(id, name)
       `
       )
       .single();
@@ -155,7 +171,13 @@ export async function PUT(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data as Product);
+    const { cat: updatedCat, sub: updatedSub, ...updatedRest } = data as typeof data & { cat?: { id: number; name: string } | null; sub?: { id: number; name: string } | null };
+    const updatedProduct = {
+      ...updatedRest,
+      category_name: updatedCat?.name ?? null,
+      subcategory_name: updatedSub?.name ?? null,
+    };
+    return NextResponse.json(updatedProduct as Product);
   } catch (error) {
     console.error('Error in PUT /api/products/[id]:', error);
     return NextResponse.json(
