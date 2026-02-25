@@ -43,10 +43,12 @@ const CATEGORY_ICONS: Record<string, string> = {
 };
 
 /**
- * rootMargin crea una línea de disparo al 30% desde el top del viewport.
+ * rootMargin crea una línea de disparo al 40% desde el top del viewport.
  * Una sección es "activa" cuando su top cruza esa línea.
+ * El 40% refleja que los FilterButtons + buscador ocupan ~35-40% del viewport,
+ * de modo que la sección detectada ya es visible para el usuario.
  */
-const SPY_ROOT_MARGIN = '-30% 0px -70% 0px';
+const SPY_ROOT_MARGIN = '-40% 0px -60% 0px';
 const SCROLL_DEBOUNCE_MS = 150;
 
 /**
