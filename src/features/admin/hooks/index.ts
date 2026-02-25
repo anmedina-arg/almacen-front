@@ -12,6 +12,15 @@ export { useLowStock } from './useLowStock';
 export { useStockEntry } from './useStockEntry';
 export { useBatchIncrementStock } from './useBatchIncrementStock';
 
+// Category hooks
+export { useCategories } from './useCategories';
+export { useCreateCategory } from './useCreateCategory';
+export { useUpdateCategory } from './useUpdateCategory';
+export { useDeleteCategory } from './useDeleteCategory';
+export { useCreateSubcategory } from './useCreateSubcategory';
+export { useUpdateSubcategory } from './useUpdateSubcategory';
+export { useDeleteSubcategory } from './useDeleteSubcategory';
+
 // Order hooks
 export { useOrders } from './useOrders';
 export { useOrderDetail } from './useOrderDetail';
