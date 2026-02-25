@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useMemo } from 'react';
-import type { Product, MainCategory } from '../types';
+import type { Product } from '../types';
 import { ProductCard } from './ProductCard';
 import { ProductSquareCard } from './ProductSquareCard';
 
@@ -13,7 +13,7 @@ interface ProductListProps {
 	products: ProductWithQuantity[];
 	onAdd: (id: number) => void;
 	onRemove: (id: number) => void;
-	mainCategories?: MainCategory[];
+	mainCategories?: string[];
 	searchQuery?: string;
 }
 
@@ -48,12 +48,18 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 	const grouped = useMemo(() => {
 		if (!mainCategories) return [];
 
-		return mainCategories.map((main) => {
-			const mainProducts = products.filter((p) => p.mainCategory === main);
+		return mainCategories.map((displayCat) => {
+			// Agrupar por categoría: nuevo sistema (category_name) con fallback a mainCategory legacy
+			const catProducts = products.filter(
+				(p) => (p.category_name ?? String(p.mainCategory)) === displayCat
+			);
 
 			const subMap = new Map<string, ProductWithQuantity[]>();
-			mainProducts.forEach((p) => {
-				const subLabel = (p.categories ?? 'Sin categoría').toString().trim();
+			catProducts.forEach((p) => {
+				// Sub-agrupación: subcategory_name → categories (texto) → 'General'
+				const subLabel = p.subcategory_name
+					?? (p.categories?.trim() || null)
+					?? 'General';
 				if (!subMap.has(subLabel)) subMap.set(subLabel, []);
 				subMap.get(subLabel)!.push(p);
 			});
@@ -64,7 +70,7 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 				products: items,
 			}));
 
-			return { main, subcategories };
+			return { main: displayCat, subcategories };
 		});
 	}, [products, mainCategories]);
 
@@ -127,6 +133,7 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 					<div
 						key={String(main)}
 						id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
+						data-category={String(main)}
 						className="w-full scroll-mt-48"
 					>
 						<div className='flex gap-2 items-baseline'>
@@ -136,7 +143,13 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 
 						{subcategories.map((sub) => {
 							return (
-								<section key={`${String(main)}-${sub.key}`} className="mb-4">
+								<section
+								key={`${String(main)}-${sub.key}`}
+								id={`${String(main).charAt(0).toUpperCase() + String(main).slice(1)}-${sub.key}`}
+								data-category={String(main)}
+								data-subcategory={sub.label}
+								className="mb-4 scroll-mt-48"
+							>
 									<div className="flex items-center gap-2 w-full text-md font-semibold mb-2 border-b-1 border-gray-700">
 										<span>{sub.label}</span>
 										<span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{sub.products.length} Productos</span>
