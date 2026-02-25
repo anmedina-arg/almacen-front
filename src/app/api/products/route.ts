@@ -59,7 +59,11 @@ export async function GET(request: NextRequest) {
         active,
         categories,
         mainCategory:main_category,
-        sale_type
+        sale_type,
+        category_id,
+        subcategory_id,
+        cat:categories!products_category_id_fkey(id, name),
+        sub:subcategories!products_subcategory_id_fkey(id, name)
       `
       )
       .order('name', { ascending: true });
@@ -85,10 +89,15 @@ export async function GET(request: NextRequest) {
       (stockData ?? []).map((s) => [s.product_id, s.quantity])
     );
 
-    const products = (data ?? []).map((p) => ({
-      ...p,
-      stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
-    }));
+    const products = (data ?? []).map((p) => {
+      const { cat, sub, ...rest } = p as typeof p & { cat?: { id: number; name: string } | null; sub?: { id: number; name: string } | null };
+      return {
+        ...rest,
+        category_name: cat?.name ?? null,
+        subcategory_name: sub?.name ?? null,
+        stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
+      };
+    });
 
     // Return with no-cache headers to prevent browser/PWA caching
     return NextResponse.json(products as Product[], {
@@ -121,15 +130,15 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     // Validar datos básicos
-    if (!body.name || body.price == null || !body.mainCategory) {
+    if (!body.name || body.price == null) {
       return NextResponse.json(
-        { error: 'Missing required fields: name, price, mainCategory' },
+        { error: 'Missing required fields: name, price' },
         { status: 400 }
       );
     }
 
     // NORMALIZAR mainCategory a minúsculas para que coincida con la constraint
-    const normalizedCategory = body.mainCategory.toLowerCase();
+    const normalizedCategory = body.mainCategory ? body.mainCategory.toLowerCase() : 'otros';
 
     const supabase = await createSupabaseClient();
 
@@ -145,6 +154,8 @@ export async function POST(request: NextRequest) {
           categories: body.categories || '',
           active: body.active ?? true,
           sale_type: body.sale_type ?? 'unit',
+          category_id: body.category_id ?? null,
+          subcategory_id: body.subcategory_id ?? null,
         },
       ])
       .select(
@@ -156,7 +167,11 @@ export async function POST(request: NextRequest) {
         active,
         categories,
         mainCategory:main_category,
-        sale_type
+        sale_type,
+        category_id,
+        subcategory_id,
+        cat:categories!products_category_id_fkey(id, name),
+        sub:subcategories!products_subcategory_id_fkey(id, name)
       `
       )
       .single();
@@ -169,7 +184,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(data as Product, { status: 201 });
+    const { cat: insertedCat, sub: insertedSub, ...insertedRest } = data as typeof data & { cat?: { id: number; name: string } | null; sub?: { id: number; name: string } | null };
+    const product = {
+      ...insertedRest,
+      category_name: insertedCat?.name ?? null,
+      subcategory_name: insertedSub?.name ?? null,
+    };
+    return NextResponse.json(product as Product, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/products:', error);
     return NextResponse.json(

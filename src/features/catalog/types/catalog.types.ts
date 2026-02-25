@@ -22,6 +22,11 @@ export interface Product {
   mainCategory: MainCategory;
   sale_type: WeightType;
   stock_quantity?: number; // undefined = no stock record (treat as available)
+  // FK-based category system (Phase 2)
+  category_id?: number | null;
+  subcategory_id?: number | null;
+  category_name?: string | null;    // from JOIN with categories table
+  subcategory_name?: string | null; // from JOIN with subcategories table
 }
 
 // description esctructurada

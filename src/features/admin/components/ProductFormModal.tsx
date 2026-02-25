@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
+import { useCategories } from '../hooks/useCategories';
 import { productCreateSchema } from '../schemas/productCreateSchema';
 import type { Product } from '@/types';
 import type { ProductCreateInput } from '../schemas/productCreateSchema';
@@ -16,15 +17,20 @@ interface ProductFormModalProps {
 export function ProductFormModal({ mode, product, onClose }: ProductFormModalProps) {
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
+  const { data: categories = [] } = useCategories();
+
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(product?.category_id ?? null);
 
   const [formData, setFormData] = useState<ProductCreateInput>({
     name: product?.name || '',
     price: product?.price || 0,
     image: product?.image || '',
-    mainCategory: product?.mainCategory || 'almacen',
+    mainCategory: product?.mainCategory || 'otros',
     categories: product?.categories || '',
     active: product?.active ?? true,
     sale_type: product?.sale_type || 'unit',
+    category_id: product?.category_id ?? null,
+    subcategory_id: product?.subcategory_id ?? null,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -32,17 +38,22 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
   // Sincronizar formData cuando el producto cambia (importante para modo edit)
   useEffect(() => {
     if (product) {
+      setSelectedCategoryId(product.category_id ?? null);
       setFormData({
         name: product.name,
         price: product.price,
         image: product.image,
-        mainCategory: product.mainCategory,
+        mainCategory: product.mainCategory || 'otros',
         categories: product.categories,
         active: product.active,
         sale_type: product.sale_type,
+        category_id: product.category_id ?? null,
+        subcategory_id: product.subcategory_id ?? null,
       });
     }
   }, [product]);
+
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -147,30 +158,49 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
             {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
           </div>
 
-          {/* Categoría Principal */}
+          {/* Categoría (dinámica) */}
           <div>
-            <label htmlFor="mainCategory" className="block text-sm font-medium text-gray-700 mb-1">
-              Categoría principal *
+            <label htmlFor="category_id" className="block text-sm font-medium text-gray-700 mb-1">
+              Categoría
             </label>
             <select
-              id="mainCategory"
-              value={formData.mainCategory}
-              onChange={(e) => setFormData({ ...formData, mainCategory: e.target.value as ProductCreateInput['mainCategory'] })}
+              id="category_id"
+              value={selectedCategoryId ?? ''}
+              onChange={(e) => {
+                const val = e.target.value ? Number(e.target.value) : null;
+                setSelectedCategoryId(val);
+                setFormData({ ...formData, category_id: val, subcategory_id: null });
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
               disabled={isPending}
             >
-              <option value="almacen">Almacén</option>
-              <option value="bebidas">Bebidas</option>
-              <option value="snaks">Snacks</option>
-              <option value="lacteos">Lácteos</option>
-              <option value="panaderia">Panadería</option>
-              <option value="congelados">Congelados</option>
-              <option value="fiambres">Fiambres</option>
-              <option value="pizzas">Pizzas</option>
-              <option value="combos">Combos</option>
-              <option value="otros">Otros</option>
+              <option value="">Sin categoría</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
             </select>
-            {errors.mainCategory && <p className="mt-1 text-sm text-red-600">{errors.mainCategory}</p>}
+          </div>
+
+          {/* Subcategoría (dinámica) */}
+          <div>
+            <label htmlFor="subcategory_id" className="block text-sm font-medium text-gray-700 mb-1">
+              Subcategoría
+            </label>
+            <select
+              id="subcategory_id"
+              value={formData.subcategory_id ?? ''}
+              onChange={(e) => {
+                const val = e.target.value ? Number(e.target.value) : null;
+                setFormData({ ...formData, subcategory_id: val });
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+              disabled={isPending || !selectedCategory || selectedCategory.subcategories.length === 0}
+            >
+              <option value="">Sin subcategoría</option>
+              {selectedCategory?.subcategories.map((sub) => (
+                <option key={sub.id} value={sub.id}>{sub.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Tipo de venta */}
@@ -190,22 +220,6 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
               <option value="kg">Por kilo</option>
             </select>
             {errors.sale_type && <p className="mt-1 text-sm text-red-600">{errors.sale_type}</p>}
-          </div>
-
-          {/* Categorías adicionales */}
-          <div>
-            <label htmlFor="categories" className="block text-sm font-medium text-gray-700 mb-1">
-              Categorías adicionales (separadas por coma)
-            </label>
-            <input
-              id="categories"
-              type="text"
-              value={formData.categories}
-              onChange={(e) => setFormData({ ...formData, categories: e.target.value })}
-              placeholder="categoria1, categoria2, categoria3"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              disabled={isPending}
-            />
           </div>
 
           {/* Estado activo */}
