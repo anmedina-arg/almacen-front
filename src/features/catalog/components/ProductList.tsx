@@ -134,7 +134,7 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 						key={String(main)}
 						id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
 						data-category={String(main)}
-						className="w-full scroll-mt-48"
+						className="w-full scroll-mt-56"
 					>
 						<div className='flex gap-2 items-baseline'>
 							<span className="text-lg font-bold mb-2 capitalize">{String(main)}</span>
@@ -148,7 +148,7 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 								id={`${String(main).charAt(0).toUpperCase() + String(main).slice(1)}-${sub.key}`}
 								data-category={String(main)}
 								data-subcategory={sub.label}
-								className="mb-4 scroll-mt-48"
+								className="mb-4 scroll-mt-56"
 							>
 									<div className="flex items-center gap-2 w-full text-md font-semibold mb-2 border-b-1 border-gray-700">
 										<span>{sub.label}</span>

@@ -153,7 +153,7 @@ export function ProductListContainer() {
 			{state.items.length === 0 && <InfoBanner />}
 
 			{/* Buscador */}
-			<div className="w-full flex justify-center px-4 py-2 sticky top-42 z-30 bg-white/80 backdrop-blur-md transition-all duration-300">
+			<div className="w-full flex justify-center px-4 py-2 sticky top-52 z-30 bg-white/80 backdrop-blur-md transition-all duration-300">
 				<input
 					type="search"
 					value={search}
