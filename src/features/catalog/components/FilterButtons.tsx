@@ -188,10 +188,12 @@ export function FilterButtons() {
 		});
 		mo.observe(document.body, { childList: true, subtree: true });
 
+		// Capturar ref en variable local para el cleanup (react-hooks/exhaustive-deps)
+		const observedSet = observedRef.current;
 		return () => {
 			io.disconnect();
 			mo.disconnect();
-			observedRef.current.clear();
+			observedSet.clear();
 		};
 	}, [observeSection]);
 
