@@ -4,7 +4,9 @@ import { useState, useEffect } from 'react';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
 import { useCategories } from '../hooks/useCategories';
+import { useCloudinaryUpload } from '../hooks/useCloudinaryUpload';
 import { productCreateSchema } from '../schemas/productCreateSchema';
+import { ImageUploadField } from './ImageUploadField';
 import type { Product } from '@/types';
 import type { ProductCreateInput } from '../schemas/productCreateSchema';
 
@@ -18,7 +20,9 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const { data: categories = [] } = useCategories();
+  const { uploadFile, uploading, uploadError } = useCloudinaryUpload();
 
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(product?.category_id ?? null);
 
   const [formData, setFormData] = useState<ProductCreateInput>({
@@ -55,11 +59,23 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Si hay archivo pendiente, subirlo primero y actualizar formData con la URL
+    let finalFormData = formData;
+    if (pendingFile) {
+      try {
+        const imageUrl = await uploadFile(pendingFile);
+        finalFormData = { ...formData, image: imageUrl };
+      } catch {
+        // uploadError ya está seteado en el hook
+        return;
+      }
+    }
+
     // Validar con Zod
-    const result = productCreateSchema.safeParse(formData);
+    const result = productCreateSchema.safeParse(finalFormData);
 
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -86,7 +102,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
     }
   };
 
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending = createMutation.isPending || updateMutation.isPending || uploading;
   const error = createMutation.error || updateMutation.error;
 
   return (
@@ -141,22 +157,13 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
             {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
           </div>
 
-          {/* Imagen URL */}
-          <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-1">
-              URL de imagen (Cloudinary) *
-            </label>
-            <input
-              id="image"
-              type="text"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              disabled={isPending}
-              placeholder="https://res.cloudinary.com/..."
-            />
-            {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
-          </div>
+          {/* Imagen */}
+          <ImageUploadField
+            currentImageUrl={formData.image || undefined}
+            onFileChange={(file) => setPendingFile(file)}
+            disabled={isPending}
+            error={uploadError ?? errors.image}
+          />
 
           {/* Categoría (dinámica) */}
           <div>
@@ -259,7 +266,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
               disabled={isPending}
               className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium disabled:opacity-50"
             >
-              {isPending ? 'Guardando...' : mode === 'create' ? 'Crear' : 'Actualizar'}
+              {uploading ? 'Subiendo imagen...' : isPending ? 'Guardando...' : mode === 'create' ? 'Crear' : 'Actualizar'}
             </button>
           </div>
         </form>
