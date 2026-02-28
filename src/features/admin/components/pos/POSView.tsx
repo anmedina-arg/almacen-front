@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { ProductSquareCard } from '@/features/catalog/components/ProductSquareCard';
+import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { usePOSCart } from '../../hooks/usePOSCart';
 import type { Product } from '@/features/catalog/types/catalog.types';
 
@@ -126,9 +126,9 @@ export function POSView() {
             {search ? 'Sin resultados' : 'No hay productos disponibles'}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="flex flex-col gap-2">
             {filtered.map((product) => (
-              <ProductSquareCard
+              <ProductCard
                 key={product.id}
                 product={product}
                 quantity={getQty(product.id)}
