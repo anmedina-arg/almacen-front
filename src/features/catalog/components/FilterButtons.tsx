@@ -86,7 +86,12 @@ const Chips = forwardRef<HTMLAnchorElement, ChipsProps>(function Chips(
 export function FilterButtons() {
 	const { data: categories = [] } = useQuery<CategoryWithSubsPublic[]>({
 		queryKey: ['categories-public-with-subs'],
-		queryFn: () => fetch('/api/categories?include=subcategories').then((r) => r.json()),
+		queryFn: async () => {
+			const r = await fetch('/api/categories?include=subcategories');
+			if (!r.ok) throw new Error('Error al cargar categorías');
+			const data = await r.json();
+			return Array.isArray(data) ? data : [];
+		},
 		staleTime: 1000 * 60 * 10,
 	});
 
