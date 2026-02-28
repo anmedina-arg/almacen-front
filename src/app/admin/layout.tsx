@@ -2,7 +2,7 @@ import { redirect } from 'next/navigation';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
-import { AdminNav } from '@/features/admin/components/AdminNav';
+import { AdminTabBar } from '@/features/admin/components/AdminTabBar';
 
 export default async function AdminLayout({
   children,
@@ -70,13 +70,11 @@ export default async function AdminLayout({
         </div>
       </div>
 
-      {/* Navegación */}
-      <div className="container mx-auto px-4 pt-6">
-        <AdminNav />
-      </div>
+      {/* Tab bar de navegación */}
+      <AdminTabBar />
 
       {/* Contenido */}
-      <div className="container mx-auto px-4 py-6">{children}</div>
+      <div className="container mx-auto px-4 py-4">{children}</div>
     </div>
   );
 }
