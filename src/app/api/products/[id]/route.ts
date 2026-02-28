@@ -49,6 +49,7 @@ export async function GET(
         id,
         name,
         price,
+        cost,
         image,
         active,
         categories,
@@ -129,6 +130,7 @@ export async function PUT(
     const updates: Record<string, unknown> = {};
     if (body.name !== undefined) updates.name = body.name;
     if (body.price !== undefined) updates.price = body.price;
+    if (body.cost !== undefined) updates.cost = body.cost;
     if (body.image !== undefined) updates.image = body.image;
     // NORMALIZAR mainCategory a minúsculas para que coincida con la constraint
     if (body.mainCategory !== undefined) updates.main_category = body.mainCategory.toLowerCase();
@@ -150,6 +152,7 @@ export async function PUT(
         id,
         name,
         price,
+        cost,
         image,
         active,
         categories,

@@ -23,6 +23,7 @@ export const productCreateSchema = z.object({
   sale_type: z.enum(['unit', '100gr', 'kg'], {
     errorMap: () => ({ message: 'Tipo de venta inválido' }),
   }).default('unit'),
+  cost: z.number().min(0, 'El costo no puede ser negativo').optional().default(0),
   category_id: z.number().int().positive().nullable().optional(),
   subcategory_id: z.number().int().positive().nullable().optional(),
 });

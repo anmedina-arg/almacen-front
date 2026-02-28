@@ -8,6 +8,7 @@ const posOrderItemSchema = z.object({
   product_name: z.string().min(1).max(500),
   quantity: z.number().positive(),
   unit_price: z.number().min(0),
+  unit_cost: z.number().min(0).default(0),
   is_by_weight: z.boolean().default(false),
 });
 
@@ -55,6 +56,7 @@ export async function POST(request: NextRequest) {
         product_name: item.product_name,
         quantity: item.quantity,
         unit_price: item.unit_price,
+        unit_cost: item.unit_cost,
         is_by_weight: item.is_by_weight,
       })),
     });

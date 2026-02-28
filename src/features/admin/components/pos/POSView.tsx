@@ -65,6 +65,7 @@ export function POSView() {
             product_name: product.name,
             quantity: qty,
             unit_price: product.price,
+            unit_cost: product.cost ?? 0,
             is_by_weight: product.sale_type !== 'unit',
           })),
         }),

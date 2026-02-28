@@ -55,6 +55,7 @@ export async function GET(request: NextRequest) {
         id,
         name,
         price,
+        cost,
         image,
         active,
         categories,
@@ -149,6 +150,7 @@ export async function POST(request: NextRequest) {
         {
           name: body.name,
           price: body.price,
+          cost: body.cost ?? 0,
           image: body.image || '',
           main_category: normalizedCategory,
           categories: body.categories || '',
@@ -163,6 +165,7 @@ export async function POST(request: NextRequest) {
         id,
         name,
         price,
+        cost,
         image,
         active,
         categories,

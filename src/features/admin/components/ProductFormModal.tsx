@@ -28,6 +28,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
   const [formData, setFormData] = useState<ProductCreateInput>({
     name: product?.name || '',
     price: product?.price || 0,
+    cost: product?.cost ?? 0,
     image: product?.image || '',
     mainCategory: product?.mainCategory || 'otros',
     categories: product?.categories || '',
@@ -46,6 +47,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
       setFormData({
         name: product.name,
         price: product.price,
+        cost: product.cost ?? 0,
         image: product.image,
         mainCategory: product.mainCategory || 'otros',
         categories: product.categories,
@@ -139,10 +141,10 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
             {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
           </div>
 
-          {/* Precio */}
+          {/* Precio de venta */}
           <div>
             <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-1">
-              Precio *
+              Precio de venta *
             </label>
             <input
               id="price"
@@ -155,6 +157,33 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
               disabled={isPending}
             />
             {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
+          </div>
+
+          {/* Precio de compra (costo) */}
+          <div>
+            <label htmlFor="cost" className="block text-sm font-medium text-gray-700 mb-1">
+              Precio de compra (costo)
+            </label>
+            <input
+              id="cost"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.cost ?? 0}
+              onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              disabled={isPending}
+            />
+            {errors.cost && <p className="mt-1 text-sm text-red-600">{errors.cost}</p>}
+            {/* Margen en tiempo real */}
+            {(() => {
+              const margin = formData.price - (formData.cost ?? 0);
+              return (
+                <p className={`mt-1 text-sm font-medium ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                  Margen: ${margin.toFixed(2)}
+                </p>
+              );
+            })()}
           </div>
 
           {/* Imagen */}
