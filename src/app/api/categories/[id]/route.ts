@@ -35,7 +35,7 @@ export async function PUT(
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from('categories')
-      .update({ name: parsed.data.name })
+      .update({ name: parsed.data.name, image_url: parsed.data.image_url ?? null })
       .eq('id', categoryId)
       .select()
       .single();

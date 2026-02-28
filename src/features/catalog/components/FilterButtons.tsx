@@ -3,6 +3,7 @@
 import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
+import Image from 'next/image';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -14,33 +15,19 @@ interface SubcategoryPublic {
 interface CategoryWithSubsPublic {
 	id: number;
 	name: string;
+	image_url?: string | null;
 	subcategories: SubcategoryPublic[];
 }
 
 interface ChipsProps {
 	to: string;
 	label: string;
-	icons?: string;
+	imageUrl?: string | null;
 	active?: boolean;
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
-const CATEGORY_ICONS: Record<string, string> = {
-	pizzas: '🍕',
-	fiambres: '🧀',
-	fiambrería: '🧀',
-	panaderia: '🍞',
-	panadería: '🍞',
-	congelados: '🍗',
-	combos: '🍔',
-	snaks: '🍟',
-	bebidas: '🍹',
-	lacteos: '🐮',
-	lácteos: '🐮',
-	almacen: '🛒',
-	almacén: '🛒',
-};
 
 /**
  * rootMargin crea una línea de disparo al 40% desde el top del viewport.
@@ -61,7 +48,7 @@ const SPY_SELECTOR = 'section[data-category], div[data-category]';
 // ─── Chips ────────────────────────────────────────────────────────────────────
 
 const Chips = forwardRef<HTMLAnchorElement, ChipsProps>(function Chips(
-	{ to, label, icons, active = false },
+	{ to, label, imageUrl, active = false },
 	ref,
 ) {
 	return (
@@ -73,11 +60,19 @@ const Chips = forwardRef<HTMLAnchorElement, ChipsProps>(function Chips(
 			}`}
 		>
 			<div
-				className={`w-full h-16 flex items-center justify-center rounded-xl transition-colors ${
+				className={`relative w-full h-16 rounded-xl overflow-hidden transition-colors ${
 					active ? 'bg-gray-600' : 'bg-gray-200'
 				}`}
 			>
-				<span className="text-3xl">{icons}</span>
+				{imageUrl && (
+					<Image
+						src={imageUrl}
+						alt={label}
+						fill
+						className="object-cover"
+						sizes="96px"
+					/>
+				)}
 			</div>
 			<span className={`text-sm capitalize transition-colors ${active ? 'text-gray-100' : ''}`}>
 				{label}
@@ -278,7 +273,6 @@ export function FilterButtons() {
 			<div ref={chipRowRef} className="flex gap-2 py-1 overflow-x-auto">
 				{categories.map((cat) => {
 					const anchor = `#${cat.name.charAt(0).toUpperCase() + cat.name.slice(1)}`;
-					const icon = CATEGORY_ICONS[cat.name.toLowerCase()] ?? '🛒';
 					const isActive = activeCatName === cat.name.toLowerCase();
 					return (
 						<Chips
@@ -289,7 +283,7 @@ export function FilterButtons() {
 							}}
 							to={anchor}
 							label={cat.name}
-							icons={icon}
+							imageUrl={cat.image_url}
 							active={isActive}
 						/>
 					);

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const categorySchema = z.object({
   name: z.string().min(1, 'El nombre es requerido').max(100),
+  image_url: z.string().url().nullable().optional(),
 });
 
 export const subcategorySchema = z.object({

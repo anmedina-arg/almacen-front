@@ -17,8 +17,8 @@ export async function GET(request: NextRequest) {
 
     let query = supabase.from('categories').select(
       includeSubcategories
-        ? 'id, name, created_at, updated_at, subcategories(id, name, category_id, created_at, updated_at)'
-        : 'id, name, created_at, updated_at'
+        ? 'id, name, image_url, created_at, updated_at, subcategories(id, name, category_id, created_at, updated_at)'
+        : 'id, name, image_url, created_at, updated_at'
     );
 
     query = query.order('name', { ascending: true });
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
     const supabase = await createSupabaseServerClient();
     const { data, error } = await supabase
       .from('categories')
-      .insert({ name: parsed.data.name })
+      .insert({ name: parsed.data.name, image_url: parsed.data.image_url ?? null })
       .select()
       .single();
 

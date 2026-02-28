@@ -21,7 +21,7 @@ export function useUpdateCategory() {
       const previous = queryClient.getQueryData<CategoryWithSubcategories[]>(adminKeys.categoriesList());
 
       queryClient.setQueryData<CategoryWithSubcategories[]>(adminKeys.categoriesList(), (old) =>
-        old?.map((c) => (c.id === id ? { ...c, name: data.name } : c))
+        old?.map((c) => (c.id === id ? { ...c, name: data.name, image_url: data.image_url ?? c.image_url } : c))
       );
 
       return { previous };

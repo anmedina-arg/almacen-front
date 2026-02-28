@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useCreateCategory } from '../../hooks/useCreateCategory';
 import { useUpdateCategory } from '../../hooks/useUpdateCategory';
+import { useCloudinaryUpload } from '../../hooks/useCloudinaryUpload';
+import { ImageUploadField } from '../ImageUploadField';
 import type { CategoryWithSubcategories } from '../../types/category.types';
 
 type CategoryFormModalProps =
@@ -11,14 +13,16 @@ type CategoryFormModalProps =
 
 export function CategoryFormModal({ mode, category, onClose }: CategoryFormModalProps) {
   const [name, setName] = useState(category?.name ?? '');
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [error, setError] = useState('');
 
   const createCategory = useCreateCategory();
   const updateCategory = useUpdateCategory();
+  const { uploadFile, uploading, uploadError } = useCloudinaryUpload({ folder: 'categories' });
 
-  const isSaving = createCategory.isPending || updateCategory.isPending;
+  const isSaving = createCategory.isPending || updateCategory.isPending || uploading;
 
-  const handleSave = () => {
+  const handleSave = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
       setError('El nombre es requerido');
@@ -26,14 +30,24 @@ export function CategoryFormModal({ mode, category, onClose }: CategoryFormModal
     }
     setError('');
 
+    // Si hay imagen pendiente, subirla primero
+    let imageUrl: string | null | undefined = category?.image_url;
+    if (pendingFile) {
+      try {
+        imageUrl = await uploadFile(pendingFile);
+      } catch {
+        return; // uploadError ya está seteado en el hook
+      }
+    }
+
     if (mode === 'create') {
       createCategory.mutate(
-        { name: trimmed },
+        { name: trimmed, image_url: imageUrl ?? null },
         { onSuccess: onClose, onError: (e) => setError(e.message) }
       );
     } else if (category) {
       updateCategory.mutate(
-        { id: category.id, data: { name: trimmed } },
+        { id: category.id, data: { name: trimmed, image_url: imageUrl ?? null } },
         { onSuccess: onClose, onError: (e) => setError(e.message) }
       );
     }
@@ -56,20 +70,30 @@ export function CategoryFormModal({ mode, category, onClose }: CategoryFormModal
         </div>
 
         {/* Body */}
-        <div className="p-6">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Nombre de categoría
-          </label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSave()}
-            placeholder="Ej: Lácteos"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
-            autoFocus
+        <div className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Nombre de categoría
+            </label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+              placeholder="Ej: Lácteos"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+              autoFocus
+              disabled={isSaving}
+            />
+            {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
+          </div>
+
+          <ImageUploadField
+            currentImageUrl={category?.image_url ?? undefined}
+            onFileChange={(file) => setPendingFile(file)}
+            disabled={isSaving}
+            error={uploadError ?? undefined}
           />
-          {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
         </div>
 
         {/* Footer */}
@@ -86,7 +110,7 @@ export function CategoryFormModal({ mode, category, onClose }: CategoryFormModal
             disabled={isSaving}
             className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium disabled:opacity-50 text-sm"
           >
-            {isSaving ? 'Guardando...' : 'Guardar'}
+            {uploading ? 'Subiendo imagen...' : isSaving ? 'Guardando...' : 'Guardar'}
           </button>
         </div>
       </div>

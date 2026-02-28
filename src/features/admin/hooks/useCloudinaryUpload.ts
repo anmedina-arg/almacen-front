@@ -1,8 +1,10 @@
 import { useState } from 'react';
 
-const FOLDER = 'products';
+interface UseCloudinaryUploadOptions {
+  folder?: string;
+}
 
-export function useCloudinaryUpload() {
+export function useCloudinaryUpload({ folder = 'products' }: UseCloudinaryUploadOptions = {}) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -17,7 +19,7 @@ export function useCloudinaryUpload() {
       const signRes = await fetch('/api/cloudinary/sign', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timestamp, folder: FOLDER }),
+        body: JSON.stringify({ timestamp, folder }),
       });
 
       if (!signRes.ok) {
@@ -37,7 +39,7 @@ export function useCloudinaryUpload() {
       formData.append('api_key', api_key);
       formData.append('timestamp', String(timestamp));
       formData.append('signature', signature);
-      formData.append('folder', FOLDER);
+      formData.append('folder', folder);
 
       const uploadRes = await fetch(
         `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
