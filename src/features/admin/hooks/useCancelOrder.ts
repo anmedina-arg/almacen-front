@@ -1,6 +1,6 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { adminKeys } from '../constants/queryKeys';
+import { useMutation } from '@tanstack/react-query';
 import { orderService } from '../services/orderService';
+import { useInvalidateOrderQueries } from './useInvalidateOrderQueries';
 
 /**
  * Mutation hook to cancel an order (admin only).
@@ -8,19 +8,13 @@ import { orderService } from '../services/orderService';
  * Invalidates orders list and order detail queries on success.
  */
 export function useCancelOrder() {
-  const queryClient = useQueryClient();
+  const invalidateOrderQueries = useInvalidateOrderQueries();
 
   return useMutation({
     mutationFn: (orderId: number) => orderService.cancelOrder(orderId),
 
     onSuccess: async (_data, orderId) => {
-      await queryClient.invalidateQueries({
-        queryKey: adminKeys.ordersList(),
-        refetchType: 'active',
-      });
-      await queryClient.invalidateQueries({
-        queryKey: adminKeys.orderDetail(orderId),
-      });
+      await invalidateOrderQueries(orderId);
     },
   });
 }
