@@ -7,20 +7,8 @@ import { useLowStock } from '../../hooks/useLowStock';
 import { LowStockBadge } from './LowStockBadge';
 import { StockUpdateModal } from './StockUpdateModal';
 import { StockHistoryModal } from './StockHistoryModal';
+import { CATEGORY_LABELS } from '../../constants';
 import type { ProductStockView, StockFilters } from '../../types/stock.types';
-
-const CATEGORY_LABELS: Record<string, string> = {
-  almacen: 'Almacen',
-  bebidas: 'Bebidas',
-  snaks: 'Snacks',
-  lacteos: 'Lacteos',
-  panaderia: 'Panaderia',
-  congelados: 'Congelados',
-  fiambres: 'Fiambres',
-  pizzas: 'Pizzas',
-  combos: 'Combos',
-  otros: 'Otros',
-};
 
 /**
  * Componente principal de gestion de stock.

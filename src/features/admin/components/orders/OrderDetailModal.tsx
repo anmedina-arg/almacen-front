@@ -7,6 +7,7 @@ import { useCancelOrder } from '../../hooks/useCancelOrder';
 import { useUpdateOrder } from '../../hooks/useUpdateOrder';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
+import { formatAdminDate } from '../../utils/formatDate';
 
 interface OrderDetailModalProps {
   orderId: number;
@@ -29,16 +30,6 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   const handleCancel = () => {
     if (!confirm('Cancelar este pedido? Se devolverá el stock de todos los productos.')) return;
     cancelOrder.mutate(orderId);
-  };
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
   };
 
   return (
@@ -134,14 +125,14 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                   <div>
                     <span className="text-gray-500">Creado:</span>
                     <p className="font-medium text-gray-800">
-                      {formatDate(order.created_at)}
+                      {formatAdminDate(order.created_at)}
                     </p>
                   </div>
                   {order.confirmed_at && (
                     <div>
                       <span className="text-gray-500">Confirmado:</span>
                       <p className="font-medium text-gray-800">
-                        {formatDate(order.confirmed_at)}
+                        {formatAdminDate(order.confirmed_at)}
                       </p>
                     </div>
                   )}

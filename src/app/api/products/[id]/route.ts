@@ -1,33 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { Product } from '@/types';
 import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
-
-// Helper to create Supabase client with user session
-async function createSupabaseClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Cookies can only be modified in Route Handlers
-          }
-        },
-      },
-    }
-  );
-}
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
@@ -40,7 +14,7 @@ export async function GET(
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseClient();
+    const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
       .from('products')
@@ -141,7 +115,7 @@ export async function PUT(
     if ('category_id' in body) updates.category_id = body.category_id ?? null;
     if ('subcategory_id' in body) updates.subcategory_id = body.subcategory_id ?? null;
 
-    const supabase = await createSupabaseClient();
+    const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
       .from('products')
@@ -210,7 +184,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseClient();
+    const supabase = await createSupabaseServerClient();
 
     const { error } = await supabase
       .from('products')

@@ -1,33 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import { Product } from '@/types';
 import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
-
-// Helper to create Supabase client with user session
-async function createSupabaseClient() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Cookies can only be modified in Route Handlers
-          }
-        },
-      },
-    }
-  );
-}
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function GET(request: NextRequest) {
   try {
@@ -45,7 +19,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const supabase = await createSupabaseClient();
+    const supabase = await createSupabaseServerClient();
 
     // Query 1: productos
     let query = supabase
@@ -141,7 +115,7 @@ export async function POST(request: NextRequest) {
     // NORMALIZAR mainCategory a minúsculas para que coincida con la constraint
     const normalizedCategory = body.mainCategory ? body.mainCategory.toLowerCase() : 'otros';
 
-    const supabase = await createSupabaseClient();
+    const supabase = await createSupabaseServerClient();
 
     // Crear producto
     const { data, error } = await supabase

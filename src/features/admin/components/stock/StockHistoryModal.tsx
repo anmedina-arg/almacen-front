@@ -2,43 +2,13 @@
 
 import { useEffect } from 'react';
 import { useStockHistory } from '../../hooks/useStockHistory';
-import type { StockMovementType } from '../../types/stock.types';
+import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from '../../constants/stock';
+import { formatAdminDate } from '../../utils/formatDate';
 
 interface StockHistoryModalProps {
   productId: number;
   productName: string;
   onClose: () => void;
-}
-
-const MOVEMENT_TYPE_LABELS: Record<StockMovementType, string> = {
-  manual_adjustment: 'Ajuste manual',
-  initial_count: 'Conteo inicial',
-  correction: 'Correccion',
-  loss: 'Perdida',
-  sale: 'Venta',
-  purchase: 'Compra',
-  return: 'Devolucion',
-};
-
-const MOVEMENT_TYPE_COLORS: Record<StockMovementType, string> = {
-  manual_adjustment: 'bg-blue-100 text-blue-700',
-  initial_count: 'bg-purple-100 text-purple-700',
-  correction: 'bg-yellow-100 text-yellow-700',
-  loss: 'bg-red-100 text-red-700',
-  sale: 'bg-orange-100 text-orange-700',
-  purchase: 'bg-green-100 text-green-700',
-  return: 'bg-teal-100 text-teal-700',
-};
-
-function formatDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString('es-AR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
 }
 
 /**
@@ -139,7 +109,7 @@ export function StockHistoryModal({ productId, productName, onClose }: StockHist
                           className="border-b border-gray-100 hover:bg-gray-50"
                         >
                           <td className="py-3 px-3 text-gray-600 whitespace-nowrap">
-                            {formatDate(movement.created_at)}
+                            {formatAdminDate(movement.created_at)}
                           </td>
                           <td className="py-3 px-3">
                             <span
@@ -201,7 +171,7 @@ export function StockHistoryModal({ productId, productName, onClose }: StockHist
                           {MOVEMENT_TYPE_LABELS[movement.movement_type] || movement.movement_type}
                         </span>
                         <span className="text-xs text-gray-500">
-                          {formatDate(movement.created_at)}
+                          {formatAdminDate(movement.created_at)}
                         </span>
                       </div>
 

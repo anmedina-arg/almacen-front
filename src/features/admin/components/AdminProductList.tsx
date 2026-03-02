@@ -5,22 +5,10 @@ import Image from 'next/image';
 import { useAdminProducts } from '../hooks/useAdminProducts';
 import { useToggleProductActive } from '../hooks/useToggleProductActive';
 import { useDeleteProduct } from '../hooks/useDeleteProduct';
+import { CATEGORY_LABELS } from '../constants';
 import { ProductFormModal } from './ProductFormModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import type { Product } from '@/types';
-
-const CATEGORY_LABELS: Record<string, string> = {
-  almacen: 'Almacen',
-  bebidas: 'Bebidas',
-  snaks: 'Snacks',
-  lacteos: 'Lacteos',
-  panaderia: 'Panaderia',
-  congelados: 'Congelados',
-  fiambres: 'Fiambres',
-  pizzas: 'Pizzas',
-  combos: 'Combos',
-  otros: 'Otros',
-};
 
 export function AdminProductList() {
   const { data: products, isLoading, error } = useAdminProducts();

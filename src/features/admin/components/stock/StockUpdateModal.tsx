@@ -3,22 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useUpsertStock } from '../../hooks/useUpsertStock';
 import { stockUpdateSchema } from '../../schemas/stockUpdateSchema';
+import { MOVEMENT_TYPE_LABELS } from '../../constants/stock';
 import type { ProductStockView, StockMovementType } from '../../types/stock.types';
 
 interface StockUpdateModalProps {
   product: ProductStockView;
   onClose: () => void;
 }
-
-const MOVEMENT_TYPE_LABELS: Record<string, string> = {
-  manual_adjustment: 'Ajuste manual',
-  initial_count: 'Conteo inicial',
-  correction: 'Correccion',
-  loss: 'Perdida / Merma',
-  sale: 'Venta',
-  purchase: 'Compra / Reposicion',
-  return: 'Devolucion',
-};
 
 /**
  * Modal para actualizar el stock de un producto.

@@ -5,6 +5,7 @@ import { useOrders } from '../../hooks/useOrders';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
+import { formatAdminDate } from '../../utils/formatDate';
 
 function MarginCell({
   totalCost,
@@ -72,16 +73,6 @@ export function OrdersTable() {
       cancelled: orders.filter((o) => o.status === 'cancelled').length,
     };
   }, [orders]);
-
-  const formatDate = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = date.getFullYear();
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${day}/${month}/${year} ${hours}:${minutes}`;
-  };
 
   // Loading state
   if (isLoading) {
@@ -223,7 +214,7 @@ export function OrdersTable() {
                       #{order.id}
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {formatDate(order.created_at)}
+                      {formatAdminDate(order.created_at)}
                     </td>
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-800">
                       ${Number(order.total).toFixed(2)}
@@ -271,7 +262,7 @@ export function OrdersTable() {
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">
-                    {formatDate(order.created_at)}
+                    {formatAdminDate(order.created_at)}
                   </span>
                   <div className="text-right">
                     <span className="text-lg font-bold text-gray-800">
