@@ -99,7 +99,25 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json(data || [], {
+    // Aggregate cost per order to compute margin
+    const { data: costsData } = await supabase
+      .from('order_items')
+      .select('order_id, unit_cost, quantity');
+
+    const costMap = new Map<number, number>();
+    for (const item of costsData ?? []) {
+      const prev = costMap.get(item.order_id) ?? 0;
+      costMap.set(item.order_id, prev + Number(item.unit_cost) * Number(item.quantity));
+    }
+
+    const ordersWithMargin = (data ?? []).map((order) => {
+      const total_cost = costMap.get(order.id) ?? 0;
+      const margin = Number(order.total) - total_cost;
+      const margin_pct = Number(order.total) > 0 ? (margin / Number(order.total)) * 100 : 0;
+      return { ...order, total_cost, margin, margin_pct };
+    });
+
+    return NextResponse.json(ordersWithMargin, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
         Pragma: 'no-cache',

@@ -102,12 +102,33 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
             <>
               {/* Order info */}
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <OrderStatusBadge status={order.status} />
-                  <span className="text-2xl font-bold text-gray-800">
-                    ${Number(order.total).toFixed(2)}
-                  </span>
-                </div>
+                {(() => {
+                  const totalCost = order.order_items.reduce(
+                    (sum, item) => sum + Number(item.unit_cost) * Number(item.quantity),
+                    0
+                  );
+                  const hasCostData = totalCost > 0;
+                  const margin = Number(order.total) - totalCost;
+                  const marginPct = Number(order.total) > 0 ? (margin / Number(order.total)) * 100 : 0;
+                  const isPositive = margin >= 0;
+                  return (
+                    <div className="flex items-start justify-between">
+                      <OrderStatusBadge status={order.status} />
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-gray-800">
+                          ${Number(order.total).toFixed(2)}
+                        </p>
+                        {hasCostData ? (
+                          <p className={`text-sm font-medium mt-0.5 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                            Margen: ${margin.toFixed(2)} ({marginPct.toFixed(1)}%)
+                          </p>
+                        ) : (
+                          <p className="text-xs text-gray-400 mt-0.5">Sin datos de costo</p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
 
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>

@@ -12,6 +12,7 @@ export type OrderStatus = 'pending' | 'confirmed' | 'cancelled';
 
 /**
  * Represents a row from the orders table.
+ * total_cost, margin and margin_pct are computed server-side and injected in the list endpoint.
  */
 export interface Order {
   id: number;
@@ -24,6 +25,10 @@ export interface Order {
   updated_at: string;
   confirmed_at: string | null;
   confirmed_by: string | null;
+  // Computed margin fields (undefined when no cost data available)
+  total_cost?: number;
+  margin?: number;
+  margin_pct?: number;
 }
 
 /**
@@ -36,6 +41,7 @@ export interface OrderItem {
   product_name: string;
   quantity: number;
   unit_price: number;
+  unit_cost: number;
   subtotal: number;
   is_by_weight: boolean;
   created_at: string;

@@ -213,6 +213,18 @@ export function OrderItemsEditor({
                   <p className="text-xs text-gray-500">
                     {item.quantity} x ${Number(item.unit_price).toFixed(2)}
                   </p>
+                  {item.unit_cost > 0 && (() => {
+                    const itemMargin = (Number(item.unit_price) - Number(item.unit_cost)) * Number(item.quantity);
+                    const itemMarginPct = Number(item.unit_price) > 0
+                      ? ((Number(item.unit_price) - Number(item.unit_cost)) / Number(item.unit_price)) * 100
+                      : 0;
+                    const isPositive = itemMargin >= 0;
+                    return (
+                      <p className={`text-xs font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+                        Margen: ${itemMargin.toFixed(2)} ({itemMarginPct.toFixed(1)}%)
+                      </p>
+                    );
+                  })()}
                 </div>
                 <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">
                   ${Number(item.subtotal).toFixed(2)}

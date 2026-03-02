@@ -6,6 +6,27 @@ import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
 
+function MarginCell({
+  totalCost,
+  margin,
+  marginPct,
+}: {
+  totalCost?: number;
+  margin?: number;
+  marginPct?: number;
+}) {
+  if (totalCost === undefined || totalCost === 0 || margin === undefined) {
+    return <span className="text-gray-400 text-xs">—</span>;
+  }
+  const isPositive = margin >= 0;
+  return (
+    <span className={`font-mono font-semibold text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+      ${margin.toFixed(2)}{' '}
+      <span className="text-xs font-normal">({(marginPct ?? 0).toFixed(1)}%)</span>
+    </span>
+  );
+}
+
 /**
  * Main orders management table component.
  * Displays all orders with filtering and detail view.
@@ -180,6 +201,9 @@ export function OrdersTable() {
                   <th className="text-right py-3 px-4 font-semibold text-gray-600">
                     Total
                   </th>
+                  <th className="text-right py-3 px-4 font-semibold text-gray-600">
+                    Margen
+                  </th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">
                     Estado
                   </th>
@@ -203,6 +227,13 @@ export function OrdersTable() {
                     </td>
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-800">
                       ${Number(order.total).toFixed(2)}
+                    </td>
+                    <td className="py-3 px-4 text-right">
+                      <MarginCell
+                        totalCost={order.total_cost}
+                        margin={order.margin}
+                        marginPct={order.margin_pct}
+                      />
                     </td>
                     <td className="py-3 px-4 text-center">
                       <OrderStatusBadge status={order.status} />
@@ -242,9 +273,18 @@ export function OrdersTable() {
                   <span className="text-gray-500">
                     {formatDate(order.created_at)}
                   </span>
-                  <span className="text-lg font-bold text-gray-800">
-                    ${Number(order.total).toFixed(2)}
-                  </span>
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-gray-800">
+                      ${Number(order.total).toFixed(2)}
+                    </span>
+                    <div className="mt-0.5">
+                      <MarginCell
+                        totalCost={order.total_cost}
+                        margin={order.margin}
+                        marginPct={order.margin_pct}
+                      />
+                    </div>
+                  </div>
                 </div>
                 <button
                   onClick={(e) => {
