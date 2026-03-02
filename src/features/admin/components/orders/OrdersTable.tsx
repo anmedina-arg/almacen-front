@@ -6,6 +6,7 @@ import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
 import { formatAdminDate } from '../../utils/formatDate';
+import { Spinner } from '@/components/ui/Spinner';
 
 function MarginCell({
   totalCost,
@@ -78,7 +79,7 @@ export function OrdersTable() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -92,7 +93,7 @@ export function OrdersTable() {
     ) {
       return (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+          <Spinner size="lg" />
         </div>
       );
     }

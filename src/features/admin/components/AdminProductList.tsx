@@ -8,6 +8,7 @@ import { useDeleteProduct } from '../hooks/useDeleteProduct';
 import { CATEGORY_LABELS } from '../constants';
 import { ProductFormModal } from './ProductFormModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
+import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
 
 export function AdminProductList() {
@@ -24,7 +25,7 @@ export function AdminProductList() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -34,7 +35,7 @@ export function AdminProductList() {
     if (errorMessage.includes('Forbidden') || errorMessage.includes('Admin access required')) {
       return (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+          <Spinner size="lg" />
         </div>
       );
     }

@@ -8,6 +8,7 @@ import { useUpdateSubcategory } from '../../hooks/useUpdateSubcategory';
 import { useDeleteSubcategory } from '../../hooks/useDeleteSubcategory';
 import { CategoryFormModal } from './CategoryFormModal';
 import { DeleteConfirmationModal } from '../DeleteConfirmationModal';
+import { Spinner } from '@/components/ui/Spinner';
 import type { CategoryWithSubcategories } from '../../types/category.types';
 
 const INPUT_CLS =
@@ -36,7 +37,7 @@ export function CategoryManagement() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+        <Spinner size="lg" />
       </div>
     );
   }

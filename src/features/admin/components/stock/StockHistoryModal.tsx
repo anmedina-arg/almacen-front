@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { useStockHistory } from '../../hooks/useStockHistory';
 import { MOVEMENT_TYPE_LABELS, MOVEMENT_TYPE_COLORS } from '../../constants/stock';
 import { formatAdminDate } from '../../utils/formatDate';
+import { Spinner } from '@/components/ui/Spinner';
 
 interface StockHistoryModalProps {
   productId: number;
@@ -66,7 +67,7 @@ export function StockHistoryModal({ productId, productName, onClose }: StockHist
         <div className="flex-1 overflow-y-auto p-6">
           {isLoading && (
             <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600" />
+              <Spinner size="md" />
             </div>
           )}
 

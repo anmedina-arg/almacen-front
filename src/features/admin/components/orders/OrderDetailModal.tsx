@@ -8,6 +8,7 @@ import { useUpdateOrder } from '../../hooks/useUpdateOrder';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
 import { formatAdminDate } from '../../utils/formatDate';
+import { Spinner } from '@/components/ui/Spinner';
 
 interface OrderDetailModalProps {
   orderId: number;
@@ -77,7 +78,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
         <div className="px-6 py-4 space-y-5">
           {isLoading && (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600" />
+              <Spinner size="sm" />
             </div>
           )}
 

@@ -8,6 +8,7 @@ import { LowStockBadge } from './LowStockBadge';
 import { StockUpdateModal } from './StockUpdateModal';
 import { StockHistoryModal } from './StockHistoryModal';
 import { CATEGORY_LABELS } from '../../constants';
+import { Spinner } from '@/components/ui/Spinner';
 import type { ProductStockView, StockFilters } from '../../types/stock.types';
 
 /**
@@ -75,7 +76,7 @@ export function StockManagement() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+        <Spinner size="lg" />
       </div>
     );
   }
@@ -87,7 +88,7 @@ export function StockManagement() {
     if (errorMessage.includes('Forbidden') || errorMessage.includes('Admin access required')) {
       return (
         <div className="flex justify-center items-center py-12">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600" />
+          <Spinner size="lg" />
         </div>
       );
     }
