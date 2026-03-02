@@ -30,6 +30,16 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createSupabaseServerClient();
 
+    // Fetch current product costs server-side to capture unit_cost at time of sale
+    const productIds = items.map((i) => i.product_id);
+    const { data: productsData } = await supabase
+      .from('products')
+      .select('id, cost')
+      .in('id', productIds);
+    const costMap = new Map<number, number>(
+      (productsData ?? []).map((p) => [p.id, Number(p.cost ?? 0)])
+    );
+
     // Call the create_order RPC function (transactional)
     const { data, error } = await supabase.rpc('create_order', {
       p_user_id: null,
@@ -40,6 +50,7 @@ export async function POST(request: NextRequest) {
         product_name: item.product_name,
         quantity: item.quantity,
         unit_price: item.unit_price,
+        unit_cost: costMap.get(item.product_id) ?? 0,
         is_by_weight: item.is_by_weight,
       })),
     });
