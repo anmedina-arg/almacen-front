@@ -104,3 +104,27 @@ BEGIN
   );
 END;
 $$;
+
+-- 7. Trigger: cuando se actualiza products.cost, sincroniza order_items con unit_cost = 0
+-- Preserva snapshots históricos correctos (solo toca items sin costo capturado)
+CREATE OR REPLACE FUNCTION sync_order_items_unit_cost()
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  IF (OLD.cost IS DISTINCT FROM NEW.cost) AND NEW.cost > 0 THEN
+    UPDATE order_items
+    SET unit_cost = NEW.cost
+    WHERE product_id = NEW.id
+      AND unit_cost = 0;
+  END IF;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_sync_order_items_cost ON products;
+CREATE TRIGGER trg_sync_order_items_cost
+  AFTER UPDATE ON products
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_order_items_unit_cost();
