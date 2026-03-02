@@ -1,5 +1,5 @@
-const CACHE_NAME = 'market-cevil-v5';
-const RUNTIME_CACHE = 'market-cevil-runtime-v5';
+const CACHE_NAME = 'market-cevil-v6';
+const RUNTIME_CACHE = 'market-cevil-runtime-v6';
 
 // Assets to cache on install
 const PRECACHE_URLS = [
