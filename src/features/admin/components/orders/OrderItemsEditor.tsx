@@ -214,7 +214,7 @@ export function OrderItemsEditor({
                   <p className="text-xs text-gray-500">
                     {item.quantity} x ${Number(item.unit_price).toFixed(2)}
                   </p>
-                  {item.unit_cost > 0 && (() => {
+                  {(() => {
                     const { margin, marginPct } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.quantity));
                     return (
                       <p className="text-xs">

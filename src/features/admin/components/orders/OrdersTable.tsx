@@ -201,7 +201,7 @@ export function OrdersTable() {
                       ${Number(order.total).toFixed(2)}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      {order.total_cost === undefined || order.total_cost === 0 || order.margin === undefined ? (
+                      {order.margin === undefined ? (
                         <span className="text-gray-400 text-xs">—</span>
                       ) : (
                         <MarginDisplay
@@ -253,7 +253,7 @@ export function OrdersTable() {
                       ${Number(order.total).toFixed(2)}
                     </span>
                     <div className="mt-0.5">
-                      {order.total_cost === undefined || order.total_cost === 0 || order.margin === undefined ? (
+                      {order.margin === undefined ? (
                         <span className="text-gray-400 text-xs">—</span>
                       ) : (
                         <MarginDisplay

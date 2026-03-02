@@ -100,7 +100,6 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                     (sum, item) => sum + Number(item.unit_cost) * Number(item.quantity),
                     0
                   );
-                  const hasCostData = totalCost > 0;
                   const { margin, marginPct } = computeMargin(Number(order.total), totalCost, 1);
                   return (
                     <div className="flex items-start justify-between">
@@ -109,13 +108,9 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                         <p className="text-2xl font-bold text-gray-800">
                           ${Number(order.total).toFixed(2)}
                         </p>
-                        {hasCostData ? (
-                          <p className="text-sm mt-0.5">
-                            <MarginDisplay label="Margen" margin={margin} marginPct={marginPct} />
-                          </p>
-                        ) : (
-                          <p className="text-xs text-gray-400 mt-0.5">Sin datos de costo</p>
-                        )}
+                        <p className="text-sm mt-0.5">
+                          <MarginDisplay label="Margen" margin={margin} marginPct={marginPct} />
+                        </p>
                       </div>
                     </div>
                   );
