@@ -1,21 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-
-const posOrderItemSchema = z.object({
-  product_id: z.number().int().positive(),
-  product_name: z.string().min(1).max(500),
-  quantity: z.number().positive(),
-  unit_price: z.number().min(0),
-  unit_cost: z.number().min(0).default(0),
-  is_by_weight: z.boolean().default(false),
-});
-
-const posOrderSchema = z.object({
-  customer_name: z.string().max(200).optional(),
-  items: z.array(posOrderItemSchema).min(1, 'Debe incluir al menos un producto'),
-});
+import { posOrderSchema } from '@/features/admin/schemas/orderSchemas';
 
 /**
  * POST /api/pos/orders

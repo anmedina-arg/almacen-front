@@ -70,3 +70,16 @@ export const updateOrderItemSchema = z.object({
 });
 
 export type UpdateOrderItemSchemaInput = z.infer<typeof updateOrderItemSchema>;
+
+export const posOrderItemSchema = addOrderItemSchema.extend({
+  unit_cost: z.number().min(0).default(0),
+});
+
+export type PosOrderItemInput = z.infer<typeof posOrderItemSchema>;
+
+export const posOrderSchema = z.object({
+  customer_name: z.string().max(200).optional(),
+  items: z.array(posOrderItemSchema).min(1, 'Debe incluir al menos un producto'),
+});
+
+export type PosOrderInput = z.infer<typeof posOrderSchema>;
