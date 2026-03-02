@@ -4,30 +4,10 @@ import { useState, useMemo } from 'react';
 import { useOrders } from '../../hooks/useOrders';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailModal } from './OrderDetailModal';
+import { MarginDisplay } from './MarginDisplay';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
-
-function MarginCell({
-  totalCost,
-  margin,
-  marginPct,
-}: {
-  totalCost?: number;
-  margin?: number;
-  marginPct?: number;
-}) {
-  if (totalCost === undefined || totalCost === 0 || margin === undefined) {
-    return <span className="text-gray-400 text-xs">—</span>;
-  }
-  const isPositive = margin >= 0;
-  return (
-    <span className={`font-mono font-semibold text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-      ${margin.toFixed(2)}{' '}
-      <span className="text-xs font-normal">({(marginPct ?? 0).toFixed(1)}%)</span>
-    </span>
-  );
-}
 
 /**
  * Main orders management table component.
@@ -221,11 +201,14 @@ export function OrdersTable() {
                       ${Number(order.total).toFixed(2)}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <MarginCell
-                        totalCost={order.total_cost}
-                        margin={order.margin}
-                        marginPct={order.margin_pct}
-                      />
+                      {order.total_cost === undefined || order.total_cost === 0 || order.margin === undefined ? (
+                        <span className="text-gray-400 text-xs">—</span>
+                      ) : (
+                        <MarginDisplay
+                          margin={order.margin}
+                          marginPct={order.margin_pct ?? 0}
+                        />
+                      )}
                     </td>
                     <td className="py-3 px-4 text-center">
                       <OrderStatusBadge status={order.status} />
@@ -270,11 +253,14 @@ export function OrdersTable() {
                       ${Number(order.total).toFixed(2)}
                     </span>
                     <div className="mt-0.5">
-                      <MarginCell
-                        totalCost={order.total_cost}
-                        margin={order.margin}
-                        marginPct={order.margin_pct}
-                      />
+                      {order.total_cost === undefined || order.total_cost === 0 || order.margin === undefined ? (
+                        <span className="text-gray-400 text-xs">—</span>
+                      ) : (
+                        <MarginDisplay
+                          margin={order.margin}
+                          marginPct={order.margin_pct ?? 0}
+                        />
+                      )}
                     </div>
                   </div>
                 </div>

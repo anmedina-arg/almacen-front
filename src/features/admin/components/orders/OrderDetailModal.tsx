@@ -7,6 +7,7 @@ import { useCancelOrder } from '../../hooks/useCancelOrder';
 import { useUpdateOrder } from '../../hooks/useUpdateOrder';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
+import { computeMargin, MarginDisplay } from './MarginDisplay';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
 
@@ -100,9 +101,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                     0
                   );
                   const hasCostData = totalCost > 0;
-                  const margin = Number(order.total) - totalCost;
-                  const marginPct = Number(order.total) > 0 ? (margin / Number(order.total)) * 100 : 0;
-                  const isPositive = margin >= 0;
+                  const { margin, marginPct } = computeMargin(Number(order.total), totalCost, 1);
                   return (
                     <div className="flex items-start justify-between">
                       <OrderStatusBadge status={order.status} />
@@ -111,8 +110,8 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                           ${Number(order.total).toFixed(2)}
                         </p>
                         {hasCostData ? (
-                          <p className={`text-sm font-medium mt-0.5 ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                            Margen: ${margin.toFixed(2)} ({marginPct.toFixed(1)}%)
+                          <p className="text-sm mt-0.5">
+                            <MarginDisplay label="Margen" margin={margin} marginPct={marginPct} />
                           </p>
                         ) : (
                           <p className="text-xs text-gray-400 mt-0.5">Sin datos de costo</p>

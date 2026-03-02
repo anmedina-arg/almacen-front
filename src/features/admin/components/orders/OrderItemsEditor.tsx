@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { OrderItem, OrderStatus } from '../../types/order.types';
+import { computeMargin, MarginDisplay } from './MarginDisplay';
 import { useRemoveOrderItem } from '../../hooks/useRemoveOrderItem';
 import { useUpdateOrderItem } from '../../hooks/useUpdateOrderItem';
 import { useAddOrderItem } from '../../hooks/useAddOrderItem';
@@ -214,14 +215,10 @@ export function OrderItemsEditor({
                     {item.quantity} x ${Number(item.unit_price).toFixed(2)}
                   </p>
                   {item.unit_cost > 0 && (() => {
-                    const itemMargin = (Number(item.unit_price) - Number(item.unit_cost)) * Number(item.quantity);
-                    const itemMarginPct = Number(item.unit_price) > 0
-                      ? ((Number(item.unit_price) - Number(item.unit_cost)) / Number(item.unit_price)) * 100
-                      : 0;
-                    const isPositive = itemMargin >= 0;
+                    const { margin, marginPct } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.quantity));
                     return (
-                      <p className={`text-xs font-medium ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
-                        Margen: ${itemMargin.toFixed(2)} ({itemMarginPct.toFixed(1)}%)
+                      <p className="text-xs">
+                        <MarginDisplay margin={margin} marginPct={marginPct} />
                       </p>
                     );
                   })()}
