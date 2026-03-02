@@ -28,7 +28,10 @@ CREATE POLICY "Admins can view price history"
 
 -- 4. Trigger function: registra en historial en INSERT y en UPDATE cuando price o cost cambian
 CREATE OR REPLACE FUNCTION log_price_change()
-RETURNS TRIGGER AS $$
+RETURNS TRIGGER
+SECURITY DEFINER
+SET search_path = public
+AS $$
 BEGIN
   IF TG_OP = 'INSERT' THEN
     INSERT INTO product_price_history (product_id, sale_price, cost, changed_at)
