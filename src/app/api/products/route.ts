@@ -13,6 +13,7 @@ function formatComboItem(rawName: string, qty: number, saleType: string): string
     .replace(/\b100\s*gr\b/gi, '')
     .replace(/\bkilos?\b/gi, '')
     .replace(/\bkg\b/gi, '')
+    .replace(/\bx\b/gi, '')
     .replace(/\s+/g, ' ')
     .trim();
 
