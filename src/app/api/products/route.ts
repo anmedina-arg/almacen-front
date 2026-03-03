@@ -3,6 +3,38 @@ import { Product } from '@/types';
 import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
+// Formats a combo component label with quantity always on the left.
+// Examples: unit 2 "Pan"       → "2 Pan"
+//           kg   0.15 "Carne"  → "150 gr Carne"
+//           kg   1.5  "Carne"  → "1.5 kg Carne"
+//           100gr 2   "Queso"  → "200 gr Queso"
+function formatComboItem(rawName: string, qty: number, saleType: string): string {
+  const name = rawName
+    .replace(/\b100\s*gr\b/gi, '')
+    .replace(/\bkilos?\b/gi, '')
+    .replace(/\bkg\b/gi, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  let qtyLabel: string;
+
+  if (saleType === 'kg') {
+    if (qty < 1) {
+      qtyLabel = `${Math.round(qty * 1000)} gr`;
+    } else {
+      qtyLabel = `${parseFloat(qty.toFixed(3))} kg`;
+    }
+  } else if (saleType === '100gr') {
+    const grams = Math.round(qty * 100);
+    qtyLabel = grams >= 1000 ? `${grams / 1000} kg` : `${grams} gr`;
+  } else {
+    const n = parseFloat(qty.toFixed(10));
+    qtyLabel = Number.isInteger(n) ? String(n) : String(parseFloat(n.toPrecision(6)));
+  }
+
+  return `${qtyLabel} ${name}`;
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -73,17 +105,17 @@ export async function GET(request: NextRequest) {
     if (comboIds.length > 0) {
       const { data: comboData } = await supabase
         .from('combo_components')
-        .select(`combo_product_id, quantity, products!combo_components_component_product_id_fkey(name)`)
+        .select(`combo_product_id, quantity, products!combo_components_component_product_id_fkey(name, sale_type)`)
         .in('combo_product_id', comboIds)
         .order('id', { ascending: true });
 
       (comboData ?? []).forEach((row) => {
-        const name = (row.products as unknown as { name: string } | null)?.name;
+        const prod = row.products as unknown as { name: string; sale_type: string } | null;
         if (!comboItemsMap.has(row.combo_product_id)) comboItemsMap.set(row.combo_product_id, []);
-        if (name) {
-          const qty = parseFloat(String(row.quantity));
-          const qtyLabel = Number.isInteger(qty) ? String(qty) : qty.toString().replace(/\.?0+$/, '');
-          comboItemsMap.get(row.combo_product_id)!.push(`${qtyLabel}x ${name}`);
+        if (prod) {
+          comboItemsMap.get(row.combo_product_id)!.push(
+            formatComboItem(prod.name, parseFloat(String(row.quantity)), prod.sale_type)
+          );
         }
       });
     }
