@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import Image from 'next/image';
 import type { ProductCardProps } from '../types';
 import { getWeightType, formatQuantity } from '../utils/productUtils';
@@ -18,9 +18,12 @@ function ProductCardBase({
 		product.stock_quantity > 0 &&
 		quantity >= product.stock_quantity;
 
+	const hasComboItems = product.is_combo && product.combo_items && product.combo_items.length > 0;
+	const [comboExpanded, setComboExpanded] = useState(false);
+
 	return (
-		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
-			<div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-center gap-3`}>
+		<div className="flex w-full items-start justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+			<div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-start gap-3`}>
 				{product.price !== 0 && (
 					<div className="flex-shrink-0 relative">
 						<Image
@@ -39,8 +42,8 @@ function ProductCardBase({
 						)}
 					</div>
 				)}
-				<div className="text-ellipsis">
-					<h2 className="text-sm font-bold ">
+				<div className="text-ellipsis py-2">
+					<h2 className="text-sm font-bold">
 						{product.name}
 					</h2>
 					{product.price !== 0 && (
@@ -48,10 +51,30 @@ function ProductCardBase({
 							${product.price}
 						</p>
 					)}
-					{product.is_combo && product.combo_items && product.combo_items.length > 0 && (
-						<p className="text-xs text-gray-400 leading-tight truncate max-w-[180px]">
-							{product.combo_items.join(' · ')}
-						</p>
+					{hasComboItems && (
+						<div className="mt-0.5">
+							{comboExpanded ? (
+								<ul className="text-xs text-gray-500 space-y-0.5">
+									{product.combo_items!.map((item, i) => (
+										<li key={i} className="flex items-start gap-1">
+											<span className="text-gray-300 mt-px">•</span>
+											<span>{item}</span>
+										</li>
+									))}
+								</ul>
+							) : (
+								<p className="text-xs text-gray-400 leading-tight line-clamp-1">
+									{product.combo_items!.join(' · ')}
+								</p>
+							)}
+							<button
+								type="button"
+								onClick={() => setComboExpanded((v) => !v)}
+								className="text-xs text-blue-500 hover:text-blue-700 mt-0.5 font-medium"
+							>
+								{comboExpanded ? 'Ver menos' : 'Ver más'}
+							</button>
+						</div>
 					)}
 					{'description' in product && (
 						<ul className="text-xs text-gray-300 mt-1">
@@ -70,7 +93,7 @@ function ProductCardBase({
 				</div>
 			</div>
 
-			<div className="flex items-center gap-2 flex-shrink-0">
+			<div className="flex items-center gap-2 flex-shrink-0 py-2 pr-2">
 				{isOutOfStock ? (
 					<span className="text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-md">
 						Sin Stock
