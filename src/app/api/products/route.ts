@@ -73,14 +73,18 @@ export async function GET(request: NextRequest) {
     if (comboIds.length > 0) {
       const { data: comboData } = await supabase
         .from('combo_components')
-        .select(`combo_product_id, products!combo_components_component_product_id_fkey(name)`)
+        .select(`combo_product_id, quantity, products!combo_components_component_product_id_fkey(name)`)
         .in('combo_product_id', comboIds)
         .order('id', { ascending: true });
 
       (comboData ?? []).forEach((row) => {
         const name = (row.products as unknown as { name: string } | null)?.name;
         if (!comboItemsMap.has(row.combo_product_id)) comboItemsMap.set(row.combo_product_id, []);
-        if (name) comboItemsMap.get(row.combo_product_id)!.push(name);
+        if (name) {
+          const qty = parseFloat(String(row.quantity));
+          const qtyLabel = Number.isInteger(qty) ? String(qty) : qty.toString().replace(/\.?0+$/, '');
+          comboItemsMap.get(row.combo_product_id)!.push(`${qtyLabel}x ${name}`);
+        }
       });
     }
 
