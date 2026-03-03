@@ -7,6 +7,7 @@ import { useAdminProducts } from '../hooks/useAdminProducts';
 import { useComboComponents } from '../hooks/useComboComponents';
 import { useUpdateComboComponents } from '../hooks/useUpdateComboComponents';
 import { useCloudinaryUpload } from '../hooks/useCloudinaryUpload';
+import { useCategories } from '../hooks/useCategories';
 import { ImageUploadField } from './ImageUploadField';
 import type { Product } from '@/types';
 import type { ComboComponent } from '../types/combo.types';
@@ -26,9 +27,13 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
     mode === 'edit' && product ? product.id : null
   );
   const { uploadFile, uploading, uploadError } = useCloudinaryUpload();
+  const { data: categories = [] } = useCategories();
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [componentSearch, setComponentSearch] = useState('');
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(
+    product?.category_id ?? null
+  );
 
   const [formData, setFormData] = useState({
     name: product?.name ?? '',
@@ -36,6 +41,8 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
     image: product?.image ?? '',
     active: product?.active ?? true,
     max_stock: product?.max_stock ?? null as number | null,
+    category_id: product?.category_id ?? null as number | null,
+    subcategory_id: product?.subcategory_id ?? null as number | null,
   });
 
   const [components, setComponents] = useState<ComboComponent[]>([]);
@@ -64,12 +71,24 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
     [availableProducts, componentSearch, components]
   );
 
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId) ?? null;
+
   // Real-time cost from components
   const calculatedCost = useMemo(
     () =>
       components.reduce((sum, comp) => {
         const prod = allProducts.find((p) => p.id === comp.component_product_id);
         return sum + comp.quantity * (prod?.cost ?? 0);
+      }, 0),
+    [components, allProducts]
+  );
+
+  // Suggested price: sum of component sale prices × quantities
+  const suggestedPrice = useMemo(
+    () =>
+      components.reduce((sum, comp) => {
+        const prod = allProducts.find((p) => p.id === comp.component_product_id);
+        return sum + comp.quantity * (prod?.price ?? 0);
       }, 0),
     [components, allProducts]
   );
@@ -130,6 +149,8 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
       sale_type: 'unit' as const,
       is_combo: true,
       max_stock: formData.max_stock,
+      category_id: formData.category_id,
+      subcategory_id: formData.subcategory_id,
     };
 
     if (mode === 'create') {
@@ -216,12 +237,26 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
             {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
           </div>
 
-          {/* Costo y margen calculados */}
+          {/* Costo, precio sugerido y margen */}
           <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-sm space-y-1">
             <p className="text-gray-600">
               Costo calculado:{' '}
               <span className="font-semibold text-gray-800">${calculatedCost.toFixed(2)}</span>
             </p>
+            {components.length > 0 && (
+              <p className="text-gray-600">
+                Precio sugerido:{' '}
+                <button
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, price: suggestedPrice }))}
+                  className="font-semibold text-blue-700 underline underline-offset-2 hover:text-blue-900"
+                  title="Usar como precio de venta"
+                >
+                  ${suggestedPrice.toFixed(2)}
+                </button>
+                <span className="text-gray-400 ml-1 text-xs">(suma de precios de componentes)</span>
+              </p>
+            )}
             <p className={`font-semibold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
               Margen: ${margin.toFixed(2)}
             </p>
@@ -270,6 +305,49 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
             <label htmlFor="combo-active" className="text-sm font-medium text-gray-700">
               Combo activo
             </label>
+          </div>
+
+          {/* Categoría */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Categoría
+            </label>
+            <select
+              value={selectedCategoryId ?? ''}
+              onChange={(e) => {
+                const val = e.target.value ? Number(e.target.value) : null;
+                setSelectedCategoryId(val);
+                setFormData({ ...formData, category_id: val, subcategory_id: null });
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+              disabled={isPending}
+            >
+              <option value="">Sin categoría</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Subcategoría */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Subcategoría
+            </label>
+            <select
+              value={formData.subcategory_id ?? ''}
+              onChange={(e) => {
+                const val = e.target.value ? Number(e.target.value) : null;
+                setFormData({ ...formData, subcategory_id: val });
+              }}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+              disabled={isPending || !selectedCategory || selectedCategory.subcategories.length === 0}
+            >
+              <option value="">Sin subcategoría</option>
+              {selectedCategory?.subcategories.map((sub) => (
+                <option key={sub.id} value={sub.id}>{sub.name}</option>
+              ))}
+            </select>
           </div>
 
           {/* Sección componentes */}
