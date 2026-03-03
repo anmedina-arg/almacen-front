@@ -42,7 +42,7 @@ function ProductCardBase({
 						)}
 					</div>
 				)}
-				<div className="text-ellipsis py-2">
+				<div className="text-ellipsis py-2 min-w-0">
 					<h2 className="text-sm font-bold">
 						{product.name}
 					</h2>
@@ -54,26 +54,37 @@ function ProductCardBase({
 					{hasComboItems && (
 						<div className="mt-0.5">
 							{comboExpanded ? (
-								<ul className="text-xs text-gray-500 space-y-0.5">
-									{product.combo_items!.map((item, i) => (
-										<li key={i} className="flex items-start gap-1">
-											<span className="text-gray-300 mt-px">•</span>
-											<span>{item}</span>
-										</li>
-									))}
-								</ul>
+								<>
+									<ul className="text-xs text-gray-500 space-y-0.5">
+										{product.combo_items!.map((item, i) => (
+											<li key={i} className="flex items-start gap-1">
+												<span className="text-gray-300 mt-px">•</span>
+												<span>{item}</span>
+											</li>
+										))}
+									</ul>
+									<button
+										type="button"
+										onClick={() => setComboExpanded(false)}
+										className="mt-1 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded"
+									>
+										Ver menos
+									</button>
+								</>
 							) : (
-								<p className="text-xs text-gray-400 leading-tight line-clamp-1">
-									{product.combo_items!.join(' · ')}
-								</p>
+								<div className="flex items-center gap-1.5 min-w-0">
+									<p className="text-xs text-gray-400 leading-tight truncate min-w-0">
+										{product.combo_items!.join(' · ')}
+									</p>
+									<button
+										type="button"
+										onClick={() => setComboExpanded(true)}
+										className="flex-shrink-0 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded"
+									>
+										Ver más
+									</button>
+								</div>
 							)}
-							<button
-								type="button"
-								onClick={() => setComboExpanded((v) => !v)}
-								className="text-xs text-blue-500 hover:text-blue-700 mt-0.5 font-medium"
-							>
-								{comboExpanded ? 'Ver menos' : 'Ver más'}
-							</button>
 						</div>
 					)}
 					{'description' in product && (
