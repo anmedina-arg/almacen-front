@@ -22,9 +22,8 @@ function ProductCardBase({
 	const [comboExpanded, setComboExpanded] = useState(false);
 
 	return (
-		<div className="flex w-full min-w-0 items-start justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow overflow-hidden">
-			{/* Left: image + text */}
-			<div className={`flex min-w-0 flex-1 ${'description' in product ? 'flex-col' : 'flex-row'} items-start gap-3`}>
+		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+			<div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-center gap-3`}>
 				{product.price !== 0 && (
 					<div className="flex-shrink-0 relative">
 						<Image
@@ -43,8 +42,8 @@ function ProductCardBase({
 						)}
 					</div>
 				)}
-				<div className="min-w-0 py-2">
-					<h2 className="text-sm font-bold truncate">
+				<div className="text-ellipsis">
+					<h2 className="text-sm font-bold ">
 						{product.name}
 					</h2>
 					{product.price !== 0 && (
@@ -52,36 +51,33 @@ function ProductCardBase({
 							${product.price}
 						</p>
 					)}
-					{hasComboItems && (
-						<div className="mt-0.5">
-							{comboExpanded ? (
-								<>
-									<ul className="text-xs text-gray-500 space-y-0.5">
-										{product.combo_items!.map((item, i) => (
-											<li key={i} className="flex items-start gap-1">
-												<span className="text-gray-300 mt-px">•</span>
-												<span>{item}</span>
-											</li>
-										))}
-									</ul>
-									<button
-										type="button"
-										onClick={() => setComboExpanded(false)}
-										className="mt-1 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded"
-									>
-										Ver menos
-									</button>
-								</>
-							) : (
-								<button
-									type="button"
-									onClick={() => setComboExpanded(true)}
-									className="bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded"
-								>
-									Ver más
-								</button>
-							)}
-						</div>
+					{hasComboItems && !comboExpanded && (
+						<button
+							type="button"
+							onClick={() => setComboExpanded(true)}
+							className="mt-0.5 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded"
+						>
+							Ver más
+						</button>
+					)}
+					{hasComboItems && comboExpanded && (
+						<>
+							<ul className="text-xs text-gray-500 mt-0.5 space-y-0.5">
+								{product.combo_items!.map((item, i) => (
+									<li key={i} className="flex items-start gap-1">
+										<span className="text-gray-300 mt-px">•</span>
+										<span>{item}</span>
+									</li>
+								))}
+							</ul>
+							<button
+								type="button"
+								onClick={() => setComboExpanded(false)}
+								className="mt-1 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded"
+							>
+								Ver menos
+							</button>
+						</>
 					)}
 					{'description' in product && (
 						<ul className="text-xs text-gray-300 mt-1">
@@ -100,8 +96,7 @@ function ProductCardBase({
 				</div>
 			</div>
 
-			{/* Right: quantity + buttons */}
-			<div className="flex flex-shrink-0 items-center gap-2 py-2 pr-2">
+			<div className="flex items-center gap-2 flex-shrink-0">
 				{isOutOfStock ? (
 					<span className="text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-md">
 						Sin Stock
@@ -113,8 +108,9 @@ function ProductCardBase({
 								{formatQuantity(quantity, weightType)}
 							</span>
 						)}
+
 						{product.price !== 0 && (
-							<div className="flex flex-col gap-1 items-center">
+							<div className='flex flex-col gap-1 items-center'>
 								{quantity > 0 &&
 									<QuantityButton variant="decrement" onClick={() => onRemove(product.id)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
 								}
