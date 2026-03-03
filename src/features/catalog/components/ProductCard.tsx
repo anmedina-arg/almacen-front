@@ -55,9 +55,9 @@ function ProductCardBase({
 						<button
 							type="button"
 							onClick={() => setComboExpanded(true)}
-							className="mt-0.5 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded"
+							className="mt-0.5 bg-blue-600 text-white text-xs font-medium px-1.5 py-0.5 rounded"
 						>
-							Ver más
+							Qué incluye?
 						</button>
 					)}
 					{hasComboItems && comboExpanded && (

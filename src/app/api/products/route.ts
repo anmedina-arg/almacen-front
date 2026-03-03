@@ -18,15 +18,13 @@ function formatComboItem(rawName: string, qty: number, saleType: string): string
 
   let qtyLabel: string;
 
-  if (saleType === 'kg') {
+  if (saleType === 'kg' || saleType === '100gr') {
+    // Quantities in combo_components are always stored in kg regardless of sale_type
     if (qty < 1) {
       qtyLabel = `${Math.round(qty * 1000)} gr`;
     } else {
       qtyLabel = `${parseFloat(qty.toFixed(3))} kg`;
     }
-  } else if (saleType === '100gr') {
-    const grams = Math.round(qty * 100);
-    qtyLabel = grams >= 1000 ? `${grams / 1000} kg` : `${grams} gr`;
   } else {
     const n = parseFloat(qty.toFixed(10));
     qtyLabel = Number.isInteger(n) ? String(n) : String(parseFloat(n.toPrecision(6)));
