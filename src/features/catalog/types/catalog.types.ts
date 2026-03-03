@@ -25,6 +25,7 @@ export interface Product {
   cost?: number | null;
   is_combo?: boolean;
   max_stock?: number | null;
+  combo_items?: string[]; // nombres de los componentes, solo para combos
   // FK-based category system (Phase 2)
   category_id?: number | null;
   subcategory_id?: number | null;

@@ -66,6 +66,24 @@ export async function GET(request: NextRequest) {
       (stockData ?? []).map((s) => [s.product_id, s.quantity])
     );
 
+    // Query 3: combo component names — solo para productos combo
+    const comboIds = (data ?? []).filter((p) => p.is_combo).map((p) => p.id);
+    const comboItemsMap = new Map<number, string[]>();
+
+    if (comboIds.length > 0) {
+      const { data: comboData } = await supabase
+        .from('combo_components')
+        .select(`combo_product_id, products!combo_components_component_product_id_fkey(name)`)
+        .in('combo_product_id', comboIds)
+        .order('id', { ascending: true });
+
+      (comboData ?? []).forEach((row) => {
+        const name = (row.products as unknown as { name: string } | null)?.name;
+        if (!comboItemsMap.has(row.combo_product_id)) comboItemsMap.set(row.combo_product_id, []);
+        if (name) comboItemsMap.get(row.combo_product_id)!.push(name);
+      });
+    }
+
     const products = (data ?? []).map((p) => {
       const { cat, sub, ...rest } = p as typeof p & { cat?: { id: number; name: string } | null; sub?: { id: number; name: string } | null };
       return {
@@ -73,6 +91,7 @@ export async function GET(request: NextRequest) {
         category_name: cat?.name ?? null,
         subcategory_name: sub?.name ?? null,
         stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
+        ...(p.is_combo ? { combo_items: comboItemsMap.get(p.id) ?? [] } : {}),
       };
     });
 

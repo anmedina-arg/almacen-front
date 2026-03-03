@@ -48,6 +48,11 @@ function ProductCardBase({
 							${product.price}
 						</p>
 					)}
+					{product.is_combo && product.combo_items && product.combo_items.length > 0 && (
+						<p className="text-xs text-gray-400 leading-tight truncate max-w-[180px]">
+							{product.combo_items.join(' · ')}
+						</p>
+					)}
 					{'description' in product && (
 						<ul className="text-xs text-gray-300 mt-1">
 							{product.description.map((item, idx) => (
