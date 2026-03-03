@@ -22,7 +22,7 @@ function ProductCardBase({
 		<div className="flex w-full items-center justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
 			<div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-center gap-3`}>
 				{product.price !== 0 && (
-					<div className="flex-shrink-0">
+					<div className="flex-shrink-0 relative">
 						<Image
 							src={product.image}
 							alt={product.name}
@@ -32,6 +32,11 @@ function ProductCardBase({
 							loading="lazy"
 							sizes="(max-width: 768px) 100vw, 80px"
 						/>
+						{product.is_combo && (
+							<span className="absolute top-1 left-1 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">
+								COMBO
+							</span>
+						)}
 					</div>
 				)}
 				<div className="text-ellipsis">

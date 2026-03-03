@@ -15,6 +15,9 @@ export const adminKeys = {
   ordersList: () => [...adminKeys.orders(), 'list'] as const,
   orderDetail: (id: number) => [...adminKeys.orders(), id] as const,
 
+  // Combo query keys
+  comboComponents: (id: number | null) => [...adminKeys.all, 'combo-components', id] as const,
+
   // Categories query keys
   categories: () => [...adminKeys.all, 'categories'] as const,
   categoriesList: () => [...adminKeys.categories(), 'list'] as const,

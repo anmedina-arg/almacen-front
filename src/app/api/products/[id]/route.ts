@@ -29,6 +29,8 @@ export async function GET(
         categories,
         mainCategory:main_category,
         sale_type,
+        is_combo,
+        max_stock,
         category_id,
         subcategory_id,
         cat:categories!products_category_id_fkey(id, name),
@@ -111,6 +113,8 @@ export async function PUT(
     if (body.categories !== undefined) updates.categories = body.categories;
     if (body.active !== undefined) updates.active = body.active;
     if (body.sale_type !== undefined) updates.sale_type = body.sale_type;
+    if (body.is_combo !== undefined) updates.is_combo = body.is_combo;
+    if ('max_stock' in body) updates.max_stock = body.max_stock ?? null;
     // FK-based category fields (Phase 2)
     if ('category_id' in body) updates.category_id = body.category_id ?? null;
     if ('subcategory_id' in body) updates.subcategory_id = body.subcategory_id ?? null;
@@ -132,6 +136,8 @@ export async function PUT(
         categories,
         mainCategory:main_category,
         sale_type,
+        is_combo,
+        max_stock,
         category_id,
         subcategory_id,
         cat:categories!products_category_id_fkey(id, name),

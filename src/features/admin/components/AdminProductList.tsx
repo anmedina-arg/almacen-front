@@ -7,6 +7,7 @@ import { useToggleProductActive } from '../hooks/useToggleProductActive';
 import { useDeleteProduct } from '../hooks/useDeleteProduct';
 import { CATEGORY_LABELS } from '../constants';
 import { ProductFormModal } from './ProductFormModal';
+import { ComboFormModal } from './ComboFormModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
@@ -18,7 +19,9 @@ export function AdminProductList() {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'products' | 'combos'>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isCreateComboModalOpen, setIsCreateComboModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
@@ -52,7 +55,11 @@ export function AdminProductList() {
       filterActive === 'all' ||
       (filterActive === 'active' && product.active) ||
       (filterActive === 'inactive' && !product.active);
-    return matchesSearch && matchesFilter;
+    const matchesType =
+      filterType === 'all' ||
+      (filterType === 'combos' && product.is_combo) ||
+      (filterType === 'products' && !product.is_combo);
+    return matchesSearch && matchesFilter && matchesType;
   });
 
   const handleDelete = () => {
@@ -60,6 +67,10 @@ export function AdminProductList() {
     deleteMutation.mutate(deletingProduct.id, {
       onSuccess: () => setDeletingProduct(null),
     });
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditingProduct(product);
   };
 
   return (
@@ -70,12 +81,20 @@ export function AdminProductList() {
           <h2 className="text-2xl font-bold text-gray-800">Productos</h2>
           <p className="text-sm text-gray-500">Gestión del catálogo de productos</p>
         </div>
-        <button
-          onClick={() => setIsCreateModalOpen(true)}
-          className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors font-medium"
-        >
-          + Crear Producto
-        </button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => setIsCreateComboModalOpen(true)}
+            className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
+          >
+            + Nuevo Combo
+          </button>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors font-medium text-sm"
+          >
+            + Crear Producto
+          </button>
+        </div>
       </div>
 
       {/* Filtros */}
@@ -95,6 +114,15 @@ export function AdminProductList() {
           <option value="all">Todos</option>
           <option value="active">Activos</option>
           <option value="inactive">Inactivos</option>
+        </select>
+        <select
+          value={filterType}
+          onChange={(e) => setFilterType(e.target.value as 'all' | 'products' | 'combos')}
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+        >
+          <option value="all">Tipo: Todos</option>
+          <option value="products">Solo productos</option>
+          <option value="combos">Solo combos</option>
         </select>
       </div>
 
@@ -141,7 +169,14 @@ export function AdminProductList() {
                           </div>
                         )}
                         <div className="min-w-0">
-                          <p className="font-medium text-gray-800 truncate">{product.name}</p>
+                          <div className="flex items-center gap-1.5">
+                            <p className="font-medium text-gray-800 truncate">{product.name}</p>
+                            {product.is_combo && (
+                              <span className="flex-shrink-0 bg-blue-100 text-blue-700 text-xs font-bold px-1.5 py-0.5 rounded">
+                                COMBO
+                              </span>
+                            )}
+                          </div>
                           {!product.active && (
                             <span className="text-xs text-red-500">Inactivo</span>
                           )}
@@ -182,7 +217,7 @@ export function AdminProductList() {
                     <td className="py-3 px-4">
                       <div className="flex items-center justify-center gap-2">
                         <button
-                          onClick={() => setEditingProduct(product)}
+                          onClick={() => handleEdit(product)}
                           className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs font-medium"
                         >
                           Editar
@@ -224,7 +259,14 @@ export function AdminProductList() {
                     </div>
                   )}
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-800 truncate">{product.name}</p>
+                    <div className="flex items-center gap-1.5">
+                      <p className="font-semibold text-gray-800 truncate">{product.name}</p>
+                      {product.is_combo && (
+                        <span className="flex-shrink-0 bg-blue-100 text-blue-700 text-xs font-bold px-1.5 py-0.5 rounded">
+                          COMBO
+                        </span>
+                      )}
+                    </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-gray-500">
                         {CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
@@ -262,7 +304,7 @@ export function AdminProductList() {
                 {/* Acciones */}
                 <div className="flex gap-2">
                   <button
-                    onClick={() => setEditingProduct(product)}
+                    onClick={() => handleEdit(product)}
                     className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm font-medium"
                   >
                     Editar
@@ -292,12 +334,27 @@ export function AdminProductList() {
         />
       )}
 
-      {editingProduct && (
-        <ProductFormModal
-          mode="edit"
-          product={editingProduct}
-          onClose={() => setEditingProduct(null)}
+      {isCreateComboModalOpen && (
+        <ComboFormModal
+          mode="create"
+          onClose={() => setIsCreateComboModalOpen(false)}
         />
+      )}
+
+      {editingProduct && (
+        editingProduct.is_combo ? (
+          <ComboFormModal
+            mode="edit"
+            product={editingProduct}
+            onClose={() => setEditingProduct(null)}
+          />
+        ) : (
+          <ProductFormModal
+            mode="edit"
+            product={editingProduct}
+            onClose={() => setEditingProduct(null)}
+          />
+        )
       )}
 
       {deletingProduct && (

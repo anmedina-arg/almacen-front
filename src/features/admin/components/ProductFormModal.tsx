@@ -34,6 +34,8 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
     categories: product?.categories || '',
     active: product?.active ?? true,
     sale_type: product?.sale_type || 'unit',
+    is_combo: false,
+    max_stock: null,
     category_id: product?.category_id ?? null,
     subcategory_id: product?.subcategory_id ?? null,
   });
@@ -53,6 +55,8 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
         categories: product.categories,
         active: product.active,
         sale_type: product.sale_type,
+        is_combo: false,
+        max_stock: null,
         category_id: product.category_id ?? null,
         subcategory_id: product.subcategory_id ?? null,
       });
