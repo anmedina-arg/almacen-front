@@ -65,6 +65,56 @@ export async function GET(
 }
 
 /**
+ * DELETE /api/orders/[orderId]
+ * Permanently delete an order and all its items. Admin only.
+ * order_items are removed automatically via ON DELETE CASCADE.
+ * Note: stock is NOT restored — handle separately if needed.
+ */
+export async function DELETE(
+  _request: NextRequest,
+  { params }: { params: Promise<{ orderId: string }> }
+) {
+  try {
+    const { isAdmin, error: authError } = await verifyAdminAuth();
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: authError || 'Forbidden: Admin access required' },
+        { status: 403 }
+      );
+    }
+
+    const { orderId: orderIdParam } = await params;
+    const orderId = parseInt(orderIdParam);
+    if (isNaN(orderId)) {
+      return NextResponse.json(
+        { error: 'ID de orden invalido' },
+        { status: 400 }
+      );
+    }
+
+    const supabase = await createSupabaseServerClient();
+
+    const { error } = await supabase
+      .from('orders')
+      .delete()
+      .eq('id', orderId);
+
+    if (error) {
+      console.error('Error deleting order:', error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return new NextResponse(null, { status: 204 });
+  } catch (error) {
+    console.error('Error in DELETE /api/orders/[orderId]:', error);
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * PUT /api/orders/[orderId]
  * Update an order (status, notes). Admin only.
  */

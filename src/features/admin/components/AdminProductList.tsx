@@ -112,6 +112,7 @@ export function AdminProductList() {
                 <tr className="border-b border-gray-200 bg-gray-50">
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">Producto</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">Categoría</th>
+                  <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>
                   <th className="text-right py-3 px-4 font-semibold text-gray-600">Precio</th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">Activo</th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">Acciones</th>
@@ -151,6 +152,13 @@ export function AdminProductList() {
                     {/* Categoría */}
                     <td className="py-3 px-4 text-gray-600">
                       {CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
+                    </td>
+
+                    {/* Costo */}
+                    <td className="py-3 px-4 text-right font-mono text-gray-500">
+                      {product.cost != null && Number(product.cost) > 0
+                        ? `$${Number(product.cost).toFixed(2)}`
+                        : <span className="text-gray-300">—</span>}
                     </td>
 
                     {/* Precio */}
@@ -225,6 +233,14 @@ export function AdminProductList() {
                       <span className="text-xs font-medium text-green-600">
                         ${Number(product.price).toFixed(2)}
                       </span>
+                      {product.cost != null && Number(product.cost) > 0 && (
+                        <>
+                          <span className="text-xs text-gray-400">|</span>
+                          <span className="text-xs text-gray-500">
+                            costo ${Number(product.cost).toFixed(2)}
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   {/* Checkbox activo */}

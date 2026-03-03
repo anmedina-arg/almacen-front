@@ -215,7 +215,7 @@ export function OrderItemsEditor({
                     {item.quantity} x ${Number(item.unit_price).toFixed(2)}
                   </p>
                   {(() => {
-                    const { margin, marginPct } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.quantity));
+                    const { margin, marginPct } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.subtotal));
                     return (
                       <p className="text-xs">
                         <MarginDisplay margin={margin} marginPct={marginPct} />

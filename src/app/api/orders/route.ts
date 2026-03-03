@@ -30,14 +30,18 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createSupabaseServerClient();
 
-    // Fetch current product costs server-side to capture unit_cost at time of sale
+    // Fetch current product price + cost server-side.
+    // unit_cost is stored normalized to the same scale as unit_price:
+    //   unit_cost = unit_price * (product.cost / product.price)
+    // This handles all sale types (unit, 100gr, kg) correctly because
+    // the WhatsApp flow normalizes unit_price to price-per-base-unit.
     const productIds = items.map((i) => i.product_id);
     const { data: productsData } = await supabase
       .from('products')
-      .select('id, cost')
+      .select('id, price, cost')
       .in('id', productIds);
-    const costMap = new Map<number, number>(
-      (productsData ?? []).map((p) => [p.id, Number(p.cost ?? 0)])
+    const productMap = new Map<number, { price: number; cost: number }>(
+      (productsData ?? []).map((p) => [p.id, { price: Number(p.price ?? 0), cost: Number(p.cost ?? 0) }])
     );
 
     // Call the create_order RPC function (transactional)
@@ -45,14 +49,20 @@ export async function POST(request: NextRequest) {
       p_user_id: null,
       p_notes: notes || null,
       p_whatsapp_message: whatsapp_message,
-      p_items: items.map((item) => ({
-        product_id: item.product_id,
-        product_name: item.product_name,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        unit_cost: costMap.get(item.product_id) ?? 0,
-        is_by_weight: item.is_by_weight,
-      })),
+      p_items: items.map((item) => {
+        const prod = productMap.get(item.product_id);
+        const unit_cost = (prod && prod.price > 0)
+          ? item.unit_price * (prod.cost / prod.price)
+          : 0;
+        return {
+          product_id: item.product_id,
+          product_name: item.product_name,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          unit_cost,
+          is_by_weight: item.is_by_weight,
+        };
+      }),
     });
 
     if (error) {
@@ -110,15 +120,22 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Aggregate cost per order to compute margin
+    // Aggregate cost per order to compute margin.
+    // Use subtotal * (unit_cost / unit_price) to correctly handle weight-based
+    // products where quantity is stored in raw grams but unit_price/unit_cost
+    // are per-100gr — avoids the 100x multiplication error.
     const { data: costsData } = await supabase
       .from('order_items')
-      .select('order_id, unit_cost, quantity');
+      .select('order_id, unit_cost, unit_price, subtotal');
 
     const costMap = new Map<number, number>();
     for (const item of costsData ?? []) {
       const prev = costMap.get(item.order_id) ?? 0;
-      costMap.set(item.order_id, prev + Number(item.unit_cost) * Number(item.quantity));
+      const unitPrice = Number(item.unit_price);
+      const itemCost = unitPrice > 0
+        ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice)
+        : 0;
+      costMap.set(item.order_id, prev + itemCost);
     }
 
     const ordersWithMargin = (data ?? []).map((order) => {

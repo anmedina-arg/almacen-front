@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useOrderDetail } from '../../hooks/useOrderDetail';
 import { useConfirmOrder } from '../../hooks/useConfirmOrder';
 import { useCancelOrder } from '../../hooks/useCancelOrder';
-import { useUpdateOrder } from '../../hooks/useUpdateOrder';
+import { useDeleteOrder } from '../../hooks/useDeleteOrder';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
 import { computeMargin, MarginDisplay } from './MarginDisplay';
@@ -20,9 +20,18 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   const { data: order, isLoading, error } = useOrderDetail(orderId);
   const confirmOrder = useConfirmOrder();
   const cancelOrder = useCancelOrder();
-  const updateOrder = useUpdateOrder();
+  const deleteOrder = useDeleteOrder();
 
   const [showWhatsAppMessage, setShowWhatsAppMessage] = useState(false);
+
+  const handleDelete = () => {
+    const isConfirmed = order?.status === 'confirmed';
+    const msg = isConfirmed
+      ? `Eliminar pedido #${orderId}? Esta acción es irreversible. El stock descontado al confirmar NO se restaurará automáticamente.`
+      : `Eliminar pedido #${orderId}? Esta acción es irreversible.`;
+    if (!confirm(msg)) return;
+    deleteOrder.mutate(orderId, { onSuccess: onClose });
+  };
 
   const handleConfirm = () => {
     if (!confirm('Confirmar este pedido?')) return;
@@ -96,11 +105,11 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               {/* Order info */}
               <div className="space-y-3">
                 {(() => {
-                  const totalCost = order.order_items.reduce(
-                    (sum, item) => sum + Number(item.unit_cost) * Number(item.quantity),
-                    0
-                  );
-                  const { margin, marginPct } = computeMargin(Number(order.total), totalCost, 1);
+                  const margin = order.order_items.reduce((sum, item) => {
+                    const { margin: m } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.subtotal));
+                    return sum + m;
+                  }, 0);
+                  const marginPct = Number(order.total) > 0 ? (margin / Number(order.total)) * 100 : 0;
                   return (
                     <div className="flex items-start justify-between">
                       <OrderStatusBadge status={order.status} />
@@ -200,6 +209,17 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                   </button>
                 </div>
               )}
+
+              {/* Delete order */}
+              <div className="pt-1 border-t border-gray-100">
+                <button
+                  onClick={handleDelete}
+                  disabled={deleteOrder.isPending}
+                  className="w-full px-4 py-2 text-red-600 border border-red-200 rounded-md hover:bg-red-50 transition-colors font-medium text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {deleteOrder.isPending ? 'Eliminando...' : 'Eliminar pedido'}
+                </button>
+              </div>
             </>
           )}
         </div>

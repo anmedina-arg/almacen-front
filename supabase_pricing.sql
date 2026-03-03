@@ -106,16 +106,19 @@ END;
 $$;
 
 -- 7. Trigger: cuando se actualiza products.cost, sincroniza order_items con unit_cost = 0
--- Preserva snapshots históricos correctos (solo toca items sin costo capturado)
+-- Normaliza unit_cost a la misma escala que unit_price usando el ratio cost/price.
+-- Esto es necesario porque el flujo WhatsApp almacena unit_price normalizado
+-- (precio por gramo base), mientras que el POS almacena unit_price = product.price.
+-- La formula unit_cost = unit_price * (cost / price) funciona para ambos casos.
 CREATE OR REPLACE FUNCTION sync_order_items_unit_cost()
 RETURNS TRIGGER
 SECURITY DEFINER
 SET search_path = public
 AS $$
 BEGIN
-  IF (OLD.cost IS DISTINCT FROM NEW.cost) AND NEW.cost > 0 THEN
+  IF (OLD.cost IS DISTINCT FROM NEW.cost) AND NEW.cost > 0 AND NEW.price > 0 THEN
     UPDATE order_items
-    SET unit_cost = NEW.cost
+    SET unit_cost = unit_price * (NEW.cost / NEW.price)
     WHERE product_id = NEW.id
       AND unit_cost = 0;
   END IF;
@@ -128,3 +131,16 @@ CREATE TRIGGER trg_sync_order_items_cost
   AFTER UPDATE ON products
   FOR EACH ROW
   EXECUTE FUNCTION sync_order_items_unit_cost();
+
+-- 8. BACKFILL: recomputa unit_cost para todos los order_items existentes.
+-- Usa el ratio cost/price del producto para normalizar a la misma escala
+-- que unit_price, independientemente del tipo de venta (unit, 100gr, kg).
+--   POS (unit_price = product.price):       unit_cost = price*(cost/price) = cost  ✓
+--   WhatsApp 100gr (unit_price = price/100): unit_cost = (price/100)*(cost/price) = cost/100 ✓
+--   WhatsApp kg    (unit_price = price/1000):unit_cost = (price/1000)*(cost/price) = cost/1000 ✓
+UPDATE order_items oi
+SET unit_cost = oi.unit_price * (p.cost / NULLIF(p.price, 0))
+FROM products p
+WHERE oi.product_id = p.id
+  AND p.cost > 0
+  AND p.price > 0;

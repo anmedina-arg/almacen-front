@@ -134,6 +134,19 @@ export const orderService = {
   },
 
   /**
+   * Permanently delete an order and all its items (admin only).
+   */
+  async deleteOrder(orderId: number): Promise<void> {
+    const res = await fetch(`/api/orders/${orderId}`, {
+      method: 'DELETE',
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.error || 'Error al eliminar el pedido');
+    }
+  },
+
+  /**
    * Update an item in an order (admin only).
    */
   async updateOrderItem(
