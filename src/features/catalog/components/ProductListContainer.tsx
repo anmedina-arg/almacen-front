@@ -11,6 +11,7 @@ import { ConfirmationModal } from './ConfirmationModal';
 import { InfoBanner } from './InfoBanner';
 import { useProducts } from '../hooks/useProducts';
 import { orderService } from '@/features/admin/services/orderService';
+import { normalize } from '@/utils/normalize';
 
 /**
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
@@ -29,16 +30,6 @@ export function ProductListContainer() {
 		const handler = setTimeout(() => setDebouncedSearch(search.trim()), 300);
 		return () => clearTimeout(handler);
 	}, [search]);
-
-	// Normalizador: quita tildes/diacríticos, lower-case y caracteres no alfanuméricos
-	const normalize = (s?: string) =>
-		(s ?? '')
-			.toString()
-			.toLowerCase()
-			.normalize('NFD')                       // descompone caracteres acentuados
-			.replace(/[\u0300-\u036f]/g, '')       // elimina marcas diacríticas
-			.replace(/[^a-z0-9\s]/g, '')           // elimina caracteres especiales
-			.trim();
 
 	// Filtrar productos usando el término debounced (insensible a mayúsculas, tildes y especiales)
 	const activeProducts = useMemo(() => {

@@ -1,8 +1,6 @@
+import { formatQuantity } from '@/utils/formatQuantity';
 import { CartItem } from '../types';
-import {
-  calculateItemPrice,
-  truncateProductName,
-} from './productUtils';
+import { calculateItemPrice, truncateProductName } from './productUtils';
 
 /**
  * Genera el mensaje de WhatsApp con formato optimizado
@@ -29,17 +27,7 @@ export const generateWhatsAppMessage = (cartItems: CartItem[]): string => {
 
     let quantityText = '';
 
-    if (item.saleType === '100gr') {
-      quantityText = `${item.quantity}gr`;
-    } else if (item.saleType === 'kg') {
-      if (item.quantity >= 1000) {
-        quantityText = `${item.quantity / 1000}kg`;
-      } else {
-        quantityText = `${item.quantity}gr`;
-      }
-    } else {
-      quantityText = `${item.quantity}`;
-    }
+    quantityText = formatQuantity(item.quantity, item.saleType);
 
     // Truncar nombre del producto según el ancho de la columna
     const productName = truncateProductName(item.name, productWidth);
