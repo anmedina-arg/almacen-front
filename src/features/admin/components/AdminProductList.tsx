@@ -11,6 +11,7 @@ import { ComboFormModal } from './ComboFormModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
+import { formatPrice } from '@/utils/formatPrice';
 
 export function AdminProductList() {
   const { data: products, isLoading, error } = useAdminProducts();
@@ -191,14 +192,14 @@ export function AdminProductList() {
 
                     {/* Costo */}
                     <td className="py-3 px-4 text-right font-mono text-gray-500">
-                      {product.cost != null && Number(product.cost) > 0
-                        ? `$${Number(product.cost).toFixed(2)}`
+                      {product.cost != null && product.cost > 0
+                        ? `${formatPrice(product.cost)}`
                         : <span className="text-gray-300">—</span>}
                     </td>
 
                     {/* Precio */}
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-700">
-                      ${Number(product.price).toFixed(2)}
+                      {formatPrice(product.price)}
                     </td>
 
                     {/* Activo (checkbox) */}
@@ -273,13 +274,13 @@ export function AdminProductList() {
                       </span>
                       <span className="text-xs text-gray-400">|</span>
                       <span className="text-xs font-medium text-green-600">
-                        ${Number(product.price).toFixed(2)}
+                        {formatPrice(product.price)}
                       </span>
-                      {product.cost != null && Number(product.cost) > 0 && (
+                      {product.cost != null && product.cost > 0 && (
                         <>
                           <span className="text-xs text-gray-400">|</span>
                           <span className="text-xs text-gray-500">
-                            costo ${Number(product.cost).toFixed(2)}
+                            costo {formatPrice(product.cost)}
                           </span>
                         </>
                       )}

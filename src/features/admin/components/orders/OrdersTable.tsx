@@ -8,6 +8,7 @@ import { MarginDisplay } from './MarginDisplay';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
+import { formatPrice } from '@/utils/formatPrice';
 
 /**
  * Main orders management table component.
@@ -103,11 +104,10 @@ export function OrdersTable() {
                   prev.statusFilter === 'pending' ? 'all' : 'pending',
               }))
             }
-            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              filters.statusFilter === 'pending'
+            className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${filters.statusFilter === 'pending'
                 ? 'bg-yellow-600 text-white hover:bg-yellow-700'
                 : 'bg-yellow-50 text-yellow-700 border border-yellow-200 hover:bg-yellow-100'
-            }`}
+              }`}
           >
             <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-yellow-200 text-yellow-800 text-xs font-bold">
               {statusCounts.pending}
@@ -198,7 +198,7 @@ export function OrdersTable() {
                       {formatAdminDate(order.created_at)}
                     </td>
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-800">
-                      ${Number(order.total).toFixed(2)}
+                      {formatPrice(order.total)}
                     </td>
                     <td className="py-3 px-4 text-right">
                       {order.margin === undefined ? (
@@ -250,7 +250,7 @@ export function OrdersTable() {
                   </span>
                   <div className="text-right">
                     <span className="text-lg font-bold text-gray-800">
-                      ${Number(order.total).toFixed(2)}
+                      {formatPrice(order.total)}
                     </span>
                     <div className="mt-0.5">
                       {order.margin === undefined ? (

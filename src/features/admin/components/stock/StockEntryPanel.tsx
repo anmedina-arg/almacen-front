@@ -10,15 +10,7 @@ import { useStockEntry } from '../../hooks/useStockEntry';
 import { useBatchIncrementStock } from '../../hooks/useBatchIncrementStock';
 import { StockEntryCard } from './StockEntryCard';
 import type { StockEntryCardProduct } from './StockEntryCard';
-
-const normalize = (s?: string) =>
-  (s ?? '')
-    .toString()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim();
+import { normalize } from '@/utils/normalize';
 
 export function StockEntryPanel() {
   const { data: stockData = [], isLoading: stockLoading } = useProductStock();

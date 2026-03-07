@@ -11,6 +11,7 @@ import { useCategories } from '../hooks/useCategories';
 import { ImageUploadField } from './ImageUploadField';
 import type { Product } from '@/types';
 import type { ComboComponent } from '../types/combo.types';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface ComboFormModalProps {
   mode: 'create' | 'edit';
@@ -241,7 +242,7 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
           <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-sm space-y-1">
             <p className="text-gray-600">
               Costo calculado:{' '}
-              <span className="font-semibold text-gray-800">${calculatedCost.toFixed(2)}</span>
+              <span className="font-semibold text-gray-800">{formatPrice(calculatedCost)}</span>
             </p>
             {components.length > 0 && (
               <p className="text-gray-600">
@@ -252,13 +253,13 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                   className="font-semibold text-blue-700 underline underline-offset-2 hover:text-blue-900"
                   title="Usar como precio de venta"
                 >
-                  ${suggestedPrice.toFixed(2)}
+                  {formatPrice(suggestedPrice)}
                 </button>
                 <span className="text-gray-400 ml-1 text-xs">(suma de precios de componentes)</span>
               </p>
             )}
             <p className={`font-semibold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              Margen: ${margin.toFixed(2)}
+              Margen: {formatPrice(margin)}
             </p>
           </div>
 
@@ -374,7 +375,7 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                         {prod?.name ?? `Producto #${comp.component_product_id}`}
                       </span>
                       <span className="text-xs text-gray-400 whitespace-nowrap">
-                        costo: ${compCost.toFixed(2)}
+                        costo: {formatPrice(compCost)}
                       </span>
                       <input
                         type="number"
@@ -427,9 +428,9 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                       disabled={isPending}
                     >
                       <span className="font-medium text-gray-800">{p.name}</span>
-                      {p.cost != null && Number(p.cost) > 0 && (
+                      {p.cost != null && p.cost > 0 && (
                         <span className="text-gray-400 ml-2 text-xs">
-                          costo: ${Number(p.cost).toFixed(2)}
+                          costo: {formatPrice(p.cost)}
                         </span>
                       )}
                     </button>
@@ -469,10 +470,10 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
               {uploading
                 ? 'Subiendo imagen...'
                 : isPending
-                ? 'Guardando...'
-                : mode === 'create'
-                ? 'Crear Combo'
-                : 'Actualizar Combo'}
+                  ? 'Guardando...'
+                  : mode === 'create'
+                    ? 'Crear Combo'
+                    : 'Actualizar Combo'}
             </button>
           </div>
         </form>

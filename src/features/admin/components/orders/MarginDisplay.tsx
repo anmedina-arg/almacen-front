@@ -1,5 +1,7 @@
 'use client';
 
+import { formatPrice } from "@/utils/formatPrice";
+
 export function computeMargin(
   unitPrice: number,
   unitCost: number,
@@ -21,7 +23,7 @@ export function MarginDisplay({ margin, marginPct, label }: MarginDisplayProps) 
   return (
     <span className={`font-mono font-semibold text-sm ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
       {label && <span className="font-sans font-medium">{label}: </span>}
-      ${margin.toFixed(2)}{' '}
+      {formatPrice(margin)}{' '}
       <span className="text-xs font-normal">({marginPct.toFixed(1)}%)</span>
     </span>
   );

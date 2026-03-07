@@ -5,13 +5,8 @@ import { useQuery } from '@tanstack/react-query';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { usePOSCart } from '../../hooks/usePOSCart';
 import type { Product } from '@/features/catalog/types/catalog.types';
-
-function normalize(str: string) {
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
+import { normalize } from '@/utils/normalize';
+import { formatPrice } from '@/utils/formatPrice';
 
 async function fetchProducts(): Promise<Product[]> {
   const res = await fetch('/api/products?includeInactive=false&includeStock=true');
@@ -163,7 +158,7 @@ export function POSView() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs text-gray-500">{itemCount} {itemCount === 1 ? 'producto' : 'productos'}</p>
-            <p className="text-2xl font-bold text-gray-800">${total.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-gray-800">{formatPrice(total)}</p>
           </div>
           <button
             onClick={handleCreateOrder}
