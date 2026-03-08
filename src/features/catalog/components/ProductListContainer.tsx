@@ -9,7 +9,7 @@ import { ProductList } from './ProductList';
 import { WhatsAppButton } from './WhatsAppButton';
 import { ConfirmationModal } from './ConfirmationModal';
 import { InfoBanner } from './InfoBanner';
-import { useProducts } from '../hooks/useProducts';
+import { useProducts } from '@/hooks/useProducts';
 import { orderService } from '@/features/admin/services/orderService';
 import { normalize } from '@/utils/normalize';
 
@@ -17,10 +17,10 @@ import { normalize } from '@/utils/normalize';
  * Contenedor que maneja toda la lógica del carrito y la interfaz de usuario
  */
 export function ProductListContainer() {
-	const { products, isLoading, refetch } = useProducts();
+	const { data: products = [], isLoading, refetch } = useProducts();
 
-	// Filtrar productos activos (sin search)
-	const activeProductsAll: Product[] = products.filter((product) => product.active);
+	// API ya filtra solo activos cuando includeInactive no está presente
+	const activeProductsAll: Product[] = products;
 
 	// Search + debounce
 	const [search, setSearch] = useState('');

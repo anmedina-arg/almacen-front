@@ -6,7 +6,7 @@ import { computeMargin, MarginDisplay } from './MarginDisplay';
 import { useRemoveOrderItem } from '../../hooks/useRemoveOrderItem';
 import { useUpdateOrderItem } from '../../hooks/useUpdateOrderItem';
 import { useAddOrderItem } from '../../hooks/useAddOrderItem';
-import { useAdminProducts } from '../../hooks/useAdminProducts';
+import { useProducts } from '@/hooks/useProducts';
 import { formatPrice } from '@/utils/formatPrice';
 
 interface OrderItemsEditorProps {
@@ -23,7 +23,7 @@ export function OrderItemsEditor({
   const removeItem = useRemoveOrderItem();
   const updateItem = useUpdateOrderItem();
   const addItem = useAddOrderItem();
-  const { data: products } = useAdminProducts();
+  const { data: products } = useProducts({ includeInactive: true });
 
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [editQuantity, setEditQuantity] = useState<string>('');

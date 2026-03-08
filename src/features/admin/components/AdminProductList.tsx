@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useAdminProducts } from '../hooks/useAdminProducts';
+import { useProducts } from '@/hooks/useProducts';
 import { useToggleProductActive } from '../hooks/useToggleProductActive';
 import { useDeleteProduct } from '../hooks/useDeleteProduct';
 import { CATEGORY_LABELS } from '../constants';
@@ -14,7 +14,7 @@ import type { Product } from '@/types';
 import { formatPrice } from '@/utils/formatPrice';
 
 export function AdminProductList() {
-  const { data: products, isLoading, error } = useAdminProducts();
+  const { data: products, isLoading, error } = useProducts({ includeInactive: true });
   const toggleMutation = useToggleProductActive();
   const deleteMutation = useDeleteProduct();
 

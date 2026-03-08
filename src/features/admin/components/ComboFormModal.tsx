@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
-import { useAdminProducts } from '../hooks/useAdminProducts';
+import { useProducts } from '@/hooks/useProducts';
 import { useComboComponents } from '../hooks/useComboComponents';
 import { useUpdateComboComponents } from '../hooks/useUpdateComboComponents';
 import { useCloudinaryUpload } from '../hooks/useCloudinaryUpload';
@@ -23,7 +23,7 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
   const createMutation = useCreateProduct();
   const updateProductMutation = useUpdateProduct();
   const updateComponentsMutation = useUpdateComboComponents();
-  const { data: allProducts = [] } = useAdminProducts();
+  const { data: allProducts = [] } = useProducts({ includeInactive: true });
   const { data: existingComponents = [] } = useComboComponents(
     mode === 'edit' && product ? product.id : null
   );

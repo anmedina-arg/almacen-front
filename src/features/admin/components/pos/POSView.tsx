@@ -1,19 +1,11 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { ProductCard } from '@/features/catalog/components/ProductCard';
 import { usePOSCart } from '../../hooks/usePOSCart';
-import type { Product } from '@/features/catalog/types/catalog.types';
 import { normalize } from '@/utils/normalize';
 import { formatPrice } from '@/utils/formatPrice';
-
-async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch('/api/products?includeInactive=false&includeStock=true');
-  if (!res.ok) throw new Error('Error al cargar productos');
-  const data = await res.json();
-  return Array.isArray(data) ? data : [];
-}
+import { useProducts } from '@/hooks/useProducts';
 
 export function POSView() {
   const [search, setSearch] = useState('');
@@ -22,11 +14,7 @@ export function POSView() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const { data: products = [], isLoading } = useQuery<Product[]>({
-    queryKey: ['pos-products'],
-    queryFn: fetchProducts,
-    staleTime: 1000 * 60 * 2,
-  });
+  const { data: products = [], isLoading } = useProducts();
 
   const { add, remove, getQty, entries, total, itemCount, clear } = usePOSCart();
 
