@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Image from 'next/image';
 import type { ProductWithOptionalDescription } from '@/types';
 import { getWeightType } from '@/utils/productUtils';
@@ -12,7 +13,7 @@ export interface ProductCardProps {
   onRemove: (id: number) => void;
 }
 
-export function ProductCard({
+function ProductCardBase({
   product,
   quantity,
   onAdd,
@@ -117,5 +118,8 @@ export function ProductCard({
     </div>
   );
 }
+
+export const ProductCard = memo(ProductCardBase);
+ProductCard.displayName = 'ProductCard';
 
 export default ProductCard;

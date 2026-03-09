@@ -44,7 +44,7 @@ export function ProductListContainer() {
 		return Array.from(new Set(cats)).filter(Boolean);
 	}, [activeProducts]);
 
-	const { state, addToCart, removeFromCart, clearCart, getItemQuantity } = useCart();
+	const { state, addToCart, removeFromCart, clearCart } = useCart();
 	const [showConfirmation, setShowConfirmation] = useState(false);
 
 	// Memoizar el mensaje de WhatsApp
@@ -123,12 +123,11 @@ export function ProductListContainer() {
 		if (product) removeFromCart(product);
 	}, [removeFromCart, productsById]);
 
-	const productsWithQuantity = useMemo(() => {
-		return activeProducts.map(product => ({
-			...product,
-			quantity: getItemQuantity(product.id),
-		}));
-	}, [activeProducts, getItemQuantity]);
+	// Map estable: solo cambia cuando el carrito cambia, no mezcla datos del catálogo
+	const cartQuantities = useMemo(
+		() => new Map(state.items.map(item => [item.id, item.quantity])),
+		[state.items]
+	);
 
 	if (isLoading) {
 		return (
@@ -164,7 +163,8 @@ export function ProductListContainer() {
 				</div>
 			) : (
 				<ProductList
-					products={productsWithQuantity}
+					products={activeProducts}
+					cartQuantities={cartQuantities}
 					onAdd={onAdd}
 					onRemove={onRemove}
 					mainCategories={displayCategories}
