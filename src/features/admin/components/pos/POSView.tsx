@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { ProductCard } from '@/features/catalog/components/ProductCard';
+import { ProductCard } from '@/components/ProductCard';
 import { usePOSCart } from '../../hooks/usePOSCart';
 import { normalize } from '@/utils/normalize';
 import { formatPrice } from '@/utils/formatPrice';

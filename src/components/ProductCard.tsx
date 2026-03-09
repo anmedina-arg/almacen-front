@@ -2,10 +2,17 @@
 
 import { memo, useState } from 'react';
 import Image from 'next/image';
-import type { ProductCardProps } from '../types';
-import { getWeightType } from '../utils/productUtils';
+import type { ProductWithOptionalDescription } from '@/types';
+import { getWeightType } from '@/utils/productUtils';
 import { QuantityButton } from '@/components/ui/QuantityButton';
 import { formatQuantity } from '@/utils/formatQuantity';
+
+export interface ProductCardProps {
+  product: ProductWithOptionalDescription;
+  quantity: number;
+  onAdd: (id: number) => void;
+  onRemove: (id: number) => void;
+}
 
 function ProductCardBase({
 	product,

@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import type { Product } from '../types';
-import { ProductCard } from './ProductCard';
+import { ProductCard } from '@/components/ProductCard';
 import { ProductSquareCard } from './ProductSquareCard';
 
 interface ProductWithQuantity extends Product {

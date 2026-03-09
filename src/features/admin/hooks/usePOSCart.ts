@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import type { Product } from '@/features/catalog/types/catalog.types';
+import type { Product } from '@/types';
+import { getQuantityPerClick } from '@/utils/productUtils';
 
 interface POSCartEntry {
   product: Product;
@@ -8,6 +9,14 @@ interface POSCartEntry {
 
 type POSCart = Record<number, POSCartEntry>;
 
+function computeItemTotal(product: Product, qty: number): number {
+  switch (product.sale_type) {
+    case '100gr': return (qty / 100) * product.price;
+    case 'kg':    return (qty / 1000) * product.price;
+    default:      return qty * product.price;
+  }
+}
+
 export function usePOSCart() {
   const [cart, setCart] = useState<POSCart>({});
 
@@ -15,6 +24,7 @@ export function usePOSCart() {
     setCart((prev) => {
       const current = prev[product.id];
       const currentQty = current?.qty ?? 0;
+      const delta = getQuantityPerClick(product);
 
       // Respect stock limit
       const stockLimit = product.stock_quantity;
@@ -24,7 +34,7 @@ export function usePOSCart() {
 
       return {
         ...prev,
-        [product.id]: { product, qty: currentQty + 1 },
+        [product.id]: { product, qty: currentQty + delta },
       };
     });
   }, []);
@@ -33,12 +43,14 @@ export function usePOSCart() {
     setCart((prev) => {
       const current = prev[productId];
       if (!current || current.qty <= 0) return prev;
-      if (current.qty === 1) {
+      const delta = getQuantityPerClick(current.product);
+      const nextQty = current.qty - delta;
+      if (nextQty <= 0) {
         const next = { ...prev };
         delete next[productId];
         return next;
       }
-      return { ...prev, [productId]: { ...current, qty: current.qty - 1 } };
+      return { ...prev, [productId]: { ...current, qty: nextQty } };
     });
   }, []);
 
@@ -49,14 +61,12 @@ export function usePOSCart() {
   const entries = useMemo(() => Object.values(cart), [cart]);
 
   const total = useMemo(
-    () => entries.reduce((sum, { product, qty }) => sum + product.price * qty, 0),
+    () => entries.reduce((sum, { product, qty }) => sum + computeItemTotal(product, qty), 0),
     [entries]
   );
 
-  const itemCount = useMemo(
-    () => entries.reduce((sum, { qty }) => sum + qty, 0),
-    [entries]
-  );
+  // Number of distinct product lines in the cart
+  const itemCount = useMemo(() => entries.length, [entries]);
 
   return { cart, entries, add, remove, clear, getQty, total, itemCount };
 }
