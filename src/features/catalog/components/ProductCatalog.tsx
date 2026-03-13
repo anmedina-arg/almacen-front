@@ -13,14 +13,15 @@ import { InfoBanner } from './InfoBanner';
 
 interface ProductCatalogProps {
   initialProducts: Product[];
+  orderedCategories: string[];
 }
 
-export function ProductCatalog({ initialProducts }: ProductCatalogProps) {
+export function ProductCatalog({ initialProducts, orderedCategories }: ProductCatalogProps) {
   const { data: products = initialProducts } = useProducts({ initialData: initialProducts });
   const { state, addToCart, removeFromCart, clearCart } = useCart();
 
   const { search, setSearch, filteredProducts, displayCategories, debouncedSearch } =
-    useProductSearch(products);
+    useProductSearch(products, orderedCategories);
 
   const { showConfirmation, whatsAppMessage, handleSendMessage, handleConfirmOrder, handleCancelOrder } =
     useOrderSubmit(state.items);

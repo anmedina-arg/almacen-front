@@ -2,6 +2,7 @@ export interface Category {
   id: number;
   name: string;
   image_url?: string | null;
+  sort_order: number;
   created_at: string;
   updated_at: string;
 }
@@ -10,6 +11,7 @@ export interface Subcategory {
   id: number;
   name: string;
   category_id: number;
+  sort_order: number;
   created_at: string;
   updated_at: string;
 }
