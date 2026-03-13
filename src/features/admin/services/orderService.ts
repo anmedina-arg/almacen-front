@@ -22,6 +22,9 @@ export const orderService = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
+      // keepalive: ensures the request completes even if iOS backgrounds Safari
+      // right after the user taps "Confirm" and switches to WhatsApp.
+      keepalive: true,
     });
     if (!res.ok) {
       const body = await res.json();
