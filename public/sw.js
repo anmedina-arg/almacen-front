@@ -1,12 +1,12 @@
 const CACHE_NAME = 'market-cevil-v7';
 const RUNTIME_CACHE = 'market-cevil-runtime-v7';
 
-// Assets to cache on install.
+// Static assets that never change: precache on install.
+// NOTE: Do NOT add HTML pages here — pages are SSR and must be fetched fresh
+// every time so that prices and stock are always up to date.
 // NOTE: Do NOT add /_next/static/ here — Next.js JS/CSS chunks already have
 // content-hash filenames and are optimally handled by the browser HTTP cache.
-// Caching them in the SW causes stale-code issues on iOS.
 const PRECACHE_URLS = [
-  '/',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
@@ -74,7 +74,25 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // For everything else (pages, icons, manifest): cache-first
+  // HTML navigation requests (pages): network-first.
+  // SSR pages contain prices and stock — must always be fresh.
+  // Fall back to cache only when offline.
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).then((response) => {
+        // Optionally cache for offline fallback
+        if (response.status === 200) {
+          caches.open(RUNTIME_CACHE).then((cache) => cache.put(event.request, response.clone()));
+        }
+        return response;
+      }).catch(() => {
+        return caches.match(event.request).then((cached) => cached || caches.match('/'));
+      })
+    );
+    return;
+  }
+
+  // Static assets (icons, manifest, fonts, images): cache-first
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
