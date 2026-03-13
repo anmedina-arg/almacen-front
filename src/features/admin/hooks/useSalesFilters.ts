@@ -5,8 +5,13 @@ import type { Order } from '../types/order.types';
 
 export type QuickFilter = 'today' | 'week' | 'month' | 'all' | 'custom';
 
+// Use local time methods — Supabase timestamps are UTC but formatAdminDate
+// already converts to local time, so filters must use the same reference.
 function toDateString(d: Date): string {
-  return d.toISOString().slice(0, 10); // YYYY-MM-DD
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function getQuickRange(preset: QuickFilter): { from: string; to: string } {
@@ -60,7 +65,8 @@ export function useSalesFilters(orders: Order[] | undefined) {
     if (quickFilter === 'all') return orders;
 
     return orders.filter((order) => {
-      const orderDate = order.created_at.slice(0, 10); // YYYY-MM-DD
+      // Convert to local date string so it matches what formatAdminDate displays
+      const orderDate = toDateString(new Date(order.created_at));
       if (dateFrom && orderDate < dateFrom) return false;
       if (dateTo && orderDate > dateTo) return false;
       return true;
