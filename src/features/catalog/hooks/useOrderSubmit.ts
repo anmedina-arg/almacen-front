@@ -22,25 +22,34 @@ export function useOrderSubmit(cartItems: CartItem[]) {
   };
 
   const handleConfirmOrder = (clearCart: () => void) => {
-    // CRITICAL for iOS Safari: Open WhatsApp FIRST (synchronously), then create order in background.
-    openWhatsApp(whatsAppMessage);
+    // Snapshot order data before any state changes.
+    const items = cartItems.map((item) => ({
+      product_id: item.id,
+      product_name: item.name,
+      quantity: item.quantity,
+      unit_price: item.quantity > 0
+        ? calculateItemPrice(item) / item.quantity
+        : item.unitPrice,
+      is_by_weight: item.isByWeight,
+    }));
+    const message = whatsAppMessage;
+
+    // Start the fetch BEFORE opening WhatsApp so the request is already
+    // in-flight when iOS switches apps. Combined with keepalive:true in the
+    // service, this survives Safari being backgrounded immediately after.
+    const orderPromise = orderService.createOrder({
+      whatsapp_message: message,
+      items,
+    });
+
+    // CRITICAL for iOS Safari: must be synchronous from the user gesture —
+    // calling window.open after an await would trigger the popup blocker.
+    openWhatsApp(message);
 
     setShowConfirmation(false);
     clearCart();
 
-    orderService
-      .createOrder({
-        whatsapp_message: whatsAppMessage,
-        items: cartItems.map((item) => ({
-          product_id: item.id,
-          product_name: item.name,
-          quantity: item.quantity,
-          unit_price: item.quantity > 0
-            ? calculateItemPrice(item) / item.quantity
-            : item.unitPrice,
-          is_by_weight: item.isByWeight,
-        })),
-      })
+    orderPromise
       .then(() => {
         router.refresh();
       })
