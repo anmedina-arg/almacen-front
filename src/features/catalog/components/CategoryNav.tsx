@@ -1,15 +1,8 @@
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { fetchCategoriesWithSubs } from '../services/fetchCategoriesWithSubs';
 import { FilterButtons } from './FilterButtons';
-import type { CategoryWithSubsPublic } from '../types/category.types';
 
 export default async function CategoryNav() {
-  const supabase = await createSupabaseServerClient();
-  const { data } = await supabase
-    .from('categories')
-    .select('id, name, image_url, subcategories(id, name)')
-    .order('name', { ascending: true });
-
-  const categories: CategoryWithSubsPublic[] = (data as CategoryWithSubsPublic[]) ?? [];
+  const categories = await fetchCategoriesWithSubs();
 
   return (
     <div className="p-1 mt-0 sticky top-9 z-50 bg-white/80 backdrop-blur-md transition-all duration-300">

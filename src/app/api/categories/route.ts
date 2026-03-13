@@ -17,11 +17,11 @@ export async function GET(request: NextRequest) {
 
     let query = supabase.from('categories').select(
       includeSubcategories
-        ? 'id, name, image_url, created_at, updated_at, subcategories(id, name, category_id, created_at, updated_at)'
-        : 'id, name, image_url, created_at, updated_at'
+        ? 'id, name, image_url, sort_order, created_at, updated_at, subcategories(id, name, category_id, sort_order, created_at, updated_at)'
+        : 'id, name, image_url, sort_order, created_at, updated_at'
     );
 
-    query = query.order('name', { ascending: true });
+    query = query.order('sort_order', { ascending: true });
 
     const { data, error } = await query;
 
@@ -58,9 +58,19 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = await createSupabaseServerClient();
+
+    // Assign sort_order = MAX(sort_order) + 1 so new categories appear at the end.
+    const { data: maxRow } = await supabase
+      .from('categories')
+      .select('sort_order')
+      .order('sort_order', { ascending: false })
+      .limit(1)
+      .single();
+    const nextSortOrder = (maxRow?.sort_order ?? 0) + 1;
+
     const { data, error } = await supabase
       .from('categories')
-      .insert({ name: parsed.data.name, image_url: parsed.data.image_url ?? null })
+      .insert({ name: parsed.data.name, image_url: parsed.data.image_url ?? null, sort_order: nextSortOrder })
       .select()
       .single();
 

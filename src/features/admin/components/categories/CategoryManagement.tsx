@@ -6,6 +6,8 @@ import { useDeleteCategory } from '../../hooks/useDeleteCategory';
 import { useCreateSubcategory } from '../../hooks/useCreateSubcategory';
 import { useUpdateSubcategory } from '../../hooks/useUpdateSubcategory';
 import { useDeleteSubcategory } from '../../hooks/useDeleteSubcategory';
+import { useReorderCategories } from '../../hooks/useReorderCategories';
+import { useReorderSubcategories } from '../../hooks/useReorderSubcategories';
 import { CategoryFormModal } from './CategoryFormModal';
 import { DeleteConfirmationModal } from '../DeleteConfirmationModal';
 import { Spinner } from '@/components/ui/Spinner';
@@ -20,6 +22,8 @@ export function CategoryManagement() {
   const createSubMutation = useCreateSubcategory();
   const updateSubMutation = useUpdateSubcategory();
   const deleteSubMutation = useDeleteSubcategory();
+  const reorderCategoriesMutation = useReorderCategories();
+  const reorderSubcategoriesMutation = useReorderSubcategories();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -116,6 +120,26 @@ export function CategoryManagement() {
     );
   };
 
+  const handleMoveCategory = (index: number, direction: 'up' | 'down') => {
+    const sorted = [...(categories ?? [])].sort((a, b) => a.sort_order - b.sort_order);
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= sorted.length) return;
+    const newOrder = sorted.map((c) => c.id);
+    [newOrder[index], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[index]];
+    reorderCategoriesMutation.mutate(newOrder);
+  };
+
+  const handleMoveSubcategory = (categoryId: number, subIndex: number, direction: 'up' | 'down') => {
+    const category = (categories ?? []).find((c) => c.id === categoryId);
+    if (!category) return;
+    const sorted = [...category.subcategories].sort((a, b) => a.sort_order - b.sort_order);
+    const targetIndex = direction === 'up' ? subIndex - 1 : subIndex + 1;
+    if (targetIndex < 0 || targetIndex >= sorted.length) return;
+    const newOrder = sorted.map((s) => s.id);
+    [newOrder[subIndex], newOrder[targetIndex]] = [newOrder[targetIndex], newOrder[subIndex]];
+    reorderSubcategoriesMutation.mutate({ categoryId, orderedIds: newOrder });
+  };
+
   // --- Render ---
   return (
     <div className="space-y-4">
@@ -167,7 +191,7 @@ export function CategoryManagement() {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((category) => (
+                {filtered.map((category, catIndex) => (
                   <Fragment key={category.id}>
                     {/* Fila de categoría */}
                     <tr className="border-t-2 border-gray-200 bg-gray-50">
@@ -179,6 +203,22 @@ export function CategoryManagement() {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-center gap-2">
+                          <button
+                            onClick={() => handleMoveCategory(catIndex, 'up')}
+                            disabled={catIndex === 0 || reorderCategoriesMutation.isPending}
+                            title="Mover arriba"
+                            className="px-2 py-1.5 border border-gray-300 text-gray-600 rounded-md hover:bg-gray-100 transition-colors text-xs disabled:opacity-30"
+                          >
+                            ↑
+                          </button>
+                          <button
+                            onClick={() => handleMoveCategory(catIndex, 'down')}
+                            disabled={catIndex === filtered.length - 1 || reorderCategoriesMutation.isPending}
+                            title="Mover abajo"
+                            className="px-2 py-1.5 border border-gray-300 text-gray-600 rounded-md hover:bg-gray-100 transition-colors text-xs disabled:opacity-30"
+                          >
+                            ↓
+                          </button>
                           <button
                             onClick={() => setEditingCategory(category)}
                             className="px-3 py-1.5 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-xs font-medium"
@@ -196,7 +236,9 @@ export function CategoryManagement() {
                     </tr>
 
                     {/* Filas de subcategorías */}
-                    {category.subcategories.map((sub) => (
+                    {[...category.subcategories]
+                      .sort((a, b) => a.sort_order - b.sort_order)
+                      .map((sub, subIndex, sortedSubs) => (
                       <tr key={`sub-${sub.id}`} className="border-b border-gray-100 bg-white hover:bg-gray-50">
                         <td className="py-2 px-4">
                           <div className="flex items-center gap-2 pl-6">
@@ -255,6 +297,22 @@ export function CategoryManagement() {
                               </>
                             ) : (
                               <>
+                                <button
+                                  onClick={() => handleMoveSubcategory(category.id, subIndex, 'up')}
+                                  disabled={subIndex === 0 || reorderSubcategoriesMutation.isPending}
+                                  title="Mover arriba"
+                                  className="px-1.5 py-1 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50 disabled:opacity-30"
+                                >
+                                  ↑
+                                </button>
+                                <button
+                                  onClick={() => handleMoveSubcategory(category.id, subIndex, 'down')}
+                                  disabled={subIndex === sortedSubs.length - 1 || reorderSubcategoriesMutation.isPending}
+                                  title="Mover abajo"
+                                  className="px-1.5 py-1 border border-gray-200 text-gray-500 rounded text-xs hover:bg-gray-50 disabled:opacity-30"
+                                >
+                                  ↓
+                                </button>
                                 <button
                                   onClick={() => handleStartEditSub(sub.id, sub.name)}
                                   className="px-2.5 py-1 text-blue-600 border border-blue-200 rounded text-xs hover:bg-blue-50 transition-colors"

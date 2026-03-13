@@ -71,9 +71,20 @@ export async function POST(
     }
 
     const supabase = await createSupabaseServerClient();
+
+    // Assign sort_order = MAX(sort_order within category) + 1 so new subcategories appear last.
+    const { data: maxRow } = await supabase
+      .from('subcategories')
+      .select('sort_order')
+      .eq('category_id', categoryId)
+      .order('sort_order', { ascending: false })
+      .limit(1)
+      .single();
+    const nextSortOrder = (maxRow?.sort_order ?? 0) + 1;
+
     const { data, error } = await supabase
       .from('subcategories')
-      .insert({ name: parsed.data.name, category_id: categoryId })
+      .insert({ name: parsed.data.name, category_id: categoryId, sort_order: nextSortOrder })
       .select()
       .single();
 
