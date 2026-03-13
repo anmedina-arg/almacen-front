@@ -2,9 +2,10 @@
 
 import { memo } from 'react';
 import Image from 'next/image';
-import type { ProductCardProps } from '../types';
-import { getWeightType, formatQuantity } from '../utils/productUtils';
+import type { ProductCardProps } from '@/components/ProductCard';
+import { getWeightType } from '../utils/productUtils';
 import { QuantityButton } from '@/components/ui/QuantityButton';
+import { formatQuantity } from '@/utils/formatQuantity';
 
 function ProductSquareCardBase({
 	product,

@@ -1,24 +1,11 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { ProductCard } from '@/features/catalog/components/ProductCard';
+import { ProductCard } from '@/components/ProductCard';
 import { usePOSCart } from '../../hooks/usePOSCart';
-import type { Product } from '@/features/catalog/types/catalog.types';
-
-function normalize(str: string) {
-  return str
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
-}
-
-async function fetchProducts(): Promise<Product[]> {
-  const res = await fetch('/api/products?includeInactive=false&includeStock=true');
-  if (!res.ok) throw new Error('Error al cargar productos');
-  const data = await res.json();
-  return Array.isArray(data) ? data : [];
-}
+import { normalize } from '@/utils/normalize';
+import { formatPrice } from '@/utils/formatPrice';
+import { useProducts } from '@/hooks/useProducts';
 
 export function POSView() {
   const [search, setSearch] = useState('');
@@ -27,11 +14,7 @@ export function POSView() {
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  const { data: products = [], isLoading } = useQuery<Product[]>({
-    queryKey: ['pos-products'],
-    queryFn: fetchProducts,
-    staleTime: 1000 * 60 * 2,
-  });
+  const { data: products = [], isLoading } = useProducts();
 
   const { add, remove, getQty, entries, total, itemCount, clear } = usePOSCart();
 
@@ -163,7 +146,7 @@ export function POSView() {
         <div className="flex items-center justify-between gap-3">
           <div>
             <p className="text-xs text-gray-500">{itemCount} {itemCount === 1 ? 'producto' : 'productos'}</p>
-            <p className="text-2xl font-bold text-gray-800">${total.toFixed(2)}</p>
+            <p className="text-2xl font-bold text-gray-800">{formatPrice(total)}</p>
           </div>
           <button
             onClick={handleCreateOrder}

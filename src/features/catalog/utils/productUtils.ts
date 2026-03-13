@@ -1,40 +1,7 @@
-import { Product, CartItem, WeightType } from '../types';
+import { Product, CartItem } from '../types';
 
-/**
- * Detecta si un producto se vende por peso
- */
-export const isProductByWeight = (product: Pick<Product, 'sale_type'>): boolean => {
-  return product.sale_type !== 'unit';
-};
-
-/**
- * Obtiene el tipo de producto por peso
- */
-export const getWeightType = (product: Pick<Product, 'sale_type'>): WeightType => {
-  return product.sale_type;
-};
-
-/**
- * Obtiene la cantidad a agregar por click según el tipo de producto.
- * Caso especial: productos "noisette" (tipo kg) usan 1000g por click en lugar de 500g.
- */
-export const getQuantityPerClick = (product: Pick<Product, 'name' | 'sale_type'>): number => {
-  // TODO: reemplazar con columna quantity_per_click en DB cuando se requieran más casos especiales
-  if (product.name.toLowerCase().includes('noisette')) {
-    return 1000; // 1000 gramos por click
-  }
-
-  switch (product.sale_type) {
-    case '100gr':
-      return 100; // 100 gramos por click
-    case 'kg':
-      return 500; // 500 gramos (medio kilo) por click
-    case 'unit':
-      return 1; // 1 unidad por click
-    default:
-      return 1;
-  }
-};
+// Re-exportar desde utils compartida
+export { isProductByWeight, getWeightType, getQuantityPerClick } from '@/utils/productUtils';
 
 /**
  * Obtiene el precio unitario por gramo o unidad
@@ -67,7 +34,7 @@ export const calculateItemPrice = (item: CartItem): number => {
  */
 export const truncateProductName = (
   name: string,
-  maxLength: number
+  maxLength: number,
 ): string => {
   if (name.length <= maxLength) return name;
 
@@ -85,27 +52,4 @@ export const truncateProductName = (
 
   // Si aún es muy largo, truncar
   return cleanName.substring(0, maxLength - 3) + '...';
-};
-
-/**
- * Formatea la cantidad mostrada según el tipo de peso
- */
-export const formatQuantity = (
-  quantity: number,
-  weightType: WeightType
-): string => {
-  switch (weightType) {
-    case 'kg':
-      if (quantity >= 1000) {
-        return `${quantity / 1000}kg`;
-      } else {
-        return `${quantity}gr`;
-      }
-    case '100gr':
-      return `${quantity}gr`;
-    case 'unit':
-      return quantity.toString();
-    default:
-      return quantity.toString();
-  }
 };

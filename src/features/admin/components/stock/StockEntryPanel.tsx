@@ -5,24 +5,16 @@ import Link from 'next/link';
 import type { WeightType } from '@/features/catalog/types';
 import { getQuantityPerClick } from '@/features/catalog/utils/productUtils';
 import { useProductStock } from '../../hooks/useProductStock';
-import { useAdminProducts } from '../../hooks/useAdminProducts';
+import { useProducts } from '@/hooks/useProducts';
 import { useStockEntry } from '../../hooks/useStockEntry';
 import { useBatchIncrementStock } from '../../hooks/useBatchIncrementStock';
 import { StockEntryCard } from './StockEntryCard';
 import type { StockEntryCardProduct } from './StockEntryCard';
-
-const normalize = (s?: string) =>
-  (s ?? '')
-    .toString()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s]/g, '')
-    .trim();
+import { normalize } from '@/utils/normalize';
 
 export function StockEntryPanel() {
   const { data: stockData = [], isLoading: stockLoading } = useProductStock();
-  const { data: productsData = [], isLoading: productsLoading } = useAdminProducts();
+  const { data: productsData = [], isLoading: productsLoading } = useProducts({ includeInactive: true });
   const { entries, addEntry, removeEntry, setNotes, clearAll, getEntryAmount, getEntryNotes } =
     useStockEntry();
   const batchMutation = useBatchIncrementStock();

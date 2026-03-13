@@ -2,15 +2,12 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import type { Product } from '../types';
-import { ProductCard } from './ProductCard';
+import { ProductCard } from '@/components/ProductCard';
 import { ProductSquareCard } from './ProductSquareCard';
 
-interface ProductWithQuantity extends Product {
-	quantity: number;
-}
-
 interface ProductListProps {
-	products: ProductWithQuantity[];
+	products: Product[];
+	cartQuantities: Map<number, number>;
 	onAdd: (id: number) => void;
 	onRemove: (id: number) => void;
 	mainCategories?: string[];
@@ -20,7 +17,7 @@ interface ProductListProps {
 /**
  * Componente de lista de productos
  */
-export function ProductList({ products, mainCategories, searchQuery, onAdd, onRemove }: ProductListProps) {
+export function ProductList({ products, cartQuantities, mainCategories, searchQuery, onAdd, onRemove }: ProductListProps) {
 	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>('list');
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -54,7 +51,7 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 				(p) => (p.category_name ?? String(p.mainCategory)) === displayCat
 			);
 
-			const subMap = new Map<string, ProductWithQuantity[]>();
+			const subMap = new Map<string, Product[]>();
 			catProducts.forEach((p) => {
 				// Sub-agrupación: subcategory_name → categories (texto) → 'General'
 				const subLabel = p.subcategory_name
@@ -161,15 +158,15 @@ export function ProductList({ products, mainCategories, searchQuery, onAdd, onRe
 												<ProductCard
 													key={`${product.id}-${product.name}`}
 													product={product}
-													quantity={product.quantity}
-													onAdd={() => onAdd(product.id)}
-													onRemove={() => onRemove(product.id)}
+													quantity={cartQuantities.get(product.id) ?? 0}
+													onAdd={onAdd}
+													onRemove={onRemove}
 												/>
 											) : (
 												<ProductSquareCard
 													key={`${product.id}-${product.name}`}
 													product={product}
-													quantity={product.quantity}
+													quantity={cartQuantities.get(product.id) ?? 0}
 													onAdd={onAdd}
 													onRemove={onRemove}
 												/>

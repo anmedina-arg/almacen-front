@@ -1,8 +1,10 @@
+import { productKeys } from '@/constants/queryKeys';
+
 export const adminKeys = {
   all: ['admin'] as const,
-  products: () => [...adminKeys.all, 'products'] as const,
-  productsList: () => [...adminKeys.products(), 'list'] as const,
-  productDetail: (id: number) => [...adminKeys.products(), id] as const,
+  products: () => productKeys.all,
+  productsList: () => productKeys.list({ includeInactive: true }),
+  productDetail: (id: number) => productKeys.detail(id),
 
   // Stock query keys
   stock: () => [...adminKeys.all, 'stock'] as const,

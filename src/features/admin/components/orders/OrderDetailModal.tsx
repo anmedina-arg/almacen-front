@@ -10,6 +10,7 @@ import { OrderItemsEditor } from './OrderItemsEditor';
 import { computeMargin, MarginDisplay } from './MarginDisplay';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface OrderDetailModalProps {
   orderId: number;
@@ -115,7 +116,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                       <OrderStatusBadge status={order.status} />
                       <div className="text-right">
                         <p className="text-2xl font-bold text-gray-800">
-                          ${Number(order.total).toFixed(2)}
+                          {formatPrice(order.total)}
                         </p>
                         <p className="text-sm mt-0.5">
                           <MarginDisplay label="Margen" margin={margin} marginPct={marginPct} />

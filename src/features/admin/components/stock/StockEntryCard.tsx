@@ -3,10 +3,10 @@
 import { memo } from 'react';
 import Image from 'next/image';
 import type { WeightType } from '@/features/catalog/types';
-import { formatQuantity, getQuantityPerClick } from '@/features/catalog/utils/productUtils';
+import { getQuantityPerClick } from '@/features/catalog/utils/productUtils';
 import { QuantityButton } from '@/components/ui/QuantityButton';
 import type { ProductStockView } from '../../types/stock.types';
-
+import { formatQuantity } from '@/utils/formatQuantity';
 export interface StockEntryCardProduct extends ProductStockView {
   sale_type: WeightType;
 }

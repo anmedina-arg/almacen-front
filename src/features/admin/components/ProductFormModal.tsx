@@ -9,6 +9,7 @@ import { productCreateSchema } from '../schemas/productCreateSchema';
 import { ImageUploadField } from './ImageUploadField';
 import type { Product } from '@/types';
 import type { ProductCreateInput } from '../schemas/productCreateSchema';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface ProductFormModalProps {
   mode: 'create' | 'edit';
@@ -184,7 +185,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
               const margin = formData.price - (formData.cost ?? 0);
               return (
                 <p className={`mt-1 text-sm font-medium ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                  Margen: ${margin.toFixed(2)}
+                  Margen: {formatPrice(margin)}
                 </p>
               );
             })()}

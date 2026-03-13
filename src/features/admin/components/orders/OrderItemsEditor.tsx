@@ -6,7 +6,8 @@ import { computeMargin, MarginDisplay } from './MarginDisplay';
 import { useRemoveOrderItem } from '../../hooks/useRemoveOrderItem';
 import { useUpdateOrderItem } from '../../hooks/useUpdateOrderItem';
 import { useAddOrderItem } from '../../hooks/useAddOrderItem';
-import { useAdminProducts } from '../../hooks/useAdminProducts';
+import { useProducts } from '@/hooks/useProducts';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface OrderItemsEditorProps {
   orderId: number;
@@ -22,7 +23,7 @@ export function OrderItemsEditor({
   const removeItem = useRemoveOrderItem();
   const updateItem = useUpdateOrderItem();
   const addItem = useAddOrderItem();
-  const { data: products } = useAdminProducts();
+  const { data: products } = useProducts({ includeInactive: true });
 
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [editQuantity, setEditQuantity] = useState<string>('');
@@ -212,7 +213,7 @@ export function OrderItemsEditor({
                     {item.product_name}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {item.quantity} x ${Number(item.unit_price).toFixed(2)}
+                    {item.quantity} x {formatPrice(item.unit_price)}
                   </p>
                   {(() => {
                     const { margin, marginPct } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.subtotal));
@@ -224,7 +225,7 @@ export function OrderItemsEditor({
                   })()}
                 </div>
                 <div className="text-sm font-semibold text-gray-800 whitespace-nowrap">
-                  ${Number(item.subtotal).toFixed(2)}
+                  {formatPrice(item.subtotal)}
                 </div>
                 {isPending && (
                   <div className="flex gap-1">

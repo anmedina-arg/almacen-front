@@ -6,6 +6,7 @@ import { useDeleteProduct } from '../hooks/useDeleteProduct';
 import { useToggleProductActive } from '../hooks/useToggleProductActive';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import type { Product } from '@/types';
+import { formatPrice } from '@/utils/formatPrice';
 
 interface AdminProductCardProps {
   product: Product;
@@ -61,7 +62,7 @@ export function AdminProductCard({ product, onEdit }: AdminProductCardProps) {
             <h3 className="font-semibold text-gray-800 truncate" title={product.name}>
               {product.name}
             </h3>
-            <p className="text-lg font-bold text-green-600">${product.price.toFixed(2)}</p>
+            <p className="text-lg font-bold text-green-600">{formatPrice(product.price)}</p>
             <p className="text-xs text-gray-500 mt-1">{product.mainCategory}</p>
           </div>
 
@@ -77,17 +78,16 @@ export function AdminProductCard({ product, onEdit }: AdminProductCardProps) {
             <button
               onClick={handleToggle}
               disabled={toggleMutation.isPending}
-              className={`px-3 py-2 rounded-md transition-colors text-sm font-medium disabled:opacity-50 ${
-                product.active
+              className={`px-3 py-2 rounded-md transition-colors text-sm font-medium disabled:opacity-50 ${product.active
                   ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
                   : 'bg-green-600 hover:bg-green-700 text-white'
-              }`}
+                }`}
             >
               {toggleMutation.isPending
                 ? '...'
                 : product.active
-                ? 'Desactivar'
-                : 'Activar'}
+                  ? 'Desactivar'
+                  : 'Activar'}
             </button>
           </div>
 

@@ -10,6 +10,7 @@ import { StockHistoryModal } from './StockHistoryModal';
 import { CATEGORY_LABELS } from '../../constants';
 import { Spinner } from '@/components/ui/Spinner';
 import type { ProductStockView, StockFilters } from '../../types/stock.types';
+import { formatPrice } from '@/utils/formatPrice';
 
 /**
  * Componente principal de gestion de stock.
@@ -127,11 +128,10 @@ export function StockManagement() {
                   stockFilter: prev.stockFilter === 'low_stock' ? 'all' : 'low_stock',
                 }))
               }
-              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                filters.stockFilter === 'low_stock'
+              className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${filters.stockFilter === 'low_stock'
                   ? 'bg-red-600 text-white hover:bg-red-700'
                   : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'
-              }`}
+                }`}
             >
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-200 text-red-800 text-xs font-bold">
                 {lowStockCount}
@@ -208,9 +208,8 @@ export function StockManagement() {
                 {filteredData.map((product) => (
                   <tr
                     key={product.product_id}
-                    className={`border-b border-gray-100 hover:bg-gray-50 ${
-                      product.is_low_stock ? 'bg-red-50/50' : ''
-                    } ${!product.product_active ? 'opacity-60' : ''}`}
+                    className={`border-b border-gray-100 hover:bg-gray-50 ${product.is_low_stock ? 'bg-red-50/50' : ''
+                      } ${!product.product_active ? 'opacity-60' : ''}`}
                   >
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
@@ -237,7 +236,7 @@ export function StockManagement() {
                       {CATEGORY_LABELS[product.main_category] || product.main_category}
                     </td>
                     <td className="py-3 px-4 text-right font-mono text-gray-700">
-                      ${Number(product.product_price).toFixed(2)}
+                      {formatPrice(product.product_price)}
                     </td>
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-800">
                       {product.quantity !== null ? Number(product.quantity) : '-'}
@@ -289,9 +288,8 @@ export function StockManagement() {
             {filteredData.map((product) => (
               <div
                 key={product.product_id}
-                className={`bg-white rounded-lg shadow-md border border-gray-200 p-4 space-y-3 ${
-                  product.is_low_stock ? 'border-red-200 bg-red-50/30' : ''
-                } ${!product.product_active ? 'opacity-60' : ''}`}
+                className={`bg-white rounded-lg shadow-md border border-gray-200 p-4 space-y-3 ${product.is_low_stock ? 'border-red-200 bg-red-50/30' : ''
+                  } ${!product.product_active ? 'opacity-60' : ''}`}
               >
                 {/* Product info */}
                 <div className="flex items-center gap-3">
@@ -314,7 +312,7 @@ export function StockManagement() {
                       </span>
                       <span className="text-xs text-gray-400">|</span>
                       <span className="text-xs font-medium text-green-600">
-                        ${Number(product.product_price).toFixed(2)}
+                        {formatPrice(product.product_price)}
                       </span>
                     </div>
                   </div>

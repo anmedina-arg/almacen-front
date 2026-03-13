@@ -110,9 +110,12 @@ export async function GET() {
 
     const supabase = await createSupabaseServerClient();
 
+    // Fetch orders with their items in one query (same pattern as GET /api/orders/[orderId]).
+    // Avoids a separate order_items query + Map lookup that can silently return nothing
+    // if the parallel query fails or returns null.
     const { data, error } = await supabase
       .from('orders')
-      .select('*')
+      .select('*, order_items(unit_cost, unit_price, subtotal)')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -120,29 +123,25 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    // Aggregate cost per order to compute margin.
+    // Compute margin per order from nested items.
     // Use subtotal * (unit_cost / unit_price) to correctly handle weight-based
     // products where quantity is stored in raw grams but unit_price/unit_cost
     // are per-100gr — avoids the 100x multiplication error.
-    const { data: costsData } = await supabase
-      .from('order_items')
-      .select('order_id, unit_cost, unit_price, subtotal');
-
-    const costMap = new Map<number, number>();
-    for (const item of costsData ?? []) {
-      const prev = costMap.get(item.order_id) ?? 0;
-      const unitPrice = Number(item.unit_price);
-      const itemCost = unitPrice > 0
-        ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice)
-        : 0;
-      costMap.set(item.order_id, prev + itemCost);
-    }
-
     const ordersWithMargin = (data ?? []).map((order) => {
-      const total_cost = costMap.get(order.id) ?? 0;
-      const margin = Number(order.total) - total_cost;
-      const margin_pct = Number(order.total) > 0 ? (margin / Number(order.total)) * 100 : 0;
-      return { ...order, total_cost, margin, margin_pct };
+      const items: { unit_cost: number; unit_price: number; subtotal: number }[] =
+        (order.order_items as unknown as { unit_cost: number; unit_price: number; subtotal: number }[]) ?? [];
+      const total_cost = items.reduce((acc, item) => {
+        const unitPrice = Number(item.unit_price);
+        const itemCost = unitPrice > 0
+          ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice)
+          : 0;
+        return acc + itemCost;
+      }, 0);
+      const { order_items: _items, ...orderFields } = order;
+      const total = Number(orderFields.total);
+      const margin = total - total_cost;
+      const margin_pct = total > 0 ? (margin / total) * 100 : 0;
+      return { ...orderFields, total_cost, margin, margin_pct };
     });
 
     return NextResponse.json(ordersWithMargin, {

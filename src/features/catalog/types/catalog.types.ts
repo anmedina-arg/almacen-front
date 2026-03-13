@@ -96,13 +96,6 @@ export interface CartContextType {
   getItemQuantity: (productId: number) => number;
 }
 
-// Tipos para las props de componentes
-export interface ProductCardProps {
-  product: ProductWithOptionalDescription;
-  quantity: number;
-  onAdd: (id: number) => void;
-  onRemove: (id: number) => void;
-}
 
 export interface ProductListProps {
   products: Product[];

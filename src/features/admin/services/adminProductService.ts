@@ -1,17 +1,6 @@
 import { Product } from '@/types';
 
 export const adminProductService = {
-  async getAll(): Promise<Product[]> {
-    const res = await fetch('/api/products?includeInactive=true', {
-      cache: 'no-store',
-    });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.error || 'Failed to fetch products');
-    }
-    return res.json();
-  },
-
   async getById(id: number): Promise<Product> {
     const res = await fetch(`/api/products/${id}`, {
       cache: 'no-store',
