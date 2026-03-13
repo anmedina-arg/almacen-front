@@ -1,16 +1,7 @@
 'use client';
 
 import { formatPrice } from "@/utils/formatPrice";
-
-export function computeMargin(
-  unitPrice: number,
-  unitCost: number,
-  subtotal: number
-): { margin: number; marginPct: number } {
-  const marginPct = unitPrice > 0 ? ((unitPrice - unitCost) / unitPrice) * 100 : 0;
-  const margin = subtotal * (marginPct / 100);
-  return { margin, marginPct };
-}
+export { computeMargin } from '../../utils/orderUtils';
 
 interface MarginDisplayProps {
   margin: number;
