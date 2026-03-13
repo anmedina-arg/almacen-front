@@ -26,13 +26,16 @@ function formatComboItem(rawName: string, qty: number, saleType: string): string
 }
 
 /**
- * Fetches active public products with stock and combo items.
+ * Fetches products with stock and combo items.
  * Server-only — do not import from client components.
+ *
+ * @param options.includeInactive - When true, returns all products (active + inactive).
+ *   The caller is responsible for verifying admin access before passing this flag.
  */
-export async function fetchPublicProducts(): Promise<Product[]> {
+export async function fetchPublicProducts(options?: { includeInactive?: boolean }): Promise<Product[]> {
   const supabase = await createSupabaseServerClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('products')
     .select(
       `
@@ -53,8 +56,13 @@ export async function fetchPublicProducts(): Promise<Product[]> {
       sub:subcategories!products_subcategory_id_fkey(id, name)
     `
     )
-    .eq('active', true)
     .order('name', { ascending: true });
+
+  if (!options?.includeInactive) {
+    query = query.eq('active', true);
+  }
+
+  const { data, error } = await query;
 
   if (error || !data) return [];
 
