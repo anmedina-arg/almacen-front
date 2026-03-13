@@ -1,7 +1,10 @@
-const CACHE_NAME = 'market-cevil-v6';
-const RUNTIME_CACHE = 'market-cevil-runtime-v6';
+const CACHE_NAME = 'market-cevil-v7';
+const RUNTIME_CACHE = 'market-cevil-runtime-v7';
 
-// Assets to cache on install
+// Assets to cache on install.
+// NOTE: Do NOT add /_next/static/ here — Next.js JS/CSS chunks already have
+// content-hash filenames and are optimally handled by the browser HTTP cache.
+// Caching them in the SW causes stale-code issues on iOS.
 const PRECACHE_URLS = [
   '/',
   '/manifest.json',
@@ -48,20 +51,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Skip caching for API requests - always fetch from server
+  // Let the browser handle Next.js static chunks — they have content-hash
+  // filenames and are already optimally cached via HTTP Cache-Control headers.
+  // Intercepting them here causes stale-code on iOS and requires manual SW bumps.
+  if (event.request.url.includes('/_next/')) {
+    return;
+  }
+
+  // API requests — always network, never cache
   if (event.request.url.includes('/api/')) {
     event.respondWith(fetch(event.request));
     return;
   }
 
-  // Skip caching for authentication routes - critical for OAuth flow
-  if (event.request.url.includes('/auth/') ||
-      event.request.url.includes('/login') ||
-      event.request.url.includes('/register')) {
+  // Auth routes — always network (critical for OAuth flow)
+  if (
+    event.request.url.includes('/auth/') ||
+    event.request.url.includes('/login') ||
+    event.request.url.includes('/register')
+  ) {
     event.respondWith(fetch(event.request));
     return;
   }
 
+  // For everything else (pages, icons, manifest): cache-first
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -70,13 +83,11 @@ self.addEventListener('fetch', (event) => {
 
       return caches.open(RUNTIME_CACHE).then((cache) => {
         return fetch(event.request).then((response) => {
-          // Cache successful GET requests
           if (event.request.method === 'GET' && response.status === 200) {
             cache.put(event.request, response.clone());
           }
           return response;
         }).catch((error) => {
-          // If offline and no cache, return offline page or error
           console.error('Fetch failed:', error);
           throw error;
         });
