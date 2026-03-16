@@ -2,14 +2,10 @@
 
 import { useState, useRef, useEffect, useMemo } from 'react';
 import type { Product } from '../types';
-import { ProductCard } from '@/components/ProductCard';
-import { ProductSquareCard } from './ProductSquareCard';
+import { CatalogCard } from './CatalogCard';
 
 interface ProductListProps {
 	products: Product[];
-	cartQuantities: Map<number, number>;
-	onAdd: (id: number) => void;
-	onRemove: (id: number) => void;
 	mainCategories?: string[];
 	searchQuery?: string;
 }
@@ -17,7 +13,7 @@ interface ProductListProps {
 /**
  * Componente de lista de productos
  */
-export function ProductList({ products, cartQuantities, mainCategories, searchQuery, onAdd, onRemove }: ProductListProps) {
+export function ProductList({ products, mainCategories, searchQuery }: ProductListProps) {
 	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>('list');
 	const loadMoreRef = useRef<HTMLDivElement | null>(null);
@@ -153,25 +149,13 @@ export function ProductList({ products, cartQuantities, mainCategories, searchQu
 									</div>
 
 									<div className={`${showList === 'list' ? 'flex flex-wrap gap-4' : 'grid grid-cols-2 gap-2'}`}>
-										{sub.products.map((product) =>
-											showList === 'list' ? (
-												<ProductCard
-													key={`${product.id}-${product.name}`}
-													product={product}
-													quantity={cartQuantities.get(product.id) ?? 0}
-													onAdd={onAdd}
-													onRemove={onRemove}
-												/>
-											) : (
-												<ProductSquareCard
-													key={`${product.id}-${product.name}`}
-													product={product}
-													quantity={cartQuantities.get(product.id) ?? 0}
-													onAdd={onAdd}
-													onRemove={onRemove}
-												/>
-											)
-										)}
+										{sub.products.map((product) => (
+											<CatalogCard
+												key={`${product.id}-${product.name}`}
+												product={product}
+												view={showList === 'list' ? 'list' : 'grid'}
+											/>
+										))}
 									</div>
 								</section>
 							);
