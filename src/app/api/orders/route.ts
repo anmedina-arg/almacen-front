@@ -115,7 +115,7 @@ export async function GET() {
     // if the parallel query fails or returns null.
     const { data, error } = await supabase
       .from('orders')
-      .select('*, order_items(unit_cost, unit_price, subtotal)')
+      .select('*, order_items(unit_cost, unit_price, subtotal), clients(id, barrio, manzana_lote, display_code)')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -137,11 +137,11 @@ export async function GET() {
           : 0;
         return acc + itemCost;
       }, 0);
-      const { order_items: _items, ...orderFields } = order;
+      const { order_items: _items, clients: client, ...orderFields } = order;
       const total = Number(orderFields.total);
       const margin = total - total_cost;
       const margin_pct = total > 0 ? (margin / total) * 100 : 0;
-      return { ...orderFields, total_cost, margin, margin_pct };
+      return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null };
     });
 
     return NextResponse.json(ordersWithMargin, {

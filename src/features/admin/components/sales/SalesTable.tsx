@@ -27,6 +27,7 @@ export function SalesTable({ orders }: SalesTableProps) {
           <thead>
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="text-left py-3 px-4 font-semibold text-gray-600">ID</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-600">Cliente</th>
               <th className="text-left py-3 px-4 font-semibold text-gray-600">Fecha</th>
               <th className="text-center py-3 px-4 font-semibold text-gray-600">Estado</th>
               <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>
@@ -38,6 +39,15 @@ export function SalesTable({ orders }: SalesTableProps) {
             {orders.map((order) => (
               <tr key={order.id} className="border-b border-gray-100 hover:bg-gray-50">
                 <td className="py-3 px-4 font-mono font-medium text-gray-800">#{order.id}</td>
+                <td className="py-3 px-4">
+                  {order.client ? (
+                    <span className="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">
+                      {order.client.display_code}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 text-xs">—</span>
+                  )}
+                </td>
                 <td className="py-3 px-4 text-gray-600">{formatAdminDate(order.created_at)}</td>
                 <td className="py-3 px-4 text-center">
                   <OrderStatusBadge status={order.status} />
@@ -69,7 +79,14 @@ export function SalesTable({ orders }: SalesTableProps) {
             className="bg-white rounded-lg shadow-md border border-gray-200 p-4 space-y-2"
           >
             <div className="flex items-center justify-between">
-              <span className="font-mono font-bold text-gray-800">Pedido #{order.id}</span>
+              <div className="font-mono font-bold text-gray-800">
+                <span>Pedido #{order.id}</span>
+                {order.client && (
+                  <span className="ml-1.5 text-indigo-600 font-semibold text-sm">
+                    · {order.client.display_code}
+                  </span>
+                )}
+              </div>
               <OrderStatusBadge status={order.status} />
             </div>
             <p className="text-xs text-gray-500">{formatAdminDate(order.created_at)}</p>
