@@ -6,6 +6,7 @@ import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import { MarginDisplay } from './MarginDisplay';
 import { ClientAssignCell } from './ClientAssignCell';
+import { PaymentCell } from './PaymentCell';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
@@ -180,6 +181,9 @@ export function OrdersTable() {
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">
                     Cliente
                   </th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-600">
+                    Pago
+                  </th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">
                     Estado
                   </th>
@@ -219,6 +223,13 @@ export function OrdersTable() {
                     </td>
                     <td className="py-3 px-4">
                       <ClientAssignCell orderId={order.id} client={order.client} />
+                    </td>
+                    <td className="py-3 px-4">
+                      <PaymentCell
+                        orderId={order.id}
+                        orderTotal={order.total}
+                        payments={order.order_payments ?? []}
+                      />
                     </td>
                     <td className="py-3 px-4 text-center">
                       <OrderStatusBadge status={order.status} />
@@ -261,6 +272,13 @@ export function OrdersTable() {
                 </div>
                 <div onClick={(e) => e.stopPropagation()}>
                   <ClientAssignCell orderId={order.id} client={order.client} />
+                </div>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <PaymentCell
+                    orderId={order.id}
+                    orderTotal={order.total}
+                    payments={order.order_payments ?? []}
+                  />
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">

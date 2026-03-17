@@ -28,4 +28,8 @@ export const adminKeys = {
   // Clients query keys
   clients: () => [...adminKeys.all, 'clients'] as const,
   clientsList: () => [...adminKeys.clients(), 'list'] as const,
+
+  // Payments query keys
+  payments: () => [...adminKeys.all, 'payments'] as const,
+  orderPayments: (orderId: number) => [...adminKeys.payments(), orderId] as const,
 };

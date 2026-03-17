@@ -3,6 +3,7 @@
 import type { Order } from '../../types/order.types';
 import { OrderStatusBadge } from '../orders/OrderStatusBadge';
 import { MarginDisplay } from '../orders/MarginDisplay';
+import { PAYMENT_EMOJI } from '../../types/payment.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { formatPrice } from '@/utils/formatPrice';
 
@@ -28,6 +29,7 @@ export function SalesTable({ orders }: SalesTableProps) {
             <tr className="border-b border-gray-200 bg-gray-50">
               <th className="text-left py-3 px-4 font-semibold text-gray-600">ID</th>
               <th className="text-left py-3 px-4 font-semibold text-gray-600">Cliente</th>
+              <th className="text-left py-3 px-4 font-semibold text-gray-600">Pago</th>
               <th className="text-left py-3 px-4 font-semibold text-gray-600">Fecha</th>
               <th className="text-center py-3 px-4 font-semibold text-gray-600">Estado</th>
               <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>
@@ -43,6 +45,15 @@ export function SalesTable({ orders }: SalesTableProps) {
                   {order.client ? (
                     <span className="font-mono text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-200 px-2 py-0.5 rounded">
                       {order.client.display_code}
+                    </span>
+                  ) : (
+                    <span className="text-gray-400 text-xs">—</span>
+                  )}
+                </td>
+                <td className="py-3 px-4">
+                  {(order.order_payments ?? []).length > 0 ? (
+                    <span className="text-base">
+                      {(order.order_payments ?? []).map((p) => PAYMENT_EMOJI[p.method]).join(' ')}
                     </span>
                   ) : (
                     <span className="text-gray-400 text-xs">—</span>
@@ -89,7 +100,14 @@ export function SalesTable({ orders }: SalesTableProps) {
               </div>
               <OrderStatusBadge status={order.status} />
             </div>
-            <p className="text-xs text-gray-500">{formatAdminDate(order.created_at)}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs text-gray-500">{formatAdminDate(order.created_at)}</p>
+              {(order.order_payments ?? []).length > 0 && (
+                <span className="text-base">
+                  {(order.order_payments ?? []).map((p) => PAYMENT_EMOJI[p.method]).join(' ')}
+                </span>
+              )}
+            </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div>
                 <p className="text-xs text-gray-400">Costo</p>

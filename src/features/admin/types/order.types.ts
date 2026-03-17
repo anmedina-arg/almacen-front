@@ -5,6 +5,7 @@
 // Mirror the Supabase database schema for orders and order_items.
 
 import type { Client } from './client.types';
+import type { OrderPayment } from './payment.types';
 
 /**
  * Valid statuses for an order.
@@ -34,6 +35,8 @@ export interface Order {
   // Client assignment (nullable — orders can exist without a client)
   client_id?: number | null;
   client?: Client | null;
+  // Payment methods (0, 1 or 2 records)
+  order_payments?: OrderPayment[];
 }
 
 /**
