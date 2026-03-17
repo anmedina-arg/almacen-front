@@ -4,6 +4,8 @@
 // Types for the orders management feature.
 // Mirror the Supabase database schema for orders and order_items.
 
+import type { Client } from './client.types';
+
 /**
  * Valid statuses for an order.
  * Must match the order_status enum in the database.
@@ -29,6 +31,9 @@ export interface Order {
   total_cost?: number;
   margin?: number;
   margin_pct?: number;
+  // Client assignment (nullable — orders can exist without a client)
+  client_id?: number | null;
+  client?: Client | null;
 }
 
 /**

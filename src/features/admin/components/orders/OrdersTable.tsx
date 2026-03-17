@@ -5,6 +5,7 @@ import { useOrders } from '../../hooks/useOrders';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import { MarginDisplay } from './MarginDisplay';
+import { ClientAssignCell } from './ClientAssignCell';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
@@ -176,6 +177,9 @@ export function OrdersTable() {
                   <th className="text-right py-3 px-4 font-semibold text-gray-600">
                     Margen
                   </th>
+                  <th className="text-left py-3 px-4 font-semibold text-gray-600">
+                    Cliente
+                  </th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">
                     Estado
                   </th>
@@ -191,8 +195,11 @@ export function OrdersTable() {
                     className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
                     onClick={() => setSelectedOrderId(order.id)}
                   >
-                    <td className="py-3 px-4 font-mono font-medium text-gray-800">
+                    <td className="py-3 px-4 font-mono font-medium text-gray-800 whitespace-nowrap">
                       #{order.id}
+                      {order.client && (
+                        <span className="text-indigo-600 font-semibold"> · {order.client.display_code}</span>
+                      )}
                     </td>
                     <td className="py-3 px-4 text-gray-600">
                       {formatAdminDate(order.created_at)}
@@ -209,6 +216,9 @@ export function OrdersTable() {
                           marginPct={order.margin_pct ?? 0}
                         />
                       )}
+                    </td>
+                    <td className="py-3 px-4">
+                      <ClientAssignCell orderId={order.id} client={order.client} />
                     </td>
                     <td className="py-3 px-4 text-center">
                       <OrderStatusBadge status={order.status} />
@@ -239,10 +249,18 @@ export function OrdersTable() {
                 onClick={() => setSelectedOrderId(order.id)}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-mono font-bold text-gray-800">
-                    Pedido #{order.id}
-                  </span>
+                  <div className="font-mono font-bold text-gray-800">
+                    <span>Pedido #{order.id}</span>
+                    {order.client && (
+                      <span className="ml-1.5 text-indigo-600 font-semibold text-sm">
+                        · {order.client.display_code}
+                      </span>
+                    )}
+                  </div>
                   <OrderStatusBadge status={order.status} />
+                </div>
+                <div onClick={(e) => e.stopPropagation()}>
+                  <ClientAssignCell orderId={order.id} client={order.client} />
                 </div>
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">
