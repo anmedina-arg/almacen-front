@@ -187,7 +187,7 @@ export function AdminProductList() {
 
                     {/* Categoría */}
                     <td className="py-3 px-4 text-gray-600">
-                      {CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
+                      {product.category_name ?? CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
                     </td>
 
                     {/* Costo */}
@@ -270,7 +270,7 @@ export function AdminProductList() {
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-gray-500">
-                        {CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
+                        {product.category_name ?? CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
                       </span>
                       <span className="text-xs text-gray-400">|</span>
                       <span className="text-xs font-medium text-green-600">
