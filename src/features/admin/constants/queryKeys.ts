@@ -32,4 +32,9 @@ export const adminKeys = {
   // Payments query keys
   payments: () => [...adminKeys.all, 'payments'] as const,
   orderPayments: (orderId: number) => [...adminKeys.payments(), orderId] as const,
+
+  // Ranking query keys
+  ranking: () => [...adminKeys.all, 'ranking'] as const,
+  topProducts: (params: object) => [...adminKeys.ranking(), 'products', params] as const,
+  topCategories: (params: object) => [...adminKeys.ranking(), 'categories', params] as const,
 };
