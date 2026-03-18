@@ -21,6 +21,10 @@ const navItems = [
     href: '/admin/orders',
     label: 'Pedidos',
   },
+  {
+    href: '/admin/ranking',
+    label: 'Ranking',
+  },
 ];
 
 export function AdminNav() {

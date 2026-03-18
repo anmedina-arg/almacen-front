@@ -9,6 +9,7 @@ const MANAGEMENT_LINKS = [
   { href: '/admin/stock', label: 'Stock' },
   { href: '/admin/orders', label: 'Pedidos' },
   { href: '/admin/sales', label: 'Ventas' },
+  { href: '/admin/ranking', label: 'Ranking' },
 ];
 
 export function AdminTabBar() {
