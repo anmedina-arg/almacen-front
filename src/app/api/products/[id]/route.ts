@@ -160,6 +160,27 @@ export async function PUT(
       category_name: updatedCat?.name ?? null,
       subcategory_name: updatedSub?.name ?? null,
     };
+
+    // Si el costo pasó a ser > 0, corregir order_items que tengan unit_cost = 0
+    // en órdenes pending/confirmed (snapshot era 0 porque el producto no tenía costo)
+    const newCost = typeof body.cost === 'number' ? body.cost : null;
+    if (newCost !== null && newCost > 0) {
+      const { data: activeOrders } = await supabase
+        .from('orders')
+        .select('id')
+        .in('status', ['pending', 'confirmed']);
+
+      if (activeOrders && activeOrders.length > 0) {
+        const orderIds = activeOrders.map((o: { id: number }) => o.id);
+        await supabase
+          .from('order_items')
+          .update({ unit_cost: newCost })
+          .eq('product_id', id)
+          .in('order_id', orderIds)
+          .or('unit_cost.eq.0,unit_cost.is.null');
+      }
+    }
+
     return NextResponse.json(updatedProduct as Product);
   } catch (error) {
     console.error('Error in PUT /api/products/[id]:', error);

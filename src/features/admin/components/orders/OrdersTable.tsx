@@ -22,9 +22,27 @@ export function OrdersTable() {
   const [filters, setFilters] = useState<OrderFilters>({
     search: '',
     statusFilter: 'all',
+    clientFilter: 'all',
   });
 
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+
+  // Unique client options derived from loaded orders
+  const clientOptions = useMemo(() => {
+    if (!orders) return [];
+    const seen = new Set<string>();
+    const options: { value: string; label: string }[] = [];
+    for (const order of orders) {
+      if (order.client) {
+        const code = order.client.display_code;
+        if (!seen.has(code)) {
+          seen.add(code);
+          options.push({ value: code, label: code });
+        }
+      }
+    }
+    return options.sort((a, b) => a.label.localeCompare(b.label));
+  }, [orders]);
 
   // Filter orders
   const filteredOrders = useMemo(() => {
@@ -34,6 +52,13 @@ export function OrdersTable() {
       // Status filter
       if (filters.statusFilter !== 'all' && order.status !== filters.statusFilter) {
         return false;
+      }
+
+      // Client filter
+      if (filters.clientFilter === 'unassigned') {
+        if (order.client) return false;
+      } else if (filters.clientFilter !== 'all') {
+        if (order.client?.display_code !== filters.clientFilter) return false;
       }
 
       // Search filter (by order ID or total)
@@ -151,6 +176,22 @@ export function OrdersTable() {
           <option value="cancelled">
             Cancelados ({statusCounts.cancelled})
           </option>
+        </select>
+
+        <select
+          value={filters.clientFilter}
+          onChange={(e) =>
+            setFilters((prev) => ({ ...prev, clientFilter: e.target.value }))
+          }
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+        >
+          <option value="all">Todos los clientes</option>
+          <option value="unassigned">Sin cliente</option>
+          {clientOptions.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
         </select>
       </div>
 
