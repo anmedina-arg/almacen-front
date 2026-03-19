@@ -74,6 +74,9 @@ export async function fetchPublicProducts(options?: { includeInactive?: boolean 
     (stockData ?? []).map((s) => [s.product_id, s.quantity])
   );
 
+  const { data: topSellersData } = await supabase.rpc('get_top_seller_ids', { p_days: 30 });
+  const topSellerIds = new Set<number>((topSellersData ?? []).map((r: { product_id: number }) => r.product_id));
+
   const comboIds = data.filter((p) => p.is_combo).map((p) => p.id);
   const comboItemsMap = new Map<number, string[]>();
 
@@ -106,6 +109,7 @@ export async function fetchPublicProducts(options?: { includeInactive?: boolean 
       subcategory_name: sub?.name ?? null,
       stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
       ...(p.is_combo ? { combo_items: comboItemsMap.get(p.id) ?? [] } : {}),
+      is_top_seller: topSellerIds.has(p.id),
     } as Product;
   });
 }

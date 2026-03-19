@@ -11,7 +11,7 @@ export const assignClientSchema = z.discriminatedUnion('barrio', [
   }),
   z.object({
     barrio: z.literal('otros'),
-    manzana_lote: z.undefined().optional(),
+    manzana_lote: z.string().trim().min(1, 'Ingresá una descripción').optional(),
   }),
 ]);
 

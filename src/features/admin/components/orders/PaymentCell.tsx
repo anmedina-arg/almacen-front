@@ -104,35 +104,51 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
 
   // ── Saved display ──
   if (!isEditing) {
+    // Balance calculation (only meaningful when at least one payment has an explicit amount)
+    const amountWithValues = payments.filter((p) => p.amount !== null);
+    const amountPaid = amountWithValues.reduce((sum, p) => sum + (p.amount ?? 0), 0);
+    const balance = amountWithValues.length > 0 ? orderTotal - amountPaid : null;
+
     if (payments.length === 0) {
       return (
         <button
           onClick={openForm}
-          className="text-xs text-gray-400 hover:text-indigo-600 transition-colors whitespace-nowrap"
+          className="inline-flex items-center px-2 py-0.5 rounded bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-colors whitespace-nowrap"
         >
-          + Agregar
+          DEBE
         </button>
       );
     }
 
     if (payments.length === 1) {
       return (
-        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-          <button
-            onClick={openForm}
-            className="text-lg leading-none hover:opacity-70 transition-opacity"
-            title={`${payments[0].method} — click para editar`}
-          >
-            {PAYMENT_EMOJI[payments[0].method]}
-          </button>
-          <button
-            onClick={(e) => handleDelete(e, payments[0].id)}
-            disabled={isDeleting}
-            className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 text-xs leading-none ml-0.5"
-            title="Quitar método de pago"
-          >
-            ×
-          </button>
+        <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={openForm}
+              className="text-lg leading-none hover:opacity-70 transition-opacity"
+              title={`${payments[0].method} — click para editar`}
+            >
+              {PAYMENT_EMOJI[payments[0].method]}
+            </button>
+            {payments[0].amount !== null && (
+              <span className="text-xs font-mono text-gray-700">{formatPrice(payments[0].amount)}</span>
+            )}
+            <button
+              onClick={(e) => handleDelete(e, payments[0].id)}
+              disabled={isDeleting}
+              className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 text-xs leading-none ml-0.5"
+              title="Quitar método de pago"
+            >
+              ×
+            </button>
+          </div>
+          {balance !== null && balance > 0.01 && (
+            <span className="text-xs font-semibold text-red-600">Debe {formatPrice(balance)}</span>
+          )}
+          {balance !== null && balance < -0.01 && (
+            <span className="text-xs font-semibold text-green-600">A favor {formatPrice(Math.abs(balance))}</span>
+          )}
         </div>
       );
     }
@@ -162,6 +178,12 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
             </button>
           </div>
         ))}
+        {balance !== null && balance > 0.01 && (
+          <span className="text-xs font-semibold text-red-600">Debe {formatPrice(balance)}</span>
+        )}
+        {balance !== null && balance < -0.01 && (
+          <span className="text-xs font-semibold text-green-600">A favor {formatPrice(Math.abs(balance))}</span>
+        )}
       </div>
     );
   }

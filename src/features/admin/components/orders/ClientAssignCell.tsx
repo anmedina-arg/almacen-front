@@ -15,6 +15,7 @@ export function ClientAssignCell({ orderId, client }: ClientAssignCellProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [barrio, setBarrio] = useState<Barrio>('AC1');
   const [manzanaLote, setManzanaLote] = useState('');
+  const [otrosDesc, setOtrosDesc] = useState('');
   const [validationError, setValidationError] = useState('');
 
   const { mutate: assign, isPending: isAssigning } = useAssignClient();
@@ -24,6 +25,7 @@ export function ClientAssignCell({ orderId, client }: ClientAssignCellProps) {
     e.stopPropagation();
     setBarrio('AC1');
     setManzanaLote('');
+    setOtrosDesc('');
     setValidationError('');
     setIsEditing(true);
   };
@@ -47,8 +49,9 @@ export function ClientAssignCell({ orderId, client }: ClientAssignCellProps) {
         { onSuccess: () => setIsEditing(false) }
       );
     } else {
+      const desc = otrosDesc.trim();
       assign(
-        { orderId, input: { barrio: 'otros' } },
+        { orderId, input: { barrio: 'otros', ...(desc ? { manzana_lote: desc } : {}) } },
         { onSuccess: () => setIsEditing(false) }
       );
     }
@@ -77,6 +80,11 @@ export function ClientAssignCell({ orderId, client }: ClientAssignCellProps) {
           title="Cambiar cliente"
         >
           {client.display_code}
+          {client.barrio === 'otros' && client.manzana_lote && (
+            <span className="font-sans font-normal normal-case ml-1 text-indigo-500">
+              {client.manzana_lote}
+            </span>
+          )}
         </button>
         <button
           onClick={handleUnassign}
@@ -111,7 +119,7 @@ export function ClientAssignCell({ orderId, client }: ClientAssignCellProps) {
           <option value="otros">otros</option>
         </select>
 
-        {barrio !== 'otros' && (
+        {barrio !== 'otros' ? (
           <input
             type="text"
             value={manzanaLote}
@@ -119,6 +127,17 @@ export function ClientAssignCell({ orderId, client }: ClientAssignCellProps) {
             placeholder="Ej: H10"
             maxLength={3}
             className={`text-xs border rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-400 uppercase w-20 ${
+              validationError ? 'border-red-400' : 'border-gray-300'
+            }`}
+            autoFocus
+          />
+        ) : (
+          <input
+            type="text"
+            value={otrosDesc}
+            onChange={(e) => { setOtrosDesc(e.target.value); setValidationError(''); }}
+            placeholder="Descripción (opcional)"
+            className={`text-xs border rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-400 w-full ${
               validationError ? 'border-red-400' : 'border-gray-300'
             }`}
             autoFocus
