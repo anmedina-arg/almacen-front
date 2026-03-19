@@ -31,7 +31,8 @@ RETURNS TABLE (
   subtotal_venta       NUMERIC,
   costo_total          NUMERIC,
   margen               NUMERIC,
-  margen_pct           NUMERIC
+  margen_pct           NUMERIC,
+  desde_sugerencia     TEXT
 )
 LANGUAGE sql
 STABLE
@@ -81,7 +82,9 @@ AS $$
       WHEN oi.subtotal > 0
       THEN ROUND((oi.subtotal - (oi.quantity * oi.unit_cost)) / oi.subtotal * 100, 1)
       ELSE NULL
-    END
+    END,
+
+    CASE WHEN COALESCE(oi.from_suggestion, FALSE) THEN 'sí' ELSE 'no' END
 
   FROM orders o
   JOIN order_items oi ON oi.order_id = o.id
@@ -96,7 +99,7 @@ AS $$
   GROUP BY
     o.id, o.status, o.created_at, o.confirmed_at, o.total,
     c.display_code, c.barrio, c.manzana_lote,
-    oi.id, oi.product_name, oi.quantity, oi.unit_price, oi.unit_cost, oi.subtotal,
+    oi.id, oi.product_name, oi.quantity, oi.unit_price, oi.unit_cost, oi.subtotal, oi.from_suggestion,
     p.sale_type, p.is_combo, p.price,
     cat.name
 

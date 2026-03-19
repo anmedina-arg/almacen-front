@@ -31,6 +31,7 @@ export function useOrderSubmit(cartItems: CartItem[]) {
         ? calculateItemPrice(item) / item.quantity
         : item.unitPrice,
       is_by_weight: item.isByWeight,
+      from_suggestion: item.from_suggestion ?? false,
     }));
     const message = whatsAppMessage;
 
