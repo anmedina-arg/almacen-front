@@ -49,6 +49,11 @@ function ProductCardBase({
           </div>
         )}
         <div className="text-ellipsis">
+          {product.is_top_seller && (
+            <span className="inline-block bg-amber-400 text-amber-900 text-xs font-bold px-1.5 py-0.5 rounded mb-0.5">
+              ⭐ Más vendido
+            </span>
+          )}
           <h2 className="text-sm font-bold">{product.name}</h2>
           {product.price !== 0 && (
             <p className="text-base font-semibold text-green-600">

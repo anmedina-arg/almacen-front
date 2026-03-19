@@ -45,11 +45,17 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     // Find-or-create: partial unique indexes can't be used with upsert onConflict,
     // so we do an explicit select-then-insert.
-    const findQuery = barrio === 'otros'
-      ? supabase.from('clients').select('id, barrio, manzana_lote, display_code').eq('barrio', 'otros').single()
-      : supabase.from('clients').select('id, barrio, manzana_lote, display_code').eq('barrio', barrio).eq('manzana_lote', manzana_lote!).single();
+    let findQuery = supabase.from('clients').select('id, barrio, manzana_lote, display_code').eq('barrio', barrio);
+    if (barrio === 'otros') {
+      findQuery = manzana_lote
+        ? findQuery.eq('manzana_lote', manzana_lote)
+        : findQuery.is('manzana_lote', null);
+    } else {
+      findQuery = findQuery.eq('manzana_lote', manzana_lote!);
+    }
+    const findQuerySingle = findQuery.single();
 
-    const { data: existing, error: findError } = await findQuery;
+    const { data: existing, error: findError } = await findQuerySingle;
 
     let client;
 

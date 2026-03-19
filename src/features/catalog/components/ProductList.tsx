@@ -60,7 +60,11 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 			const subcategories = Array.from(subMap.entries()).map(([label, items]) => ({
 				key: label.toLowerCase(),
 				label,
-				products: items,
+				products: [...items].sort((a, b) => {
+					if (a.is_top_seller && !b.is_top_seller) return -1;
+					if (!a.is_top_seller && b.is_top_seller) return 1;
+					return 0;
+				}),
 			}));
 
 			return { main: displayCat, subcategories };
