@@ -53,8 +53,9 @@ export function useOrderSubmit(cartItems: CartItem[]) {
       .then(() => {
         router.refresh();
       })
-      .catch((error) => {
-        console.error('Error creating order in background:', error);
+      .catch((error: unknown) => {
+        console.error('[useOrderSubmit] Error creating order:', error instanceof Error ? error.message : error);
+        console.error('[useOrderSubmit] Items sent:', JSON.stringify(items, null, 2));
       });
   };
 

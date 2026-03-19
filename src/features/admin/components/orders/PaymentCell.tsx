@@ -24,6 +24,7 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
     efectivo: '',
     transferencia: '',
   });
+  const [debeAmount, setDebeAmount] = useState('');
   const [validationError, setValidationError] = useState('');
 
   const { mutate: setPayments, isPending: isSaving } = useSetOrderPayments();
@@ -39,14 +40,18 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
         efectivo: payments.find((p) => p.method === 'efectivo')?.amount?.toString() ?? '',
         transferencia: payments.find((p) => p.method === 'transferencia')?.amount?.toString() ?? '',
       });
+      setDebeAmount('');
     } else if (payments.length === 1) {
       setSelected(payments[0].method);
       setIsBoth(false);
       setAmounts({ efectivo: '', transferencia: '' });
+      const existingAmount = payments[0].amount;
+      setDebeAmount(existingAmount !== null ? String(orderTotal - existingAmount) : '');
     } else {
       setSelected('efectivo');
       setIsBoth(false);
       setAmounts({ efectivo: '', transferencia: '' });
+      setDebeAmount('');
     }
 
     setIsEditing(true);
@@ -90,10 +95,23 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
         { onSuccess: () => setIsEditing(false) }
       );
     } else {
-      setPayments(
-        { orderId, orderTotal, payments: [{ method: selected }] },
-        { onSuccess: () => setIsEditing(false) }
-      );
+      const debeStr = debeAmount.trim();
+      if (debeStr !== '') {
+        const debe = parseFloat(debeStr);
+        if (isNaN(debe)) {
+          setValidationError('Monto inválido');
+          return;
+        }
+        setPayments(
+          { orderId, orderTotal, payments: [{ method: selected, amount: orderTotal - debe }] },
+          { onSuccess: () => setIsEditing(false) }
+        );
+      } else {
+        setPayments(
+          { orderId, orderTotal, payments: [{ method: selected }] },
+          { onSuccess: () => setIsEditing(false) }
+        );
+      }
     }
   };
 
@@ -120,35 +138,31 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
       );
     }
 
+    const balanceBadge = balance !== null && balance > 0.01
+      ? <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-red-600 text-white text-xs font-bold whitespace-nowrap">Debe {formatPrice(balance)}</span>
+      : balance !== null && balance < -0.01
+        ? <span className="inline-flex items-center px-1.5 py-0.5 rounded bg-green-600 text-white text-xs font-bold whitespace-nowrap">A favor {formatPrice(Math.abs(balance))}</span>
+        : null;
+
     if (payments.length === 1) {
       return (
-        <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
-          <div className="flex items-center gap-1">
-            <button
-              onClick={openForm}
-              className="text-lg leading-none hover:opacity-70 transition-opacity"
-              title={`${payments[0].method} — click para editar`}
-            >
-              {PAYMENT_EMOJI[payments[0].method]}
-            </button>
-            {payments[0].amount !== null && (
-              <span className="text-xs font-mono text-gray-700">{formatPrice(payments[0].amount)}</span>
-            )}
-            <button
-              onClick={(e) => handleDelete(e, payments[0].id)}
-              disabled={isDeleting}
-              className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 text-xs leading-none ml-0.5"
-              title="Quitar método de pago"
-            >
-              ×
-            </button>
-          </div>
-          {balance !== null && balance > 0.01 && (
-            <span className="text-xs font-semibold text-red-600">Debe {formatPrice(balance)}</span>
-          )}
-          {balance !== null && balance < -0.01 && (
-            <span className="text-xs font-semibold text-green-600">A favor {formatPrice(Math.abs(balance))}</span>
-          )}
+        <div className="flex items-center gap-1.5 flex-wrap" onClick={(e) => e.stopPropagation()}>
+          <button
+            onClick={openForm}
+            className="text-lg leading-none hover:opacity-70 transition-opacity"
+            title={`${payments[0].method} — click para editar`}
+          >
+            {PAYMENT_EMOJI[payments[0].method]}
+          </button>
+          {balanceBadge}
+          <button
+            onClick={(e) => handleDelete(e, payments[0].id)}
+            disabled={isDeleting}
+            className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 text-xs leading-none"
+            title="Quitar método de pago"
+          >
+            ×
+          </button>
         </div>
       );
     }
@@ -156,34 +170,31 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
     // 2 payments
     return (
       <div className="flex flex-col gap-0.5" onClick={(e) => e.stopPropagation()}>
-        {payments.map((p) => (
-          <div key={p.id} className="flex items-center gap-1">
-            <button
-              onClick={openForm}
-              className="text-base leading-none hover:opacity-70 transition-opacity"
-              title={`${p.method} — click para editar`}
-            >
-              {PAYMENT_EMOJI[p.method]}
-            </button>
-            <span className="text-xs font-mono text-gray-700">
-              {p.amount !== null ? formatPrice(p.amount) : ''}
-            </span>
-            <button
-              onClick={(e) => handleDelete(e, p.id)}
-              disabled={isDeleting}
-              className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 text-xs leading-none"
-              title="Quitar este método"
-            >
-              ×
-            </button>
-          </div>
-        ))}
-        {balance !== null && balance > 0.01 && (
-          <span className="text-xs font-semibold text-red-600">Debe {formatPrice(balance)}</span>
-        )}
-        {balance !== null && balance < -0.01 && (
-          <span className="text-xs font-semibold text-green-600">A favor {formatPrice(Math.abs(balance))}</span>
-        )}
+        <div className="flex items-center gap-1 flex-wrap">
+          {payments.map((p) => (
+            <div key={p.id} className="flex items-center gap-1">
+              <button
+                onClick={openForm}
+                className="text-base leading-none hover:opacity-70 transition-opacity"
+                title={`${p.method} — click para editar`}
+              >
+                {PAYMENT_EMOJI[p.method]}
+              </button>
+              <span className="text-xs font-mono text-gray-700">
+                {p.amount !== null ? formatPrice(p.amount) : ''}
+              </span>
+              <button
+                onClick={(e) => handleDelete(e, p.id)}
+                disabled={isDeleting}
+                className="text-gray-400 hover:text-red-500 transition-colors disabled:opacity-50 text-xs leading-none"
+                title="Quitar este método"
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          {balanceBadge}
+        </div>
       </div>
     );
   }
@@ -236,6 +247,29 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
         />
         Ambos métodos
       </label>
+
+      {/* Debe input for single method (partial payment) */}
+      {!isBoth && (
+        <div className="flex flex-col gap-0.5">
+          <div className="flex items-center gap-1.5">
+            <label className="text-xs text-gray-500 whitespace-nowrap">Debe $</label>
+            <input
+              type="number"
+              value={debeAmount}
+              onChange={(e) => { setDebeAmount(e.target.value); setValidationError(''); }}
+              placeholder="vacío = pago total"
+              step="0.01"
+              className="w-28 text-xs border border-gray-300 rounded px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-indigo-400"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+          {debeAmount.trim() !== '' && !isNaN(parseFloat(debeAmount)) && (
+            <span className="text-xs text-gray-400">
+              Pagó: {formatPrice(orderTotal - parseFloat(debeAmount))}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* Amount inputs when both selected */}
       {isBoth && (

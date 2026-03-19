@@ -17,6 +17,10 @@ export async function POST(request: NextRequest) {
     const validation = createOrderSchema.safeParse(body);
     if (!validation.success) {
       const firstError = validation.error.errors[0];
+      console.error('[POST /api/orders] Zod validation failed:', JSON.stringify({
+        errors: validation.error.errors,
+        body,
+      }, null, 2));
       return NextResponse.json(
         {
           error: firstError?.message || 'Datos invalidos',
@@ -45,6 +49,12 @@ export async function POST(request: NextRequest) {
     );
 
     // Call the create_order RPC function (transactional)
+    console.log('[POST /api/orders] Calling create_order RPC with items:', JSON.stringify(
+      items.map((item) => {
+        const prod = productMap.get(item.product_id);
+        return { ...item, product_price: prod?.price, product_cost: prod?.cost };
+      }), null, 2
+    ));
     const { data, error } = await supabase.rpc('create_order', {
       p_user_id: null,
       p_notes: notes || null,
@@ -79,7 +89,7 @@ export async function POST(request: NextRequest) {
         // Not JSON — fall through to generic error
       }
 
-      console.error('Error creating order via RPC:', error);
+      console.error('[POST /api/orders] RPC create_order error:', JSON.stringify(error, null, 2));
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
