@@ -53,6 +53,7 @@ export interface CartItem {
   unitPrice: number;
   isByWeight: boolean;
   saleType: WeightType;
+  from_suggestion?: boolean;
 }
 
 // Tipos para el sistema de pesos
@@ -114,6 +115,7 @@ export interface ConfirmationModalProps {
   onConfirm: () => void;
   onCancel: () => void;
   isLoading?: boolean;
+  cartProductIds?: number[];
 }
 
 // Tipos para utilidades

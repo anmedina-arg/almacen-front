@@ -15,6 +15,7 @@ interface CartState {
 
 interface CartActions {
   addToCart: (product: Product) => void;
+  addSuggestedItem: (product: Product) => void;
   removeFromCart: (product: Product) => void;
   clearCart: () => void;
   updateQuantity: (productId: number, quantity: number) => void;
@@ -59,6 +60,52 @@ export const useCartStore = create<CartStore>()((set) => ({
         unitPrice: getUnitPrice(product),
         isByWeight: isProductByWeight(product),
         saleType: product.sale_type,
+      };
+
+      return {
+        items: [...state.items, newItem],
+        totalItems: state.totalItems + quantity,
+        totalPrice: state.totalPrice + quantity * getUnitPrice(product),
+      };
+    });
+  },
+
+  // Like addToCart but marks the item as from_suggestion = true.
+  // If already in cart (added organically), does NOT overwrite the flag.
+  addSuggestedItem: (product) => {
+    const quantity = getQuantityPerClick(product);
+    set((state) => {
+      const existing = state.items.find((i) => i.id === product.id);
+
+      if (product.stock_quantity !== undefined) {
+        const currentQty = existing?.quantity ?? 0;
+        if (product.stock_quantity === 0 || currentQty >= product.stock_quantity) {
+          return state;
+        }
+      }
+
+      if (existing) {
+        // Already in cart — just increase quantity, preserve existing from_suggestion flag
+        return {
+          items: state.items.map((item) =>
+            item.id === product.id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          ),
+          totalItems: state.totalItems + quantity,
+          totalPrice: state.totalPrice + quantity * getUnitPrice(product),
+        };
+      }
+
+      const newItem: CartItem = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        unitPrice: getUnitPrice(product),
+        isByWeight: isProductByWeight(product),
+        saleType: product.sale_type,
+        from_suggestion: true,
       };
 
       return {

@@ -71,6 +71,7 @@ export interface CreateOrderItemInput {
   quantity: number;
   unit_price: number;
   is_by_weight: boolean;
+  from_suggestion?: boolean;
 }
 
 /**

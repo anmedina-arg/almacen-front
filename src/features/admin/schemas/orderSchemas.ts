@@ -13,6 +13,7 @@ export const createOrderItemSchema = z.object({
     .number({ invalid_type_error: 'El precio debe ser un numero' })
     .min(0, 'El precio no puede ser negativo'),
   is_by_weight: z.boolean().default(false),
+  from_suggestion: z.boolean().default(false),
 });
 
 /**

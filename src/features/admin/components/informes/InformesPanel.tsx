@@ -31,6 +31,11 @@ export function InformesPanel() {
   const [prodLoading, setProdLoading] = useState(false);
   const [prodError, setProdError]     = useState('');
 
+  // Recomendaciones state
+  const [recoLoading, setRecoLoading] = useState(false);
+  const [recoStatus, setRecoStatus]   = useState<'idle' | 'ok' | 'error'>('idle');
+  const [recoError, setRecoError]     = useState('');
+
   const handleDownloadVentas = async () => {
     setVentasError('');
     setVentasLoading(true);
@@ -43,6 +48,25 @@ export function InformesPanel() {
       setVentasError(e instanceof Error ? e.message : 'Error de conexión');
     } finally {
       setVentasLoading(false);
+    }
+  };
+
+  const handleRefreshRecommendations = async () => {
+    setRecoError('');
+    setRecoStatus('idle');
+    setRecoLoading(true);
+    try {
+      const res = await fetch('/api/admin/recommendations/refresh', { method: 'POST' });
+      if (!res.ok) {
+        const body = await res.json() as { error: string };
+        throw new Error(body.error || 'Error al actualizar');
+      }
+      setRecoStatus('ok');
+    } catch (e) {
+      setRecoError(e instanceof Error ? e.message : 'Error de conexión');
+      setRecoStatus('error');
+    } finally {
+      setRecoLoading(false);
     }
   };
 
@@ -122,6 +146,28 @@ export function InformesPanel() {
           className="self-start flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded hover:bg-indigo-700 disabled:opacity-50 transition-colors"
         >
           {prodLoading ? '⏳ Generando...' : '⬇ Descargar CSV'}
+        </button>
+      </div>
+
+      {/* ── Recomendaciones ── */}
+      <div className="border border-gray-200 rounded-lg p-4 flex flex-col gap-4">
+        <h2 className="text-sm font-semibold text-gray-700">Recomendaciones de productos</h2>
+        <p className="text-xs text-gray-500">
+          Recalcula la matriz de afinidad entre productos en base a las órdenes de los últimos 30 días.
+          Ejecutar cada vez que haya acumulado suficientes ventas nuevas.
+        </p>
+
+        {recoError && <span className="text-xs text-red-600">{recoError}</span>}
+        {recoStatus === 'ok' && (
+          <span className="text-xs text-green-600 font-medium">✓ Afinidad actualizada correctamente</span>
+        )}
+
+        <button
+          onClick={handleRefreshRecommendations}
+          disabled={recoLoading}
+          className="self-start flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded hover:bg-violet-700 disabled:opacity-50 transition-colors"
+        >
+          {recoLoading ? '⏳ Calculando...' : '↺ Actualizar afinidad'}
         </button>
       </div>
     </div>

@@ -71,6 +71,7 @@ export async function POST(request: NextRequest) {
           unit_price: item.unit_price,
           unit_cost,
           is_by_weight: item.is_by_weight,
+          from_suggestion: item.from_suggestion ?? false,
         };
       }),
     });

@@ -20,6 +20,7 @@ export function OrderFlowController() {
         message={whatsAppMessage}
         onConfirm={() => handleConfirmOrder(clearCart)}
         onCancel={handleCancelOrder}
+        cartProductIds={items.map((i) => i.id)}
       />
     </>
   );
