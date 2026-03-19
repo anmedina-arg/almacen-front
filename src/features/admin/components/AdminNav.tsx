@@ -25,6 +25,10 @@ const navItems = [
     href: '/admin/ranking',
     label: 'Ranking',
   },
+  {
+    href: '/admin/informes',
+    label: 'Informes',
+  },
 ];
 
 export function AdminNav() {

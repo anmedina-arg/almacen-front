@@ -61,7 +61,7 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
         payments.map((p) => ({
           order_id: orderId,
           method: p.method,
-          amount: payments.length === 1 ? null : (p.amount ?? null),
+          amount: p.amount ?? null,
         }))
       )
       .select('id, order_id, method, amount, created_at');
