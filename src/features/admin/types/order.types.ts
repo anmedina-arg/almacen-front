@@ -37,6 +37,8 @@ export interface Order {
   client?: Client | null;
   // Payment methods (0, 1 or 2 records)
   order_payments?: OrderPayment[];
+  // Product names from items (for client-side search)
+  product_names?: string[];
 }
 
 /**
