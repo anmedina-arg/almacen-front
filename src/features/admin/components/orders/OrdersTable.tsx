@@ -2,11 +2,13 @@
 
 import { useState, useMemo } from 'react';
 import { useOrders } from '../../hooks/useOrders';
+import { useSalesFilters } from '../../hooks/useSalesFilters';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import { MarginDisplay } from './MarginDisplay';
 import { ClientAssignCell } from './ClientAssignCell';
 import { PaymentCell } from './PaymentCell';
+import { SalesFilters } from '../sales/SalesFilters';
 import type { OrderFilters, OrderStatus } from '../../types/order.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
@@ -19,10 +21,14 @@ import { formatPrice } from '@/utils/formatPrice';
 export function OrdersTable() {
   const { data: orders, isLoading, error } = useOrders();
 
+  const { quickFilter, dateFrom, dateTo, setQuickFilter, setDateFrom, setDateTo, filteredOrders: dateFilteredOrders } =
+    useSalesFilters(orders);
+
   const [filters, setFilters] = useState<OrderFilters>({
     search: '',
     statusFilter: 'all',
     clientFilter: 'all',
+    paymentFilter: 'all',
   });
 
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
@@ -44,11 +50,20 @@ export function OrdersTable() {
     return options.sort((a, b) => a.label.localeCompare(b.label));
   }, [orders]);
 
-  // Filter orders
-  const filteredOrders = useMemo(() => {
-    if (!orders) return [];
+  // An order "debe" when: no payments at all, or has payments with amounts
+  // but the sum doesn't cover the total.
+  const orderDebe = (order: { total: number; order_payments?: { amount: number | null }[] }) => {
+    const payments = order.order_payments ?? [];
+    if (payments.length === 0) return true;
+    const amountsWithValue = payments.filter((p) => p.amount !== null);
+    if (amountsWithValue.length === 0) return false; // all payments without amount = fully paid
+    const paid = amountsWithValue.reduce((acc, p) => acc + (p.amount ?? 0), 0);
+    return order.total - paid > 0;
+  };
 
-    return orders.filter((order) => {
+  // Filter orders (applied on top of date filter)
+  const filteredOrders = useMemo(() => {
+    return dateFilteredOrders.filter((order) => {
       // Status filter
       if (filters.statusFilter !== 'all' && order.status !== filters.statusFilter) {
         return false;
@@ -61,6 +76,11 @@ export function OrdersTable() {
         if (order.client?.display_code !== filters.clientFilter) return false;
       }
 
+      // Payment filter
+      if (filters.paymentFilter === 'debe' && !orderDebe(order)) {
+        return false;
+      }
+
       // Search filter (by order ID or total)
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
@@ -71,17 +91,20 @@ export function OrdersTable() {
 
       return true;
     });
-  }, [orders, filters]);
+  }, [dateFilteredOrders, filters]);
 
-  // Count by status
+  // Count by status (within date range)
   const statusCounts = useMemo(() => {
-    if (!orders) return { pending: 0, confirmed: 0, cancelled: 0 };
     return {
-      pending: orders.filter((o) => o.status === 'pending').length,
-      confirmed: orders.filter((o) => o.status === 'confirmed').length,
-      cancelled: orders.filter((o) => o.status === 'cancelled').length,
+      pending: dateFilteredOrders.filter((o) => o.status === 'pending').length,
+      confirmed: dateFilteredOrders.filter((o) => o.status === 'confirmed').length,
+      cancelled: dateFilteredOrders.filter((o) => o.status === 'cancelled').length,
     };
-  }, [orders]);
+  }, [dateFilteredOrders]);
+
+  const debeCount = useMemo(() => {
+    return dateFilteredOrders.filter((o) => o.status !== 'cancelled' && orderDebe(o)).length;
+  }, [dateFilteredOrders]);
 
   // Loading state
   if (isLoading) {
@@ -144,6 +167,16 @@ export function OrdersTable() {
         )}
       </div>
 
+      {/* Date filters */}
+      <SalesFilters
+        quickFilter={quickFilter}
+        dateFrom={dateFrom}
+        dateTo={dateTo}
+        onQuickFilter={setQuickFilter}
+        onDateFrom={setDateFrom}
+        onDateTo={setDateTo}
+      />
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
         <input
@@ -193,11 +226,25 @@ export function OrdersTable() {
             </option>
           ))}
         </select>
+
+        <select
+          value={filters.paymentFilter}
+          onChange={(e) =>
+            setFilters((prev) => ({
+              ...prev,
+              paymentFilter: e.target.value as 'all' | 'debe',
+            }))
+          }
+          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+        >
+          <option value="all">Todos los pagos</option>
+          <option value="debe">Debe ({debeCount})</option>
+        </select>
       </div>
 
       {/* Counter */}
       <p className="text-sm text-gray-600">
-        Mostrando {filteredOrders.length} de {orders?.length || 0} pedidos
+        Mostrando {filteredOrders.length} de {dateFilteredOrders.length} pedidos
       </p>
 
       {/* Table Desktop */}

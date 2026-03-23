@@ -119,4 +119,5 @@ export interface OrderFilters {
   search: string;
   statusFilter: OrderStatus | 'all';
   clientFilter: string; // display_code | 'all' | 'unassigned'
+  paymentFilter: 'all' | 'debe';
 }
