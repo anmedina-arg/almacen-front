@@ -126,7 +126,7 @@ export async function GET() {
     // if the parallel query fails or returns null.
     const { data, error } = await supabase
       .from('orders')
-      .select('*, order_items(unit_cost, unit_price, subtotal), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
+      .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -139,8 +139,8 @@ export async function GET() {
     // products where quantity is stored in raw grams but unit_price/unit_cost
     // are per-100gr — avoids the 100x multiplication error.
     const ordersWithMargin = (data ?? []).map((order) => {
-      const items: { unit_cost: number; unit_price: number; subtotal: number }[] =
-        (order.order_items as unknown as { unit_cost: number; unit_price: number; subtotal: number }[]) ?? [];
+      const items: { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[] =
+        (order.order_items as unknown as { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
       const total_cost = items.reduce((acc, item) => {
         const unitPrice = Number(item.unit_price);
         const itemCost = unitPrice > 0
@@ -148,11 +148,12 @@ export async function GET() {
           : 0;
         return acc + itemCost;
       }, 0);
+      const product_names = items.map((i) => i.product_name).filter(Boolean);
       const { order_items: _items, clients: client, order_payments, ...orderFields } = order;
       const total = Number(orderFields.total);
       const margin = total - total_cost;
       const margin_pct = total > 0 ? (margin / total) * 100 : 0;
-      return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [] };
+      return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names };
     });
 
     return NextResponse.json(ordersWithMargin, {

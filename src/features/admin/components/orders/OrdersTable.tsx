@@ -81,12 +81,15 @@ export function OrdersTable() {
         return false;
       }
 
-      // Search filter (by order ID or total)
+      // Search filter (by order ID, total or product name)
       if (filters.search) {
         const searchLower = filters.search.toLowerCase();
         const matchesId = String(order.id).includes(searchLower);
         const matchesTotal = String(order.total).includes(searchLower);
-        if (!matchesId && !matchesTotal) return false;
+        const matchesProduct = (order.product_names ?? []).some((name) =>
+          name.toLowerCase().includes(searchLower)
+        );
+        if (!matchesId && !matchesTotal && !matchesProduct) return false;
       }
 
       return true;
@@ -181,7 +184,7 @@ export function OrdersTable() {
       <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
-          placeholder="Buscar por ID o total..."
+          placeholder="Buscar por ID, total o producto..."
           value={filters.search}
           onChange={(e) =>
             setFilters((prev) => ({ ...prev, search: e.target.value }))
