@@ -21,15 +21,16 @@ function ProductSquareCardBase({
 
 	return (
 		<div className="flex flex-col items-center w-full border border-gray-200 rounded-lg min-h-64 shadow-sm hover:shadow-md transition-shadow">
-			<Image
-				src={product.image}
-				alt={product.name}
-				width={80}
-				height={80}
-				className="object-cover rounded-lg rounded-br-none rounded-bl-none h-32 w-full"
-				loading="lazy"
-				sizes="(max-width: 768px) 100vw, 80px"
-			/>
+			<div className="relative w-full h-32 rounded-t-lg overflow-hidden flex-shrink-0">
+				<Image
+					src={product.image}
+					alt={product.name}
+					fill
+					className="object-cover"
+					loading="lazy"
+					sizes="(max-width: 640px) 45vw, 200px"
+				/>
+			</div>
 			<div className="flex flex-col justify-between items-center flex-grow-1">
 				<h2 className="text-lg font-light text-ellipsis line-clamp-2 text-center text-balance tracking-wide">{product.name}</h2>
 

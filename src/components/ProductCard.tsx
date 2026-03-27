@@ -39,7 +39,7 @@ function ProductCardBase({
               height={80}
               className="object-cover rounded-tl-lg rounded-bl-lg w-20 h-20"
               loading="lazy"
-              sizes="(max-width: 768px) 100vw, 80px"
+              sizes="80px"
             />
             {product.is_combo && (
               <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">
