@@ -5,6 +5,7 @@ import { getWeightType } from '@/utils/productUtils';
 import { QuantityButton } from '@/components/ui/QuantityButton';
 import { ComboDisclosure } from '@/components/ui/ComboDisclosure';
 import { formatQuantity } from '@/utils/formatQuantity';
+import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
 
 export interface ProductCardProps {
   product: ProductWithOptionalDescription;
@@ -33,13 +34,12 @@ function ProductCardBase({
         {product.price !== 0 && (
           <div className="flex-shrink-0 relative">
             <Image
-              src={product.image}
+              src={getCloudinaryUrl(product.image, 160)}
               alt={product.name}
               width={80}
               height={80}
               className="object-cover rounded-tl-lg rounded-bl-lg w-20 h-20"
               loading="lazy"
-              sizes="80px"
             />
             {product.is_combo && (
               <span className="absolute top-1 left-1 bg-blue-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">

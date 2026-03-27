@@ -6,6 +6,7 @@ import type { ProductCardProps } from '@/components/ProductCard';
 import { getWeightType } from '../utils/productUtils';
 import { QuantityButton } from '@/components/ui/QuantityButton';
 import { formatQuantity } from '@/utils/formatQuantity';
+import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
 
 function ProductSquareCardBase({
 	product,
@@ -23,7 +24,7 @@ function ProductSquareCardBase({
 		<div className="flex flex-col items-center w-full border border-gray-200 rounded-lg min-h-64 shadow-sm hover:shadow-md transition-shadow">
 			<div className="relative w-full h-32 rounded-t-lg overflow-hidden flex-shrink-0">
 				<Image
-					src={product.image}
+					src={getCloudinaryUrl(product.image, 400)}
 					alt={product.name}
 					fill
 					className="object-cover"

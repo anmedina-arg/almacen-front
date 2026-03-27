@@ -66,37 +66,40 @@ export async function fetchPublicProducts(options?: { includeInactive?: boolean 
 
   if (error || !data) return [];
 
-  const { data: stockData } = await supabase
-    .from('product_stock')
-    .select('product_id, quantity');
+  const comboIds = data.filter((p) => p.is_combo).map((p) => p.id);
+
+  const [
+    { data: stockData },
+    { data: topSellersData },
+    { data: comboData },
+  ] = await Promise.all([
+    supabase.from('product_stock').select('product_id, quantity'),
+    supabase.rpc('get_top_seller_ids', { p_days: 30 }),
+    comboIds.length > 0
+      ? supabase
+          .from('combo_components')
+          .select(`combo_product_id, quantity, products!combo_components_component_product_id_fkey(name, sale_type)`)
+          .in('combo_product_id', comboIds)
+          .order('id', { ascending: true })
+      : Promise.resolve({ data: [] as { combo_product_id: number; quantity: number; products: unknown }[] }),
+  ]);
 
   const stockMap = new Map<number, number>(
     (stockData ?? []).map((s) => [s.product_id, s.quantity])
   );
 
-  const { data: topSellersData } = await supabase.rpc('get_top_seller_ids', { p_days: 30 });
   const topSellerIds = new Set<number>((topSellersData ?? []).map((r: { product_id: number }) => r.product_id));
 
-  const comboIds = data.filter((p) => p.is_combo).map((p) => p.id);
   const comboItemsMap = new Map<number, string[]>();
-
-  if (comboIds.length > 0) {
-    const { data: comboData } = await supabase
-      .from('combo_components')
-      .select(`combo_product_id, quantity, products!combo_components_component_product_id_fkey(name, sale_type)`)
-      .in('combo_product_id', comboIds)
-      .order('id', { ascending: true });
-
-    (comboData ?? []).forEach((row) => {
-      const prod = row.products as unknown as { name: string; sale_type: string } | null;
-      if (!comboItemsMap.has(row.combo_product_id)) comboItemsMap.set(row.combo_product_id, []);
-      if (prod) {
-        comboItemsMap
-          .get(row.combo_product_id)!
-          .push(formatComboItem(prod.name, parseFloat(String(row.quantity)), prod.sale_type));
-      }
-    });
-  }
+  (comboData ?? []).forEach((row) => {
+    const prod = row.products as unknown as { name: string; sale_type: string } | null;
+    if (!comboItemsMap.has(row.combo_product_id)) comboItemsMap.set(row.combo_product_id, []);
+    if (prod) {
+      comboItemsMap
+        .get(row.combo_product_id)!
+        .push(formatComboItem(prod.name, parseFloat(String(row.quantity)), prod.sale_type));
+    }
+  });
 
   return data.map((p) => {
     const { cat, sub, ...rest } = p as typeof p & {
