@@ -41,34 +41,36 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 	const grouped = useMemo(() => {
 		if (!mainCategories) return [];
 
-		return mainCategories.map((displayCat) => {
-			// Agrupar por categoría: nuevo sistema (category_name) con fallback a mainCategory legacy
-			const catProducts = products.filter(
-				(p) => (p.category_name ?? String(p.mainCategory)) === displayCat
-			);
+		return mainCategories
+			.map((displayCat) => {
+				// Agrupar por categoría: nuevo sistema (category_name) con fallback a mainCategory legacy
+				const catProducts = products.filter(
+					(p) => (p.category_name ?? String(p.mainCategory)) === displayCat
+				);
 
-			const subMap = new Map<string, Product[]>();
-			catProducts.forEach((p) => {
-				// Sub-agrupación: subcategory_name → categories (texto) → 'General'
-				const subLabel = p.subcategory_name
-					?? (p.categories?.trim() || null)
-					?? 'General';
-				if (!subMap.has(subLabel)) subMap.set(subLabel, []);
-				subMap.get(subLabel)!.push(p);
-			});
+				const subMap = new Map<string, Product[]>();
+				catProducts.forEach((p) => {
+					// Sub-agrupación: subcategory_name → categories (texto) → 'General'
+					const subLabel = p.subcategory_name
+						?? (p.categories?.trim() || null)
+						?? 'General';
+					if (!subMap.has(subLabel)) subMap.set(subLabel, []);
+					subMap.get(subLabel)!.push(p);
+				});
 
-			const subcategories = Array.from(subMap.entries()).map(([label, items]) => ({
-				key: label.toLowerCase(),
-				label,
-				products: [...items].sort((a, b) => {
-					if (a.is_top_seller && !b.is_top_seller) return -1;
-					if (!a.is_top_seller && b.is_top_seller) return 1;
-					return 0;
-				}),
-			}));
+				const subcategories = Array.from(subMap.entries()).map(([label, items]) => ({
+					key: label.toLowerCase(),
+					label,
+					products: [...items].sort((a, b) => {
+						if (a.is_top_seller && !b.is_top_seller) return -1;
+						if (!a.is_top_seller && b.is_top_seller) return 1;
+						return 0;
+					}),
+				}));
 
-			return { main: displayCat, subcategories };
-		});
+				return { main: displayCat, subcategories };
+			})
+			.filter(({ subcategories }) => subcategories.length > 0);
 	}, [products, mainCategories]);
 
 	const [fixHeight, setFixHeight] = useState(false);
