@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Product } from '../types';
 import { CatalogCard } from './CatalogCard';
 
@@ -14,29 +14,7 @@ interface ProductListProps {
  * Componente de lista de productos
  */
 export function ProductList({ products, mainCategories, searchQuery }: ProductListProps) {
-	const [visibleProducts, setVisibleProducts] = useState(10);
 	const [showList, setShowList] = useState<string>('list');
-	const loadMoreRef = useRef<HTMLDivElement | null>(null);
-
-	useEffect(() => {
-		const observer = new IntersectionObserver(
-			entries => {
-				if (entries[0].isIntersecting) {
-					setVisibleProducts(prev => prev + 10);
-				}
-			},
-			{ rootMargin: '200px' }
-		);
-
-		const currentRef = loadMoreRef.current;
-		if (currentRef) {
-			observer.observe(currentRef);
-		}
-
-		return () => {
-			if (currentRef) observer.unobserve(currentRef);
-		};
-	}, []);
 
 	const grouped = useMemo(() => {
 		if (!mainCategories) return [];
@@ -84,9 +62,6 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 
 		return () => { setFixHeight(false); };
 	}, [searchQuery]);
-
-	// Suppress unused variable warning — visibleProducts is used for future pagination
-	void visibleProducts;
 
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
@@ -169,8 +144,6 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 					</div>
 				))}
 			</div>
-
-			<div ref={loadMoreRef} className="h-10" />
 		</div>
 	);
 }

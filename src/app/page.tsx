@@ -9,19 +9,28 @@ import { fetchCategoriesWithSubs } from '@/features/catalog/services/fetchCatego
 export default async function Home() {
   // fetchCategoriesWithSubs uses React cache() — CategoryNav calls it too,
   // so both share a single Supabase query per request.
-  const [initialProducts, categories] = await Promise.all([
-    fetchPublicProducts(),
-    fetchCategoriesWithSubs(),
-  ]);
+  const categories = await fetchCategoriesWithSubs();
+
+  // Fetch only the first category's products for SSR.
+  // Subsequent categories are lazy-loaded client-side as the user scrolls.
+  const firstCategoryId = categories[0]?.id;
+  const initialProducts = firstCategoryId
+    ? await fetchPublicProducts({ categoryId: firstCategoryId })
+    : [];
 
   const orderedCategories = categories.map((c) => c.name);
+  const orderedCategoryIds = categories.map((c) => c.id);
 
   return (
     <div className="font-barlow flex flex-col min-h-screen px-2">
       <Header />
       <AdminPanelLink />
       <CategoryNav />
-      <ProductCatalog initialProducts={initialProducts} orderedCategories={orderedCategories} />
+      <ProductCatalog
+        initialProducts={initialProducts}
+        orderedCategories={orderedCategories}
+        orderedCategoryIds={orderedCategoryIds}
+      />
       <Footer />
     </div>
   );
