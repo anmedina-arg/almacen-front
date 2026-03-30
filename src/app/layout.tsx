@@ -51,16 +51,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        {/* Preload del logo — crítico para LCP. URL debe ser idéntica a la de Header.tsx.
-            Con unoptimized: true, next/image no genera este preload automáticamente. */}
-        <link
-          rel="preload"
-          as="image"
-          href="https://res.cloudinary.com/dfwo3qi5q/image/upload/f_auto,q_auto,w_256/v1763599423/logo-og_pydhrd.png"
-          fetchPriority="high"
-        />
-      </head>
+      <head />
       <body className={`${barlow.variable} antialiased`}>
         <Providers>
           {children}
