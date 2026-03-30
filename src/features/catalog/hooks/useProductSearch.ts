@@ -27,16 +27,19 @@ export function useProductSearch(products: Product[], orderedCategories: string[
     return products.filter((p) => normalize(p.name).includes(q));
   }, [products, debouncedSearch]);
 
-  // Respect admin-defined category order: filter orderedCategories to those
-  // that have at least one visible product after search filtering.
+  // Browse mode: use orderedCategories directly (source of truth is the DB, not the product list).
+  // Search mode: filter to only categories that have at least one matching product.
+  // ProductList filters out empty categories on its side, so browse mode is safe
+  // even when only a subset of products is loaded (pagination).
   const displayCategories = useMemo(() => {
+    if (!debouncedSearch) return orderedCategories;
     const catsWithProducts = new Set(
       filteredProducts
         .map((p) => p.category_name ?? String(p.mainCategory))
         .filter(Boolean)
     );
     return orderedCategories.filter((name) => catsWithProducts.has(name));
-  }, [filteredProducts, orderedCategories]);
+  }, [filteredProducts, orderedCategories, debouncedSearch]);
 
   return { search, setSearch, filteredProducts, displayCategories, debouncedSearch };
 }

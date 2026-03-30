@@ -13,6 +13,7 @@ function ProductSquareCardBase({
 	quantity,
 	onAdd,
 	onRemove,
+	priority = false,
 }: ProductCardProps) {
 	const weightType = getWeightType(product);
 	const isOutOfStock = product.stock_quantity === 0;
@@ -28,7 +29,8 @@ function ProductSquareCardBase({
 					alt={product.name}
 					fill
 					className="object-cover"
-					loading="lazy"
+					priority={priority}
+					loading={priority ? undefined : 'lazy'}
 					sizes="(max-width: 640px) 45vw, 200px"
 				/>
 			</div>

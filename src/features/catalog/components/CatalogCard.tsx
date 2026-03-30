@@ -9,9 +9,10 @@ import type { Product } from '../types';
 interface CatalogCardProps {
   product: Product;
   view: 'list' | 'grid';
+  priority?: boolean;
 }
 
-export function CatalogCard({ product, view }: CatalogCardProps) {
+export function CatalogCard({ product, view, priority = false }: CatalogCardProps) {
   const quantity = useCartItemQuantity(product.id);
   const addToCart = useCartStore((s) => s.addToCart);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
@@ -26,6 +27,7 @@ export function CatalogCard({ product, view }: CatalogCardProps) {
         quantity={quantity}
         onAdd={onAdd}
         onRemove={onRemove}
+        priority={priority}
       />
     );
   }
@@ -36,6 +38,7 @@ export function CatalogCard({ product, view }: CatalogCardProps) {
       quantity={quantity}
       onAdd={onAdd}
       onRemove={onRemove}
+      priority={priority}
     />
   );
 }

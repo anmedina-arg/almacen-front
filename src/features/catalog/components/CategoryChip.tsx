@@ -7,10 +7,11 @@ interface CategoryChipProps {
   label: string;
   imageUrl?: string | null;
   active?: boolean;
+  priority?: boolean;
 }
 
 export const CategoryChip = forwardRef<HTMLAnchorElement, CategoryChipProps>(
-  function CategoryChip({ to, label, imageUrl, active = false }, ref) {
+  function CategoryChip({ to, label, imageUrl, active = false, priority = false }, ref) {
     return (
       <Link
         ref={ref}
@@ -31,6 +32,8 @@ export const CategoryChip = forwardRef<HTMLAnchorElement, CategoryChipProps>(
               fill
               className="object-cover"
               sizes="96px"
+              priority={priority}
+              loading={priority ? undefined : 'lazy'}
             />
           )}
         </div>

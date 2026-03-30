@@ -1,3 +1,4 @@
+import 'server-only';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Product } from '@/types';
 
@@ -31,8 +32,13 @@ function formatComboItem(rawName: string, qty: number, saleType: string): string
  *
  * @param options.includeInactive - When true, returns all products (active + inactive).
  *   The caller is responsible for verifying admin access before passing this flag.
+ * @param options.categoryId - When provided, returns only products of that category.
+ *   Used by SSR and the catalog infinite query to load one category at a time.
  */
-export async function fetchPublicProducts(options?: { includeInactive?: boolean }): Promise<Product[]> {
+export async function fetchPublicProducts(options?: {
+  includeInactive?: boolean;
+  categoryId?: number;
+}): Promise<Product[]> {
   const supabase = await createSupabaseServerClient();
 
   let query = supabase
@@ -60,6 +66,10 @@ export async function fetchPublicProducts(options?: { includeInactive?: boolean 
 
   if (!options?.includeInactive) {
     query = query.eq('active', true);
+  }
+
+  if (options?.categoryId != null) {
+    query = query.eq('category_id', options.categoryId);
   }
 
   const { data, error } = await query;
