@@ -70,11 +70,12 @@ export function Header() {
 				<div className="flex items-center justify-between w-full px-2">
 					<div className="flex items-center gap-2">
 						<Image
-							src="https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png"
+							src={getCloudinaryUrl('https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png', 64)}
 							alt="Market del cevil Logo"
 							width={32}
 							height={32}
 							className="rounded-lg"
+							loading="lazy"
 						/>
 						<h1 className="text-lg font-bold">Market del Cevil</h1>
 					</div>
