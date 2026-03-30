@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
 import HelpButton from './HelpButton';
 import { useIsAuthenticated } from '@/features/auth/stores/authStore';
 import { UserAvatar } from '@/features/auth/components/UserAvatar';
@@ -29,11 +30,12 @@ export function Header() {
 					}`}
 			>
 				<Image
-					src="https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png"
+					src={getCloudinaryUrl('https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png', 256)}
 					alt="Market del cevil Logo"
 					width={128}
 					height={128}
 					className="rounded-2xl"
+					priority
 				/>
 				<div className="flex flex-col items-center gap-2">
 					<h1 className="text-3xl font-bold">Market del Cevil</h1>

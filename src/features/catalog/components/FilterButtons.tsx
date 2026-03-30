@@ -33,7 +33,7 @@ export function FilterButtons({ categories }: FilterButtonsProps) {
     <div className="flex flex-col">
       {/* Fila 1: chips de categoría */}
       <div className="flex gap-2 py-1 overflow-x-auto">
-        {categories.map((cat) => (
+        {categories.map((cat, index) => (
           <CategoryChip
             key={cat.id}
             ref={(el) => {
@@ -44,6 +44,7 @@ export function FilterButtons({ categories }: FilterButtonsProps) {
             label={cat.name}
             imageUrl={cat.image_url}
             active={activeCatName === cat.name.toLowerCase()}
+            priority={index < 3}
           />
         ))}
       </div>
