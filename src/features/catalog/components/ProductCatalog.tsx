@@ -1,7 +1,18 @@
+'use client';
+
+import dynamic from 'next/dynamic';
 import type { Product } from '../types';
-import { InfoBanner } from './InfoBanner';
 import { ProductSearchController } from './ProductSearchController';
-import { OrderFlowController } from './OrderFlowController';
+
+const InfoBanner = dynamic(
+  () => import('./InfoBanner').then((m) => ({ default: m.InfoBanner })),
+  { ssr: false }
+);
+
+const OrderFlowController = dynamic(
+  () => import('./OrderFlowController').then((m) => ({ default: m.OrderFlowController })),
+  { ssr: false }
+);
 
 interface ProductCatalogProps {
   initialProducts: Product[];
