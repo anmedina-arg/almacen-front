@@ -18,9 +18,6 @@ export default async function Home() {
     ? await fetchPublicProducts({ categoryId: firstCategoryId })
     : [];
 
-  const orderedCategories = categories.map((c) => c.name);
-  const orderedCategoryIds = categories.map((c) => c.id);
-
   return (
     <div className="font-barlow flex flex-col min-h-screen px-2">
       <Header />
@@ -28,8 +25,7 @@ export default async function Home() {
       <CategoryNav />
       <ProductCatalog
         initialProducts={initialProducts}
-        orderedCategories={orderedCategories}
-        orderedCategoryIds={orderedCategoryIds}
+        categories={categories}
       />
       <Footer />
     </div>

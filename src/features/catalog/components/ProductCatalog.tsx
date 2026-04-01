@@ -1,7 +1,8 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import type { Product } from '../types';
+import { useMemo } from 'react';
+import type { Product, CategoryWithSubsPublic } from '../types';
 import { ProductSearchController } from './ProductSearchController';
 
 const InfoBanner = dynamic(
@@ -16,11 +17,13 @@ const OrderFlowController = dynamic(
 
 interface ProductCatalogProps {
   initialProducts: Product[];
-  orderedCategories: string[];
-  orderedCategoryIds: number[];
+  categories: CategoryWithSubsPublic[];
 }
 
-export function ProductCatalog({ initialProducts, orderedCategories, orderedCategoryIds }: ProductCatalogProps) {
+export function ProductCatalog({ initialProducts, categories }: ProductCatalogProps) {
+  const orderedCategories = useMemo(() => categories.map((c) => c.name), [categories]);
+  const orderedCategoryIds = useMemo(() => categories.map((c) => c.id), [categories]);
+
   return (
     <>
       <InfoBanner />
