@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import type { Product } from '@/types';
-import { getQuantityPerClick } from '@/utils/productUtils';
+import { getQuantityPerClick, calculateLineTotal } from '@/utils/productUtils';
 
 interface POSCartEntry {
   product: Product;
@@ -8,14 +8,6 @@ interface POSCartEntry {
 }
 
 type POSCart = Record<number, POSCartEntry>;
-
-function computeItemTotal(product: Product, qty: number): number {
-  switch (product.sale_type) {
-    case '100gr': return (qty / 100) * product.price;
-    case 'kg':    return (qty / 1000) * product.price;
-    default:      return qty * product.price;
-  }
-}
 
 export function usePOSCart() {
   const [cart, setCart] = useState<POSCart>({});
@@ -61,7 +53,7 @@ export function usePOSCart() {
   const entries = useMemo(() => Object.values(cart), [cart]);
 
   const total = useMemo(
-    () => entries.reduce((sum, { product, qty }) => sum + computeItemTotal(product, qty), 0),
+    () => entries.reduce((sum, { product, qty }) => sum + calculateLineTotal(qty, product.sale_type, product.price), 0),
     [entries]
   );
 

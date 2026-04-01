@@ -1,7 +1,8 @@
 import { Product, CartItem } from '../types';
+import { calculateLineTotal } from '@/utils/productUtils';
 
 // Re-exportar desde utils compartida
-export { isProductByWeight, getWeightType, getQuantityPerClick } from '@/utils/productUtils';
+export { isProductByWeight, getWeightType, getQuantityPerClick, calculateLineTotal } from '@/utils/productUtils';
 
 /**
  * Obtiene el precio unitario por gramo o unidad
@@ -13,21 +14,8 @@ export const getUnitPrice = (product: Product): number => {
 /**
  * Calcula el precio total de un item del carrito
  */
-export const calculateItemPrice = (item: CartItem): number => {
-  switch (item.saleType) {
-    case '100gr':
-      // Para productos por 100gr: (cantidad en gr / 100) * precio por 100gr
-      return (item.quantity / 100) * item.unitPrice;
-    case 'kg':
-      // Para productos por kg: (cantidad en gr / 1000) * precio por kg
-      return (item.quantity / 1000) * item.unitPrice;
-    case 'unit':
-      // Para productos por unidad: cantidad * precio unitario
-      return item.quantity * item.unitPrice;
-    default:
-      return item.quantity * item.unitPrice;
-  }
-};
+export const calculateItemPrice = (item: CartItem): number =>
+  calculateLineTotal(item.quantity, item.saleType, item.unitPrice);
 
 /**
  * Trunca el nombre del producto según el ancho máximo

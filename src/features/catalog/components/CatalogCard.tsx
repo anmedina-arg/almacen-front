@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductSquareCard } from './ProductSquareCard';
 import { useCartItemQuantity, useCartStore } from '../stores/cartStore';
@@ -17,8 +17,14 @@ export function CatalogCard({ product, view, priority = false }: CatalogCardProp
   const addToCart = useCartStore((s) => s.addToCart);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
 
-  const onAdd = useCallback(() => addToCart(product), [addToCart, product]);
-  const onRemove = useCallback(() => removeFromCart(product), [removeFromCart, product]);
+  // Ref trick: keeps the latest product reference without being a useCallback dependency.
+  // Prevents onAdd/onRemove from being recreated when the parent re-renders with a new
+  // product object reference (same data, different identity — e.g. after infinite scroll).
+  const productRef = useRef(product);
+  productRef.current = product;
+
+  const onAdd = useCallback(() => addToCart(productRef.current), [addToCart]);
+  const onRemove = useCallback(() => removeFromCart(productRef.current), [removeFromCart]);
 
   if (view === 'grid') {
     return (

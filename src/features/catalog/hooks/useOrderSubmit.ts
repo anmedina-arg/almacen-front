@@ -48,10 +48,10 @@ export function useOrderSubmit(cartItems: CartItem[]) {
     openWhatsApp(message);
 
     setShowConfirmation(false);
-    clearCart();
 
     orderPromise
       .then(() => {
+        clearCart();
         router.refresh();
       })
       .catch((error: unknown) => {

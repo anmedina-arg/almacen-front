@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import type { Product } from '../types';
+import type { Product, CategoryWithSubsPublic } from '../types';
 import { ProductSearchController } from './ProductSearchController';
 
 const InfoBanner = dynamic(
@@ -16,18 +16,16 @@ const OrderFlowController = dynamic(
 
 interface ProductCatalogProps {
   initialProducts: Product[];
-  orderedCategories: string[];
-  orderedCategoryIds: number[];
+  categories: CategoryWithSubsPublic[];
 }
 
-export function ProductCatalog({ initialProducts, orderedCategories, orderedCategoryIds }: ProductCatalogProps) {
+export function ProductCatalog({ initialProducts, categories }: ProductCatalogProps) {
   return (
     <>
       <InfoBanner />
       <ProductSearchController
         initialProducts={initialProducts}
-        orderedCategories={orderedCategories}
-        orderedCategoryIds={orderedCategoryIds}
+        categories={categories}
       />
       <OrderFlowController />
     </>
