@@ -38,6 +38,7 @@ function formatComboItem(rawName: string, qty: number, saleType: string): string
 export async function fetchPublicProducts(options?: {
   includeInactive?: boolean;
   categoryId?: number;
+  search?: string;
 }): Promise<Product[]> {
   const supabase = await createSupabaseServerClient();
 
@@ -70,6 +71,10 @@ export async function fetchPublicProducts(options?: {
 
   if (options?.categoryId != null) {
     query = query.eq('category_id', options.categoryId);
+  }
+
+  if (options?.search) {
+    query = query.ilike('name', `%${options.search}%`);
   }
 
   const { data, error } = await query;

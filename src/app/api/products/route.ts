@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
     const includeInactive = searchParams.get('includeInactive') === 'true';
     const categoryIdParam = searchParams.get('categoryId');
     const categoryId = categoryIdParam ? Number(categoryIdParam) : undefined;
+    const searchParam = searchParams.get('search');
+    const search = searchParam ? searchParam.trim() : undefined;
 
     if (includeInactive) {
       const { isAdmin } = await verifyAdminAuth();
@@ -21,7 +23,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const products = await fetchPublicProducts({ includeInactive, categoryId });
+    const products = await fetchPublicProducts({ includeInactive, categoryId, search });
 
     return NextResponse.json(products, {
       headers: {

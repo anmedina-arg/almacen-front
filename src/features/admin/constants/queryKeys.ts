@@ -33,6 +33,11 @@ export const adminKeys = {
   payments: () => [...adminKeys.all, 'payments'] as const,
   orderPayments: (orderId: number) => [...adminKeys.payments(), orderId] as const,
 
+  // Dashboard query keys
+  dashboard: () => [...adminKeys.all, 'dashboard'] as const,
+  dashboardStockByCategory: () => [...adminKeys.dashboard(), 'stock-by-category'] as const,
+  dashboardStockProducts: (category: string) => [...adminKeys.dashboard(), 'stock-products', category] as const,
+
   // Ranking query keys
   ranking: () => [...adminKeys.all, 'ranking'] as const,
   topProducts: (params: object) => [...adminKeys.ranking(), 'products', params] as const,

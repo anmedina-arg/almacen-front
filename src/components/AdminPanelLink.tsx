@@ -3,6 +3,7 @@
 import { useUser } from '@/features/auth/stores/authStore';
 import { useQuery } from '@tanstack/react-query';
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { features } from '@/lib/features';
 import Link from 'next/link';
 
 export function AdminPanelLink() {
@@ -32,7 +33,7 @@ export function AdminPanelLink() {
   return (
     <div className="w-full px-4 py-3 bg-green-50 border-b border-green-100">
       <Link
-        href="/admin/products"
+        href={features.dashboard ? '/admin/dashboard' : '/admin/products'}
         className="flex items-center justify-center gap-2 w-full max-w-md mx-auto px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors font-medium text-sm shadow-sm"
       >
         <svg
