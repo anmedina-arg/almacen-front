@@ -61,7 +61,8 @@ export async function GET(request: NextRequest) {
       .from('orders')
       .select('id')
       .in('status', ['pending', 'confirmed'])
-      .gte('created_at', startIso),
+      .gte('created_at', startIso)
+      .limit(10000),
 
     // ALL historical movements (to reconstruct daily stock from any start date).
     // Total volume is small (~3-4k rows) so fetching all is fine.
@@ -83,10 +84,19 @@ export async function GET(request: NextRequest) {
   const orderIds = (ordersRes.data ?? []).map((o) => o.id);
   if (orderIds.length === 0) return NextResponse.json([]);
 
-  const { data: itemsData } = await supabase
-    .from('order_items')
-    .select('product_id, quantity')
-    .in('order_id', orderIds);
+  // Fetch in batches of 500 order IDs to avoid URL length limits and
+  // bypass PostgREST's default 1000-row cap per request.
+  const BATCH = 500;
+  const allItems: { product_id: number | null; quantity: string }[] = [];
+  for (let i = 0; i < orderIds.length; i += BATCH) {
+    const { data } = await supabase
+      .from('order_items')
+      .select('product_id, quantity')
+      .in('order_id', orderIds.slice(i, i + BATCH))
+      .limit(10000);
+    if (data) allItems.push(...data);
+  }
+  const itemsData = allItems;
 
   // Sales per product
   const salesMap = new Map<number, number>();
