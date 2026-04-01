@@ -17,6 +17,11 @@ const COLORS = [
   '#86efac', '#bbf7d0', '#dcfce7',
 ];
 
+const COLORS_SELECTED = [
+  '#15803d', '#14532d', '#14532d', '#16a34a', '#22c55e',
+  '#4ade80', '#86efac', '#bbf7d0',
+];
+
 function formatARS(value: number): string {
   return new Intl.NumberFormat('es-AR', {
     style: 'currency',
@@ -27,10 +32,18 @@ function formatARS(value: number): string {
 
 interface Props {
   data: StockByCategoryItem[];
+  selectedCategory: string | null;
+  onCategoryClick: (category: string) => void;
 }
 
-export function StockByCategoryChart({ data }: Props) {
+export function StockByCategoryChart({ data, selectedCategory, onCategoryClick }: Props) {
   const total = data.reduce((sum, d) => sum + d.total_value, 0);
+
+  const handleClick = (payload: unknown) => {
+    const item = payload as { activePayload?: { payload: StockByCategoryItem }[] };
+    const category = item?.activePayload?.[0]?.payload?.category_name;
+    if (category) onCategoryClick(category);
+  };
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
@@ -41,7 +54,7 @@ export function StockByCategoryChart({ data }: Props) {
           </h2>
           <p className="text-2xl font-bold text-gray-900 mt-0.5">{formatARS(total)}</p>
         </div>
-        <span className="text-xs text-gray-400 mt-1">stock × costo</span>
+        <span className="text-xs text-gray-400 mt-1">Click en una barra para ver detalle</span>
       </div>
 
       <div className="mt-4" style={{ height: 320 }}>
@@ -50,6 +63,8 @@ export function StockByCategoryChart({ data }: Props) {
             data={data}
             layout="vertical"
             margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
+            onClick={handleClick}
+            style={{ cursor: 'pointer' }}
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
             <XAxis
@@ -73,9 +88,16 @@ export function StockByCategoryChart({ data }: Props) {
               cursor={{ fill: '#f0fdf4' }}
             />
             <Bar dataKey="total_value" radius={[0, 4, 4, 0]} maxBarSize={32}>
-              {data.map((_, index) => (
-                <Cell key={index} fill={COLORS[index % COLORS.length]} />
-              ))}
+              {data.map((item, index) => {
+                const isSelected = item.category_name === selectedCategory;
+                return (
+                  <Cell
+                    key={index}
+                    fill={isSelected ? COLORS_SELECTED[index % COLORS_SELECTED.length] : COLORS[index % COLORS.length]}
+                    opacity={selectedCategory && !isSelected ? 0.4 : 1}
+                  />
+                );
+              })}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
