@@ -18,7 +18,7 @@ export async function GET() {
   const [{ data: products, error: productsError }, { data: stockData }] = await Promise.all([
     supabase
       .from('products')
-      .select('id, cost, cat:categories!products_category_id_fkey(name)')
+      .select('id, cost, sale_type, cat:categories!products_category_id_fkey(name)')
       .eq('active', true),
     supabase.from('product_stock').select('product_id, quantity'),
   ]);
@@ -36,8 +36,14 @@ export async function GET() {
   for (const product of products) {
     const cat = product.cat as unknown as { name: string } | null;
     const categoryName = cat?.name ?? 'Sin categoría';
-    const quantity = stockMap.get(product.id) ?? 0;
-    const value = quantity * (product.cost ?? 0);
+    const stockGrams = stockMap.get(product.id) ?? 0;
+    const cost = product.cost ?? 0;
+    let value: number;
+    switch (product.sale_type) {
+      case 'kg':    value = (stockGrams / 1000) * cost; break;
+      case '100gr': value = (stockGrams / 100)  * cost; break;
+      default:      value = stockGrams * cost;
+    }
 
     totals.set(categoryName, (totals.get(categoryName) ?? 0) + value);
   }
