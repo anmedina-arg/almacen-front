@@ -84,19 +84,21 @@ export async function GET(request: NextRequest) {
   const orderIds = (ordersRes.data ?? []).map((o) => o.id);
   if (orderIds.length === 0) return NextResponse.json([]);
 
-  // Fetch in batches of 500 order IDs to avoid URL length limits and
-  // bypass PostgREST's default 1000-row cap per request.
+  // Parallel batches of 500 order IDs — avoids URL length limits,
+  // bypasses PostgREST's 1000-row cap, and runs concurrently.
   const BATCH = 500;
-  const allItems: { product_id: number | null; quantity: string }[] = [];
+  const batches = [];
   for (let i = 0; i < orderIds.length; i += BATCH) {
-    const { data } = await supabase
-      .from('order_items')
-      .select('product_id, quantity')
-      .in('order_id', orderIds.slice(i, i + BATCH))
-      .limit(10000);
-    if (data) allItems.push(...data);
+    batches.push(
+      supabase
+        .from('order_items')
+        .select('product_id, quantity')
+        .in('order_id', orderIds.slice(i, i + BATCH))
+        .limit(10000)
+    );
   }
-  const itemsData = allItems;
+  const batchResults = await Promise.all(batches);
+  const itemsData = batchResults.flatMap((r) => r.data ?? []);
 
   // Sales per product
   const salesMap = new Map<number, number>();

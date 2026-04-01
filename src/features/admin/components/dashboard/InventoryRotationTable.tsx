@@ -5,7 +5,8 @@ import { useInventoryRotation } from '../../hooks/useInventoryRotation';
 import type { RotationItem } from '@/app/api/dashboard/rotation/route';
 
 const PERIODS = [
-  { label: '7 días', value: 7 },
+  { label: '7 días',  value: 7  },
+  { label: '15 días', value: 15 },
   { label: '30 días', value: 30 },
   { label: '60 días', value: 60 },
   { label: '90 días', value: 90 },
