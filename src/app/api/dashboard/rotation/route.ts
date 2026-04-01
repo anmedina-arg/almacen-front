@@ -106,14 +106,14 @@ export async function GET(request: NextRequest) {
   const result: RotationItem[] = [];
 
   for (const product of productsRes.data ?? []) {
-    const units_sold = salesMap.get(product.id) ?? 0;
-    if (units_sold === 0) continue;
-
     const movements = movsByProduct.get(product.id) ?? [];
     // (stock_day1 + stock_day2 + ... + stock_dayN) / N
     const avg_stock = calcDailyAvgStock(movements, startDate, days);
 
+    // No stock at all → rotation is undefined, skip
     if (avg_stock === 0) continue;
+
+    const units_sold = salesMap.get(product.id) ?? 0;
 
     const cat = product.cat as unknown as { name: string } | null;
     result.push({
