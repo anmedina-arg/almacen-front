@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useEffect, useRef } from 'react';
+import { useMemo, useEffect, useRef, useState } from 'react';
 import type { Product, CategoryWithSubsPublic } from '../types';
 import { useCatalogByCategory } from '../hooks/useCatalogByCategory';
 import { useProductSearch } from '../hooks/useProductSearch';
@@ -46,6 +46,35 @@ export function ProductSearchController({
     );
     return orderedCategories.filter((name) => catsWithProducts.has(name));
   }, [isSearchMode, products, orderedCategories]);
+
+  // Chip navigation: target category requested before its section was in the DOM.
+  const [pendingScrollTarget, setPendingScrollTarget] = useState<string | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      setPendingScrollTarget((e as CustomEvent<string>).detail);
+    };
+    window.addEventListener('catalog:request-category', handler);
+    return () => window.removeEventListener('catalog:request-category', handler);
+  }, []);
+
+  useEffect(() => {
+    if (!pendingScrollTarget || isSearchMode) return;
+
+    const section = document.getElementById(pendingScrollTarget);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setPendingScrollTarget(null);
+      return;
+    }
+
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    } else if (!hasNextPage) {
+      // All pages loaded but section not found — category has no products.
+      setPendingScrollTarget(null);
+    }
+  }, [pendingScrollTarget, data, hasNextPage, isFetchingNextPage, fetchNextPage, isSearchMode]);
 
   // Sentinel: trigger next category fetch when scrolling in browse mode.
   const sentinelRef = useRef<HTMLDivElement | null>(null);
