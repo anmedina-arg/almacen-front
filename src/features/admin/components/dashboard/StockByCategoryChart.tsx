@@ -39,12 +39,6 @@ interface Props {
 export function StockByCategoryChart({ data, selectedCategory, onCategoryClick }: Props) {
   const total = data.reduce((sum, d) => sum + d.total_value, 0);
 
-  const handleClick = (payload: unknown) => {
-    const item = payload as { activePayload?: { payload: StockByCategoryItem }[] };
-    const category = item?.activePayload?.[0]?.payload?.category_name;
-    if (category) onCategoryClick(category);
-  };
-
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
       <div className="flex items-start justify-between mb-1">
@@ -63,8 +57,6 @@ export function StockByCategoryChart({ data, selectedCategory, onCategoryClick }
             data={data}
             layout="vertical"
             margin={{ top: 0, right: 16, left: 0, bottom: 0 }}
-            onClick={handleClick}
-            style={{ cursor: 'pointer' }}
           >
             <CartesianGrid strokeDasharray="3 3" horizontal={false} />
             <XAxis
@@ -87,7 +79,13 @@ export function StockByCategoryChart({ data, selectedCategory, onCategoryClick }
               contentStyle={{ fontSize: 13, borderRadius: 8, border: '1px solid #e5e7eb' }}
               cursor={{ fill: '#f0fdf4' }}
             />
-            <Bar dataKey="total_value" radius={[0, 4, 4, 0]} maxBarSize={32}>
+            <Bar
+              dataKey="total_value"
+              radius={[0, 4, 4, 0]}
+              maxBarSize={32}
+              cursor="pointer"
+              onClick={(barData) => onCategoryClick((barData as unknown as StockByCategoryItem).category_name)}
+            >
               {data.map((item, index) => {
                 const isSelected = item.category_name === selectedCategory;
                 return (
