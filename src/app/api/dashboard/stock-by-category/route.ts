@@ -15,30 +15,28 @@ export async function GET() {
 
   const supabase = await createSupabaseServerClient();
 
-  const { data, error } = await supabase
-    .from('products')
-    .select(
-      `
-      cost,
-      cat:categories!products_category_id_fkey(name),
-      stock:product_stock(quantity)
-    `
-    )
-    .eq('active', true);
+  const [{ data: products, error: productsError }, { data: stockData }] = await Promise.all([
+    supabase
+      .from('products')
+      .select('id, cost, cat:categories!products_category_id_fkey(name)')
+      .eq('active', true),
+    supabase.from('product_stock').select('product_id, quantity'),
+  ]);
 
-  if (error || !data) {
-    return NextResponse.json({ error: 'Error fetching data' }, { status: 500 });
+  if (productsError || !products) {
+    return NextResponse.json({ error: 'Error fetching products' }, { status: 500 });
   }
 
-  // Aggregate: sum(stock * cost) per category
+  const stockMap = new Map<number, number>(
+    (stockData ?? []).map((s) => [s.product_id, s.quantity])
+  );
+
   const totals = new Map<string, number>();
 
-  for (const product of data) {
+  for (const product of products) {
     const cat = product.cat as unknown as { name: string } | null;
-    const stockRows = product.stock as { quantity: number }[] | null;
-
     const categoryName = cat?.name ?? 'Sin categoría';
-    const quantity = stockRows?.[0]?.quantity ?? 0;
+    const quantity = stockMap.get(product.id) ?? 0;
     const value = quantity * (product.cost ?? 0);
 
     totals.set(categoryName, (totals.get(categoryName) ?? 0) + value);
