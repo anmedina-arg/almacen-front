@@ -1,3 +1,4 @@
+import { useCallback } from 'react';
 import { create } from 'zustand';
 import type { CartItem } from '../types';
 import type { Product } from '@/types';
@@ -161,5 +162,11 @@ export const useCartStore = create<CartStore>()((set) => ({
 
 // Granular selectors
 export const useCartItems = () => useCartStore((s) => s.items);
-export const useCartItemQuantity = (productId: number) =>
-  useCartStore((s) => s.items.find((i) => i.id === productId)?.quantity ?? 0);
+
+export function useCartItemQuantity(productId: number) {
+  const selector = useCallback(
+    (s: CartStore) => s.items.find((i) => i.id === productId)?.quantity ?? 0,
+    [productId]
+  );
+  return useCartStore(selector);
+}
