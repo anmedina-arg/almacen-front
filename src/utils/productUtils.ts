@@ -1,6 +1,26 @@
 import type { Product, WeightType } from '@/types';
 
 /**
+ * Calcula el precio total de un ítem dado su cantidad, tipo de venta y precio unitario.
+ * Fuente de verdad compartida entre Catálogo, POS y Order Editor.
+ *
+ * @param quantity - cantidad en gramos (para kg/100gr) o unidades
+ * @param saleType - tipo de venta: 'kg' | '100gr' | 'unit'
+ * @param unitPrice - precio por kg, por 100gr, o por unidad según saleType
+ */
+export const calculateLineTotal = (
+  quantity: number,
+  saleType: WeightType,
+  unitPrice: number,
+): number => {
+  switch (saleType) {
+    case '100gr': return (quantity / 100) * unitPrice;
+    case 'kg':    return (quantity / 1000) * unitPrice;
+    default:      return quantity * unitPrice;
+  }
+};
+
+/**
  * Detecta si un producto se vende por peso
  */
 export const isProductByWeight = (
