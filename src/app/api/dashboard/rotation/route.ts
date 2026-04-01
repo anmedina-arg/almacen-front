@@ -64,12 +64,12 @@ export async function GET(request: NextRequest) {
       .gte('created_at', startIso)
       .limit(10000),
 
-    // ALL historical movements (to reconstruct daily stock from any start date).
-    // Total volume is small (~3-4k rows) so fetching all is fine.
+    // ALL historical movements to reconstruct daily stock.
     supabase
       .from('stock_movement_log')
       .select('product_id, new_qty, created_at')
-      .order('created_at', { ascending: true }),
+      .order('created_at', { ascending: true })
+      .limit(100000),
 
     supabase
       .from('products')
