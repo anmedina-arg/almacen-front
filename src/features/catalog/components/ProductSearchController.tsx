@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useEffect, useRef } from 'react';
-import type { Product } from '../types';
+import type { Product, CategoryWithSubsPublic } from '../types';
 import { useCatalogByCategory } from '../hooks/useCatalogByCategory';
 import { useProductSearch } from '../hooks/useProductSearch';
 import { ProductSearchBar } from './ProductSearchBar';
@@ -9,15 +9,16 @@ import { ProductSearchSection } from './ProductSearchSection';
 
 interface ProductSearchControllerProps {
   initialProducts: Product[];
-  orderedCategories: string[];
-  orderedCategoryIds: number[];
+  categories: CategoryWithSubsPublic[];
 }
 
 export function ProductSearchController({
   initialProducts,
-  orderedCategories,
-  orderedCategoryIds,
+  categories,
 }: ProductSearchControllerProps) {
+  const orderedCategoryIds = useMemo(() => categories.map((c) => c.id), [categories]);
+  const orderedCategories = useMemo(() => categories.map((c) => c.name), [categories]);
+
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useCatalogByCategory({
     orderedCategoryIds,
     initialProducts,
