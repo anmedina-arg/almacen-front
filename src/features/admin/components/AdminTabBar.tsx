@@ -2,8 +2,10 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { features } from '@/lib/features';
 
 const MANAGEMENT_LINKS = [
+  ...(features.dashboard ? [{ href: '/admin/dashboard', label: 'Dashboard' }] : []),
   { href: '/admin/products', label: 'Productos' },
   { href: '/admin/categories', label: 'Categorías' },
   { href: '/admin/stock', label: 'Stock' },
