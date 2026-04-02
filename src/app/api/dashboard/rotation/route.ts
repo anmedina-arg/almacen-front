@@ -55,14 +55,15 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createSupabaseServerClient();
 
-  const [ordersRes, allMovementsRes, productsRes] = await Promise.all([
-    // Sales in period
+  const [itemsRes, allMovementsRes, productsRes] = await Promise.all([
+    // Single query: order_items joined to orders via PostgREST !inner.
+    // Filters status and date on the orders side, no two-step ID lookup needed.
     supabase
-      .from('orders')
-      .select('id')
-      .in('status', ['pending', 'confirmed'])
-      .gte('created_at', startIso)
-      .limit(10000),
+      .from('order_items')
+      .select('product_id, quantity, orders!inner(status, created_at)')
+      .filter('orders.status', 'in', '("pending","confirmed")')
+      .gte('orders.created_at', startIso)
+      .limit(100000),
 
     // ALL historical movements to reconstruct daily stock.
     supabase
@@ -77,28 +78,12 @@ export async function GET(request: NextRequest) {
       .eq('active', true),
   ]);
 
-  if (ordersRes.error || productsRes.error || allMovementsRes.error) {
+  if (itemsRes.error || productsRes.error || allMovementsRes.error) {
     return NextResponse.json({ error: 'Error fetching data' }, { status: 500 });
   }
 
-  const orderIds = (ordersRes.data ?? []).map((o) => o.id);
-  if (orderIds.length === 0) return NextResponse.json([]);
-
-  // Parallel batches of 500 order IDs — avoids URL length limits,
-  // bypasses PostgREST's 1000-row cap, and runs concurrently.
-  const BATCH = 500;
-  const batches = [];
-  for (let i = 0; i < orderIds.length; i += BATCH) {
-    batches.push(
-      supabase
-        .from('order_items')
-        .select('product_id, quantity')
-        .in('order_id', orderIds.slice(i, i + BATCH))
-        .limit(10000)
-    );
-  }
-  const batchResults = await Promise.all(batches);
-  const itemsData = batchResults.flatMap((r) => r.data ?? []);
+  const itemsData = itemsRes.data ?? [];
+  if (itemsData.length === 0) return NextResponse.json([]);
 
   // Sales per product
   const salesMap = new Map<number, number>();
