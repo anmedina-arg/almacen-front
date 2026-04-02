@@ -13,34 +13,51 @@ export interface RotationItem {
 }
 
 /**
- * For each day in [startDate, today], find the last stock snapshot before
- * end-of-day for the given sorted-ASC movements array.
- * Returns 0 if no movement exists before that day (product had no stock).
+ * Time-weighted average stock over [startDate, endDate].
+ * Each stock level is weighted by how long it was held:
+ *   avg = SUM(qty_i × duration_i) / total_duration
+ *
+ * This correctly handles intraday restocks + sales: if 200g were available
+ * for 1 day and 2g for 6 days, the average reflects that distribution
+ * instead of just the end-of-day snapshot (which would show ~2g).
  */
-function calcDailyAvgStock(
+function calcTimeWeightedAvgStock(
   movements: { new_qty: number; created_at: string }[],
   startDate: Date,
-  days: number,
+  endDate: Date,
 ): number {
-  let total = 0;
-  for (let i = 0; i < days; i++) {
-    const endOfDay = new Date(startDate);
-    endOfDay.setDate(endOfDay.getDate() + i);
-    endOfDay.setHours(23, 59, 59, 999);
-    const endMs = endOfDay.getTime();
+  const startMs = startDate.getTime();
+  const endMs = endDate.getTime();
+  const periodMs = endMs - startMs;
+  if (periodMs <= 0) return 0;
 
-    // Last movement on or before end-of-day (movements sorted ASC)
-    let stockOnDay = 0;
-    for (const m of movements) {
-      if (new Date(m.created_at).getTime() <= endMs) {
-        stockOnDay = Number(m.new_qty);
-      } else {
-        break;
-      }
+  // Stock level just before the period starts (last movement before startDate)
+  let currentQty = 0;
+  for (const m of movements) {
+    if (new Date(m.created_at).getTime() < startMs) {
+      currentQty = Number(m.new_qty);
+    } else {
+      break;
     }
-    total += stockOnDay;
   }
-  return total / days;
+
+  let weightedSum = 0;
+  let lastTs = startMs;
+
+  for (const m of movements) {
+    const ts = new Date(m.created_at).getTime();
+    if (ts <= startMs) continue; // before period
+    if (ts >= endMs) break;      // after period
+
+    weightedSum += currentQty * (ts - lastTs);
+    lastTs = ts;
+    currentQty = Number(m.new_qty);
+  }
+
+  // Final interval: last known level until end of period
+  weightedSum += currentQty * (endMs - lastTs);
+
+  return weightedSum / periodMs;
 }
 
 export async function GET(request: NextRequest) {
@@ -104,8 +121,7 @@ export async function GET(request: NextRequest) {
 
   for (const product of productsRes.data ?? []) {
     const movements = movsByProduct.get(product.id) ?? [];
-    // (stock_day1 + stock_day2 + ... + stock_dayN) / N
-    const avg_stock = calcDailyAvgStock(movements, startDate, days);
+    const avg_stock = calcTimeWeightedAvgStock(movements, startDate, new Date());
 
     // No stock at all → rotation is undefined, skip
     if (avg_stock === 0) continue;
