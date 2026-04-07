@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useStockByCategory } from '../../hooks/useStockByCategory';
 import { useStockProducts } from '../../hooks/useStockProducts';
 import { StockProductsTable } from './StockProductsTable';
-import { InventoryRotationTable } from './InventoryRotationTable';
+import { InventoryRotationDashboard } from './InventoryRotationDashboard';
 
 const StockByCategoryChart = dynamic(
   () => import('./StockByCategoryChart').then((m) => ({ default: m.StockByCategoryChart })),
@@ -75,7 +75,7 @@ export function DashboardPanel() {
         />
       )}
 
-      <InventoryRotationTable />
+      <InventoryRotationDashboard />
     </div>
   );
 }

@@ -84,7 +84,7 @@ export function StockByCategoryChart({ data, selectedCategory, onCategoryClick }
               radius={[0, 4, 4, 0]}
               maxBarSize={32}
               cursor="pointer"
-              onClick={(barData) => onCategoryClick((barData as unknown as StockByCategoryItem).category_name)}
+              onClick={(barData) => onCategoryClick(barData.payload?.category_name)}
             >
               {data.map((item, index) => {
                 const isSelected = item.category_name === selectedCategory;
