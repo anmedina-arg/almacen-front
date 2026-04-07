@@ -37,6 +37,7 @@ export const adminKeys = {
   dashboard: () => [...adminKeys.all, 'dashboard'] as const,
   dashboardStockByCategory: () => [...adminKeys.dashboard(), 'stock-by-category'] as const,
   dashboardStockProducts: (category: string) => [...adminKeys.dashboard(), 'stock-products', category] as const,
+  dashboardPendingPayments: (page: number) => [...adminKeys.dashboard(), 'pending-payments', page] as const,
   dashboardRotation: (days: number) => [...adminKeys.dashboard(), 'rotation', days] as const,
   dashboardRotationSnapshots: (productId: number) => [...adminKeys.dashboard(), 'rotation-snapshots', productId] as const,
 

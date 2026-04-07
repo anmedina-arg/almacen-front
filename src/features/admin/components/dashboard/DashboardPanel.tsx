@@ -34,7 +34,7 @@ export function DashboardPanel() {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-xl font-bold text-gray-800 mb-4">Dashboard</h1>
 
       <PendingPaymentsTable />

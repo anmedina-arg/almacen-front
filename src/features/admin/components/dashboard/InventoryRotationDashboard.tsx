@@ -129,11 +129,9 @@ function CardSkeleton() {
 
 function SegmentCards({
   data,
-  days,
   onSelect,
 }: {
   data: RotationItem[];
-  days: number;
   onSelect: (seg: SegmentKey) => void;
 }) {
   const total = data.length;
@@ -337,7 +335,6 @@ export function InventoryRotationDashboard() {
             {!isLoading && data && (
               <SegmentCards
                 data={data}
-                days={days}
                 onSelect={(seg) => navigate({ level: 2, segment: seg })}
               />
             )}

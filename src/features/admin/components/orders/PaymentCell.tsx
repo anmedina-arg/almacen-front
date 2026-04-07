@@ -10,11 +10,12 @@ interface PaymentCellProps {
   orderId: number;
   orderTotal: number;
   payments: OrderPayment[];
+  onSuccess?: () => void;
 }
 
 const METHODS: PaymentMethod[] = ['efectivo', 'transferencia'];
 
-export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps) {
+export function PaymentCell({ orderId, orderTotal, payments, onSuccess }: PaymentCellProps) {
   const [isEditing, setIsEditing] = useState(false);
 
   // Form state
@@ -92,7 +93,7 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
             { method: 'transferencia', amount: amt2 },
           ],
         },
-        { onSuccess: () => setIsEditing(false) }
+        { onSuccess: () => { setIsEditing(false); onSuccess?.(); } }
       );
     } else {
       const debeStr = debeAmount.trim();
@@ -104,12 +105,12 @@ export function PaymentCell({ orderId, orderTotal, payments }: PaymentCellProps)
         }
         setPayments(
           { orderId, orderTotal, payments: [{ method: selected, amount: orderTotal - debe }] },
-          { onSuccess: () => setIsEditing(false) }
+          { onSuccess: () => { setIsEditing(false); onSuccess?.(); } }
         );
       } else {
         setPayments(
           { orderId, orderTotal, payments: [{ method: selected }] },
-          { onSuccess: () => setIsEditing(false) }
+          { onSuccess: () => { setIsEditing(false); onSuccess?.(); } }
         );
       }
     }
