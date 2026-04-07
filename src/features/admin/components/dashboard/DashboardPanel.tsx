@@ -6,6 +6,7 @@ import { useStockByCategory } from '../../hooks/useStockByCategory';
 import { useStockProducts } from '../../hooks/useStockProducts';
 import { StockProductsTable } from './StockProductsTable';
 import { InventoryRotationDashboard } from './InventoryRotationDashboard';
+import { PendingPaymentsTable } from './PendingPaymentsTable';
 
 const StockByCategoryChart = dynamic(
   () => import('./StockByCategoryChart').then((m) => ({ default: m.StockByCategoryChart })),
@@ -36,6 +37,9 @@ export function DashboardPanel() {
     <div className="p-4 max-w-4xl mx-auto">
       <h1 className="text-xl font-bold text-gray-800 mb-4">Dashboard</h1>
 
+      <PendingPaymentsTable />
+
+      <div className="mt-6">
       {isCategoryLoading && <ChartSkeleton />}
 
       {isCategoryError && (
@@ -76,6 +80,7 @@ export function DashboardPanel() {
       )}
 
       <InventoryRotationDashboard />
+      </div>
     </div>
   );
 }
