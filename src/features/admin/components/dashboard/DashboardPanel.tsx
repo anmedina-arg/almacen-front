@@ -13,6 +13,11 @@ const StockByCategoryChart = dynamic(
   { ssr: false, loading: () => <ChartSkeleton /> }
 );
 
+const StockValueHistoryChart = dynamic(
+  () => import('./StockValueHistoryChart').then((m) => ({ default: m.StockValueHistoryChart })),
+  { ssr: false, loading: () => <ChartSkeleton /> }
+);
+
 function ChartSkeleton() {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm animate-pulse">
@@ -39,47 +44,51 @@ export function DashboardPanel() {
 
       <PendingPaymentsTable />
 
-      <div className="mt-6">
-      {isCategoryLoading && <ChartSkeleton />}
+      <div className="mt-6 space-y-6">
+        <StockValueHistoryChart />
 
-      {isCategoryError && (
-        <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg p-4">
-          Error al cargar los datos de stock.
+        <div>
+          {isCategoryLoading && <ChartSkeleton />}
+
+          {isCategoryError && (
+            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg p-4">
+              Error al cargar los datos de stock.
+            </div>
+          )}
+
+          {categoryData && categoryData.length === 0 && (
+            <div className="text-sm text-gray-400 bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+              No hay productos con stock y costo registrados.
+            </div>
+          )}
+
+          {categoryData && categoryData.length > 0 && (
+            <StockByCategoryChart
+              data={categoryData}
+              selectedCategory={selectedCategory}
+              onCategoryClick={handleCategoryClick}
+            />
+          )}
+
+          {selectedCategory && isProductLoading && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mt-4 animate-pulse">
+              <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-8 bg-gray-100 rounded mb-2" />
+              ))}
+            </div>
+          )}
+
+          {selectedCategory && productData && (
+            <StockProductsTable
+              category={selectedCategory}
+              data={productData}
+              onClose={() => setSelectedCategory(null)}
+            />
+          )}
         </div>
-      )}
 
-      {categoryData && categoryData.length === 0 && (
-        <div className="text-sm text-gray-400 bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          No hay productos con stock y costo registrados.
-        </div>
-      )}
-
-      {categoryData && categoryData.length > 0 && (
-        <StockByCategoryChart
-          data={categoryData}
-          selectedCategory={selectedCategory}
-          onCategoryClick={handleCategoryClick}
-        />
-      )}
-
-      {selectedCategory && isProductLoading && (
-        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mt-4 animate-pulse">
-          <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-8 bg-gray-100 rounded mb-2" />
-          ))}
-        </div>
-      )}
-
-      {selectedCategory && productData && (
-        <StockProductsTable
-          category={selectedCategory}
-          data={productData}
-          onClose={() => setSelectedCategory(null)}
-        />
-      )}
-
-      <InventoryRotationDashboard />
+        <InventoryRotationDashboard />
       </div>
     </div>
   );

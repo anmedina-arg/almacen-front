@@ -28,10 +28,12 @@ export async function GET(request: NextRequest) {
   const supabase = await createSupabaseServerClient();
 
   // Query 1 — lightweight: only what's needed to evaluate the DEBE condition
+  // Filtro desde el 20/03/2026 — pedidos anteriores no se muestran en el dashboard
   const { data: lightweight, error: lwErr } = await supabase
     .from('orders')
     .select('id, total, order_payments(amount)')
     .neq('status', 'cancelled')
+    .gte('created_at', '2026-03-20T00:00:00.000Z')
     .order('created_at', { ascending: false });
 
   if (lwErr) return NextResponse.json({ error: lwErr.message }, { status: 500 });
