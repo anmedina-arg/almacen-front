@@ -5,10 +5,16 @@ import dynamic from 'next/dynamic';
 import { useStockByCategory } from '../../hooks/useStockByCategory';
 import { useStockProducts } from '../../hooks/useStockProducts';
 import { StockProductsTable } from './StockProductsTable';
-import { InventoryRotationTable } from './InventoryRotationTable';
+import { InventoryRotationDashboard } from './InventoryRotationDashboard';
+import { PendingPaymentsTable } from './PendingPaymentsTable';
 
 const StockByCategoryChart = dynamic(
   () => import('./StockByCategoryChart').then((m) => ({ default: m.StockByCategoryChart })),
+  { ssr: false, loading: () => <ChartSkeleton /> }
+);
+
+const StockValueHistoryChart = dynamic(
+  () => import('./StockValueHistoryChart').then((m) => ({ default: m.StockValueHistoryChart })),
   { ssr: false, loading: () => <ChartSkeleton /> }
 );
 
@@ -33,49 +39,57 @@ export function DashboardPanel() {
   };
 
   return (
-    <div className="p-4 max-w-4xl mx-auto">
+    <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-xl font-bold text-gray-800 mb-4">Dashboard</h1>
 
-      {isCategoryLoading && <ChartSkeleton />}
+      <PendingPaymentsTable />
 
-      {isCategoryError && (
-        <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg p-4">
-          Error al cargar los datos de stock.
+      <div className="mt-6 space-y-6">
+        <StockValueHistoryChart />
+
+        <div>
+          {isCategoryLoading && <ChartSkeleton />}
+
+          {isCategoryError && (
+            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg p-4">
+              Error al cargar los datos de stock.
+            </div>
+          )}
+
+          {categoryData && categoryData.length === 0 && (
+            <div className="text-sm text-gray-400 bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+              No hay productos con stock y costo registrados.
+            </div>
+          )}
+
+          {categoryData && categoryData.length > 0 && (
+            <StockByCategoryChart
+              data={categoryData}
+              selectedCategory={selectedCategory}
+              onCategoryClick={handleCategoryClick}
+            />
+          )}
+
+          {selectedCategory && isProductLoading && (
+            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mt-4 animate-pulse">
+              <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-8 bg-gray-100 rounded mb-2" />
+              ))}
+            </div>
+          )}
+
+          {selectedCategory && productData && (
+            <StockProductsTable
+              category={selectedCategory}
+              data={productData}
+              onClose={() => setSelectedCategory(null)}
+            />
+          )}
         </div>
-      )}
 
-      {categoryData && categoryData.length === 0 && (
-        <div className="text-sm text-gray-400 bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-          No hay productos con stock y costo registrados.
-        </div>
-      )}
-
-      {categoryData && categoryData.length > 0 && (
-        <StockByCategoryChart
-          data={categoryData}
-          selectedCategory={selectedCategory}
-          onCategoryClick={handleCategoryClick}
-        />
-      )}
-
-      {selectedCategory && isProductLoading && (
-        <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mt-4 animate-pulse">
-          <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
-          {[...Array(4)].map((_, i) => (
-            <div key={i} className="h-8 bg-gray-100 rounded mb-2" />
-          ))}
-        </div>
-      )}
-
-      {selectedCategory && productData && (
-        <StockProductsTable
-          category={selectedCategory}
-          data={productData}
-          onClose={() => setSelectedCategory(null)}
-        />
-      )}
-
-      <InventoryRotationTable />
+        <InventoryRotationDashboard />
+      </div>
     </div>
   );
 }

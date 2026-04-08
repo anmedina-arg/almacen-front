@@ -2,6 +2,8 @@ import type { StockByCategoryItem } from '@/app/api/dashboard/stock-by-category/
 import type { StockProductItem } from '@/app/api/dashboard/stock-products/route';
 import type { RotationItem } from '@/app/api/dashboard/rotation/route';
 
+export type { RotationItem };
+
 export const dashboardService = {
   async getStockByCategory(): Promise<StockByCategoryItem[]> {
     const res = await fetch('/api/dashboard/stock-by-category', { cache: 'no-store' });
