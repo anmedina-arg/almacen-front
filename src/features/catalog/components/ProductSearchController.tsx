@@ -1,8 +1,7 @@
 'use client';
 
-import { useMemo, useEffect, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import type { Product, CategoryWithSubsPublic } from '../types';
-import { useCatalogByCategory } from '../hooks/useCatalogByCategory';
 import { useProductSearch } from '../hooks/useProductSearch';
 import { useProductSearchQuery } from '../hooks/useProductSearchQuery';
 import { ProductSearchBar } from './ProductSearchBar';
@@ -17,81 +16,29 @@ export function ProductSearchController({
   initialProducts,
   categories,
 }: ProductSearchControllerProps) {
-  const orderedCategoryIds = useMemo(() => categories.map((c) => c.id), [categories]);
   const orderedCategories = useMemo(() => categories.map((c) => c.name), [categories]);
 
   const { search, setSearch, debouncedSearch } = useProductSearch();
   const isSearchMode = debouncedSearch.length > 0;
 
-  // Browse mode: infinite query, one category at a time.
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } = useCatalogByCategory({
-    orderedCategoryIds,
-    initialProducts,
-  });
-
   // Search mode: server-side query, full catalog.
   const { data: searchResults, isFetching: isSearchFetching } = useProductSearchQuery(debouncedSearch);
 
-  // Products and categories depend on current mode.
-  const products = isSearchMode
-    ? (searchResults ?? [])
-    : (data?.pages.flat() ?? initialProducts);
+  // Browse mode: todos los productos ya están en memoria desde SSR.
+  const products = useMemo(
+    () => (isSearchMode ? (searchResults ?? []) : initialProducts),
+    [isSearchMode, searchResults, initialProducts],
+  );
 
   const displayCategories = useMemo(() => {
     if (!isSearchMode) return orderedCategories;
-    // In search mode, only show categories that have matching products,
-    // preserving the admin-defined sort_order.
+    // En search mode, solo mostrar categorías con productos que matchean,
+    // respetando el sort_order definido en admin.
     const catsWithProducts = new Set(
       products.map((p) => p.category_name).filter(Boolean) as string[]
     );
     return orderedCategories.filter((name) => catsWithProducts.has(name));
   }, [isSearchMode, products, orderedCategories]);
-
-  // Chip navigation: target category requested before its section was in the DOM.
-  const [pendingScrollTarget, setPendingScrollTarget] = useState<string | null>(null);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      setPendingScrollTarget((e as CustomEvent<string>).detail);
-    };
-    window.addEventListener('catalog:request-category', handler);
-    return () => window.removeEventListener('catalog:request-category', handler);
-  }, []);
-
-  useEffect(() => {
-    if (!pendingScrollTarget || isSearchMode) return;
-
-    const section = document.getElementById(pendingScrollTarget);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      setPendingScrollTarget(null);
-      return;
-    }
-
-    if (hasNextPage && !isFetchingNextPage) {
-      fetchNextPage();
-    } else if (!hasNextPage) {
-      // All pages loaded but section not found — category has no products.
-      setPendingScrollTarget(null);
-    }
-  }, [pendingScrollTarget, data, hasNextPage, isFetchingNextPage, fetchNextPage, isSearchMode]);
-
-  // Sentinel: trigger next category fetch when scrolling in browse mode.
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
-  useEffect(() => {
-    if (!hasNextPage || isSearchMode) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
-          fetchNextPage();
-        }
-      },
-      { rootMargin: '400px' }
-    );
-    const el = sentinelRef.current;
-    if (el) observer.observe(el);
-    return () => { if (el) observer.unobserve(el); };
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage, isSearchMode]);
 
   return (
     <>
@@ -107,14 +54,6 @@ export function ProductSearchController({
           displayCategories={displayCategories}
           searchQuery={debouncedSearch}
         />
-      )}
-
-      {/* Sentinel: only active in browse mode */}
-      {!isSearchMode && <div ref={sentinelRef} className="h-1" />}
-      {!isSearchMode && isFetchingNextPage && (
-        <div className="flex justify-center py-6 text-sm text-gray-400">
-          Cargando más productos...
-        </div>
       )}
     </>
   );

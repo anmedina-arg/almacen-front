@@ -14,21 +14,10 @@ interface CategoryChipProps {
 
 export const CategoryChip = forwardRef<HTMLAnchorElement, CategoryChipProps>(
   function CategoryChip({ to, label, imageUrl, active = false, priority = false }, ref) {
-    const handleClick = (e: React.MouseEvent) => {
-      const sectionId = to.slice(1); // remove '#'
-      if (!document.getElementById(sectionId)) {
-        e.preventDefault();
-        window.dispatchEvent(
-          new CustomEvent('catalog:request-category', { detail: sectionId })
-        );
-      }
-    };
-
     return (
       <Link
         ref={ref}
         href={to}
-        onClick={handleClick}
         className={`font-medium py-0.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 w-24 shrink-0 transition-colors ${
           active ? 'bg-gray-700' : ''
         }`}

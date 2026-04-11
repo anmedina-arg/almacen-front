@@ -62,17 +62,13 @@ export function useScrollSpy(): UseScrollSpyReturn {
     );
 
     ioRef.current = io;
+    // Todas las secciones existen en el DOM al montar (SSR completo).
+    // No se necesita MutationObserver.
     document.querySelectorAll(SPY_SELECTOR).forEach(observeSection);
-
-    const mo = new MutationObserver(() => {
-      document.querySelectorAll(SPY_SELECTOR).forEach(observeSection);
-    });
-    mo.observe(document.body, { childList: true, subtree: true });
 
     const observedSet = observedRef.current;
     return () => {
       io.disconnect();
-      mo.disconnect();
       observedSet.clear();
     };
   }, [observeSection]);

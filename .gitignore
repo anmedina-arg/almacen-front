@@ -46,3 +46,7 @@ next-env.d.ts
 
 # Windows null device artifact
 nul
+
+# Migration artifacts (generated files with production URLs)
+scripts/url-mapping.json
+scripts/migrate-images.sql
