@@ -3,12 +3,10 @@ import { fetchCategoriesWithSubs } from '../services/fetchCategoriesWithSubs';
 import { ProductCatalog } from './ProductCatalog';
 
 export async function ProductCatalogLoader() {
-  const categories = await fetchCategoriesWithSubs();
-
-  const firstCategoryId = categories[0]?.id;
-  const initialProducts = firstCategoryId
-    ? await fetchPublicProducts({ categoryId: firstCategoryId })
-    : [];
+  const [categories, initialProducts] = await Promise.all([
+    fetchCategoriesWithSubs(),
+    fetchPublicProducts(),
+  ]);
 
   return (
     <ProductCatalog

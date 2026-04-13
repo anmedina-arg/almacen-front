@@ -25,12 +25,19 @@ export async function GET(request: NextRequest) {
 
     const products = await fetchPublicProducts({ includeInactive, categoryId, search });
 
+    // Catálogo público completo: cacheable en CDN (Vercel Edge) por 5 min,
+    // stale-while-revalidate por 1 hora.
+    // Requests con search, categoryId o includeInactive no se cachean.
+    const isPublicCatalog = !includeInactive && !search && categoryId == null;
+
     return NextResponse.json(products, {
-      headers: {
-        'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-        Pragma: 'no-cache',
-        Expires: '0',
-      },
+      headers: isPublicCatalog
+        ? { 'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=3600' }
+        : {
+            'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
+            Pragma: 'no-cache',
+            Expires: '0',
+          },
     });
   } catch (error) {
     console.error('Error in GET /api/products:', error);

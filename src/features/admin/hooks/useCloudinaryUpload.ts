@@ -1,10 +1,11 @@
 import { useState } from 'react';
+import { supabaseBrowser } from '@/lib/supabase/client';
 
-interface UseCloudinaryUploadOptions {
+interface UseStorageUploadOptions {
   folder?: string;
 }
 
-export function useCloudinaryUpload({ folder = 'products' }: UseCloudinaryUploadOptions = {}) {
+export function useCloudinaryUpload({ folder = 'products' }: UseStorageUploadOptions = {}) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -13,45 +14,18 @@ export function useCloudinaryUpload({ folder = 'products' }: UseCloudinaryUpload
     setUploadError(null);
 
     try {
-      const timestamp = Math.round(Date.now() / 1000);
+      const ext = file.name.split('.').pop() ?? 'jpg';
+      const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `${filename}`;
 
-      // 1. Pedir firma al backend
-      const signRes = await fetch('/api/cloudinary/sign', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ timestamp, folder }),
-      });
+      const { error } = await supabaseBrowser.storage
+        .from(folder)
+        .upload(path, file, { upsert: false, cacheControl: '31536000' });
 
-      if (!signRes.ok) {
-        throw new Error('Error al generar firma de Cloudinary');
-      }
+      if (error) throw new Error(error.message);
 
-      const { signature, api_key, cloud_name } = await signRes.json() as {
-        signature: string;
-        timestamp: number;
-        api_key: string;
-        cloud_name: string;
-      };
-
-      // 2. Subir archivo a Cloudinary
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('api_key', api_key);
-      formData.append('timestamp', String(timestamp));
-      formData.append('signature', signature);
-      formData.append('folder', folder);
-
-      const uploadRes = await fetch(
-        `https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`,
-        { method: 'POST', body: formData }
-      );
-
-      if (!uploadRes.ok) {
-        throw new Error('Error al subir la imagen a Cloudinary');
-      }
-
-      const data = await uploadRes.json() as { secure_url: string };
-      return data.secure_url;
+      const { data } = supabaseBrowser.storage.from(folder).getPublicUrl(path);
+      return data.publicUrl;
 
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Error desconocido al subir imagen';
