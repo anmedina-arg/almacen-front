@@ -1,12 +1,19 @@
 import type { NextConfig } from 'next';
 
+// Extraer el hostname exacto de la URL de Supabase para que Next.js
+// pueda optimizar imágenes servidas desde Supabase Storage.
+// El wildcard *.supabase.co no matchea correctamente en todos los entornos.
+const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : '*.supabase.co';
+
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: '*.supabase.co',
+        hostname: supabaseHostname,
         port: '',
         pathname: '/storage/v1/object/public/**',
       },
