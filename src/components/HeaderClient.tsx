@@ -127,7 +127,7 @@ export function HeaderClient({ logo }: HeaderClientProps) {
 	const isAuthenticated = useIsAuthenticated();
 
 	return (
-		<div className="flex items-center justify-between gap-3 px-3 py-2 bg-white/80 backdrop-blur-md">
+		<div className="relative z-10 flex items-center justify-between gap-3 px-3 py-2 bg-white/80 backdrop-blur-md">
 			{/* Izquierda: logo + título */}
 			<div className="flex items-center gap-2 flex-1 min-w-0">
 				{logo}
