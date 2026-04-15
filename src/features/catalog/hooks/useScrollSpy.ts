@@ -62,13 +62,22 @@ export function useScrollSpy(): UseScrollSpyReturn {
     );
 
     ioRef.current = io;
-    // Todas las secciones existen en el DOM al montar (SSR completo).
-    // No se necesita MutationObserver.
-    document.querySelectorAll(SPY_SELECTOR).forEach(observeSection);
+
+    const observeAll = () =>
+      document.querySelectorAll(SPY_SELECTOR).forEach(observeSection);
+
+    // Intento inmediato: si las secciones ya están en el DOM (streaming rápido).
+    observeAll();
+
+    // Fallback: ProductList dispara 'catalog:sections-ready' cuando monta.
+    // Cubre el caso donde el Suspense resuelve después de que este effect corra.
+    // { once: true } auto-elimina el listener tras el primer disparo.
+    window.addEventListener('catalog:sections-ready', observeAll, { once: true });
 
     const observedSet = observedRef.current;
     return () => {
       io.disconnect();
+      window.removeEventListener('catalog:sections-ready', observeAll);
       observedSet.clear();
     };
   }, [observeSection]);

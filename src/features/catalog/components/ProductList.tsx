@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import type { Product } from '../types';
 import { CatalogCard } from './CatalogCard';
+import { useCatalogViewStore } from '../stores/catalogViewStore';
 
 interface ProductListProps {
 	products: Product[];
@@ -14,7 +15,7 @@ interface ProductListProps {
  * Componente de lista de productos
  */
 export function ProductList({ products, mainCategories, searchQuery }: ProductListProps) {
-	const [showList, setShowList] = useState<string>('list');
+	const { view: showList } = useCatalogViewStore();
 
 	const grouped = useMemo(() => {
 		if (!mainCategories) return [];
@@ -53,6 +54,13 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 
 	const [fixHeight, setFixHeight] = useState(false);
 
+	// Notifica a useScrollSpy que las secciones ya están en el DOM.
+	// Necesario porque ProductList está dentro de Suspense y puede montar
+	// después de que FilterButtons haya corrido su useEffect.
+	useEffect(() => {
+		window.dispatchEvent(new CustomEvent('catalog:sections-ready'));
+	}, []);
+
 	useEffect(() => {
 		if (typeof window !== 'undefined' &&
 			window.scrollY > 50 &&
@@ -65,43 +73,6 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
-			<div className='flex items-center gap-2 px-4 py-1 backdrop-blur-md bg-white/10 rounded-tl-none rounded-tr-none rounded-bl-2xl rounded-br-2xl'>
-				<span className="text-xs text-gray-700">Vista:</span>
-				<button
-					onClick={() => setShowList('list')}
-					aria-label="Vista lista"
-					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === 'list'
-						? ' border-gray-500'
-						: ' border-transparent'
-						}`}
-				>
-					{/* Botón vista lista */}
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-4 h-4 fill-white stroke-gray-700">
-						<rect x="5" y="7" width="22" height="4" rx="2" />
-						<rect x="5" y="14" width="22" height="4" rx="2" />
-						<rect x="5" y="21" width="22" height="4" rx="2" />
-					</svg>
-					<span className='text-xs'>Lista</span>
-				</button>
-				<button
-					onClick={() => setShowList('grid')}
-					aria-label="Vista grilla"
-					className={`flex items-center justify-center gap-1 border-1 rounded-md px-0.5 py-0.5 transition-colors bg-transparent text-gray-700 ${showList === 'grid'
-						? '  border-gray-500'
-						: '  border-transparent'
-						}`}
-				>
-					{/* Botón vista grilla */}
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" className="w-4 h-4 fill-white stroke-gray-700">
-						<rect x="5" y="7" width="8" height="8" rx="2" />
-						<rect x="19" y="7" width="8" height="8" rx="2" />
-						<rect x="5" y="17" width="8" height="8" rx="2" />
-						<rect x="19" y="17" width="8" height="8" rx="2" />
-					</svg>
-					<span className='text-xs'>Cuadricula</span>
-				</button>
-			</div>
-
 			<div className={`flex flex-col gap-4 ${fixHeight ? 'mt-48' : ''}`}>
 				{(() => {
 					// Only the first 2 rendered products get priority={true} to fix LCP.

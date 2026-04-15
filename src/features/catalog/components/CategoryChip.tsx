@@ -18,12 +18,12 @@ export const CategoryChip = forwardRef<HTMLAnchorElement, CategoryChipProps>(
       <Link
         ref={ref}
         href={to}
-        className={`font-medium py-0.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 w-24 shrink-0 transition-colors ${
+        className={`font-medium py-0.5 px-1 rounded-xl flex flex-col items-center justify-center gap-1 w-20 shrink-0 transition-colors ${
           active ? 'bg-gray-700' : ''
         }`}
       >
         <div
-          className={`relative w-full h-16 rounded-xl overflow-hidden transition-colors ${
+          className={`relative w-full h-12 rounded-xl overflow-hidden transition-colors ${
             active ? 'bg-gray-600' : 'bg-gray-200'
           }`}
         >
@@ -33,13 +33,13 @@ export const CategoryChip = forwardRef<HTMLAnchorElement, CategoryChipProps>(
               alt={label}
               fill
               className="object-cover"
-              sizes="96px"
+              sizes="80px"
               priority={priority}
               loading={priority ? undefined : 'lazy'}
             />
           )}
         </div>
-        <span className={`text-sm capitalize transition-colors ${active ? 'text-gray-100' : ''}`}>
+        <span className={`text-xs capitalize transition-colors ${active ? 'text-gray-100' : ''}`}>
           {label}
         </span>
       </Link>

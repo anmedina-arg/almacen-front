@@ -6,11 +6,11 @@ export function HeaderLogo() {
 		<Image
 			src={getCloudinaryUrl(
 				'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png',
-				256,
+				160,
 			)}
 			alt="Market del cevil Logo"
-			width={128}
-			height={128}
+			width={72}
+			height={72}
 			className="rounded-2xl"
 			priority
 		/>
