@@ -10,7 +10,7 @@ export function HelpButton() {
 		<button
 			onClick={handleResetPopup}
 			aria-label="Ayuda"
-			className="w-8 h-8 inline-flex items-center justify-center rounded-full bg-green-700 text-white hover:bg-green-800 transition-colors cursor-pointer select-none flex-shrink-0"
+			className="w-7 h-7 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-500 hover:bg-gray-300 transition-colors cursor-pointer select-none flex-shrink-0"
 		>
 			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
 				<circle cx="12" cy="12" r="10" />
