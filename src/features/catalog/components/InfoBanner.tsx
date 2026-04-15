@@ -12,6 +12,12 @@ export function InfoBanner() {
 		}
 	}, []);
 
+	useEffect(() => {
+		const handler = () => setShowPopup(true);
+		window.addEventListener('show-help-popup', handler);
+		return () => window.removeEventListener('show-help-popup', handler);
+	}, []);
+
 	const handleClose = () => {
 		localStorage.setItem('hasSeenPopup', 'true');
 		setShowPopup(false);
