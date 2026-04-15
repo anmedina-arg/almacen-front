@@ -1,14 +1,13 @@
 'use client';
 
 export function HelpButton() {
-	const handleResetPopup = () => {
-		localStorage.removeItem('hasSeenPopup');
-		window.location.reload();
+	const handleShowHelp = () => {
+		window.dispatchEvent(new CustomEvent('show-help-popup'));
 	};
 
 	return (
 		<button
-			onClick={handleResetPopup}
+			onClick={handleShowHelp}
 			aria-label="Ayuda"
 			className="w-7 h-7 inline-flex items-center justify-center rounded-full bg-gray-200 text-gray-500 hover:bg-gray-300 transition-colors cursor-pointer select-none flex-shrink-0"
 		>
