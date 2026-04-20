@@ -140,10 +140,34 @@ export async function PUT(
       );
     }
 
+    // Recalculate unit_cost from current product cost (fixes items added without cost)
+    const { data: existingItem } = await supabase
+      .from('order_items')
+      .select('product_id, unit_price')
+      .eq('id', itemId)
+      .eq('order_id', orderId)
+      .single();
+
+    let unit_cost: number | undefined;
+    if (existingItem) {
+      const { data: product } = await supabase
+        .from('products')
+        .select('price, cost')
+        .eq('id', existingItem.product_id)
+        .single();
+
+      if (product && Number(product.price) > 0) {
+        const effectiveUnitPrice = validation.data.unit_price ?? existingItem.unit_price;
+        unit_cost = effectiveUnitPrice * (Number(product.cost ?? 0) / Number(product.price));
+      } else {
+        unit_cost = 0;
+      }
+    }
+
     // Update the item
     const { data, error } = await supabase
       .from('order_items')
-      .update(validation.data)
+      .update({ ...validation.data, ...(unit_cost !== undefined && { unit_cost }) })
       .eq('id', itemId)
       .eq('order_id', orderId)
       .select()
