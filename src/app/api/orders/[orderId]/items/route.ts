@@ -67,6 +67,18 @@ export async function POST(
       );
     }
 
+    // Fetch product cost to calculate unit_cost (same formula as order creation)
+    const { data: product } = await supabase
+      .from('products')
+      .select('price, cost')
+      .eq('id', validation.data.product_id)
+      .single();
+
+    const unit_cost =
+      product && Number(product.price) > 0
+        ? validation.data.unit_price * (Number(product.cost ?? 0) / Number(product.price))
+        : 0;
+
     // Insert the new item
     const { data, error } = await supabase
       .from('order_items')
@@ -76,6 +88,7 @@ export async function POST(
         product_name: validation.data.product_name,
         quantity: validation.data.quantity,
         unit_price: validation.data.unit_price,
+        unit_cost,
         is_by_weight: validation.data.is_by_weight,
       })
       .select()
