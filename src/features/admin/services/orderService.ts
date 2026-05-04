@@ -68,7 +68,7 @@ export const orderService = {
   /**
    * Update order fields (admin only).
    */
-  async updateOrder(orderId: number, updates: { status?: string; notes?: string | null }): Promise<Order> {
+  async updateOrder(orderId: number, updates: { status?: string; notes?: string | null; created_at?: string }): Promise<Order> {
     const res = await fetch(`/api/orders/${orderId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

@@ -35,6 +35,7 @@ export type CreateOrderSchemaInput = z.infer<typeof createOrderSchema>;
 export const updateOrderSchema = z.object({
   status: z.enum(['pending', 'confirmed', 'cancelled']).optional(),
   notes: z.string().max(1000).nullable().optional(),
+  created_at: z.string().datetime({ offset: true }).optional(),
 });
 
 export type UpdateOrderSchemaInput = z.infer<typeof updateOrderSchema>;
