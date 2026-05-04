@@ -15,7 +15,7 @@ export function useUpdateOrder() {
       updates,
     }: {
       orderId: number;
-      updates: { status?: string; notes?: string | null };
+      updates: { status?: string; notes?: string | null; created_at?: string };
     }) => orderService.updateOrder(orderId, updates),
 
     onSuccess: async (_data, variables) => {

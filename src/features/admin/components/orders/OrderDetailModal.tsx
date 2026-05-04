@@ -5,6 +5,7 @@ import { useOrderDetail } from '../../hooks/useOrderDetail';
 import { useConfirmOrder } from '../../hooks/useConfirmOrder';
 import { useCancelOrder } from '../../hooks/useCancelOrder';
 import { useDeleteOrder } from '../../hooks/useDeleteOrder';
+import { useUpdateOrder } from '../../hooks/useUpdateOrder';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
 import { computeMargin, MarginDisplay } from './MarginDisplay';
@@ -22,8 +23,11 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   const confirmOrder = useConfirmOrder();
   const cancelOrder = useCancelOrder();
   const deleteOrder = useDeleteOrder();
+  const updateOrder = useUpdateOrder();
 
   const [showWhatsAppMessage, setShowWhatsAppMessage] = useState(false);
+  const [editingDate, setEditingDate] = useState(false);
+  const [newDateStr, setNewDateStr] = useState('');
 
   const handleDelete = () => {
     const isConfirmed = order?.status === 'confirmed';
@@ -129,9 +133,62 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
                     <span className="text-gray-500">Creado:</span>
-                    <p className="font-medium text-gray-800">
-                      {formatAdminDate(order.created_at)}
-                    </p>
+                    {editingDate ? (
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <input
+                          type="date"
+                          value={newDateStr}
+                          onChange={(e) => setNewDateStr(e.target.value)}
+                          className="text-sm border border-gray-300 rounded px-1 py-0.5 text-gray-800"
+                        />
+                        <button
+                          onClick={() => {
+                            if (!newDateStr) return;
+                            const original = new Date(order.created_at);
+                            const [y, m, d] = newDateStr.split('-').map(Number);
+                            const updated = new Date(Date.UTC(y, m - 1, d, original.getUTCHours(), original.getUTCMinutes(), original.getUTCSeconds()));
+                            updateOrder.mutate(
+                              { orderId, updates: { created_at: updated.toISOString() } },
+                              { onSuccess: () => setEditingDate(false) }
+                            );
+                          }}
+                          disabled={updateOrder.isPending}
+                          className="text-green-600 hover:text-green-700 disabled:opacity-50"
+                          aria-label="Guardar fecha"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => setEditingDate(false)}
+                          className="text-gray-400 hover:text-gray-600"
+                          aria-label="Cancelar edición de fecha"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                          </svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1">
+                        <p className="font-medium text-gray-800">
+                          {formatAdminDate(order.created_at)}
+                        </p>
+                        <button
+                          onClick={() => {
+                            setNewDateStr(new Date(order.created_at).toISOString().split('T')[0]);
+                            setEditingDate(true);
+                          }}
+                          className="text-gray-400 hover:text-gray-600 transition-colors"
+                          aria-label="Editar fecha"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z" />
+                          </svg>
+                        </button>
+                      </div>
+                    )}
                   </div>
                   {order.confirmed_at && (
                     <div>
