@@ -1,13 +1,18 @@
 import { config } from 'dotenv';
+import { existsSync, readFileSync } from 'node:fs';
 
-// .env.local tiene la config de producción (NEXT_PUBLIC_SUPABASE_URL);
-// la cargamos solo para poder compararla contra la de test más abajo.
-// Esto carga TODO .env.local (incluidos secretos de producción) a
-// process.env — aceptable porque este archivo es local-only y nunca corre
-// en CI; si en algún momento se conecta a un pipeline, cambiar esto por
-// una comparación que no requiera cargar el archivo completo.
-config({ path: '.env.local' });
-const prodUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+// Leemos SOLO NEXT_PUBLIC_SUPABASE_URL de .env.local para la comparación de
+// abajo — a propósito NO usamos dotenv.config() sobre .env.local, porque eso
+// cargaría el archivo completo (incluido SUPABASE_SERVICE_ROLE_KEY y otros
+// secretos de producción) a process.env durante los tests.
+function readProdSupabaseUrl(): string | undefined {
+  if (!existsSync('.env.local')) return undefined;
+  const content = readFileSync('.env.local', 'utf-8');
+  const match = content.match(/^NEXT_PUBLIC_SUPABASE_URL=(.*)$/m);
+  return match?.[1]?.trim().replace(/^['"]|['"]$/g, '');
+}
+
+const prodUrl = readProdSupabaseUrl();
 
 config({ path: '.env.test' });
 const testUrl = process.env.TEST_SUPABASE_URL;
