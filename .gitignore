@@ -52,6 +52,5 @@ scripts/url-mapping.json
 scripts/migrate-images.sql
 
 # Production DB backups — never commit real dumps
-*.sql.bak
 backups/
 market-cevil-backups/
