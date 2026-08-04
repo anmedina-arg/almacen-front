@@ -33,7 +33,12 @@ OUT_FILE="$BACKUP_DIR/market-cevil-prod-$TIMESTAMP.sql"
 # --schema=public: los schemas auth/storage/realtime/etc. los administra
 # Supabase y ya existen en cualquier proyecto (incluido el de test) — si los
 # incluyéramos, la restauración fallaría con "schema already exists".
-pg_dump "$SAFE_DB_URL" --schema=public -f "$OUT_FILE"
+# --no-owner --no-privileges: el rol "postgres" de Supabase no es superusuario
+# real (Supabase se lo restringe) — no puede aplicar ALTER DEFAULT PRIVILEGES/
+# GRANT/OWNER TO de otro proyecto al restaurar. El proyecto de destino ya
+# tiene sus propios roles y privilegios de fábrica; no hace falta replicar
+# los de origen. Esto no afecta las RLS policies, que son parte del schema.
+pg_dump "$SAFE_DB_URL" --schema=public --no-owner --no-privileges -f "$OUT_FILE"
 chmod 600 "$OUT_FILE"
 
 echo "Backup guardado en: $OUT_FILE"
