@@ -35,6 +35,13 @@ else
 fi
 
 echo "Restaurando $DUMP_FILE en el proyecto de test..."
-psql "$SAFE_DB_URL" -f "$DUMP_FILE" -v ON_ERROR_STOP=1
+# El dump solo incluye el schema public (ver backup-production.sh) — tablas
+# como public.profiles tienen FKs a auth.users, que no está en el dump.
+# session_replication_role = replica desactiva la verificación de FKs/triggers
+# durante la carga para que eso no rompa la restauración.
+psql "$SAFE_DB_URL" -v ON_ERROR_STOP=1 \
+  -c "SET session_replication_role = replica;" \
+  -f "$DUMP_FILE" \
+  -c "SET session_replication_role = DEFAULT;"
 
 echo "Restauración completa."

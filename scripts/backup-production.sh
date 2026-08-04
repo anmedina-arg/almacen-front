@@ -29,7 +29,11 @@ mkdir -p "$BACKUP_DIR"
 TIMESTAMP=$(date +%Y-%m-%d_%H%M%S)
 OUT_FILE="$BACKUP_DIR/market-cevil-prod-$TIMESTAMP.sql"
 
-pg_dump "$SAFE_DB_URL" -f "$OUT_FILE"
+
+# --schema=public: los schemas auth/storage/realtime/etc. los administra
+# Supabase y ya existen en cualquier proyecto (incluido el de test) — si los
+# incluyéramos, la restauración fallaría con "schema already exists".
+pg_dump "$SAFE_DB_URL" --schema=public -f "$OUT_FILE"
 chmod 600 "$OUT_FILE"
 
 echo "Backup guardado en: $OUT_FILE"
