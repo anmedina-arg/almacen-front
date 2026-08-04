@@ -4,6 +4,8 @@ Restaura el dump de producción (ver `docs/ops/backup-produccion.md`) en el proy
 
 **El script borra y recrea el schema `public` completo del proyecto de test en cada corrida** (necesario para que la restauración sea idempotente) — pide confirmación explícita antes de hacerlo. Nunca apuntes `TEST_DB_URL` a producción.
 
+**Diferencia deliberada con el schema de producción**: `orders.user_id`, `orders.confirmed_by` y `profiles.id` tienen FK a `auth.users` en producción. `auth.users` es administrado por Supabase y no se restaura (ni tendría sentido — sus UUIDs no coinciden con los de producción), así que el script excluye esas 3 constraints puntuales al restaurar. Las columnas existen igual, solo no tienen la FK enforced en el proyecto de test. No afecta ninguna de las tablas/relaciones de negocio que importan para los tests de aislamiento por Store.
+
 ## Cómo correrlo
 
 Igual que el backup: **corré esto en tu propia terminal, fuera de cualquier sesión de Claude Code** — la connection string del proyecto de test no debe escribirse en un chat.

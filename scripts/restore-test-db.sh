@@ -45,21 +45,47 @@ fi
 
 # Armamos un único archivo SQL en vez de encadenar varios -c/-f de psql:
 # encadenar -c y -f no garantiza una sola sesión en todas las versiones de
-# psql, y session_replication_role es por sesión — si psql abre una conexión
-# nueva para el -f, el SET del -c anterior se pierde en silencio (es lo que
-# pasó: la FK de orders.confirmed_by se validó igual). \i dentro de un único
-# -f sí corre todo en la misma sesión, garantizado.
+# psql. \i dentro de un único -f sí corre todo en la misma sesión, garantizado.
 WRAPPER_FILE="$(dirname "$DUMP_FILE")/.restore-wrapper-$$.sql"
-trap 'unset PGPASSWORD; rm -f "$WRAPPER_FILE"' EXIT
+FILTERED_DUMP="$(dirname "$DUMP_FILE")/.restore-filtered-$$.sql"
+trap 'unset PGPASSWORD; rm -f "$WRAPPER_FILE" "$FILTERED_DUMP"' EXIT
+
+# El dump (schema public) tiene 3 columnas con FK a auth.users
+# (orders.user_id, orders.confirmed_by, profiles.id) — auth.users es
+# administrado por Supabase y nunca vamos a poder satisfacer esas FKs contra
+# el proyecto de test (sus UUIDs no tienen relación con los de producción).
+# pg_dump agrega esas constraints al final vía ALTER TABLE ADD CONSTRAINT,
+# que valida todas las filas existentes de la tabla en el momento — eso no
+# lo evita session_replication_role (que solo desactiva triggers de
+# INSERT/UPDATE, no la validación de una constraint nueva). La única forma
+# real de saltear esto es no agregar esas 3 constraints puntuales.
+#
+# pg_dump emite cada ADD CONSTRAINT en 2 líneas ("ALTER TABLE ONLY x" y
+# "ADD CONSTRAINT ...;"). Un grep -v línea por línea dejaría la primera
+# línea huérfana sin punto y coma, corrompiendo el statement siguiente —
+# por eso el filtro trabaja en pares y solo toca líneas que empiezan con
+# "ALTER TABLE ONLY", dejando intactos los bloques COPY de datos (que
+# pueden tener ";" literal dentro del contenido).
+awk '
+  /^ALTER TABLE ONLY/ {
+    pending = $0
+    getline nextline
+    if (nextline ~ /REFERENCES auth\.users/) { next }
+    print pending
+    print nextline
+    next
+  }
+  { print }
+' "$DUMP_FILE" > "$FILTERED_DUMP"
 
 # \i corre dentro de psql.exe (binario nativo de Windows), que no entiende
 # rutas estilo MSYS (/c/Users/...) salvo que se las pasemos como argv de
 # línea de comando (ahí Git Bash las traduce solo). Como acá van como texto
 # dentro del archivo SQL, hay que convertirlas explícitamente con cygpath.
 if command -v cygpath >/dev/null 2>&1; then
-  DUMP_FILE_WIN="$(cygpath -m "$DUMP_FILE")"
+  FILTERED_DUMP_WIN="$(cygpath -m "$FILTERED_DUMP")"
 else
-  DUMP_FILE_WIN="$DUMP_FILE"
+  FILTERED_DUMP_WIN="$FILTERED_DUMP"
 fi
 
 cat > "$WRAPPER_FILE" << SQLEOF
@@ -68,11 +94,7 @@ cat > "$WRAPPER_FILE" << SQLEOF
 -- en cualquier proyecto Supabase — lo recreamos primero para que quede
 -- idempotente.
 DROP SCHEMA IF EXISTS public CASCADE;
--- Desactiva la verificación de FKs/triggers durante la carga
--- (public.profiles referencia auth.users, que no está en el dump).
-SET session_replication_role = replica;
-\i $DUMP_FILE_WIN
-SET session_replication_role = DEFAULT;
+\i $FILTERED_DUMP_WIN
 SQLEOF
 
 echo "Restaurando $DUMP_FILE en el proyecto de test..."
