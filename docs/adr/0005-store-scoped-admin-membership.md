@@ -1,0 +1,3 @@
+# Admin scoping: membresía por Store, no rol global
+
+`profiles.role` era global (`'user' | 'admin'`) — cualquier admin podía ver y operar pedidos/stock/clientes/pagos de todas las Stores, algo inaceptable en un SaaS vendido a terceros que no deben ver los datos de otros. Se optó por una tabla de membresía (`store_admins` o similar) que vincula `profiles.id` ↔ `store_id` ↔ rol dentro de esa Store, en lugar de mantener el filtro de Store solo a nivel de queries/UI sobre el rol global existente. El dueño de la plataforma conserva un rol adicional (`super_admin`) en `profiles.role` para operar todas las Stores; los dueños de cada Store cliente no lo tienen.
