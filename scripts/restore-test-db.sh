@@ -76,6 +76,18 @@ awk '
   { print }
 ' "$DUMP_FILE" > "$FILTERED_DUMP"
 
+# El filtro asume el formato de 2 líneas que pg_dump usa hoy para estas 3
+# constraints puntuales — si algún día cambia (otra versión de pg_dump, un
+# FK compuesto, etc.) preferimos fallar fuerte acá antes de restaurar, en
+# vez de dejar pasar en silencio una referencia a auth.users que después
+# rompería la carga con el mismo error de FK que resolvimos.
+REMAINING=$(grep -c 'REFERENCES auth\.users' "$FILTERED_DUMP" || true)
+if [ "$REMAINING" -ne 0 ]; then
+  echo "Error: el filtro no eliminó todas las referencias a auth.users ($REMAINING quedan)."
+  echo "Revisá el formato de scripts/restore-test-db.sh contra el dump actual antes de continuar."
+  exit 1
+fi
+
 # \i corre dentro de psql.exe (binario nativo de Windows), que no entiende
 # rutas estilo MSYS (/c/Users/...) salvo que se las pasemos como argv de
 # línea de comando (ahí Git Bash las traduce solo). Como acá van como texto
