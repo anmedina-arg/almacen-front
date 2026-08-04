@@ -34,13 +34,25 @@ else
   exit 1
 fi
 
+echo "Esto va a BORRAR y recrear el schema 'public' completo en:"
+echo "  postgresql://${DB_USER}@${BASH_REMATCH[4]}"
+echo "Confirmá que esa es la URL del proyecto de TEST, no producción."
+read -p "Escribí 'si' para continuar: " CONFIRM
+if [ "$CONFIRM" != "si" ]; then
+  echo "Cancelado."
+  exit 1
+fi
+
 echo "Restaurando $DUMP_FILE en el proyecto de test..."
-# El dump solo incluye el schema public (ver backup-production.sh) — tablas
-# como public.profiles tienen FKs a auth.users, que no está en el dump.
-# session_replication_role = replica desactiva la verificación de FKs/triggers
-# durante la carga para que eso no rompa la restauración.
+# El dump solo incluye el schema public (ver backup-production.sh). pg_dump
+# moderno emite "CREATE SCHEMA public;" explícito, que ya existe de fábrica
+# en cualquier proyecto Supabase — lo recreamos primero para que quede
+# idempotente. session_replication_role = replica desactiva la verificación
+# de FKs/triggers durante la carga (public.profiles referencia auth.users,
+# que intencionalmente no está en el dump).
 psql "$SAFE_DB_URL" -v ON_ERROR_STOP=1 \
   -c "SET session_replication_role = replica;" \
+  -c "DROP SCHEMA IF EXISTS public CASCADE;" \
   -f "$DUMP_FILE" \
   -c "SET session_replication_role = DEFAULT;"
 

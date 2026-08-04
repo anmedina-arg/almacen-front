@@ -2,6 +2,8 @@
 
 Restaura el dump de producción (ver `docs/ops/backup-produccion.md`) en el proyecto Supabase de test, para que los tests de integración de la migración multi-tenant corran contra datos representativos sin tocar producción nunca.
 
+**El script borra y recrea el schema `public` completo del proyecto de test en cada corrida** (necesario para que la restauración sea idempotente) — pide confirmación explícita antes de hacerlo. Nunca apuntes `TEST_DB_URL` a producción.
+
 ## Cómo correrlo
 
 Igual que el backup: **corré esto en tu propia terminal, fuera de cualquier sesión de Claude Code** — la connection string del proyecto de test no debe escribirse en un chat.
