@@ -22,20 +22,18 @@ if [ -z "$TEST_DB_URL" ]; then
   exit 1
 fi
 
-# Mismo criterio que backup-production.sh: la contraseña va por PGPASSWORD,
-# nunca como parte del argv de psql.
-if [[ "$TEST_DB_URL" =~ ^postgres(ql)?://([^:]+):([^@]+)@(.+)$ ]]; then
-  DB_USER="${BASH_REMATCH[2]}"
-  export PGPASSWORD="${BASH_REMATCH[3]}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/lib/pg-url.sh"
+
+if parse_pg_url "$TEST_DB_URL"; then
   trap 'unset PGPASSWORD' EXIT
-  SAFE_DB_URL="postgresql://${DB_USER}@${BASH_REMATCH[4]}"
 else
   echo "Error: TEST_DB_URL no tiene el formato esperado (postgresql://user:password@host:port/db)."
   exit 1
 fi
 
 echo "Esto va a BORRAR y recrear el schema 'public' completo en:"
-echo "  postgresql://${DB_USER}@${BASH_REMATCH[4]}"
+echo "  $SAFE_DB_URL"
 echo "Confirmá que esa es la URL del proyecto de TEST, no producción."
 read -p "Escribí 'si' para continuar: " CONFIRM
 if [ "$CONFIRM" != "si" ]; then
