@@ -18,4 +18,4 @@ Este comando necesita la contraseña de la base de producción. **Corré este pr
 
 | Fecha | Motivo | Ubicación |
 |-------|--------|-----------|
-| _(completar tras cada corrida)_ | | |
+| 2026-08-04 | Backup previo a arrancar la migración multi-tenant (ticket #7) | `~/market-cevil-backups/` |
