@@ -6,13 +6,18 @@ Proceso para respaldar la base de datos de producción (Supabase) antes de aplic
 
 Este comando necesita la contraseña de la base de producción. **Corré este proceso en tu propia terminal, fuera de cualquier sesión de Claude Code** — la connection string no debe escribirse en un chat ni quedar en un historial de conversación.
 
-1. Obtené la connection string desde Supabase Dashboard → Project Settings → Database → Connection string (URI).
+Tampoco la escribas en una sola línea con `export` (queda guardada en el historial de tu shell, ej. `~/.bash_history`, con la contraseña en texto plano). Ingresala de forma interactiva:
+
+1. Obtené el host y el usuario desde Supabase Dashboard → Project Settings → Database → Connection string (URI) (no hace falta copiar la contraseña ahí, solo el resto de los datos).
 2. En tu terminal:
    ```bash
-   export SUPABASE_DB_URL="postgresql://postgres:[password]@[host]:5432/postgres"
+   read -s -p "Contraseña de la DB: " DB_PASS; echo
+   export SUPABASE_DB_URL="postgresql://postgres:${DB_PASS}@[host]:5432/postgres"
+   unset DB_PASS
    ./scripts/backup-production.sh
    ```
-3. El dump se guarda por defecto en `~/market-cevil-backups/` (fuera del repo — nunca se commitea). Podés cambiar el destino con `BACKUP_DIR=/otra/ruta`.
+   `read -s` no muestra ni loguea lo que tipeás, y la contraseña nunca queda como parte de una línea de comando.
+3. El dump se guarda por defecto en `~/market-cevil-backups/` (fuera del repo — nunca se commitea), con permisos restringidos (`600`, solo lectura para tu usuario). Podés cambiar el destino con `BACKUP_DIR=/otra/ruta`.
 
 ## Registro de backups tomados
 
