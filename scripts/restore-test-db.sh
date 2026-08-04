@@ -51,6 +51,17 @@ fi
 # -f sí corre todo en la misma sesión, garantizado.
 WRAPPER_FILE="$(dirname "$DUMP_FILE")/.restore-wrapper-$$.sql"
 trap 'unset PGPASSWORD; rm -f "$WRAPPER_FILE"' EXIT
+
+# \i corre dentro de psql.exe (binario nativo de Windows), que no entiende
+# rutas estilo MSYS (/c/Users/...) salvo que se las pasemos como argv de
+# línea de comando (ahí Git Bash las traduce solo). Como acá van como texto
+# dentro del archivo SQL, hay que convertirlas explícitamente con cygpath.
+if command -v cygpath >/dev/null 2>&1; then
+  DUMP_FILE_WIN="$(cygpath -m "$DUMP_FILE")"
+else
+  DUMP_FILE_WIN="$DUMP_FILE"
+fi
+
 cat > "$WRAPPER_FILE" << SQLEOF
 -- El dump solo incluye el schema public (ver backup-production.sh). pg_dump
 -- moderno emite "CREATE SCHEMA public;" explícito, que ya existe de fábrica
@@ -60,7 +71,7 @@ DROP SCHEMA IF EXISTS public CASCADE;
 -- Desactiva la verificación de FKs/triggers durante la carga
 -- (public.profiles referencia auth.users, que no está en el dump).
 SET session_replication_role = replica;
-\i $DUMP_FILE
+\i $DUMP_FILE_WIN
 SET session_replication_role = DEFAULT;
 SQLEOF
 
