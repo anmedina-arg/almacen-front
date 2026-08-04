@@ -21,6 +21,7 @@ Tampoco la escribas en una sola línea con `export` (queda guardada en el histor
 
 ## Registro de backups tomados
 
-| Fecha | Motivo | Ubicación |
-|-------|--------|-----------|
+| Fecha      | Motivo                                                         | Ubicación                 |
+| ---------- | -------------------------------------------------------------- | ------------------------- |
 | 2026-08-04 | Backup previo a arrancar la migración multi-tenant (ticket #7) | `~/market-cevil-backups/` |
+| 2026-08-04 | Retomado con `--schema=public --no-owner --no-privileges`, para poblar el proyecto de test (ticket #8) | `~/market-cevil-backups/` |

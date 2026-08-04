@@ -35,4 +35,4 @@ Igual que el backup: **corré esto en tu propia terminal, fuera de cualquier ses
 
 | Fecha | Dump restaurado | Notas |
 |-------|------------------|-------|
-| _(completar tras cada corrida)_ | | |
+| 2026-08-04 | `market-cevil-prod-2026-08-04_*.sql` (retomado con `--no-owner --no-privileges`) | Primera restauración exitosa (ticket #8), tras iterar sobre 4 problemas: schema `auth` ya existente, schema `public` ya existente, FKs a `auth.users`, y metadata de ownership/privilegios |
