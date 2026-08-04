@@ -43,17 +43,28 @@ if [ "$CONFIRM" != "si" ]; then
   exit 1
 fi
 
+# Armamos un único archivo SQL en vez de encadenar varios -c/-f de psql:
+# encadenar -c y -f no garantiza una sola sesión en todas las versiones de
+# psql, y session_replication_role es por sesión — si psql abre una conexión
+# nueva para el -f, el SET del -c anterior se pierde en silencio (es lo que
+# pasó: la FK de orders.confirmed_by se validó igual). \i dentro de un único
+# -f sí corre todo en la misma sesión, garantizado.
+WRAPPER_FILE="$(dirname "$DUMP_FILE")/.restore-wrapper-$$.sql"
+trap 'unset PGPASSWORD; rm -f "$WRAPPER_FILE"' EXIT
+cat > "$WRAPPER_FILE" << SQLEOF
+-- El dump solo incluye el schema public (ver backup-production.sh). pg_dump
+-- moderno emite "CREATE SCHEMA public;" explícito, que ya existe de fábrica
+-- en cualquier proyecto Supabase — lo recreamos primero para que quede
+-- idempotente.
+DROP SCHEMA IF EXISTS public CASCADE;
+-- Desactiva la verificación de FKs/triggers durante la carga
+-- (public.profiles referencia auth.users, que no está en el dump).
+SET session_replication_role = replica;
+\i $DUMP_FILE
+SET session_replication_role = DEFAULT;
+SQLEOF
+
 echo "Restaurando $DUMP_FILE en el proyecto de test..."
-# El dump solo incluye el schema public (ver backup-production.sh). pg_dump
-# moderno emite "CREATE SCHEMA public;" explícito, que ya existe de fábrica
-# en cualquier proyecto Supabase — lo recreamos primero para que quede
-# idempotente. session_replication_role = replica desactiva la verificación
-# de FKs/triggers durante la carga (public.profiles referencia auth.users,
-# que intencionalmente no está en el dump).
-psql "$SAFE_DB_URL" -v ON_ERROR_STOP=1 \
-  -c "SET session_replication_role = replica;" \
-  -c "DROP SCHEMA IF EXISTS public CASCADE;" \
-  -f "$DUMP_FILE" \
-  -c "SET session_replication_role = DEFAULT;"
+psql "$SAFE_DB_URL" -v ON_ERROR_STOP=1 -f "$WRAPPER_FILE"
 
 echo "Restauración completa."
