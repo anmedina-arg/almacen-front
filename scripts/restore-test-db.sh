@@ -105,6 +105,20 @@ cat > "$WRAPPER_FILE" << SQLEOF
 -- idempotente.
 DROP SCHEMA IF EXISTS public CASCADE;
 \i $FILTERED_DUMP_WIN
+
+-- El DROP también se llevó puestos los grants de fábrica de Supabase sobre
+-- public (anon/authenticated necesitan USAGE en el schema para que la RLS
+-- de las tablas siquiera se evalúe) y --no-privileges en el backup los
+-- excluyó del dump a propósito. Los reponemos: son los grants estándar que
+-- Supabase aplica en cualquier proyecto, no algo específico de producción
+-- que estemos filtrando por error.
+GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
+GRANT ALL ON ALL FUNCTIONS IN SCHEMA public TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON FUNCTIONS TO anon, authenticated, service_role;
 SQLEOF
 
 echo "Restaurando $DUMP_FILE en el proyecto de test..."
