@@ -25,5 +25,5 @@ Aplica `supabase/supabase_multitenant_schema_expand.sql`: crea la tabla `stores`
 
 | Fecha | Entorno | Resultado |
 |-------|---------|-----------|
-| _pendiente_ | test | |
+| 2026-08-06 | test | Migración aplicada. `npm test` → 16/16 en verde (los 14 del ticket #10 + los 2 de #9), confirmando `stores` y `store_id` en las 13 tablas |
 | _pendiente_ | producción | |
