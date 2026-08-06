@@ -26,24 +26,23 @@ CREATE TRIGGER trg_stores_updated_at
   BEFORE UPDATE ON public.stores
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+-- RLS habilitada sin ninguna policy: default-deny total para anon/authenticated
+-- (los grants por defecto de Supabase les dan ALL a nivel de schema, así que
+-- sin RLS la tabla quedaría abierta a cualquiera con la anon key). Quién puede
+-- leer/escribir stores es una decisión de scoping que corresponde a los
+-- tickets #12 (resolución por slug) y #13 (store_admins/super_admin) — hasta
+-- entonces, el alta de Stores es manual vía SQL Editor (ADR-0006), que corre
+-- como el rol postgres y por lo tanto bypassea RLS igual.
 ALTER TABLE public.stores ENABLE ROW LEVEL SECURITY;
 
--- Lectura pública: el middleware de resolución de Store (ADR-0003) necesita
--- poder buscar una Store por slug sin sesión admin.
-DROP POLICY IF EXISTS "Anyone can read stores" ON public.stores;
-CREATE POLICY "Anyone can read stores"
-  ON public.stores FOR SELECT USING (true);
 
--- Escritura: admins únicamente. Usa el rol global existente en profiles —
--- store_admins (membresía por Store) todavía no existe, lo crea el
--- ticket #13. Se revisará esta policy cuando ese modelo esté disponible.
-DROP POLICY IF EXISTS "Admins can manage stores" ON public.stores;
-CREATE POLICY "Admins can manage stores"
-  ON public.stores FOR ALL
-  USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin'));
-
-
--- ── 2. store_id nullable en las 13 tablas de negocio ───────────────────
+-- ── 2. store_id nullable en las 13 tablas de negocio identificadas ─────
+-- Lista autoritativa (ver ticket #10): products, categories, subcategories,
+-- clients, orders, order_items, order_payments, product_stock,
+-- stock_movement_log, product_affinity, category_affinity_rules,
+-- product_price_history, combo_components. Si se agrega una tabla de
+-- negocio nueva más adelante, sumarla acá Y a TABLES_WITH_STORE_ID en
+-- src/test/integration/multitenant-schema.test.ts.
 -- Sin default: en Postgres, agregar una columna nullable sin default es
 -- una operación de solo-metadata (no reescribe la tabla), por eso no hay
 -- riesgo de bloqueo prolongado en producción aun con tablas grandes.
