@@ -18,6 +18,14 @@ Aplica `supabase/supabase_backfill_store_id.sql`: da de alta la Store `market-de
 4. Verificá el resultado (ver sección de abajo).
 5. Recién con la verificación en verde: repetí el mismo script en el SQL Editor del proyecto de **producción**, y volvé a verificar ahí.
 
+## Troubleshooting
+
+Si al pegar el script completo el SQL Editor devuelve un error tipo `invalid transaction termination` (o similar, relacionado a los `COMMIT` dentro del loop del procedure): dividí la ejecución en dos pasos en vez de uno solo —
+1. Primero pegá y corré solo las secciones 1 y 2 (el `INSERT` de la Store + el `CREATE PROCEDURE` + el `REVOKE`).
+2. Después, en una ejecución separada, pegá y corré las secciones 3 y 4 en adelante (las 13 `CALL`, el `DROP PROCEDURE` y las queries de verificación).
+
+No debería hacer falta — este patrón (procedure con `COMMIT` en un loop, invocado como sentencia de nivel superior) es el caso de uso documentado para el que Postgres 11+ agregó control de transacciones en procedures — pero no está verificado contra el SQL Editor de Supabase específicamente hasta la primera corrida en test.
+
 ## Verificación
 
 - Las dos queries al final del script: debe existir exactamente 1 fila en `stores` (`market-del-cevil`), y las 13 filas del `UNION ALL` deben mostrar `count = 0`.

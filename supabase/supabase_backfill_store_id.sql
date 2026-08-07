@@ -44,9 +44,9 @@ BEGIN
 
   LOOP
     EXECUTE format(
-      'UPDATE public.%I SET store_id = %L
+      'UPDATE public.%I SET store_id = %s
        WHERE ctid = ANY(ARRAY(
-         SELECT ctid FROM public.%I WHERE store_id IS NULL LIMIT %L
+         SELECT ctid FROM public.%I WHERE store_id IS NULL LIMIT %s
        ))',
       p_table, v_store_id, p_table, p_batch_size
     );
@@ -61,8 +61,20 @@ BEGIN
 END;
 $$;
 
+-- Postgres le da EXECUTE a PUBLIC por default en funciones/procedures nuevos
+-- (a diferencia de las tablas) y Supabase notifica a PostgREST para recargar
+-- su schema cache en cada cambio de DDL — mientras este procedure exista
+-- podría quedar expuesto brevemente como endpoint RPC invocable con la anon
+-- key, con cualquier p_table/p_store_slug, no solo los de las CALL de abajo.
+-- Se lo revocamos apenas se crea; no afecta las CALL de este mismo script,
+-- que corren como el rol dueño de la sesión (no como anon/authenticated).
+REVOKE EXECUTE ON PROCEDURE public.backfill_store_id_batch(TEXT, TEXT, INTEGER) FROM PUBLIC;
 
--- ── 3. Backfill de las 13 tablas (misma lista que #10) ─────────────────
+
+-- ── 3. Backfill de las 13 tablas ────────────────────────────────────────
+-- Misma lista autoritativa que supabase_multitenant_schema_expand.sql (#10)
+-- y TABLES_WITH_STORE_ID en src/test/integration/backfill-store-id.test.ts
+-- (y multitenant-schema.test.ts) — mantener las tres en sync.
 CALL public.backfill_store_id_batch('products', 'market-del-cevil');
 CALL public.backfill_store_id_batch('categories', 'market-del-cevil');
 CALL public.backfill_store_id_batch('subcategories', 'market-del-cevil');
