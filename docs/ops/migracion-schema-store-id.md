@@ -21,6 +21,10 @@ Aplica `supabase/supabase_multitenant_schema_expand.sql`: crea la tabla `stores`
 - Contra el proyecto de **test** únicamente: corré la suite de tests con `.env.test` configurado (`npm test`) — el test de integración `src/test/integration/multitenant-schema.test.ts` confirma automáticamente que `stores` existe y que las 13 tablas exponen `store_id`. No hay equivalente automatizado corriendo contra producción (`TEST_SUPABASE_URL` nunca debe apuntar ahí, ver `vitest.setup.ts`) — en producción alcanza con repetir las dos queries de arriba en el SQL Editor.
 - Verificá manualmente que la app admin sigue funcionando igual (pedidos, stock, catálogo) en el entorno que acabás de migrar — la migración no debería cambiar ningún comportamiento visible todavía.
 
+## Lección para próximas migraciones (#11, #22)
+
+Los 13 `CREATE INDEX` de este script **no usan `CONCURRENTLY`**: toman un lock que bloquea escrituras (no lecturas) en cada tabla mientras se construye el índice. Acá fue una decisión consciente y de bajo riesgo dado el volumen de datos actual (revisado con el usuario antes de correr en producción), pero no es gratis — para #11 (backfill de `store_id` sobre filas reales) y #22 (`store_id NOT NULL`), que van a tocar más volumen y más filas existentes, conviene evaluar `CREATE INDEX CONCURRENTLY` (fuera de un bloque transaccional, en su propia sesión) o una ventana de bajo tráfico antes de asumir que "nullable sin default" alcanza para descartar cualquier lock.
+
 ## Registro
 
 | Fecha | Entorno | Resultado |
