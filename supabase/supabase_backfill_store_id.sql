@@ -16,6 +16,14 @@
 --
 -- EJECUTAR PRIMERO EN EL PROYECTO DE TEST (ver docs/ops/), verificar 0 filas
 -- con store_id IS NULL, y recién después en producción.
+--
+-- IMPORTANTE: correr este archivo vía scripts/run-backfill-store-id.sh (psql),
+-- NO pegándolo en el SQL Editor de Supabase. El SQL Editor envuelve todo el
+-- script pegado en una única transacción explícita, lo que rompe el COMMIT
+-- dentro del loop del PROCEDURE (confirmado empíricamente: ERROR 2D000
+-- invalid transaction termination). psql sí ejecuta cada sentencia de nivel
+-- superior del archivo en su propia transacción autocommiteada, que es lo
+-- que este backfill necesita.
 -- ============================================================================
 
 -- ── 1. Alta de la Store (idempotente por slug) ─────────────────────────
