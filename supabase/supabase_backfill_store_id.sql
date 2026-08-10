@@ -33,6 +33,13 @@ ON CONFLICT (slug) DO NOTHING;
 
 
 -- ── 2. Procedure de backfill en lotes ───────────────────────────────────
+-- Cada lote se identifica por ctid (identificador físico de fila), no por
+-- primary key: no las 13 tablas comparten una PK uniforme (product_affinity
+-- tiene PK compuesta product_id_a/product_id_b, sin columna id) — un batching
+-- por PK necesitaría un caso especial por tabla. ctid capturado DENTRO de la
+-- misma sentencia UPDATE (no en un paso separado previo) es seguro: no hay
+-- ventana de tiempo entre "seleccionar" y "actualizar" donde otra transacción
+-- pueda invalidar esos ctid.
 CREATE OR REPLACE PROCEDURE public.backfill_store_id_batch(
   p_table       TEXT,
   p_store_slug  TEXT,

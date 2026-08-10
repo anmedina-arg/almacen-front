@@ -36,6 +36,13 @@ Confirmado empíricamente (primer intento, 2026-08-10, proyecto de test): pegar 
 - En producción no hay test automatizado corriendo (`TEST_SUPABASE_URL` nunca debe apuntar ahí) — alcanza con correr las dos queries de verificación del final del script manualmente (SQL Editor está bien para esto, son `SELECT`s de solo lectura sin `COMMIT` interno).
 - Verificá manualmente que la app admin sigue funcionando igual (pedidos, stock, catálogo) en el entorno que acabás de migrar.
 
+## Plan de reversión
+
+Si algo saliera mal (dato incorrecto, sospecha de fila mal asignada, etc.):
+
+- **Caso más probable — deshacer el backfill sin tocar nada más**: como `store_id` es nullable y esto solo asignó un valor a filas que antes eran `NULL`, revertir es un `UPDATE` simple por tabla: `UPDATE public.<tabla> SET store_id = NULL WHERE store_id = <id de la Store>;`. No hace falta restaurar nada — ninguna otra columna, policy, trigger o función se tocó.
+- **Caso extremo — restaurar desde backup**: si hiciera falta volver al estado exacto de antes de este ticket, usar el dump de `scripts/backup-production.sh` tomado antes de aplicar `supabase_multitenant_schema_expand.sql` (#10) — ver `docs/ops/backup-produccion.md`. No debería ser necesario dado lo acotado del cambio (una columna nueva + un `UPDATE` sobre ella).
+
 ## Registro
 
 | Fecha | Entorno | Resultado |
