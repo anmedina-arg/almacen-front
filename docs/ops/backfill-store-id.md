@@ -41,5 +41,5 @@ Confirmado empíricamente (primer intento, 2026-08-10, proyecto de test): pegar 
 | Fecha | Entorno | Resultado |
 |-------|---------|-----------|
 | 2026-08-10 | test | Primer intento fallido: pegado en el SQL Editor de Supabase → `ERROR 2D000 invalid transaction termination` en el `COMMIT` del loop. Rollback completo confirmado (`stores` vacía después). Causa y fix (`scripts/run-backfill-store-id.sh` vía psql) documentados arriba. |
-| _pendiente_ | test (retry vía psql) | |
+| 2026-08-10 | test (vía psql) | Primera corrida con el script correcto: `stores` con 1 fila (`market-del-cevil`, id `2` — el `1` quedó "quemado" en la secuencia por el intento fallido, no reutilizable, sin impacto). 12 de 13 tablas en `0`; `product_price_history` quedó con 17 filas pendientes. Sin causa identificada específica de esa tabla (el trigger `log_price_change()` no debería dispararse por un `UPDATE` que solo toca `store_id`). Se volvió a correr el mismo script (idempotente) sin cambios de código: las 13 tablas cerraron en `0`. `npm test` → 30/30 en verde. Tratado como corrida parcial transitoria, no reproducida en el segundo intento — revisar si vuelve a aparecer en producción. |
 | _pendiente_ | producción | |
