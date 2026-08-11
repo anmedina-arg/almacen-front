@@ -1,4 +1,5 @@
 import { supabaseBrowser } from '@/lib/supabase/client';
+import { getSlugFromPathname } from '@/lib/store/slug';
 import type { LoginCredentials, RegisterCredentials } from '../types/auth.types';
 
 const supabase = supabaseBrowser;
@@ -47,7 +48,10 @@ export const authService = {
       : (process.env.NEXT_PUBLIC_SITE_URL ||
          (typeof window !== 'undefined' ? window.location.origin : ''));
 
-    const slug = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
+    if (typeof window === 'undefined') {
+      throw new Error('signInWithGoogle solo puede usarse del lado del cliente.');
+    }
+    const slug = getSlugFromPathname(window.location.pathname);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',

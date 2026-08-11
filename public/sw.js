@@ -1,5 +1,5 @@
-const CACHE_NAME = 'market-cevil-v7';
-const RUNTIME_CACHE = 'market-cevil-runtime-v7';
+const CACHE_NAME = 'market-cevil-v8';
+const RUNTIME_CACHE = 'market-cevil-runtime-v8';
 
 // Static assets that never change: precache on install.
 // NOTE: Do NOT add HTML pages here — pages are SSR and must be fetched fresh
@@ -7,7 +7,6 @@ const RUNTIME_CACHE = 'market-cevil-runtime-v7';
 // NOTE: Do NOT add /_next/static/ here — Next.js JS/CSS chunks already have
 // content-hash filenames and are optimally handled by the browser HTTP cache.
 const PRECACHE_URLS = [
-  '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
   '/apple-touch-icon.png',

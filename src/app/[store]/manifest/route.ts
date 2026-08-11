@@ -40,6 +40,14 @@ export async function GET(
       categories: ['shopping', 'business'],
       prefer_related_applications: false,
     },
-    { headers: { 'Content-Type': 'application/manifest+json' } }
+    {
+      headers: {
+        'Content-Type': 'application/manifest+json',
+        // El nombre de una Store cambia solo por edición manual de un
+        // Platform admin (ADR-0006) — mucho más raro que el catálogo de
+        // productos, que ya cachea 5min/1h (ver [store]/api/products/route.ts).
+        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+      },
+    }
   );
 }

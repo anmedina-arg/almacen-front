@@ -1,3 +1,5 @@
+import { getSlugFromPathname } from '@/lib/store/slug';
+
 /**
  * Wrapper de fetch para llamadas a /api/* del lado del cliente. Resuelve la
  * Store activa desde el primer segmento de la URL del browser (no usa
@@ -6,21 +8,12 @@
  * /<slug>/api/<path> — así ningún caller hardcodea el slug (multi-store-safe
  * para cuando se dé de alta la Store #2).
  */
-function getActiveStoreSlug(): string {
+export function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   if (typeof window === 'undefined') {
     throw new Error('apiFetch solo puede usarse del lado del cliente.');
   }
 
-  const [, slug] = window.location.pathname.split('/');
-  if (!slug) {
-    throw new Error('No se pudo resolver la Store activa desde la URL actual.');
-  }
-
-  return slug;
-}
-
-export function apiFetch(path: string, init?: RequestInit): Promise<Response> {
-  const slug = getActiveStoreSlug();
+  const slug = getSlugFromPathname(window.location.pathname);
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return fetch(`/${slug}/api${normalizedPath}`, init);
 }
