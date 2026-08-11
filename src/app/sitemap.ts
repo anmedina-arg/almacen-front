@@ -1,24 +1,34 @@
 import type { MetadataRoute } from 'next';
+import { supabaseServer } from '@/lib/supabase/server';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  return [
+// Genera 3 entradas por cada Store activa en vez de hardcodear una — cuando
+// se dé de alta una Store nueva (ADR-0006), aparece sola en el próximo build
+// sin tocar este archivo.
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://market-del-cevil.vercel.app';
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const { data: stores } = await supabaseServer.from('stores').select('slug');
+
+  const lastModified = new Date();
+
+  return (stores ?? []).flatMap((store) => [
     {
-      url: 'https://market-del-cevil.vercel.app',
-      lastModified: new Date(),
-      changeFrequency: 'daily',
+      url: `${SITE_URL}/${store.slug}`,
+      lastModified,
+      changeFrequency: 'daily' as const,
       priority: 1,
     },
     {
-      url: 'https://market-del-cevil.vercel.app/privacy',
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
+      url: `${SITE_URL}/${store.slug}/privacy`,
+      lastModified,
+      changeFrequency: 'monthly' as const,
       priority: 0.3,
     },
     {
-      url: 'https://market-del-cevil.vercel.app/terms',
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
+      url: `${SITE_URL}/${store.slug}/terms`,
+      lastModified,
+      changeFrequency: 'monthly' as const,
       priority: 0.3,
     },
-  ];
+  ]);
 }

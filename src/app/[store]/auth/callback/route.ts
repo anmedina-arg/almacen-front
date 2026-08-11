@@ -3,7 +3,11 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const origin = requestUrl.origin;
@@ -37,10 +41,10 @@ export async function GET(request: NextRequest) {
 
     if (error) {
       console.error('Auth callback error:', error);
-      return NextResponse.redirect(`${origin}/login?error=callback_failed`);
+      return NextResponse.redirect(`${origin}/${store}/login?error=callback_failed`);
     }
   }
 
   // URL to redirect to after sign in process completes
-  return NextResponse.redirect(`${origin}/`);
+  return NextResponse.redirect(`${origin}/${store}`);
 }

@@ -3,7 +3,12 @@ import Image from 'next/image';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
 
-export default function LoginPage() {
+export default async function LoginPage({
+  params,
+}: {
+  params: Promise<{ store: string }>;
+}) {
+  const { store } = await params;
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
       <div className="w-full max-w-md">
@@ -39,14 +44,14 @@ export default function LoginPage() {
 
           <p className="text-center text-sm text-gray-600">
             ¿No tienes cuenta?{' '}
-            <Link href="/register" className="text-green-600 hover:text-green-700 font-medium">
+            <Link href={`/${store}/register`} className="text-green-600 hover:text-green-700 font-medium">
               Regístrate
             </Link>
           </p>
         </div>
 
         <div className="mt-6 text-center">
-          <Link href="/" className="text-sm text-gray-600 hover:text-gray-800">
+          <Link href={`/${store}`} className="text-sm text-gray-600 hover:text-gray-800">
             ← Volver al catálogo
           </Link>
         </div>

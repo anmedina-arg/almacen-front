@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
 import type { PaymentInput } from '../types/payment.types';
 
 async function setPayments(orderId: number, payments: PaymentInput[], orderTotal: number) {
-  const res = await fetch(`/api/orders/${orderId}/payments`, {
+  const res = await apiFetch(`/orders/${orderId}/payments`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ payments, order_total: orderTotal }),
@@ -16,7 +17,7 @@ async function setPayments(orderId: number, payments: PaymentInput[], orderTotal
 }
 
 async function deletePayment(orderId: number, paymentId: number) {
-  const res = await fetch(`/api/orders/${orderId}/payments/${paymentId}`, {
+  const res = await apiFetch(`/orders/${orderId}/payments/${paymentId}`, {
     method: 'DELETE',
   });
   if (!res.ok) {

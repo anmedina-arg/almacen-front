@@ -6,9 +6,12 @@ import { AdminTabBar } from '@/features/admin/components/AdminTabBar';
 
 export default async function AdminLayout({
   children,
+  params,
 }: {
   children: React.ReactNode;
+  params: Promise<{ store: string }>;
 }) {
+  const { store } = await params;
   const cookieStore = await cookies();
 
   const supabase = createServerClient(
@@ -38,7 +41,7 @@ export default async function AdminLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?redirectTo=/admin/products');
+    redirect(`/${store}/login?redirectTo=/${store}/admin/products`);
   }
 
   // Verificar rol admin
@@ -49,7 +52,7 @@ export default async function AdminLayout({
     .single();
 
   if (!profile || profile.role !== 'admin') {
-    redirect('/?error=unauthorized');
+    redirect(`/${store}?error=unauthorized`);
   }
 
   return (
@@ -62,7 +65,7 @@ export default async function AdminLayout({
             <p className="text-sm text-gray-600">Gestión de productos - Market del Cevil</p>
           </div>
           <Link
-            href="/"
+            href={`/${store}`}
             className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
           >
             ← Volver al sitio

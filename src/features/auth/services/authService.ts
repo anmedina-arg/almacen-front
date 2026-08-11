@@ -47,10 +47,12 @@ export const authService = {
       : (process.env.NEXT_PUBLIC_SITE_URL ||
          (typeof window !== 'undefined' ? window.location.origin : ''));
 
+    const slug = typeof window !== 'undefined' ? window.location.pathname.split('/')[1] : '';
+
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${baseUrl}/auth/callback`,
+        redirectTo: `${baseUrl}/${slug}/auth/callback`,
       },
     });
 

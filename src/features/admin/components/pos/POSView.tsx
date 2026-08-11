@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useMemo, useCallback } from 'react';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { ProductCard } from '@/components/ProductCard';
 import { usePOSCart } from '../../hooks/usePOSCart';
 import { normalize } from '@/utils/normalize';
@@ -38,7 +39,7 @@ export function POSView() {
     setErrorMsg('');
 
     try {
-      const res = await fetch('/api/pos/orders', {
+      const res = await apiFetch('/pos/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

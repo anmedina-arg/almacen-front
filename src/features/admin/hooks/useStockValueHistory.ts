@@ -1,11 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
-import type { StockValueHistoryResponse } from '@/app/api/dashboard/stock-value-history/route';
+import type { StockValueHistoryResponse } from '@/app/[store]/api/dashboard/stock-value-history/route';
 
 async function fetchStockValueHistory(): Promise<StockValueHistoryResponse> {
-  const res = await fetch('/api/dashboard/stock-value-history', { cache: 'no-store' });
+  const res = await apiFetch('/dashboard/stock-value-history', { cache: 'no-store' });
   if (!res.ok) throw new Error('Error al obtener historial de stock valorizado');
   return res.json();
 }

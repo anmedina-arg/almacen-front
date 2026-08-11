@@ -1,11 +1,12 @@
 import type { Product } from '@/types';
+import { apiFetch } from '@/lib/api/apiFetch';
 
 export const productService = {
   async fetchProducts(options?: { includeInactive?: boolean }): Promise<Product[]> {
     const params = new URLSearchParams();
     if (options?.includeInactive) params.set('includeInactive', 'true');
 
-    const res = await fetch(`/api/products${params.size ? `?${params}` : ''}`, {
+    const res = await apiFetch(`/products${params.size ? `?${params}` : ''}`, {
       cache: 'no-store',
     });
 

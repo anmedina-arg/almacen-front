@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
 import type { AssignClientInput } from '../types/client.types';
 
 async function assignClient(orderId: number, input: AssignClientInput) {
-  const res = await fetch(`/api/orders/${orderId}/client`, {
+  const res = await apiFetch(`/orders/${orderId}/client`, {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(input),
@@ -16,7 +17,7 @@ async function assignClient(orderId: number, input: AssignClientInput) {
 }
 
 async function unassignClient(orderId: number) {
-  const res = await fetch(`/api/orders/${orderId}/client`, { method: 'DELETE' });
+  const res = await apiFetch(`/orders/${orderId}/client`, { method: 'DELETE' });
   if (!res.ok) {
     const data = await res.json() as { error: string };
     throw new Error(data.error || 'Error al quitar cliente');

@@ -14,10 +14,11 @@ const barlow = Barlow({
   weight: ['300', '500', '700'],
 });
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://market-del-cevil.vercel.app';
+
 export const metadata: Metadata = {
   title: 'Market del cevil',
   description: 'Catálogo de productos - tienda online',
-  manifest: '/manifest.json',
   themeColor: '#000000',
   appleWebApp: {
     capable: true,
@@ -27,11 +28,11 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Market del cevil',
     description: 'Catálogo de productos',
-    url: 'https://market-del-cevil.vercel.app',
+    url: SITE_URL,
     type: 'website',
     images: [
       {
-        url: 'https://market-del-cevil.vercel.app/logo-og.png',
+        url: `${SITE_URL}/logo-og.png`,
       },
     ],
   },

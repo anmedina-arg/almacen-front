@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useInventoryRotation } from '../../hooks/useInventoryRotation';
 import { InventoryRotationTable } from './InventoryRotationTable';
-import type { RotationItem } from '@/app/api/dashboard/rotation/route';
+import type { RotationItem } from '@/app/[store]/api/dashboard/rotation/route';
 
 // ── Ventanas temporales ────────────────────────────────────────────────────────
 

@@ -11,6 +11,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 import { features } from '@/lib/features';
+import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 interface HeaderClientProps {
 	logo: React.ReactNode;
@@ -21,6 +22,7 @@ function UserMenu() {
 	const [open, setOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
 	const router = useRouter();
+	const slug = useStoreSlug();
 	const { mutate: logout, isPending } = useLogout();
 
 	const { data: profile } = useQuery({
@@ -65,7 +67,7 @@ function UserMenu() {
 		logout(undefined, {
 			onSuccess: () => {
 				setOpen(false);
-				router.push('/');
+				router.push(`/${slug}`);
 			},
 		});
 	};
@@ -125,6 +127,7 @@ function UserMenu() {
 
 export function HeaderClient({ logo }: HeaderClientProps) {
 	const isAuthenticated = useIsAuthenticated();
+	const slug = useStoreSlug();
 
 	return (
 		<div className="relative z-10 flex items-center justify-between gap-3 px-3 py-2 bg-white/80 backdrop-blur-md">
@@ -140,7 +143,7 @@ export function HeaderClient({ logo }: HeaderClientProps) {
 					<UserMenu />
 				) : (
 					<Link
-						href="/login"
+						href={`/${slug}/login`}
 						className="text-sm text-green-600 hover:text-green-700 font-medium transition-colors"
 					>
 						Iniciar sesión
