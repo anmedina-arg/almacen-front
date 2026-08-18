@@ -25,8 +25,8 @@ export function AdminPanelLink() {
     staleTime: 5 * 60 * 1000, // 5 minutos
   });
 
-  // Solo mostrar si el usuario es admin
-  if (!profile || profile.role !== 'admin') {
+  // Solo mostrar si el usuario es admin o super_admin
+  if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
     return null;
   }
 
