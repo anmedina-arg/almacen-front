@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -13,18 +13,18 @@ const updateSubcategorySchema = z.object({
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id } = await params;
     const subcategoryId = parseInt(id, 10);
     if (isNaN(subcategoryId)) {
       return NextResponse.json({ error: 'Invalid subcategory id' }, { status: 400 });
@@ -41,6 +41,7 @@ export async function PUT(
       .from('subcategories')
       .update({ name: parsed.data.name })
       .eq('id', subcategoryId)
+      .eq('store_id', storeId)
       .select()
       .single();
 
@@ -68,18 +69,18 @@ export async function PUT(
  */
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id } = await params;
     const subcategoryId = parseInt(id, 10);
     if (isNaN(subcategoryId)) {
       return NextResponse.json({ error: 'Invalid subcategory id' }, { status: 400 });
@@ -89,7 +90,8 @@ export async function DELETE(
     const { error } = await supabase
       .from('subcategories')
       .delete()
-      .eq('id', subcategoryId);
+      .eq('id', subcategoryId)
+      .eq('store_id', storeId);
 
     if (error) {
       console.error('Error deleting subcategory:', error);

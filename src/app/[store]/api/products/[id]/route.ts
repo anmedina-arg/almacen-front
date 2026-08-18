@@ -1,20 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Product } from '@/types';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { id: idParam } = await params;
+    const { store, id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
     }
 
     const supabase = await createSupabaseServerClient();
+    const storeId = await getStoreIdBySlug(supabase, store);
+    if (storeId == null) {
+      return NextResponse.json({ error: 'Store not found' }, { status: 404 });
+    }
 
     const { data, error } = await supabase
       .from('products')
@@ -38,6 +43,7 @@ export async function GET(
       `
       )
       .eq('id', id)
+      .eq('store_id', storeId)
       .single();
 
     if (error) {
@@ -55,10 +61,10 @@ export async function GET(
       subcategory_name: fetchedSub?.name ?? null,
     } as Product;
 
-    // Si el producto está inactivo, solo admins pueden verlo
+    // Si el producto está inactivo, solo admins de esta Store pueden verlo
     if (!product.active) {
-      const { isAdmin } = await verifyAdminAuth();
-      if (!isAdmin) {
+      const { isStoreAdmin } = await verifyStoreAdminAuth(store);
+      if (!isStoreAdmin) {
         return NextResponse.json({ error: 'Product not found' }, { status: 404 });
       }
     }
@@ -82,19 +88,19 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    // Verificar admin
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id: idParam } = await params;
+    // Verificar admin de esta Store
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
@@ -121,10 +127,36 @@ export async function PUT(
 
     const supabase = await createSupabaseServerClient();
 
+    // Mismo chequeo de ownership que en POST /api/products: category_id /
+    // subcategory_id deben pertenecer a esta Store.
+    if (updates.category_id != null) {
+      const { data: cat } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('id', updates.category_id)
+        .eq('store_id', storeId)
+        .maybeSingle();
+      if (!cat) {
+        return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+      }
+    }
+    if (updates.subcategory_id != null) {
+      const { data: sub } = await supabase
+        .from('subcategories')
+        .select('id')
+        .eq('id', updates.subcategory_id)
+        .eq('store_id', storeId)
+        .maybeSingle();
+      if (!sub) {
+        return NextResponse.json({ error: 'Subcategory not found' }, { status: 404 });
+      }
+    }
+
     const { data, error } = await supabase
       .from('products')
       .update(updates)
       .eq('id', id)
+      .eq('store_id', storeId)
       .select(
         `
         id,
@@ -162,7 +194,12 @@ export async function PUT(
     };
 
     // Si el costo pasó a ser > 0, corregir order_items que tengan unit_cost = 0
-    // en órdenes pending/confirmed (snapshot era 0 porque el producto no tenía costo)
+    // en órdenes pending/confirmed (snapshot era 0 porque el producto no tenía costo).
+    // No filtra `orders` por store_id acá: el producto ya se verificó contra
+    // storeId arriba, así que `product_id` ya acota correctamente qué
+    // order_items se tocan — solo trae de más (todas las Stores) para armar
+    // la lista de orderIds candidatos. Scopear orders/order_items en serio
+    // es #16 (Pedidos y WhatsApp), no #15.
     const newCost = typeof body.cost === 'number' ? body.cost : null;
     if (newCost !== null && newCost > 0) {
       const { data: activeOrders } = await supabase
@@ -193,19 +230,19 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    // Verificar admin
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id: idParam } = await params;
+    // Verificar admin de esta Store
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
@@ -216,7 +253,8 @@ export async function DELETE(
     const { error } = await supabase
       .from('products')
       .delete()
-      .eq('id', id);
+      .eq('id', id)
+      .eq('store_id', storeId);
 
     if (error) {
       console.error('Error deleting product:', error);
