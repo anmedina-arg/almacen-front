@@ -99,7 +99,7 @@ function UserMenu() {
 						<p className="text-xs text-gray-400">Sesión iniciada como</p>
 						<p className="text-sm font-medium text-gray-700 truncate">{displayName}</p>
 					</div>
-					{profile?.role === 'admin' && (
+					{(profile?.role === 'admin' || profile?.role === 'super_admin') && (
 						<Link
 							href={features.dashboard ? '/admin/dashboard' : '/admin/products'}
 							onClick={() => setOpen(false)}
