@@ -50,8 +50,11 @@ export async function verifyAdminAuth(): Promise<{
     return { isAdmin: false, userId: user.id, error: 'Profile not found' };
   }
 
+  // super_admin (dueño de la plataforma, #13) es un superset de admin: debe
+  // poder administrar cualquier Store, incluida market-del-cevil, sin
+  // necesitar además una membership en store_admins para cada una.
   return {
-    isAdmin: profile.role === 'admin',
+    isAdmin: profile.role === 'admin' || profile.role === 'super_admin',
     userId: user.id,
     error: null,
   };
