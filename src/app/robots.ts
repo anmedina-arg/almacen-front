@@ -4,7 +4,7 @@ import type { MetadataRoute } from 'next';
 // dominio, con las Stores como primer segmento del path. Los wildcards cubren
 // cualquier cantidad de Stores sin tener que volver a tocar este archivo
 // cuando se dé de alta una nueva (ver ADR-0006).
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://market-del-cevil.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://chaskyapp.vercel.app';
 
 export default function robots(): MetadataRoute.Robots {
   return {
