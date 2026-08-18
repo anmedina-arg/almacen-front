@@ -44,14 +44,14 @@ export default async function AdminLayout({
     redirect(`/${store}/login?redirectTo=/${store}/admin/products`);
   }
 
-  // Verificar rol admin
+  // Verificar rol admin (super_admin es un superset, ver #13/ADR-0005)
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
     .eq('id', user.id)
     .single();
 
-  if (!profile || profile.role !== 'admin') {
+  if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
     redirect(`/${store}?error=unauthorized`);
   }
 
