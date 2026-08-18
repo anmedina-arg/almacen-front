@@ -6,6 +6,7 @@ import type {
   AddOrderItemInput,
   OrderItem,
 } from '../types/order.types';
+import { apiFetch } from '@/lib/api/apiFetch';
 
 // ============================================================================
 // Order Service
@@ -18,7 +19,7 @@ export const orderService = {
    * Create a new order (public - called when user sends WhatsApp message).
    */
   async createOrder(input: CreateOrderInput): Promise<CreateOrderResponse> {
-    const res = await fetch('/api/orders', {
+    const res = await apiFetch('/orders', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
@@ -41,7 +42,7 @@ export const orderService = {
    * Fetch all orders (admin only).
    */
   async getAllOrders(): Promise<Order[]> {
-    const res = await fetch('/api/orders', {
+    const res = await apiFetch('/orders', {
       cache: 'no-store',
     });
     if (!res.ok) {
@@ -55,7 +56,7 @@ export const orderService = {
    * Fetch a single order with its items (admin only).
    */
   async getOrderById(orderId: number): Promise<OrderWithItems> {
-    const res = await fetch(`/api/orders/${orderId}`, {
+    const res = await apiFetch(`/orders/${orderId}`, {
       cache: 'no-store',
     });
     if (!res.ok) {
@@ -69,7 +70,7 @@ export const orderService = {
    * Update order fields (admin only).
    */
   async updateOrder(orderId: number, updates: { status?: string; notes?: string | null; created_at?: string }): Promise<Order> {
-    const res = await fetch(`/api/orders/${orderId}`, {
+    const res = await apiFetch(`/orders/${orderId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),
@@ -85,7 +86,7 @@ export const orderService = {
    * Confirm an order (admin only).
    */
   async confirmOrder(orderId: number): Promise<void> {
-    const res = await fetch(`/api/orders/${orderId}/confirm`, {
+    const res = await apiFetch(`/orders/${orderId}/confirm`, {
       method: 'PUT',
     });
     if (!res.ok) {
@@ -98,7 +99,7 @@ export const orderService = {
    * Cancel an order and return its stock (admin only).
    */
   async cancelOrder(orderId: number): Promise<void> {
-    const res = await fetch(`/api/orders/${orderId}/cancel`, {
+    const res = await apiFetch(`/orders/${orderId}/cancel`, {
       method: 'PUT',
     });
     if (!res.ok) {
@@ -111,7 +112,7 @@ export const orderService = {
    * Add an item to an existing order (admin only).
    */
   async addOrderItem(orderId: number, item: AddOrderItemInput): Promise<OrderItem> {
-    const res = await fetch(`/api/orders/${orderId}/items`, {
+    const res = await apiFetch(`/orders/${orderId}/items`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(item),
@@ -127,7 +128,7 @@ export const orderService = {
    * Remove an item from an order (admin only).
    */
   async removeOrderItem(orderId: number, itemId: number): Promise<void> {
-    const res = await fetch(`/api/orders/${orderId}/items/${itemId}`, {
+    const res = await apiFetch(`/orders/${orderId}/items/${itemId}`, {
       method: 'DELETE',
     });
     if (!res.ok) {
@@ -140,7 +141,7 @@ export const orderService = {
    * Permanently delete an order and all its items (admin only).
    */
   async deleteOrder(orderId: number): Promise<void> {
-    const res = await fetch(`/api/orders/${orderId}`, {
+    const res = await apiFetch(`/orders/${orderId}`, {
       method: 'DELETE',
     });
     if (!res.ok) {
@@ -157,7 +158,7 @@ export const orderService = {
     itemId: number,
     updates: { quantity?: number; unit_price?: number }
   ): Promise<OrderItem> {
-    const res = await fetch(`/api/orders/${orderId}/items/${itemId}`, {
+    const res = await apiFetch(`/orders/${orderId}/items/${itemId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updates),

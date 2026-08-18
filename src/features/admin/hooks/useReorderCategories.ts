@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
 
 async function reorderCategories(orderedIds: number[]): Promise<void> {
-  const res = await fetch('/api/categories/reorder', {
+  const res = await apiFetch('/categories/reorder', {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ orderedIds }),

@@ -10,7 +10,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
-import type { StockByCategoryItem } from '@/app/api/dashboard/stock-by-category/route';
+import type { StockByCategoryItem } from '@/app/[store]/api/dashboard/stock-by-category/route';
 
 const COLORS = [
   '#16a34a', '#15803d', '#166534', '#22c55e', '#4ade80',

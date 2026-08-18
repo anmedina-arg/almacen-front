@@ -1,10 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import type { Product } from '@/types';
 
 async function searchProducts(query: string): Promise<Product[]> {
-  const res = await fetch(`/api/products?search=${encodeURIComponent(query)}`);
+  const res = await apiFetch(`/products?search=${encodeURIComponent(query)}`);
   if (!res.ok) throw new Error('Error al buscar productos');
   return res.json();
 }

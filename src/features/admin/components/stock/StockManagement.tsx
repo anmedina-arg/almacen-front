@@ -11,6 +11,7 @@ import { CATEGORY_LABELS } from '../../constants';
 import { Spinner } from '@/components/ui/Spinner';
 import type { ProductStockView, StockFilters } from '../../types/stock.types';
 import { formatPrice } from '@/utils/formatPrice';
+import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 /**
  * Componente principal de gestion de stock.
@@ -18,6 +19,7 @@ import { formatPrice } from '@/utils/formatPrice';
  * filtros de busqueda, y modales para editar y ver historial.
  */
 export function StockManagement() {
+  const slug = useStoreSlug();
   const { data: stockData, isLoading, error } = useProductStock();
   const { data: lowStockData } = useLowStock();
 
@@ -115,7 +117,7 @@ export function StockManagement() {
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           <Link
-            href="/admin/stock/entry"
+            href={`/${slug}/admin/stock/entry`}
             className="flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 transition-colors"
           >
             Ingresar Stock

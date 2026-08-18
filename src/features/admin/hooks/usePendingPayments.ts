@@ -1,11 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
-import type { PendingPaymentsResponse } from '@/app/api/dashboard/pending-payments/route';
+import type { PendingPaymentsResponse } from '@/app/[store]/api/dashboard/pending-payments/route';
 
 async function fetchPendingPayments(page: number): Promise<PendingPaymentsResponse> {
-  const res = await fetch(`/api/dashboard/pending-payments?page=${page}`, { cache: 'no-store' });
+  const res = await apiFetch(`/dashboard/pending-payments?page=${page}`, { cache: 'no-store' });
   if (!res.ok) throw new Error('Error al obtener pedidos pendientes de pago');
   return res.json();
 }

@@ -6,6 +6,7 @@ import { useRegister } from '../hooks/useRegister';
 import { registerSchema } from '../schemas/registerSchema';
 import { getAuthErrorMessage } from '../utils/errorMessages';
 import { sanitizeInput } from '../utils/sanitize';
+import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 interface RegisterFormData {
   email: string;
@@ -16,6 +17,7 @@ interface RegisterFormData {
 
 export function RegisterForm() {
   const router = useRouter();
+  const slug = useStoreSlug();
   const [formData, setFormData] = useState<RegisterFormData>({
     email: '',
     password: '',
@@ -53,7 +55,7 @@ export function RegisterForm() {
 
     register(sanitizedData, {
       onSuccess: () => {
-        router.push('/');
+        router.push(`/${slug}`);
       },
     });
   };

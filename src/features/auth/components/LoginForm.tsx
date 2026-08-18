@@ -6,9 +6,11 @@ import { useLogin } from '../hooks/useLogin';
 import { loginSchema } from '../schemas/loginSchema';
 import { getAuthErrorMessage } from '../utils/errorMessages';
 import type { LoginCredentials } from '../types/auth.types';
+import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 export function LoginForm() {
   const router = useRouter();
+  const slug = useStoreSlug();
   const [credentials, setCredentials] = useState<LoginCredentials>({
     email: '',
     password: '',
@@ -36,7 +38,7 @@ export function LoginForm() {
     setErrors({});
     login(credentials, {
       onSuccess: () => {
-        router.push('/');
+        router.push(`/${slug}`);
       },
     });
   };

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
+import { apiFetch } from '@/lib/api/apiFetch';
 
-async function downloadCsv(url: string, fallbackName: string) {
-  const res = await fetch(url);
+async function downloadCsv(path: string, fallbackName: string) {
+  const res = await apiFetch(path);
   if (!res.ok) {
     const body = await res.json() as { error: string };
     throw new Error(body.error || 'Error al generar el informe');
@@ -43,7 +44,7 @@ export function InformesPanel() {
       const params = new URLSearchParams();
       if (startDate) params.set('start_date', `${startDate}T00:00:00`);
       if (endDate)   params.set('end_date',   `${endDate}T23:59:59`);
-      await downloadCsv(`/api/reports/ventas?${params.toString()}`, 'ventas.csv');
+      await downloadCsv(`/reports/ventas?${params.toString()}`, 'ventas.csv');
     } catch (e) {
       setVentasError(e instanceof Error ? e.message : 'Error de conexión');
     } finally {
@@ -56,7 +57,7 @@ export function InformesPanel() {
     setRecoStatus('idle');
     setRecoLoading(true);
     try {
-      const res = await fetch('/api/admin/recommendations/refresh', { method: 'POST' });
+      const res = await apiFetch('/admin/recommendations/refresh', { method: 'POST' });
       if (!res.ok) {
         const body = await res.json() as { error: string };
         throw new Error(body.error || 'Error al actualizar');
@@ -74,7 +75,7 @@ export function InformesPanel() {
     setProdError('');
     setProdLoading(true);
     try {
-      await downloadCsv('/api/reports/productos', 'productos.csv');
+      await downloadCsv('/reports/productos', 'productos.csv');
     } catch (e) {
       setProdError(e instanceof Error ? e.message : 'Error de conexión');
     } finally {

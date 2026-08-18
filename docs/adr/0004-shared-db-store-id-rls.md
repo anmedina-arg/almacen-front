@@ -1,0 +1,3 @@
+# Aislamiento de datos: `store_id` + RLS en un único proyecto Supabase
+
+Se evaluó una base de datos (o schema) Supabase separada por Store contra agregar `store_id` a cada tabla de negocio existente (`products`, `categories`, `orders`, `order_items`, `clients`, `order_payments`, `product_stock`, `stock_movement_log`, etc.) con políticas RLS que filtren por la Store del usuario autenticado, dentro del mismo proyecto Supabase actual. Se optó por `store_id` + RLS: evita gestionar y mantener sincronizado el schema entre N bases de datos a medida que se agregan features, y el tier actual de Supabase soporta bien la escala de 2 clientes. Es el camino que ya bocetaba `STACK_ANALYSIS.md`.

@@ -6,6 +6,7 @@ import type {
   StockEntryInput,
   StockEntryResult,
 } from '../types/stock.types';
+import { apiFetch } from '@/lib/api/apiFetch';
 
 // ============================================================================
 // Stock Service
@@ -19,7 +20,7 @@ export const stockService = {
    * Uses the v_product_stock view via the API route.
    */
   async getAllStock(): Promise<ProductStockView[]> {
-    const res = await fetch('/api/stock', {
+    const res = await apiFetch('/stock', {
       cache: 'no-store',
     });
     if (!res.ok) {
@@ -34,7 +35,7 @@ export const stockService = {
    * Calls the RPC function upsert_product_stock via the API route.
    */
   async upsertStock(input: UpsertStockInput): Promise<void> {
-    const res = await fetch(`/api/stock/${input.p_product_id}`, {
+    const res = await apiFetch(`/stock/${input.p_product_id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(input),
@@ -49,7 +50,7 @@ export const stockService = {
    * Fetch movement history for a specific product.
    */
   async getHistory(productId: number): Promise<StockMovement[]> {
-    const res = await fetch(`/api/stock/${productId}/history`, {
+    const res = await apiFetch(`/stock/${productId}/history`, {
       cache: 'no-store',
     });
     if (!res.ok) {
@@ -64,7 +65,7 @@ export const stockService = {
    * Calls the RPC function get_low_stock_products via the API route.
    */
   async getLowStock(): Promise<LowStockProduct[]> {
-    const res = await fetch('/api/stock/low-stock', {
+    const res = await apiFetch('/stock/low-stock', {
       cache: 'no-store',
     });
     if (!res.ok) {
@@ -80,7 +81,7 @@ export const stockService = {
    * Uses best-effort: errors per item do not stop the rest.
    */
   async incrementStock(entries: StockEntryInput[]): Promise<StockEntryResult[]> {
-    const res = await fetch('/api/stock/entry', {
+    const res = await apiFetch('/stock/entry', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ entries }),

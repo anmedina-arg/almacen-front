@@ -2,15 +2,17 @@
 
 import { useLogout } from '../hooks/useLogout';
 import { useRouter } from 'next/navigation';
+import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 export function LogoutButton() {
   const router = useRouter();
+  const slug = useStoreSlug();
   const { mutate: logout, isPending } = useLogout();
 
   const handleLogout = () => {
     logout(undefined, {
       onSuccess: () => {
-        router.push('/');
+        router.push(`/${slug}`);
       },
     });
   };
