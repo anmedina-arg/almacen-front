@@ -4,7 +4,7 @@ import { supabaseServer } from '@/lib/supabase/server';
 // Genera 3 entradas por cada Store activa en vez de hardcodear una — cuando
 // se dé de alta una Store nueva (ADR-0006), aparece sola en el próximo build
 // sin tocar este archivo.
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://market-del-cevil.vercel.app';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://chaskyapp.vercel.app';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const { data: stores } = await supabaseServer.from('stores').select('slug');
