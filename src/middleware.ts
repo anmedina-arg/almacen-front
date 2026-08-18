@@ -2,6 +2,17 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// Dominio bajo el que vivía la app entera antes de este PR (single-tenant).
+// Se mantiene como alias del mismo proyecto Vercel post-rename para no matar
+// los links ya compartidos ni las PWA que los clientes ya instalaron con ese
+// host — su manifest quedó fijo con start_url/scope = "/" al momento de
+// instalar, y eso no se puede reescribir de manera remota. Por eso el
+// redirect de abajo es same-origin (mismo host, solo cambia el path): un
+// redirect cross-domain hacia el dominio nuevo rompería el modo standalone
+// de esas PWA.
+const LEGACY_HOST = 'market-del-cevil.vercel.app';
+const LEGACY_STORE_SLUG = 'market-del-cevil';
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const segments = pathname.split('/').filter(Boolean);
@@ -12,6 +23,24 @@ export async function middleware(request: NextRequest) {
   // no tienen slug de Store: no necesitan el header ni el auth-gating de
   // abajo, que asume rutas bajo /[store]/...
   const SITE_LEVEL_ROUTES = new Set(['api', 'robots.txt', 'sitemap.xml']);
+
+  // Request al host legacy sin el slug de su Store ya al frente (link viejo,
+  // bookmark, o PWA instalada arrancando en start_url "/"): reinyectamos el
+  // slug y dejamos que el resto de este middleware (y el resto de la app)
+  // trate la request como cualquier otra bajo /[store]/...
+  if (
+    request.headers.get('host') === LEGACY_HOST &&
+    slug !== LEGACY_STORE_SLUG &&
+    !SITE_LEVEL_ROUTES.has(slug)
+  ) {
+    const redirectUrl = new URL(
+      `/${LEGACY_STORE_SLUG}${pathname === '/' ? '' : pathname}`,
+      request.url
+    );
+    redirectUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(redirectUrl);
+  }
+
   if (!slug || SITE_LEVEL_ROUTES.has(slug)) {
     return NextResponse.next();
   }
