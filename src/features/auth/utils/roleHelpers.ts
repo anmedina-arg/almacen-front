@@ -1,14 +1,14 @@
 import { createServerClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 
-export async function verifyAdminAuth(): Promise<{
-  isAdmin: boolean;
-  userId: string | null;
-  error: string | null;
-}> {
+// Compartido por verifyAdminAuth y verifyStoreAdminAuth — ambos necesitan un
+// client de Supabase atado a las cookies del request actual, fuera de eso no
+// comparten lógica (cada uno resuelve un criterio de autorización distinto).
+async function createCookieBasedSupabaseClient(): Promise<SupabaseClient> {
   const cookieStore = await cookies();
 
-  const supabase = createServerClient(
+  return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -28,6 +28,14 @@ export async function verifyAdminAuth(): Promise<{
       },
     }
   );
+}
+
+export async function verifyAdminAuth(): Promise<{
+  isAdmin: boolean;
+  userId: string | null;
+  error: string | null;
+}> {
+  const supabase = await createCookieBasedSupabaseClient();
 
   // Verificar usuario (más seguro que getSession en servidor)
   const {
@@ -58,6 +66,88 @@ export async function verifyAdminAuth(): Promise<{
     userId: user.id,
     error: null,
   };
+}
+
+// Núcleo de verifyStoreAdminAuth, separado del wrapper de cookies()/getUser()
+// de Next.js para poder testearlo directo con un client de service_role
+// contra el proyecto de test (cookies() solo funciona dentro de un request
+// real, no se puede invocar desde un test de Vitest).
+export async function resolveStoreAdminStatus(
+  supabase: SupabaseClient,
+  userId: string,
+  storeSlug: string
+): Promise<{
+  isStoreAdmin: boolean;
+  storeId: number | null;
+  error: string | null;
+}> {
+  const { data: store, error: storeError } = await supabase
+    .from('stores')
+    .select('id')
+    .eq('slug', storeSlug)
+    .maybeSingle();
+
+  if (storeError || !store) {
+    return { isStoreAdmin: false, storeId: null, error: 'Store not found' };
+  }
+
+  // maybeSingle (no single, a diferencia de verifyAdminAuth): "sin profile"
+  // es un resultado válido a distinguir de un error real de query, ya que
+  // esta función también se llama con ids de test sembrados a mano.
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (profileError || !profile) {
+    return { isStoreAdmin: false, storeId: store.id, error: 'Profile not found' };
+  }
+
+  // super_admin (#13) opera cualquier Store sin necesitar membership.
+  if (profile.role === 'super_admin') {
+    return { isStoreAdmin: true, storeId: store.id, error: null };
+  }
+
+  const { data: membership, error: membershipError } = await supabase
+    .from('store_admins')
+    .select('id')
+    .eq('profile_id', userId)
+    .eq('store_id', store.id)
+    .maybeSingle();
+
+  if (membershipError) {
+    return { isStoreAdmin: false, storeId: store.id, error: membershipError.message };
+  }
+
+  return { isStoreAdmin: membership != null, storeId: store.id, error: null };
+}
+
+// Aditivo (#14): ningún call site existente cambia todavía — verifyAdminAuth
+// sigue intacto y en uso. Reemplaza el chequeo de rol global por membership
+// scoped a la Store activa (o super_admin), resuelta acá vía slug en vez de
+// depender del header x-store-slug que setea el middleware (evita otro
+// lookup: [store]/layout.tsx y esta función ya reciben el slug como route
+// param).
+export async function verifyStoreAdminAuth(storeSlug: string): Promise<{
+  isStoreAdmin: boolean;
+  storeId: number | null;
+  userId: string | null;
+  error: string | null;
+}> {
+  const supabase = await createCookieBasedSupabaseClient();
+
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
+    return { isStoreAdmin: false, storeId: null, userId: null, error: 'No authenticated' };
+  }
+
+  const status = await resolveStoreAdminStatus(supabase, user.id, storeSlug);
+  return { ...status, userId: user.id };
 }
 
 export function hasRole(user: unknown, role: 'admin' | 'user'): boolean {
