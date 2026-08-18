@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useInventoryRotation } from '../../hooks/useInventoryRotation';
 import { useProductStockSnapshots } from '../../hooks/useProductStockSnapshots';
-import type { RotationItem } from '@/app/api/dashboard/rotation/route';
+import type { RotationItem } from '@/app/[store]/api/dashboard/rotation/route';
 
 const PERIODS = [
   { label: '7 días',  value: 7  },

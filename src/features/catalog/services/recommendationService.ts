@@ -1,4 +1,5 @@
 import type { RecommendedProduct } from '../types/recommendation.types';
+import { apiFetch } from '@/lib/api/apiFetch';
 
 export const recommendationService = {
   async getRecommendations(
@@ -13,7 +14,7 @@ export const recommendationService = {
     excludeIds.forEach((id) => params.append('exclude_ids', String(id)));
     params.set('limit', String(limit));
 
-    const res = await fetch(`/api/recommendations?${params.toString()}`, {
+    const res = await apiFetch(`/recommendations?${params.toString()}`, {
       cache: 'no-store',
     });
 

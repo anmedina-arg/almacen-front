@@ -11,8 +11,10 @@ import { useBatchIncrementStock } from '../../hooks/useBatchIncrementStock';
 import { StockEntryCard } from './StockEntryCard';
 import type { StockEntryCardProduct } from './StockEntryCard';
 import { normalize } from '@/utils/normalize';
+import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 export function StockEntryPanel() {
+  const slug = useStoreSlug();
   const { data: stockData = [], isLoading: stockLoading } = useProductStock();
   const { data: productsData = [], isLoading: productsLoading } = useProducts({ includeInactive: true });
   const { entries, addEntry, removeEntry, setNotes, clearAll, getEntryAmount, getEntryNotes } =
@@ -95,7 +97,7 @@ export function StockEntryPanel() {
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-4">
         <Link
-          href="/admin/stock"
+          href={`/${slug}/admin/stock`}
           className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 transition-colors"
         >
           ← Volver

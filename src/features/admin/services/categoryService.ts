@@ -4,10 +4,11 @@ import type {
   Subcategory,
 } from '../types/category.types';
 import type { CategoryInput } from '../schemas/categorySchemas';
+import { apiFetch } from '@/lib/api/apiFetch';
 
 export const categoryService = {
   async getAll(): Promise<Category[]> {
-    const res = await fetch('/api/categories', { cache: 'no-store' });
+    const res = await apiFetch('/categories', { cache: 'no-store' });
     if (!res.ok) {
       const error = await res.json();
       throw new Error(error.error || 'Error al obtener categorías');
@@ -16,7 +17,7 @@ export const categoryService = {
   },
 
   async getAllWithSubcategories(): Promise<CategoryWithSubcategories[]> {
-    const res = await fetch('/api/categories?include=subcategories', { cache: 'no-store' });
+    const res = await apiFetch('/categories?include=subcategories', { cache: 'no-store' });
     if (!res.ok) {
       const error = await res.json();
       throw new Error(error.error || 'Error al obtener categorías');
@@ -25,7 +26,7 @@ export const categoryService = {
   },
 
   async create(data: CategoryInput): Promise<Category> {
-    const res = await fetch('/api/categories', {
+    const res = await apiFetch('/categories', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -38,7 +39,7 @@ export const categoryService = {
   },
 
   async update(id: number, data: CategoryInput): Promise<Category> {
-    const res = await fetch(`/api/categories/${id}`, {
+    const res = await apiFetch(`/categories/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -51,7 +52,7 @@ export const categoryService = {
   },
 
   async delete(id: number): Promise<void> {
-    const res = await fetch(`/api/categories/${id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/categories/${id}`, { method: 'DELETE' });
     if (!res.ok) {
       const error = await res.json();
       throw new Error(error.error || 'Error al eliminar la categoría');
@@ -59,7 +60,7 @@ export const categoryService = {
   },
 
   async createSubcategory(categoryId: number, name: string): Promise<Subcategory> {
-    const res = await fetch(`/api/categories/${categoryId}/subcategories`, {
+    const res = await apiFetch(`/categories/${categoryId}/subcategories`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
@@ -72,7 +73,7 @@ export const categoryService = {
   },
 
   async updateSubcategory(id: number, name: string): Promise<Subcategory> {
-    const res = await fetch(`/api/subcategories/${id}`, {
+    const res = await apiFetch(`/subcategories/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name }),
@@ -85,7 +86,7 @@ export const categoryService = {
   },
 
   async deleteSubcategory(id: number): Promise<void> {
-    const res = await fetch(`/api/subcategories/${id}`, { method: 'DELETE' });
+    const res = await apiFetch(`/subcategories/${id}`, { method: 'DELETE' });
     if (!res.ok) {
       const error = await res.json();
       throw new Error(error.error || 'Error al eliminar la subcategoría');

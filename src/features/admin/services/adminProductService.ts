@@ -1,8 +1,9 @@
 import { Product } from '@/types';
+import { apiFetch } from '@/lib/api/apiFetch';
 
 export const adminProductService = {
   async getById(id: number): Promise<Product> {
-    const res = await fetch(`/api/products/${id}`, {
+    const res = await apiFetch(`/products/${id}`, {
       cache: 'no-store',
     });
     if (!res.ok) {
@@ -13,7 +14,7 @@ export const adminProductService = {
   },
 
   async create(product: Omit<Product, 'id'>): Promise<Product> {
-    const res = await fetch('/api/products', {
+    const res = await apiFetch('/products', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -28,7 +29,7 @@ export const adminProductService = {
   },
 
   async update(id: number, updates: Partial<Product>): Promise<Product> {
-    const res = await fetch(`/api/products/${id}`, {
+    const res = await apiFetch(`/products/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -43,7 +44,7 @@ export const adminProductService = {
   },
 
   async delete(id: number): Promise<void> {
-    const res = await fetch(`/api/products/${id}`, {
+    const res = await apiFetch(`/products/${id}`, {
       method: 'DELETE',
     });
     if (!res.ok) {

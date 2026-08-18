@@ -1,23 +1,15 @@
-import { Suspense } from 'react';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-import { ProductSearchBar } from '@/features/catalog/components/ProductSearchBar';
-import CategoryNav from '@/features/catalog/components/CategoryNav';
-import { ProductCatalogLoader } from '@/features/catalog/components/ProductCatalogLoader';
-import { ProductCatalogSkeleton } from '@/features/catalog/components/ProductCatalogSkeleton';
+import Link from 'next/link';
 
-export default function Home() {
+export default function RootPlaceholder() {
   return (
-    <div className="font-barlow flex flex-col min-h-screen px-2">
-      <div className="sticky top-0 z-50">
-        <Header />
-        <ProductSearchBar />
-        <CategoryNav />
-      </div>
-      <Suspense fallback={<ProductCatalogSkeleton />}>
-        <ProductCatalogLoader />
-      </Suspense>
-      <Footer />
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center font-barlow">
+      <h1 className="text-2xl font-semibold">Market Cevil</h1>
+      <p className="mt-2 text-neutral-600">
+        Buscá tu tienda en la URL, por ejemplo:{' '}
+        <Link href="/market-del-cevil" className="underline">
+          /market-del-cevil
+        </Link>
+      </p>
     </div>
   );
 }

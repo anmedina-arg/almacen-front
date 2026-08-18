@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
 import type { Client } from '../types/client.types';
 
 async function fetchClients(): Promise<Client[]> {
-  const res = await fetch('/api/clients');
+  const res = await apiFetch('/clients');
   if (!res.ok) throw new Error('Error al cargar clientes');
   return res.json() as Promise<Client[]>;
 }

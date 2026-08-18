@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
 
 interface ReorderSubcategoriesInput {
@@ -7,7 +8,7 @@ interface ReorderSubcategoriesInput {
 }
 
 async function reorderSubcategories({ categoryId, orderedIds }: ReorderSubcategoriesInput): Promise<void> {
-  const res = await fetch(`/api/categories/${categoryId}/subcategories/reorder`, {
+  const res = await apiFetch(`/categories/${categoryId}/subcategories/reorder`, {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ orderedIds }),

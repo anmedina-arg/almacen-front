@@ -1,10 +1,15 @@
 import Link from 'next/link';
 
-export default function TermsPage() {
+export default async function TermsPage({
+  params,
+}: {
+  params: Promise<{ store: string }>;
+}) {
+  const { store } = await params;
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="container mx-auto max-w-4xl bg-white rounded-lg shadow-md p-8">
-        <Link href="/" className="text-sm text-green-600 hover:text-green-700 mb-6 inline-block">
+        <Link href={`/${store}`} className="text-sm text-green-600 hover:text-green-700 mb-6 inline-block">
           ← Volver al inicio
         </Link>
 
@@ -130,7 +135,7 @@ export default function TermsPage() {
         </div>
 
         <div className="mt-12 pt-6 border-t border-gray-200">
-          <Link href="/" className="text-green-600 hover:text-green-700 font-medium">
+          <Link href={`/${store}`} className="text-green-600 hover:text-green-700 font-medium">
             ← Volver al catálogo
           </Link>
         </div>
