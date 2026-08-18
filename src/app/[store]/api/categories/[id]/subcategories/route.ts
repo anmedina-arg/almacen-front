@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { z } from 'zod';
 
 const createSubcategorySchema = z.object({
@@ -13,20 +14,26 @@ const createSubcategorySchema = z.object({
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { id } = await params;
+    const { store, id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
     }
 
     const supabase = await createSupabaseServerClient();
+    const storeId = await getStoreIdBySlug(supabase, store);
+    if (storeId == null) {
+      return NextResponse.json({ error: 'Store not found' }, { status: 404 });
+    }
+
     const { data, error } = await supabase
       .from('subcategories')
       .select('id, name, category_id, created_at, updated_at')
       .eq('category_id', categoryId)
+      .eq('store_id', storeId)
       .order('name', { ascending: true });
 
     if (error) {
@@ -47,18 +54,18 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
@@ -72,6 +79,18 @@ export async function POST(
 
     const supabase = await createSupabaseServerClient();
 
+    // La categoría padre debe pertenecer a esta Store — si no, un admin de
+    // otra Store podría colgar una subcategoría de una categoría ajena.
+    const { data: parentCategory } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('id', categoryId)
+      .eq('store_id', storeId)
+      .maybeSingle();
+    if (!parentCategory) {
+      return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+    }
+
     // Assign sort_order = MAX(sort_order within category) + 1 so new subcategories appear last.
     const { data: maxRow } = await supabase
       .from('subcategories')
@@ -84,7 +103,7 @@ export async function POST(
 
     const { data, error } = await supabase
       .from('subcategories')
-      .insert({ name: parsed.data.name, category_id: categoryId, sort_order: nextSortOrder })
+      .insert({ name: parsed.data.name, category_id: categoryId, sort_order: nextSortOrder, store_id: storeId })
       .select()
       .single();
 

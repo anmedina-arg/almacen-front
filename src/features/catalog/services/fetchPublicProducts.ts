@@ -27,19 +27,24 @@ function formatComboItem(rawName: string, qty: number, saleType: string): string
 }
 
 /**
- * Fetches products with stock and combo items.
+ * Fetches products with stock and combo items, scoped to a single Store.
  * Server-only — do not import from client components.
  *
+ * @param storeId - Store a la que se filtra el catálogo. Requerido: sin esto,
+ *   el catálogo de una Store mostraría productos de todas las demás (#15).
  * @param options.includeInactive - When true, returns all products (active + inactive).
  *   The caller is responsible for verifying admin access before passing this flag.
  * @param options.categoryId - When provided, returns only products of that category.
  *   Used by SSR and the catalog infinite query to load one category at a time.
  */
-export async function fetchPublicProducts(options?: {
-  includeInactive?: boolean;
-  categoryId?: number;
-  search?: string;
-}): Promise<Product[]> {
+export async function fetchPublicProducts(
+  storeId: number,
+  options?: {
+    includeInactive?: boolean;
+    categoryId?: number;
+    search?: string;
+  }
+): Promise<Product[]> {
   const supabase = await createSupabaseServerClient();
 
   let query = supabase
@@ -63,6 +68,7 @@ export async function fetchPublicProducts(options?: {
       sub:subcategories!products_subcategory_id_fkey(id, name)
     `
     )
+    .eq('store_id', storeId)
     .order('name', { ascending: true });
 
   if (!options?.includeInactive) {
@@ -88,7 +94,9 @@ export async function fetchPublicProducts(options?: {
     { data: topSellersData },
     { data: comboData },
   ] = await Promise.all([
-    supabase.from('product_stock').select('product_id, quantity'),
+    supabase.from('product_stock').select('product_id, quantity').eq('store_id', storeId),
+    // get_top_seller_ids no filtra por Store todavía — depende de orders,
+    // que #16 (Pedidos y WhatsApp) todavía no scopea. Fuera de alcance acá.
     supabase.rpc('get_top_seller_ids', { p_days: 30 }),
     comboIds.length > 0
       ? supabase

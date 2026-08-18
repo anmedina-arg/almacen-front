@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { categorySchema } from '@/features/admin/schemas/categorySchemas';
 
 /**
@@ -9,9 +10,18 @@ import { categorySchema } from '@/features/admin/schemas/categorySchemas';
  * Public read (no admin required).
  * Query param: ?include=subcategories → returns CategoryWithSubcategories[]
  */
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
+    const { store } = await params;
     const supabase = await createSupabaseServerClient();
+    const storeId = await getStoreIdBySlug(supabase, store);
+    if (storeId == null) {
+      return NextResponse.json({ error: 'Store not found' }, { status: 404 });
+    }
+
     const { searchParams } = new URL(request.url);
     const includeSubcategories = searchParams.get('include') === 'subcategories';
 
@@ -21,7 +31,7 @@ export async function GET(request: NextRequest) {
         : 'id, name, image_url, sort_order, created_at, updated_at'
     );
 
-    query = query.order('sort_order', { ascending: true });
+    query = query.eq('store_id', storeId).order('sort_order', { ascending: true });
 
     const { data, error } = await query;
 
@@ -41,10 +51,14 @@ export async function GET(request: NextRequest) {
  * POST /api/categories
  * Creates a new category. Admin only.
  */
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
@@ -59,10 +73,12 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createSupabaseServerClient();
 
-    // Assign sort_order = MAX(sort_order) + 1 so new categories appear at the end.
+    // Assign sort_order = MAX(sort_order) + 1 dentro de esta Store so new
+    // categories appear at the end de su propia lista.
     const { data: maxRow } = await supabase
       .from('categories')
       .select('sort_order')
+      .eq('store_id', storeId)
       .order('sort_order', { ascending: false })
       .limit(1)
       .single();
@@ -70,7 +86,7 @@ export async function POST(request: NextRequest) {
 
     const { data, error } = await supabase
       .from('categories')
-      .insert({ name: parsed.data.name, image_url: parsed.data.image_url ?? null, sort_order: nextSortOrder })
+      .insert({ name: parsed.data.name, image_url: parsed.data.image_url ?? null, sort_order: nextSortOrder, store_id: storeId })
       .select()
       .single();
 
