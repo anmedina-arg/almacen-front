@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -14,10 +14,14 @@ const reorderSchema = z.object({
  *
  * Body: { orderedIds: number[] }
  */
-export async function PUT(request: NextRequest) {
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
@@ -33,12 +37,15 @@ export async function PUT(request: NextRequest) {
     const supabase = await createSupabaseServerClient();
 
     // Update each category's sort_order based on its position in the array.
+    // .eq('store_id', storeId) además de la RLS: evita reordenar categorías
+    // de otra Store aunque el cliente mande sus ids.
     await Promise.all(
       parsed.data.orderedIds.map((id, index) =>
         supabase
           .from('categories')
           .update({ sort_order: index + 1 })
           .eq('id', id)
+          .eq('store_id', storeId)
       )
     );
 

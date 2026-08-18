@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -16,18 +16,18 @@ const reorderSchema = z.object({
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
@@ -48,6 +48,7 @@ export async function PUT(
           .update({ sort_order: index + 1 })
           .eq('id', subId)
           .eq('category_id', categoryId) // safety: only update subcategories that belong to this category
+          .eq('store_id', storeId)
       )
     );
 

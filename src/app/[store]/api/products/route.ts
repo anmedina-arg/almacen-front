@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { Product } from '@/types';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { fetchPublicProducts } from '@/features/catalog/services/fetchPublicProducts';
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
+    const { store } = await params;
     const { searchParams } = new URL(request.url);
     const includeInactive = searchParams.get('includeInactive') === 'true';
     const categoryIdParam = searchParams.get('categoryId');
@@ -13,17 +18,26 @@ export async function GET(request: NextRequest) {
     const searchParam = searchParams.get('search');
     const search = searchParam ? searchParam.trim() : undefined;
 
+    let storeId: number | null;
     if (includeInactive) {
-      const { isAdmin } = await verifyAdminAuth();
-      if (!isAdmin) {
+      const { isStoreAdmin, storeId: adminStoreId } = await verifyStoreAdminAuth(store);
+      if (!isStoreAdmin) {
         return NextResponse.json(
           { error: 'Forbidden: Admin access required' },
           { status: 403 }
         );
       }
+      storeId = adminStoreId;
+    } else {
+      const supabase = await createSupabaseServerClient();
+      storeId = await getStoreIdBySlug(supabase, store);
     }
 
-    const products = await fetchPublicProducts({ includeInactive, categoryId, search });
+    if (storeId == null) {
+      return NextResponse.json({ error: 'Store not found' }, { status: 404 });
+    }
+
+    const products = await fetchPublicProducts(storeId, { includeInactive, categoryId, search });
 
     // Catálogo público completo: cacheable en CDN (Vercel Edge) por 5 min,
     // stale-while-revalidate por 1 hora.
@@ -45,11 +59,15 @@ export async function GET(request: NextRequest) {
   }
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
-    // Verificar que sea admin
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store } = await params;
+    // Verificar que sea admin de esta Store
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
@@ -71,6 +89,32 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createSupabaseServerClient();
 
+    // category_id/subcategory_id deben pertenecer a esta Store — si no, un
+    // admin podría colgar un producto de una categoría ajena (mismo caso
+    // que ya se verifica en POST /api/categories/[id]/subcategories).
+    if (body.category_id != null) {
+      const { data: cat } = await supabase
+        .from('categories')
+        .select('id')
+        .eq('id', body.category_id)
+        .eq('store_id', storeId)
+        .maybeSingle();
+      if (!cat) {
+        return NextResponse.json({ error: 'Category not found' }, { status: 404 });
+      }
+    }
+    if (body.subcategory_id != null) {
+      const { data: sub } = await supabase
+        .from('subcategories')
+        .select('id')
+        .eq('id', body.subcategory_id)
+        .eq('store_id', storeId)
+        .maybeSingle();
+      if (!sub) {
+        return NextResponse.json({ error: 'Subcategory not found' }, { status: 404 });
+      }
+    }
+
     // Crear producto
     const { data, error } = await supabase
       .from('products')
@@ -88,6 +132,7 @@ export async function POST(request: NextRequest) {
           max_stock: body.max_stock ?? null,
           category_id: body.category_id ?? null,
           subcategory_id: body.subcategory_id ?? null,
+          store_id: storeId,
         },
       ])
       .select(

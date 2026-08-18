@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 
 // Compartido por verifyAdminAuth y verifyStoreAdminAuth — ambos necesitan un
 // client de Supabase atado a las cookies del request actual, fuera de eso no
@@ -81,13 +82,9 @@ export async function resolveStoreAdminStatus(
   storeId: number | null;
   error: string | null;
 }> {
-  const { data: store, error: storeError } = await supabase
-    .from('stores')
-    .select('id')
-    .eq('slug', storeSlug)
-    .maybeSingle();
+  const storeId = await getStoreIdBySlug(supabase, storeSlug);
 
-  if (storeError || !store) {
+  if (storeId == null) {
     return { isStoreAdmin: false, storeId: null, error: 'Store not found' };
   }
 
@@ -101,26 +98,26 @@ export async function resolveStoreAdminStatus(
     .maybeSingle();
 
   if (profileError || !profile) {
-    return { isStoreAdmin: false, storeId: store.id, error: 'Profile not found' };
+    return { isStoreAdmin: false, storeId, error: 'Profile not found' };
   }
 
   // super_admin (#13) opera cualquier Store sin necesitar membership.
   if (profile.role === 'super_admin') {
-    return { isStoreAdmin: true, storeId: store.id, error: null };
+    return { isStoreAdmin: true, storeId, error: null };
   }
 
   const { data: membership, error: membershipError } = await supabase
     .from('store_admins')
     .select('id')
     .eq('profile_id', userId)
-    .eq('store_id', store.id)
+    .eq('store_id', storeId)
     .maybeSingle();
 
   if (membershipError) {
-    return { isStoreAdmin: false, storeId: store.id, error: membershipError.message };
+    return { isStoreAdmin: false, storeId, error: membershipError.message };
   }
 
-  return { isStoreAdmin: membership != null, storeId: store.id, error: null };
+  return { isStoreAdmin: membership != null, storeId, error: null };
 }
 
 // Aditivo (#14): ningún call site existente cambia todavía — verifyAdminAuth

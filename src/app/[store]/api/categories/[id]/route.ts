@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { categorySchema } from '@/features/admin/schemas/categorySchemas';
 
@@ -9,18 +9,18 @@ import { categorySchema } from '@/features/admin/schemas/categorySchemas';
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
@@ -37,6 +37,7 @@ export async function PUT(
       .from('categories')
       .update({ name: parsed.data.name, image_url: parsed.data.image_url ?? null })
       .eq('id', categoryId)
+      .eq('store_id', storeId)
       .select()
       .single();
 
@@ -61,18 +62,18 @@ export async function PUT(
  */
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
@@ -82,7 +83,8 @@ export async function DELETE(
     const { error } = await supabase
       .from('categories')
       .delete()
-      .eq('id', categoryId);
+      .eq('id', categoryId)
+      .eq('store_id', storeId);
 
     if (error) {
       console.error('Error deleting category:', error);
