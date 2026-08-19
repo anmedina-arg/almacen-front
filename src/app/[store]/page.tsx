@@ -25,7 +25,7 @@ export default async function Home({ params }: { params: Promise<{ store: string
   return (
     <div className="font-barlow flex flex-col min-h-screen px-2">
       <div className="sticky top-0 z-50">
-        <Header storeName={storeData.name} />
+        <Header storeName={storeData.name} logoUrl={storeData.logo_url} />
         <ProductSearchBar />
         <CategoryNav storeId={storeId} />
       </div>

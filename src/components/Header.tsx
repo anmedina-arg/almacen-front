@@ -1,6 +1,16 @@
 import { HeaderLogo } from './HeaderLogo';
 import { HeaderClient } from './HeaderClient';
 
-export function Header({ storeName }: { storeName: string }) {
-	return <HeaderClient logo={<HeaderLogo />} storeName={storeName} />;
+interface HeaderProps {
+	storeName: string;
+	logoUrl: string | null;
+}
+
+export function Header({ storeName, logoUrl }: HeaderProps) {
+	return (
+		<HeaderClient
+			logo={<HeaderLogo logoUrl={logoUrl} storeName={storeName} />}
+			storeName={storeName}
+		/>
+	);
 }
