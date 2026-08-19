@@ -102,7 +102,7 @@ function UserMenu() {
 					</div>
 					{(profile?.role === 'admin' || profile?.role === 'super_admin') && (
 						<Link
-							href={features.dashboard ? '/admin/dashboard' : '/admin/products'}
+							href={`/${slug}${features.dashboard ? '/admin/dashboard' : '/admin/products'}`}
 							onClick={() => setOpen(false)}
 							className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
 						>
