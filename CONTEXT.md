@@ -9,8 +9,12 @@ Un negocio cliente de la plataforma, con su propio catálogo, pedidos y configur
 _Avoid_: Tenant (usar Store como término de dominio; "tenant" es aceptable solo al hablar de infraestructura/aislamiento de datos), cliente (ambiguo con "cliente" = comprador final del catálogo).
 
 **Feature flag**:
-Un interruptor que activa o desactiva una capacidad completa (pedidos, stock, combos, ranking, clientes, pagos) para una Store puntual. Permite ofrecer una versión minimalista de la plataforma (solo catálogo + alta de productos) a Stores que no necesitan el resto.
-_Avoid_: Instance config (nombre legado de un intento previo sin terminar).
+Un interruptor que activa o desactiva una capacidad completa (stock, combos, ranking, clientes, pagos, POS, dashboard, informes) para una Store puntual. Catálogo, productos, pedidos/WhatsApp y ventas quedan siempre encendidos — son el núcleo, no son flageables. Permite ofrecer una versión minimalista de la plataforma a Stores que no necesitan el resto. Ver [ADR-0007](./docs/adr/0007-feature-flags-db-column.md).
+_Avoid_: Instance config (nombre legado de un intento previo sin terminar, pensado para instalación dedicada por cliente — no aplica a este deployment compartido, ver "Deployment model" abajo).
+
+**Informes**:
+Página de admin (`/admin/informes`) que agrupa dos capacidades bajo una sola feature flag: descarga de reportes en CSV (ventas, catálogo de productos) y recálculo de recomendaciones de productos (afinidad). No están separadas porque no tienen ruta ni UI propia — si alguna vez se separan, ahí sí ameritan flags independientes.
+_Avoid_: Reportes (término usado en algunos issues pero no en el código ni la UI shippeada — canonizar como "Informes").
 
 **Store slug**:
 Identificador único de una Store en la URL (ej. `market-del-cevil`). Es el primer segmento del path (`/market-del-cevil/...`) — hoy no hay subdominios propios, así que el slug reemplaza esa función.
