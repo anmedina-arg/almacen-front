@@ -1,9 +1,9 @@
 import { redirect } from 'next/navigation';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { AdminTabBar } from '@/features/admin/components/AdminTabBar';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
+import { supabaseServer } from '@/lib/supabase/server';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 
 export default async function AdminLayout({
   children,
@@ -13,50 +13,23 @@ export default async function AdminLayout({
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
-  const cookieStore = await cookies();
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Layout can't modify cookies
-          }
-        },
-      },
-    }
-  );
+  // Membership en store_admins (o super_admin), no profiles.role global — ver
+  // #13/ADR-0005 y #63. Un admin de Store nueva se registra con
+  // profiles.role='user' por default y solo tiene su rol en
+  // store_admins.role, así que el chequeo viejo (profiles.role global) lo
+  // dejaba afuera de su propio panel.
+  const { isStoreAdmin, userId } = await verifyStoreAdminAuth(store);
 
-  // Verificar usuario (más seguro que getSession)
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
+  if (!userId) {
     redirect(`/${store}/login?redirectTo=/${store}/admin/products`);
   }
 
-  // Verificar rol admin (super_admin es un superset, ver #13/ADR-0005)
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .single();
-
-  if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
+  if (!isStoreAdmin) {
     redirect(`/${store}?error=unauthorized`);
   }
 
-  const storeData = await getStoreBySlug(supabase, store);
+  const storeData = await getStoreBySlug(supabaseServer, store);
   const storeName = storeData?.name ?? 'la tienda';
 
   return (
