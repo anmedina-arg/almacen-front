@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { assignClientSchema } from '@/features/admin/schemas/clientSchemas';
 
-type RouteParams = { params: Promise<{ orderId: string }> };
+type RouteParams = { params: Promise<{ store: string; orderId: string }> };
 
 function parseOrderId(param: string) {
   const id = parseInt(param);
@@ -17,15 +17,15 @@ function parseOrderId(param: string) {
  */
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam } = await params;
     const orderId = parseOrderId(orderIdParam);
     if (!orderId) {
       return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
@@ -43,9 +43,25 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { barrio, manzana_lote } = validation.data;
     const supabase = await createSupabaseServerClient();
 
+    // Verify order belongs to this Store
+    const { data: existingOrder } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('id', orderId)
+      .eq('store_id', storeId)
+      .maybeSingle();
+    if (!existingOrder) {
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+    }
+
     // Find-or-create: partial unique indexes can't be used with upsert onConflict,
-    // so we do an explicit select-then-insert.
-    let findQuery = supabase.from('clients').select('id, barrio, manzana_lote, display_code').eq('barrio', barrio);
+    // so we do an explicit select-then-insert. Scoped a esta Store — barrio +
+    // manzana_lote no son globalmente únicos entre Stores distintas.
+    let findQuery = supabase
+      .from('clients')
+      .select('id, barrio, manzana_lote, display_code')
+      .eq('barrio', barrio)
+      .eq('store_id', storeId);
     if (barrio === 'otros') {
       findQuery = manzana_lote
         ? findQuery.eq('manzana_lote', manzana_lote)
@@ -65,7 +81,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       // Not found — insert new client
       const { data: created, error: insertError } = await supabase
         .from('clients')
-        .insert({ barrio, manzana_lote: manzana_lote ?? null })
+        .insert({ barrio, manzana_lote: manzana_lote ?? null, store_id: storeId })
         .select('id, barrio, manzana_lote, display_code')
         .single();
 
@@ -84,6 +100,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       .from('orders')
       .update({ client_id: client.id })
       .eq('id', orderId)
+      .eq('store_id', storeId)
       .select('id, client_id')
       .single();
 
@@ -105,15 +122,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
  */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam } = await params;
     const orderId = parseOrderId(orderIdParam);
     if (!orderId) {
       return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
@@ -124,7 +141,8 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const { error } = await supabase
       .from('orders')
       .update({ client_id: null })
-      .eq('id', orderId);
+      .eq('id', orderId)
+      .eq('store_id', storeId);
 
     if (error) {
       console.error('Error removing client from order:', error);

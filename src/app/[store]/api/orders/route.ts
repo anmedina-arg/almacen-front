@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { createOrderSchema } from '@/features/admin/schemas/orderSchemas';
 
 /**
@@ -9,8 +10,18 @@ import { createOrderSchema } from '@/features/admin/schemas/orderSchemas';
  * because customers create orders when sending WhatsApp messages.
  * Uses the create_order RPC function for transactional insert.
  */
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
+    const { store } = await params;
+    const supabase = await createSupabaseServerClient();
+    const storeId = await getStoreIdBySlug(supabase, store);
+    if (storeId == null) {
+      return NextResponse.json({ error: 'Store not found' }, { status: 404 });
+    }
+
     const body = await request.json();
 
     // Validate with Zod schema
@@ -32,17 +43,19 @@ export async function POST(request: NextRequest) {
 
     const { notes, whatsapp_message, items } = validation.data;
 
-    const supabase = await createSupabaseServerClient();
-
     // Fetch current product price + cost server-side.
     // unit_cost is stored normalized to the same scale as unit_price:
     //   unit_cost = unit_price * (product.cost / product.price)
     // This handles all sale types (unit, 100gr, kg) correctly because
     // the WhatsApp flow normalizes unit_price to price-per-base-unit.
+    // .eq('store_id', storeId): un product_id de otra Store no matchea acá,
+    // así que productMap.get() cae al mismo fallback (unit_cost 0) que ya
+    // existía para un product_id inexistente — sin comportamiento nuevo.
     const productIds = items.map((i) => i.product_id);
     const { data: productsData } = await supabase
       .from('products')
       .select('id, price, cost')
+      .eq('store_id', storeId)
       .in('id', productIds);
     const productMap = new Map<number, { price: number; cost: number }>(
       (productsData ?? []).map((p) => [p.id, { price: Number(p.price ?? 0), cost: Number(p.cost ?? 0) }])
@@ -74,6 +87,7 @@ export async function POST(request: NextRequest) {
           from_suggestion: item.from_suggestion ?? false,
         };
       }),
+      p_store_id: storeId,
     });
 
     if (error) {
@@ -109,10 +123,14 @@ export async function POST(request: NextRequest) {
  * List all orders. Admin only.
  * Returns orders sorted by creation date (newest first).
  */
-export async function GET() {
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
@@ -127,6 +145,7 @@ export async function GET() {
     const { data, error } = await supabase
       .from('orders')
       .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
+      .eq('store_id', storeId)
       .order('created_at', { ascending: false });
 
     if (error) {
