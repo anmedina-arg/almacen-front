@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { posOrderSchema } from '@/features/admin/schemas/orderSchemas';
 
@@ -9,10 +9,14 @@ import { posOrderSchema } from '@/features/admin/schemas/orderSchemas';
  * Admin only. Uses the same create_order() RPC (transactional + stock decrement).
  * Does not require a WhatsApp message.
  */
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
@@ -45,6 +49,7 @@ export async function POST(request: NextRequest) {
         unit_cost: item.unit_cost,
         is_by_weight: item.is_by_weight,
       })),
+      p_store_id: storeId,
     });
 
     if (error) {

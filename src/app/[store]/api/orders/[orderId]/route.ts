@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { updateOrderSchema } from '@/features/admin/schemas/orderSchemas';
 
@@ -9,18 +9,18 @@ import { updateOrderSchema } from '@/features/admin/schemas/orderSchemas';
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ store: string; orderId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -35,6 +35,7 @@ export async function GET(
       .from('orders')
       .select('*, order_items(*)')
       .eq('id', orderId)
+      .eq('store_id', storeId)
       .single();
 
     if (error) {
@@ -72,18 +73,18 @@ export async function GET(
  */
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ store: string; orderId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -94,14 +95,22 @@ export async function DELETE(
 
     const supabase = await createSupabaseServerClient();
 
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('orders')
       .delete()
-      .eq('id', orderId);
+      .eq('id', orderId)
+      .eq('store_id', storeId)
+      .select('id');
 
     if (error) {
       console.error('Error deleting order:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    // Sin .select() acá, un id de otra Store hubiera devuelto 204 sin
+    // borrar nada (0 filas afectadas, sin error) — silencioso.
+    if (!data || data.length === 0) {
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
     }
 
     return new NextResponse(null, { status: 204 });
@@ -120,18 +129,18 @@ export async function DELETE(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ store: string; orderId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -161,10 +170,17 @@ export async function PUT(
       .from('orders')
       .update(validation.data)
       .eq('id', orderId)
+      .eq('store_id', storeId)
       .select()
       .single();
 
     if (error) {
+      if (error.code === 'PGRST116') {
+        return NextResponse.json(
+          { error: 'Orden no encontrada' },
+          { status: 404 }
+        );
+      }
       console.error('Error updating order:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }

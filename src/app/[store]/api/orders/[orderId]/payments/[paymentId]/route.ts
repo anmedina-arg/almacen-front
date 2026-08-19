@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-type RouteParams = { params: Promise<{ orderId: string; paymentId: string }> };
+type RouteParams = { params: Promise<{ store: string; orderId: string; paymentId: string }> };
 
 /**
  * DELETE /api/orders/[orderId]/payments/[paymentId]
@@ -11,15 +11,15 @@ type RouteParams = { params: Promise<{ orderId: string; paymentId: string }> };
  */
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam, paymentId: paymentIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam, paymentId: paymentIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     const paymentId = parseInt(paymentIdParam);
 
@@ -28,6 +28,17 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     }
 
     const supabase = await createSupabaseServerClient();
+
+    // Verify order belongs to this Store
+    const { data: order } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('id', orderId)
+      .eq('store_id', storeId)
+      .maybeSingle();
+    if (!order) {
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+    }
 
     // Delete the specified payment
     const { error: deleteError } = await supabase

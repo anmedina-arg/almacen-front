@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { addOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
 
@@ -9,18 +9,18 @@ import { addOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ store: string; orderId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -46,11 +46,12 @@ export async function POST(
 
     const supabase = await createSupabaseServerClient();
 
-    // First verify the order exists and is editable (pending)
+    // First verify the order exists, belongs to this Store, and is editable (pending)
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select('id, status')
       .eq('id', orderId)
+      .eq('store_id', storeId)
       .single();
 
     if (orderError || !order) {
@@ -72,6 +73,7 @@ export async function POST(
       .from('products')
       .select('price, cost')
       .eq('id', validation.data.product_id)
+      .eq('store_id', storeId)
       .single();
 
     const unit_cost =
@@ -90,6 +92,7 @@ export async function POST(
         unit_price: validation.data.unit_price,
         unit_cost,
         is_by_weight: validation.data.is_by_weight,
+        store_id: storeId,
       })
       .select()
       .single();
