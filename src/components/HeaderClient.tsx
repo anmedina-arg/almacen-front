@@ -41,6 +41,34 @@ function UserMenu() {
 		staleTime: 5 * 60 * 1000,
 	});
 
+	// Visibilidad del link "Panel de administración": super_admin opera
+	// cualquier Store, o el usuario tiene membership en store_admins para la
+	// Store activa (#13/ADR-0005) — no alcanza con profiles.role='admin'
+	// global, ese chequeo dejaba afuera a un admin scoped por Store (#63).
+	const { data: storeAdminMembership } = useQuery({
+		queryKey: ['store-admin-membership', user?.id, slug],
+		queryFn: async () => {
+			if (!user?.id) return null;
+			const { data: store } = await supabaseBrowser
+				.from('stores')
+				.select('id')
+				.eq('slug', slug)
+				.maybeSingle();
+			if (!store) return null;
+			const { data: membership } = await supabaseBrowser
+				.from('store_admins')
+				.select('id')
+				.eq('profile_id', user.id)
+				.eq('store_id', store.id)
+				.maybeSingle();
+			return membership;
+		},
+		enabled: !!user?.id,
+		staleTime: 5 * 60 * 1000,
+	});
+
+	const canAccessAdminPanel = profile?.role === 'super_admin' || storeAdminMembership != null;
+
 	const fullName =
 		profile?.full_name ||
 		user?.user_metadata?.full_name ||
@@ -100,7 +128,7 @@ function UserMenu() {
 						<p className="text-xs text-gray-400">Sesión iniciada como</p>
 						<p className="text-sm font-medium text-gray-700 truncate">{displayName}</p>
 					</div>
-					{(profile?.role === 'admin' || profile?.role === 'super_admin') && (
+					{canAccessAdminPanel && (
 						<Link
 							href={`/${slug}${features.dashboard ? '/admin/dashboard' : '/admin/products'}`}
 							onClick={() => setOpen(false)}
