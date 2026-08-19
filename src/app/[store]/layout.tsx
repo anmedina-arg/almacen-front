@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
+import { DEFAULT_LOGO_URL } from '@/lib/store/defaultLogo';
 
 type StoreLayoutProps = {
   children: React.ReactNode;
@@ -22,6 +23,7 @@ export async function generateMetadata({ params }: StoreLayoutProps): Promise<Me
   const data = await getStoreBySlug(supabaseServer, store);
 
   const title = data?.name ?? 'Catálogo online';
+  const logoUrl = data?.logo_url;
 
   return {
     title,
@@ -40,17 +42,22 @@ export async function generateMetadata({ params }: StoreLayoutProps): Promise<Me
       type: 'website',
       images: [
         {
-          url: `${SITE_URL}/logo-og.png`,
+          url: logoUrl ?? `${SITE_URL}/logo-og.png`,
         },
       ],
     },
-    icons: {
-      apple: '/apple-touch-icon.png',
-      icon: [
-        { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-        { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
-      ],
-    },
+    icons: logoUrl
+      ? {
+          apple: logoUrl,
+          icon: [{ url: logoUrl, sizes: '512x512', type: 'image/png' }],
+        }
+      : {
+          apple: '/apple-touch-icon.png',
+          icon: [
+            { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+            { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+          ],
+        },
   };
 }
 
