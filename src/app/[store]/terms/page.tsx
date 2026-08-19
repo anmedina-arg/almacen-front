@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 
 export default async function TermsPage({
   params,
@@ -6,6 +8,9 @@ export default async function TermsPage({
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
+  const supabase = await createSupabaseServerClient();
+  const storeData = await getStoreBySlug(supabase, store);
+  const storeName = storeData?.name ?? 'la tienda';
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
       <div className="container mx-auto max-w-4xl bg-white rounded-lg shadow-md p-8">
@@ -22,7 +27,7 @@ export default async function TermsPage({
           <section>
             <h2 className="text-2xl font-bold mb-3">1. Aceptación de términos</h2>
             <p>
-              Al acceder y usar Market del Cevil, aceptas estar sujeto a estos términos de servicio
+              Al acceder y usar {storeName}, aceptas estar sujeto a estos términos de servicio
               y a todas las leyes y regulaciones aplicables. Si no estás de acuerdo con alguno de
               estos términos, no debes usar nuestro servicio.
             </p>
@@ -31,7 +36,7 @@ export default async function TermsPage({
           <section>
             <h2 className="text-2xl font-bold mb-3">2. Descripción del servicio</h2>
             <p className="mb-3">
-              Market del Cevil es una plataforma de catálogo de productos que permite:
+              {storeName} es una plataforma de catálogo de productos que permite:
             </p>
             <ul className="list-disc pl-6 space-y-2">
               <li>Explorar nuestro catálogo de productos</li>
@@ -81,14 +86,14 @@ export default async function TermsPage({
             <h2 className="text-2xl font-bold mb-3">6. Propiedad intelectual</h2>
             <p>
               Todo el contenido del sitio (imágenes, textos, logos, diseño) es propiedad de
-              Market del Cevil o sus proveedores y está protegido por leyes de propiedad intelectual.
+              {' '}{storeName} o sus proveedores y está protegido por leyes de propiedad intelectual.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-bold mb-3">7. Limitación de responsabilidad</h2>
             <p>
-              Market del Cevil no será responsable por daños indirectos, incidentales, especiales
+              {storeName} no será responsable por daños indirectos, incidentales, especiales
               o consecuentes que resulten del uso o la imposibilidad de usar el servicio.
             </p>
           </section>

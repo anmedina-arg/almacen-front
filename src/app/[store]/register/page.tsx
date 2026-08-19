@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 
 export default async function RegisterPage({
   params,
@@ -9,6 +11,9 @@ export default async function RegisterPage({
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
+  const supabase = await createSupabaseServerClient();
+  const storeData = await getStoreBySlug(supabase, store);
+  const storeName = storeData?.name ?? 'la tienda';
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
       <div className="w-full max-w-md">
@@ -16,7 +21,7 @@ export default async function RegisterPage({
           <div className="flex justify-center mb-4">
             <Image
               src="https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png"
-              alt="Market del Cevil Logo"
+              alt={`${storeName} Logo`}
               width={80}
               height={80}
               className="rounded-2xl"
@@ -24,7 +29,7 @@ export default async function RegisterPage({
           </div>
           <h1 className="text-3xl font-bold mb-2">Crear Cuenta</h1>
           <p className="text-gray-600">
-            Regístrate en Market del Cevil
+            Regístrate en {storeName}
           </p>
         </div>
 
