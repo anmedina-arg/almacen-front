@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { AdminTabBar } from '@/features/admin/components/AdminTabBar';
+import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 
 export default async function AdminLayout({
   children,
@@ -55,6 +56,9 @@ export default async function AdminLayout({
     redirect(`/${store}?error=unauthorized`);
   }
 
+  const storeData = await getStoreBySlug(supabase, store);
+  const storeName = storeData?.name ?? 'la tienda';
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header del admin */}
@@ -62,7 +66,7 @@ export default async function AdminLayout({
         <div className="container mx-auto flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-800">Panel de Administración</h1>
-            <p className="text-sm text-gray-600">Gestión de productos - Market del Cevil</p>
+            <p className="text-sm text-gray-600">Gestión de productos - {storeName}</p>
           </div>
           <Link
             href={`/${store}`}
