@@ -1,6 +1,13 @@
 import { NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase/server';
 
+const STATIC_ICONS = [
+  { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+  { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+  { src: '/icon-192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+  { src: '/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+];
+
 // Next.js reserva el file convention `manifest.ts` SOLO para app/manifest.ts
 // (la raíz) — no soporta segmentos dinámicos anidados como /[store]/manifest.ts
 // (a diferencia de sitemap.ts u opengraph-image.tsx, que sí). Por eso el
@@ -14,11 +21,12 @@ export async function GET(
 
   const { data } = await supabaseServer
     .from('stores')
-    .select('name')
+    .select('name, logo_url')
     .eq('slug', store)
     .maybeSingle();
 
   const name = data?.name ?? store;
+  const logoUrl = data?.logo_url;
 
   return NextResponse.json(
     {
@@ -31,12 +39,12 @@ export async function GET(
       background_color: '#ffffff',
       theme_color: '#000000',
       orientation: 'portrait-primary',
-      icons: [
-        { src: '/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
-        { src: '/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
-        { src: '/icon-192-maskable.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
-        { src: '/icon-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-      ],
+      icons: logoUrl
+        ? [
+            { src: logoUrl, sizes: '512x512', type: 'image/png', purpose: 'any' },
+            { src: logoUrl, sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+          ]
+        : STATIC_ICONS,
       categories: ['shopping', 'business'],
       prefer_related_applications: false,
     },

@@ -1,14 +1,17 @@
 import Image from 'next/image';
 import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
+import { DEFAULT_LOGO_URL } from '@/lib/store/defaultLogo';
 
-export function HeaderLogo() {
+interface HeaderLogoProps {
+	logoUrl: string | null;
+	storeName: string;
+}
+
+export function HeaderLogo({ logoUrl, storeName }: HeaderLogoProps) {
 	return (
 		<Image
-			src={getCloudinaryUrl(
-				'https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png',
-				160,
-			)}
-			alt="Market del cevil Logo"
+			src={getCloudinaryUrl(logoUrl ?? DEFAULT_LOGO_URL, 160)}
+			alt={`${storeName} Logo`}
 			width={72}
 			height={72}
 			className="rounded-2xl"

@@ -4,6 +4,7 @@ import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
+import { DEFAULT_LOGO_URL } from '@/lib/store/defaultLogo';
 
 export default async function RegisterPage({
   params,
@@ -20,7 +21,7 @@ export default async function RegisterPage({
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <Image
-              src="https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png"
+              src={storeData?.logo_url ?? DEFAULT_LOGO_URL}
               alt={`${storeName} Logo`}
               width={80}
               height={80}
