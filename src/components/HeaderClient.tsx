@@ -15,6 +15,7 @@ import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 interface HeaderClientProps {
 	logo: React.ReactNode;
+	storeName: string;
 }
 
 function UserMenu() {
@@ -125,7 +126,7 @@ function UserMenu() {
 	);
 }
 
-export function HeaderClient({ logo }: HeaderClientProps) {
+export function HeaderClient({ logo, storeName }: HeaderClientProps) {
 	const isAuthenticated = useIsAuthenticated();
 	const slug = useStoreSlug();
 
@@ -134,7 +135,7 @@ export function HeaderClient({ logo }: HeaderClientProps) {
 			{/* Izquierda: logo + título */}
 			<div className="flex items-center gap-2 flex-1 min-w-0">
 				{logo}
-				<h1 className="text-xl font-bold leading-tight">Market del Cevil</h1>
+				<h1 className="text-xl font-bold leading-tight">{storeName}</h1>
 			</div>
 
 			{/* Derecha: perfil + ayuda en una sola línea */}

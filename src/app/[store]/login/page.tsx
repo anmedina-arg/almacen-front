@@ -2,6 +2,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 
 export default async function LoginPage({
   params,
@@ -9,6 +11,9 @@ export default async function LoginPage({
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
+  const supabase = await createSupabaseServerClient();
+  const storeData = await getStoreBySlug(supabase, store);
+  const storeName = storeData?.name ?? 'la tienda';
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">
       <div className="w-full max-w-md">
@@ -16,7 +21,7 @@ export default async function LoginPage({
           <div className="flex justify-center mb-4">
             <Image
               src="https://res.cloudinary.com/dfwo3qi5q/image/upload/v1763599423/logo-og_pydhrd.png"
-              alt="Market del Cevil Logo"
+              alt={`${storeName} Logo`}
               width={80}
               height={80}
               className="rounded-2xl"
@@ -24,7 +29,7 @@ export default async function LoginPage({
           </div>
           <h1 className="text-3xl font-bold mb-2">Iniciar Sesión</h1>
           <p className="text-gray-600">
-            Accede a tu cuenta de Market del Cevil
+            Accede a tu cuenta de {storeName}
           </p>
         </div>
 
