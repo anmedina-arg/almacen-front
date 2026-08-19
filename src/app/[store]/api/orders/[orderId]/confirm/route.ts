@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -9,18 +9,18 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  */
 export async function PUT(
   _request: NextRequest,
-  { params }: { params: Promise<{ orderId: string }> }
+  { params }: { params: Promise<{ store: string; orderId: string }> }
 ) {
   try {
-    const { isAdmin, userId, error: authError } = await verifyAdminAuth();
-    if (!isAdmin || !userId) {
+    const { store, orderId: orderIdParam } = await params;
+    const { isStoreAdmin, storeId, userId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || !userId || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -30,6 +30,19 @@ export async function PUT(
     }
 
     const supabase = await createSupabaseServerClient();
+
+    // confirm_order es SECURITY DEFINER y bypassea RLS — la RLS puente de
+    // #16 no lo frena, así que la verificación de que la orden pertenece a
+    // esta Store tiene que hacerse acá, antes de invocar el RPC.
+    const { data: order } = await supabase
+      .from('orders')
+      .select('id')
+      .eq('id', orderId)
+      .eq('store_id', storeId)
+      .maybeSingle();
+    if (!order) {
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+    }
 
     const { data, error } = await supabase.rpc('confirm_order', {
       p_order_id: orderId,

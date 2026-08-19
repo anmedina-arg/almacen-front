@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { updateOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
 
@@ -9,18 +9,18 @@ import { updateOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
  */
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: Promise<{ orderId: string; itemId: string }> }
+  { params }: { params: Promise<{ store: string; orderId: string; itemId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam, itemId: itemIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam, itemId: itemIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     const itemId = parseInt(itemIdParam);
     if (isNaN(orderId) || isNaN(itemId)) {
@@ -32,11 +32,12 @@ export async function DELETE(
 
     const supabase = await createSupabaseServerClient();
 
-    // Verify order is pending
+    // Verify order belongs to this Store and is pending
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select('id, status')
       .eq('id', orderId)
+      .eq('store_id', storeId)
       .single();
 
     if (orderError || !order) {
@@ -81,18 +82,18 @@ export async function DELETE(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ orderId: string; itemId: string }> }
+  { params }: { params: Promise<{ store: string; orderId: string; itemId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, orderId: orderIdParam, itemId: itemIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { orderId: orderIdParam, itemId: itemIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     const itemId = parseInt(itemIdParam);
     if (isNaN(orderId) || isNaN(itemId)) {
@@ -119,11 +120,12 @@ export async function PUT(
 
     const supabase = await createSupabaseServerClient();
 
-    // Verify order is pending
+    // Verify order belongs to this Store and is pending
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select('id, status')
       .eq('id', orderId)
+      .eq('store_id', storeId)
       .single();
 
     if (orderError || !order) {
@@ -154,6 +156,7 @@ export async function PUT(
         .from('products')
         .select('price, cost')
         .eq('id', existingItem.product_id)
+        .eq('store_id', storeId)
         .single();
 
       if (product && Number(product.price) > 0) {
