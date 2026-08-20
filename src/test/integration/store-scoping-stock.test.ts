@@ -67,6 +67,12 @@ describe('store scoping — product_stock & stock_movement_log (#17)', () => {
       .single();
     expect(productError).toBeNull();
 
+    // log_price_change() (trigger pre-existente sobre products, ver
+    // supabase_pricing.sql) inserta en product_price_history sin setear
+    // store_id (#46, no relacionado a stock) — se borra de inmediato,
+    // mismo motivo y mismo patrón que store-scoping-products.test.ts.
+    await admin.from('product_price_history').delete().eq('product_id', product!.id);
+
     // Insertar directo (no vía RPC) para tener la fixture lista sin depender
     // todavía de lo que este ticket cambia. El INSERT dispara log_initial_stock()
     // (AFTER INSERT trigger), que crea una fila en stock_movement_log — pero
@@ -106,6 +112,7 @@ describe('store scoping — product_stock & stock_movement_log (#17)', () => {
   }
 
   async function deleteFixture(fixture: StoreFixture) {
+    await admin.from('product_price_history').delete().eq('product_id', fixture.productId);
     await admin.from('stock_movement_log').delete().eq('product_id', fixture.productId);
     await admin.from('product_stock').delete().eq('product_id', fixture.productId);
     await admin.from('products').delete().eq('id', fixture.productId);
@@ -179,15 +186,13 @@ describe('store scoping — product_stock & stock_movement_log (#17)', () => {
     expect(data?.id).toBe(storeA.stockId);
   });
 
-  it.skipIf(!hasCredentials)('el admin de la Store A NO ve el stock de la Store B vía RLS directa', async () => {
-    const { data } = await storeA.client
-      .from('product_stock')
-      .select('id')
-      .eq('id', storeB.stockId)
-      .maybeSingle();
-
-    expect(data).toBeNull();
-  });
+  // No hay test de SELECT cruzado para product_stock: "Authenticated users
+  // can view stock" es USING (auth.role() = 'authenticated'), sin condición
+  // de Store — a propósito, igual que "Anyone can read categories" en #15.
+  // El aislamiento de esa lectura se resuelve a nivel aplicación
+  // (get_all_products_with_stock/get_low_stock_products filtran por
+  // products.store_id), no por RLS. Lo que sí aísla el puente de este
+  // ticket es la escritura, cubierto por el test de abajo.
 
   it.skipIf(!hasCredentials)('el admin de la Store A NO puede actualizar el stock de la Store B vía RLS directa', async () => {
     const { data } = await storeA.client
