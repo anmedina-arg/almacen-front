@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+
+/**
+ * Confirma que el combo pertenece a la Store del caller. `combo_product_id`
+ * es FK a products.id, ya scoped por Store desde #15 — una vez que esto
+ * pasa, cualquier query posterior filtrada por ese id (en vez de por
+ * combo_components.store_id de nuevo) ya está transitivamente scoped, sin
+ * necesidad de un filtro redundante.
+ */
+async function comboBelongsToStore(
+  supabase: SupabaseClient,
+  comboId: number,
+  storeId: number
+): Promise<boolean> {
+  const { data } = await supabase
+    .from('products')
+    .select('id')
+    .eq('id', comboId)
+    .eq('store_id', storeId)
+    .maybeSingle();
+  return data != null;
+}
 
 export async function GET(
   request: NextRequest,
@@ -23,19 +45,15 @@ export async function GET(
 
     const supabase = await createSupabaseServerClient();
 
-    // El combo tiene que pertenecer a la Store del caller — evita que un
-    // admin de otra Store lea componentes de un combo ajeno adivinando el id.
-    const { data: combo } = await supabase
-      .from('products')
-      .select('id')
-      .eq('id', id)
-      .eq('store_id', storeId)
-      .maybeSingle();
-
-    if (!combo) {
+    // Evita que un admin de otra Store lea componentes de un combo ajeno
+    // adivinando el id.
+    if (!(await comboBelongsToStore(supabase, id, storeId))) {
       return NextResponse.json({ error: 'Combo not found in this store' }, { status: 404 });
     }
 
+    // Filtra por combo_product_id, no por combo_components.store_id — ver
+    // comboBelongsToStore(): ese id ya quedó confirmado como propio de esta
+    // Store arriba, un filtro extra acá sería redundante.
     const { data, error } = await supabase
       .from('combo_components')
       .select(
@@ -103,15 +121,7 @@ export async function PUT(
 
     const supabase = await createSupabaseServerClient();
 
-    // El combo tiene que pertenecer a la Store del caller.
-    const { data: combo } = await supabase
-      .from('products')
-      .select('id')
-      .eq('id', id)
-      .eq('store_id', storeId)
-      .maybeSingle();
-
-    if (!combo) {
+    if (!(await comboBelongsToStore(supabase, id, storeId))) {
       return NextResponse.json({ error: 'Combo not found in this store' }, { status: 404 });
     }
 
@@ -138,7 +148,9 @@ export async function PUT(
       }
     }
 
-    // Replace all existing components
+    // Replace all existing components. Filtra por combo_product_id, no por
+    // combo_components.store_id — mismo motivo que en el GET, ya validado
+    // arriba vía comboBelongsToStore().
     const { error: deleteError } = await supabase
       .from('combo_components')
       .delete()
