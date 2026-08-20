@@ -1,21 +1,43 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+
+/**
+ * Confirma que el combo pertenece a la Store del caller. `combo_product_id`
+ * es FK a products.id, ya scoped por Store desde #15 — una vez que esto
+ * pasa, cualquier query posterior filtrada por ese id (en vez de por
+ * combo_components.store_id de nuevo) ya está transitivamente scoped, sin
+ * necesidad de un filtro redundante.
+ */
+async function comboBelongsToStore(
+  supabase: SupabaseClient,
+  comboId: number,
+  storeId: number
+): Promise<boolean> {
+  const { data } = await supabase
+    .from('products')
+    .select('id')
+    .eq('id', comboId)
+    .eq('store_id', storeId)
+    .maybeSingle();
+  return data != null;
+}
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id: idParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid combo ID' }, { status: 400 });
@@ -23,6 +45,15 @@ export async function GET(
 
     const supabase = await createSupabaseServerClient();
 
+    // Evita que un admin de otra Store lea componentes de un combo ajeno
+    // adivinando el id.
+    if (!(await comboBelongsToStore(supabase, id, storeId))) {
+      return NextResponse.json({ error: 'Combo not found in this store' }, { status: 404 });
+    }
+
+    // Filtra por combo_product_id, no por combo_components.store_id — ver
+    // comboBelongsToStore(): ese id ya quedó confirmado como propio de esta
+    // Store arriba, un filtro extra acá sería redundante.
     const { data, error } = await supabase
       .from('combo_components')
       .select(
@@ -64,18 +95,18 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id: idParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid combo ID' }, { status: 400 });
@@ -90,7 +121,36 @@ export async function PUT(
 
     const supabase = await createSupabaseServerClient();
 
-    // Replace all existing components
+    if (!(await comboBelongsToStore(supabase, id, storeId))) {
+      return NextResponse.json({ error: 'Combo not found in this store' }, { status: 404 });
+    }
+
+    // Cada componente también tiene que pertenecer a la misma Store — evita
+    // que un combo termine referenciando el producto de otra Store como
+    // componente.
+    if (components.length > 0) {
+      const componentIds = (components as { component_product_id: number }[]).map(
+        (c) => c.component_product_id
+      );
+      const { data: ownComponents } = await supabase
+        .from('products')
+        .select('id')
+        .eq('store_id', storeId)
+        .in('id', componentIds);
+
+      const ownIds = new Set((ownComponents ?? []).map((p) => p.id));
+      const foreignId = componentIds.find((cid) => !ownIds.has(cid));
+      if (foreignId != null) {
+        return NextResponse.json(
+          { error: `Component product not found in this store: ${foreignId}` },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Replace all existing components. Filtra por combo_product_id, no por
+    // combo_components.store_id — mismo motivo que en el GET, ya validado
+    // arriba vía comboBelongsToStore().
     const { error: deleteError } = await supabase
       .from('combo_components')
       .delete()
@@ -106,6 +166,7 @@ export async function PUT(
         combo_product_id: id,
         component_product_id: c.component_product_id,
         quantity: c.quantity,
+        store_id: storeId,
       }));
 
       const { error: insertError } = await supabase
