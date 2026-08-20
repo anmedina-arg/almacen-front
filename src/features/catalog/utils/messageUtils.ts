@@ -46,11 +46,11 @@ export const generateWhatsAppMessage = (cartItems: CartItem[]): string => {
 };
 
 /**
- * Abre WhatsApp con el mensaje generado
+ * Abre WhatsApp con el mensaje generado, al número ya resuelto por el
+ * caller (ver resolveWhatsappNumber.ts) — no lee env vars acá porque este
+ * número ahora depende de la Store activa, resuelta server-side.
  */
-export const openWhatsApp = (message: string): void => {
-  const phoneNumber =
-    process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '5491112345678';
+export const openWhatsApp = (message: string, phoneNumber: string): void => {
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
   window.open(whatsappUrl, '_blank');

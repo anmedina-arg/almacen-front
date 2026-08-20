@@ -7,7 +7,7 @@ import { generateWhatsAppMessage, openWhatsApp } from '../utils/messageUtils';
 import { calculateItemPrice } from '../utils/productUtils';
 import { orderService } from '@/features/admin/services/orderService';
 
-export function useOrderSubmit(cartItems: CartItem[]) {
+export function useOrderSubmit(cartItems: CartItem[], whatsappNumber: string) {
   const router = useRouter();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
@@ -15,7 +15,7 @@ export function useOrderSubmit(cartItems: CartItem[]) {
 
   const handleSendMessage = () => {
     if (cartItems.length === 0) {
-      openWhatsApp('Hola! Quiero hacerte un pedido');
+      openWhatsApp('Hola! Quiero hacerte un pedido', whatsappNumber);
     } else {
       setShowConfirmation(true);
     }
@@ -45,7 +45,7 @@ export function useOrderSubmit(cartItems: CartItem[]) {
 
     // CRITICAL for iOS Safari: must be synchronous from the user gesture —
     // calling window.open after an await would trigger the popup blocker.
-    openWhatsApp(message);
+    openWhatsApp(message, whatsappNumber);
 
     setShowConfirmation(false);
 
