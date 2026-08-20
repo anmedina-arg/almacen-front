@@ -1,29 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { stockUpdateSchema } from '@/features/admin/schemas/stockUpdateSchema';
 
 /**
  * PUT /api/stock/[productId]
  * Crea o actualiza el stock de un producto usando la funcion RPC upsert_product_stock.
- * Requiere autenticacion de admin.
+ * Requiere autenticacion de admin de la Store.
  *
  * Body esperado: { p_product_id, p_quantity, p_min_stock, p_notes, p_movement_type }
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
+  { params }: { params: Promise<{ store: string; productId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, productId: productIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { productId: productIdParam } = await params;
     const productId = parseInt(productIdParam);
     if (isNaN(productId)) {
       return NextResponse.json(
@@ -63,6 +63,7 @@ export async function PUT(
       p_min_stock: validation.data.minStock,
       p_notes: validation.data.notes || null,
       p_movement_type: validation.data.movementType,
+      p_store_id: storeId,
     });
 
     if (error) {
