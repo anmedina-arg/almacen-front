@@ -1,27 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id: idParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid combo ID' }, { status: 400 });
     }
 
     const supabase = await createSupabaseServerClient();
+
+    // El combo tiene que pertenecer a la Store del caller — evita que un
+    // admin de otra Store lea componentes de un combo ajeno adivinando el id.
+    const { data: combo } = await supabase
+      .from('products')
+      .select('id')
+      .eq('id', id)
+      .eq('store_id', storeId)
+      .maybeSingle();
+
+    if (!combo) {
+      return NextResponse.json({ error: 'Combo not found in this store' }, { status: 404 });
+    }
 
     const { data, error } = await supabase
       .from('combo_components')
@@ -64,18 +77,18 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ store: string; id: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, id: idParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid combo ID' }, { status: 400 });
@@ -89,6 +102,41 @@ export async function PUT(
     }
 
     const supabase = await createSupabaseServerClient();
+
+    // El combo tiene que pertenecer a la Store del caller.
+    const { data: combo } = await supabase
+      .from('products')
+      .select('id')
+      .eq('id', id)
+      .eq('store_id', storeId)
+      .maybeSingle();
+
+    if (!combo) {
+      return NextResponse.json({ error: 'Combo not found in this store' }, { status: 404 });
+    }
+
+    // Cada componente también tiene que pertenecer a la misma Store — evita
+    // que un combo termine referenciando el producto de otra Store como
+    // componente.
+    if (components.length > 0) {
+      const componentIds = (components as { component_product_id: number }[]).map(
+        (c) => c.component_product_id
+      );
+      const { data: ownComponents } = await supabase
+        .from('products')
+        .select('id')
+        .eq('store_id', storeId)
+        .in('id', componentIds);
+
+      const ownIds = new Set((ownComponents ?? []).map((p) => p.id));
+      const foreignId = componentIds.find((cid) => !ownIds.has(cid));
+      if (foreignId != null) {
+        return NextResponse.json(
+          { error: `Component product not found in this store: ${foreignId}` },
+          { status: 400 }
+        );
+      }
+    }
 
     // Replace all existing components
     const { error: deleteError } = await supabase
@@ -106,6 +154,7 @@ export async function PUT(
         combo_product_id: id,
         component_product_id: c.component_product_id,
         quantity: c.quantity,
+        store_id: storeId,
       }));
 
       const { error: insertError } = await supabase
