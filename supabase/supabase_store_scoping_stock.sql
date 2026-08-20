@@ -2,6 +2,17 @@
 -- Scoping por Store: product_stock, stock_movement_log
 -- Ticket: #17 (https://github.com/anmedina-arg/almacen-front/issues/17)
 -- ============================================================================
+-- NOTA: code review encontró que p_store_id en upsert_product_stock/
+-- increment_product_stock quedó con DEFAULT NULL a pesar de que este mismo
+-- comment decía "sin default" — corregido en
+-- supabase_fix_stock_scoping_gaps.sql (reordena el parámetro). Ese mismo
+-- review también cuestionó la lectura de product_stock (acá no se toca a
+-- propósito, ver el comment más abajo) — se investigó y se decidió NO
+-- tocarla: la policy real en producción ("Anyone can view stock", USING
+-- true) sostiene el catálogo público para visitantes anónimos, tightening
+-- la hubiera roto. Ver el header de supabase_fix_stock_scoping_gaps.sql
+-- para el detalle completo de esa investigación.
+-- ============================================================================
 -- Mismo patrón que #15/#16: RLS de escritura/lectura-admin reescrita contra
 -- is_store_admin() (ya existe desde #15, no se repite acá). Puente
 -- permisivo (`store_id IS NULL`, dentro de is_store_admin) para no romper
@@ -55,7 +66,10 @@ CREATE POLICY "Admins can delete stock"
   ON public.product_stock FOR DELETE
   USING (public.is_store_admin(product_stock.store_id));
 
--- "Authenticated users can view stock" NO se toca — igual que la lectura
+-- La policy de lectura pública de product_stock (nombre real en producción:
+-- "Anyone can view stock", USING true — no "Authenticated users can view
+-- stock" como decía supabase_stock_control.sql, desactualizado; verificado
+-- con pg_policies durante code review) NO se toca — igual que la lectura
 -- pública de products en #15, el aislamiento de esa lectura se resuelve a
 -- nivel aplicación (fetchPublicProducts ya filtra por store_id), no acá.
 
