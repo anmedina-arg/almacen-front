@@ -1,26 +1,26 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/stock/[productId]/history
  * Retorna el historial de movimientos de stock de un producto.
- * Requiere autenticacion de admin.
+ * Requiere autenticacion de admin de la Store.
  */
 export async function GET(
   _request: NextRequest,
-  { params }: { params: Promise<{ productId: string }> }
+  { params }: { params: Promise<{ store: string; productId: string }> }
 ) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store, productId: productIdParam } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
       );
     }
 
-    const { productId: productIdParam } = await params;
     const productId = parseInt(productIdParam);
     if (isNaN(productId)) {
       return NextResponse.json(
@@ -30,6 +30,25 @@ export async function GET(
     }
 
     const supabase = await createSupabaseServerClient();
+
+    // Se valida contra products.store_id (confiable) en vez de filtrar
+    // stock_movement_log por su propio store_id: los triggers que insertan
+    // ahí no lo setean todavía (#52, sin resolver), así que filtrar por esa
+    // columna ocultaría movimientos reales. Esto además evita que un admin
+    // de otra Store vea el historial de un product_id ajeno adivinando el id.
+    const { data: product } = await supabase
+      .from('products')
+      .select('id')
+      .eq('id', productId)
+      .eq('store_id', storeId)
+      .maybeSingle();
+
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Product not found in this store' },
+        { status: 404 }
+      );
+    }
 
     const { data, error } = await supabase
       .from('stock_movement_log')

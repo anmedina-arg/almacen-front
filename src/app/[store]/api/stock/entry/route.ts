@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { stockEntryBatchSchema } from '@/features/admin/schemas/stockEntrySchema';
 
@@ -7,15 +7,19 @@ import { stockEntryBatchSchema } from '@/features/admin/schemas/stockEntrySchema
  * POST /api/stock/entry
  * Incrementa el stock de múltiples productos en un solo lote.
  * Usa best-effort: si un item falla, los demás continúan.
- * Requiere autenticación de admin.
+ * Requiere autenticación de admin de la Store.
  *
  * Body: { entries: Array<{ product_id: number; increment: number; notes: string }> }
  * Returns: { results: Array<{ product_id: number; success: boolean; error?: string }> }
  */
-export async function POST(request: Request) {
+export async function POST(
+  request: Request,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
@@ -41,6 +45,7 @@ export async function POST(request: Request) {
           p_product_id: entry.product_id,
           p_increment: entry.increment,
           p_notes: entry.notes || null,
+          p_store_id: storeId,
         });
 
         if (error) {

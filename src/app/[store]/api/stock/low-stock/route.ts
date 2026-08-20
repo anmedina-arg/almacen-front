@@ -1,17 +1,21 @@
 import { NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/stock/low-stock
  * Retorna productos con stock por debajo del minimo configurado.
  * Usa la funcion RPC get_low_stock_products.
- * Requiere autenticacion de admin.
+ * Requiere autenticacion de admin de la Store.
  */
-export async function GET() {
+export async function GET(
+  _request: Request,
+  { params }: { params: Promise<{ store: string }> }
+) {
   try {
-    const { isAdmin, error: authError } = await verifyAdminAuth();
-    if (!isAdmin) {
+    const { store } = await params;
+    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+    if (!isStoreAdmin || storeId == null) {
       return NextResponse.json(
         { error: authError || 'Forbidden: Admin access required' },
         { status: 403 }
@@ -20,7 +24,7 @@ export async function GET() {
 
     const supabase = await createSupabaseServerClient();
 
-    const { data, error } = await supabase.rpc('get_low_stock_products');
+    const { data, error } = await supabase.rpc('get_low_stock_products', { p_store_id: storeId });
 
     if (error) {
       console.error('Error fetching low stock:', error);
