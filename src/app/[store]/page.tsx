@@ -8,6 +8,7 @@ import { ProductCatalogLoader } from '@/features/catalog/components/ProductCatal
 import { ProductCatalogSkeleton } from '@/features/catalog/components/ProductCatalogSkeleton';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
+import { resolveWhatsappNumber } from '@/features/catalog/utils/resolveWhatsappNumber';
 
 export default async function Home({ params }: { params: Promise<{ store: string }> }) {
   const { store } = await params;
@@ -21,6 +22,7 @@ export default async function Home({ params }: { params: Promise<{ store: string
     notFound();
   }
   const storeId = storeData.id;
+  const whatsappNumber = resolveWhatsappNumber(storeData.whatsapp_number);
 
   return (
     <div className="font-barlow flex flex-col min-h-screen px-2">
@@ -30,7 +32,7 @@ export default async function Home({ params }: { params: Promise<{ store: string
         <CategoryNav storeId={storeId} />
       </div>
       <Suspense fallback={<ProductCatalogSkeleton />}>
-        <ProductCatalogLoader storeId={storeId} />
+        <ProductCatalogLoader storeId={storeId} whatsappNumber={whatsappNumber} />
       </Suspense>
       <Footer />
     </div>

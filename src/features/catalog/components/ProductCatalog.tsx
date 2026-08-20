@@ -17,9 +17,10 @@ const OrderFlowController = dynamic(
 interface ProductCatalogProps {
   initialProducts: Product[];
   categories: CategoryWithSubsPublic[];
+  whatsappNumber: string;
 }
 
-export function ProductCatalog({ initialProducts, categories }: ProductCatalogProps) {
+export function ProductCatalog({ initialProducts, categories, whatsappNumber }: ProductCatalogProps) {
   return (
     <>
       <InfoBanner />
@@ -27,7 +28,7 @@ export function ProductCatalog({ initialProducts, categories }: ProductCatalogPr
         initialProducts={initialProducts}
         categories={categories}
       />
-      <OrderFlowController />
+      <OrderFlowController whatsappNumber={whatsappNumber} />
     </>
   );
 }

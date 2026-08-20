@@ -5,12 +5,12 @@ import { useOrderSubmit } from '../hooks/useOrderSubmit';
 import { WhatsAppButton } from './WhatsAppButton';
 import { ConfirmationModal } from './ConfirmationModal';
 
-export function OrderFlowController() {
+export function OrderFlowController({ whatsappNumber }: { whatsappNumber: string }) {
   const items = useCartItems();
   const clearCart = useCartStore((s) => s.clearCart);
 
   const { showConfirmation, whatsAppMessage, handleSendMessage, handleConfirmOrder, handleCancelOrder } =
-    useOrderSubmit(items);
+    useOrderSubmit(items, whatsappNumber);
 
   return (
     <>
