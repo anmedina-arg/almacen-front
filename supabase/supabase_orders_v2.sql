@@ -15,6 +15,10 @@
 -- ============================================================================
 -- PART 1: MODIFY create_order() — Deduct stock atomically
 -- ============================================================================
+-- SUPERSEDED (#49): esta ya no es la definición vigente de create_order().
+-- Se conserva como registro histórico (fue acá donde se agregó el
+-- descuento de stock atómico). La definición vigente vive en
+-- supabase_create_order.sql — cualquier cambio a la función va ahí.
 -- Stock is deducted when the ORDER IS CREATED, not when confirmed.
 -- Uses SELECT FOR UPDATE to prevent concurrent over-selling.
 -- On insufficient stock: rolls back everything and returns structured error.
