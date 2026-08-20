@@ -1,4 +1,15 @@
 -- ============================================================================
+-- ARCHIVADO (#49): esta migración ya está aplicada y su contenido pasó a
+-- formar parte de la definición vigente de create_order() en
+-- supabase_create_order.sql. Es de un solo tema (a diferencia de los otros
+-- 5 archivos históricos, que además tocan tablas/RLS que siguen vigentes),
+-- así que se archiva entera en vez de solo anotarse in situ. Se conserva
+-- por su valor histórico: documenta el primer incidente de este tipo (una
+-- migración nueva pisando una feature ya en producción sin querer — mismo
+-- patrón que #70, con store_id en vez de unit_cost).
+-- ============================================================================
+
+-- ============================================================================
 -- FIX: create_order() RPC — agregar unit_cost al INSERT de order_items
 -- ============================================================================
 --

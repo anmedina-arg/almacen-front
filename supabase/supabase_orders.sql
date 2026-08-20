@@ -101,6 +101,10 @@ CREATE TRIGGER trg_recalculate_order_total
   EXECUTE FUNCTION recalculate_order_total();
 
 -- 7. RPC: Create order with items (transactional)
+-- SUPERSEDED (#49): esta ya no es la definición vigente de create_order().
+-- Se conserva como registro histórico de esta migración (tablas, índices,
+-- trigger, RLS de más abajo siguen siendo válidos). La definición vigente
+-- vive en supabase_create_order.sql — cualquier cambio a la función va ahí.
 CREATE OR REPLACE FUNCTION create_order(
   p_user_id UUID DEFAULT NULL,
   p_notes TEXT DEFAULT NULL,

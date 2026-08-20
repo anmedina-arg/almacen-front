@@ -165,6 +165,12 @@ COMMENT ON FUNCTION public.get_all_products_with_stock IS 'Returns all products 
 -- ============================================================================
 -- PART 1f: Update create_order() — handle combo stock deduction per component
 -- ============================================================================
+-- SUPERSEDED (#49): esta ya no es la definición vigente de create_order().
+-- Se conserva como registro histórico (fue acá donde se agregó el
+-- descuento de stock por componente de combo — y donde, sin querer, se
+-- perdió unit_cost que ya estaba en producción vía supabase_pricing.sql,
+-- ver supabase_fix_create_order_unit_cost.sql). La definición vigente vive
+-- en supabase_create_order.sql — cualquier cambio a la función va ahí.
 
 CREATE OR REPLACE FUNCTION create_order(
   p_user_id          UUID    DEFAULT NULL,

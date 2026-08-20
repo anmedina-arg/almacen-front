@@ -186,6 +186,13 @@ $$;
 -- Solo se necesita que el INSERT en order_items incluya el campo.
 -- El RPC ya existe; agregamos from_suggestion al INSERT.
 -- NOTA: Ejecutar DESPUÉS de que la columna order_items.from_suggestion exista.
+--
+-- SUPERSEDED (#49): esta ya no es la definición vigente de create_order().
+-- Se conserva como registro histórico (fue acá donde se agregó
+-- from_suggestion). Firma de 4 parámetros, sin p_store_id — quedó como
+-- overload duplicado junto a la versión de 5 parámetros de #16 hasta que
+-- se eliminó en #70 (ver supabase_fix_create_order_duplicate_overload.sql).
+-- La definición vigente vive en supabase_create_order.sql.
 
 CREATE OR REPLACE FUNCTION create_order(
   p_user_id          UUID    DEFAULT NULL,

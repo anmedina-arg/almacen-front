@@ -57,6 +57,11 @@ ALTER TABLE order_items
   ADD COLUMN IF NOT EXISTS unit_cost NUMERIC(12, 2) NOT NULL DEFAULT 0;
 
 -- 6. Actualizar create_order() RPC para aceptar y guardar unit_cost por ítem
+-- SUPERSEDED (#49): esta ya no es la definición vigente de create_order().
+-- Se conserva como registro histórico (fue acá donde se agregó unit_cost
+-- por primera vez — luego se perdió y se volvió a agregar, ver
+-- supabase_fix_create_order_unit_cost.sql). La definición vigente vive en
+-- supabase_create_order.sql — cualquier cambio a la función va ahí.
 CREATE OR REPLACE FUNCTION create_order(
   p_user_id UUID DEFAULT NULL,
   p_notes TEXT DEFAULT NULL,

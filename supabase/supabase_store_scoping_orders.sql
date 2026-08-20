@@ -51,6 +51,9 @@ CREATE UNIQUE INDEX clients_unique_otros_sin_desc
   WHERE barrio = 'otros' AND manzana_lote IS NULL;
 
 -- ── create_order(): + p_store_id ────────────────────────────────────────
+-- CONSOLIDADO (#49): esta definición pasó a supabase_create_order.sql
+-- (fuente única de verdad de acá en más) sin cambios. Cualquier cambio
+-- futuro a create_order() va en ese archivo, no en este.
 CREATE OR REPLACE FUNCTION public.create_order(
   p_user_id UUID DEFAULT NULL,
   p_notes TEXT DEFAULT NULL,
