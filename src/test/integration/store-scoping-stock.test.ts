@@ -186,14 +186,16 @@ describe('store scoping — product_stock & stock_movement_log (#17)', () => {
     expect(data?.id).toBe(storeA.stockId);
   });
 
-  // No hay test de SELECT cruzado para product_stock: "Authenticated users
-  // can view stock" es USING (auth.role() = 'authenticated'), sin condición
-  // de Store — a propósito, igual que "Anyone can read categories" en #15.
-  // El aislamiento de esa lectura se resuelve a nivel aplicación
-  // (get_all_products_with_stock/get_low_stock_products filtran por
-  // products.store_id), no por RLS. Lo que sí aísla el puente de este
-  // ticket es la escritura, cubierto por el test de abajo.
-
+  // No hay test de SELECT cruzado para product_stock: investigado en code
+  // review (ver supabase_fix_stock_scoping_gaps.sql) e intencionalmente
+  // revertido — la policy real ("Anyone can view stock", USING true, no
+  // "Authenticated users..." como decía el .sql viejo) sostiene el catálogo
+  // público para visitantes anónimos vía fetchPublicProducts.ts. Acotarla a
+  // is_store_admin() rompería esa lectura para cualquiera sin sesión. El
+  // aislamiento de esa lectura para el uso público se resuelve a nivel
+  // aplicación (fetchPublicProducts ya filtra por store_id), no por RLS —
+  // mismo criterio que "Anyone can read categories" en #15. Lo que sí aísla
+  // el puente de este ticket es la escritura, cubierto por el test de abajo.
   it.skipIf(!hasCredentials)('el admin de la Store A NO puede actualizar el stock de la Store B vía RLS directa', async () => {
     const { data } = await storeA.client
       .from('product_stock')
