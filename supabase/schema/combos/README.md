@@ -35,3 +35,7 @@ Ninguna de las dos funciones de arriba gana `p_store_id` propio — ambas operan
 ## Archivos compartidos — ya resueltos
 
 `supabase_combos.sql` y `supabase_store_scoping_combos.sql` quedaron completamente extraídos entre Stock (#83, `get_all_products_with_stock`), Orders (#84, `cancel_order`/`adjust_stock_on_item_update`/`return_stock_on_item_delete`, `create_order` ya resuelta en #49), Products (#85, columnas `is_combo`/`max_stock`) y este ticket (`combo_components`, `sync_combo_cost`, `get_combo_effective_stock`) — Combos es el último dominio en confirmar su parte, así que ambos archivos se archivaron completos acá.
+
+## Gaps conocidos, no corregidos acá
+
+Ninguno identificado en este dominio.
