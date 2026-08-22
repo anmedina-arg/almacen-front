@@ -12,14 +12,14 @@
 -- [ ] categories                -> Products/Categories (#85)
 -- [ ] subcategories             -> Products/Categories (#85)
 -- [ ] clients                   -> Clients (#88)
--- [ ] orders                    -> Orders (#84)
--- [ ] order_items               -> Orders (#84)
--- [ ] order_payments            -> Orders (#84)
+-- [x] orders                    -> Orders (#84) — supabase/schema/orders/orders.sql
+-- [x] order_items               -> Orders (#84) — supabase/schema/orders/order_items.sql
+-- [x] order_payments            -> Orders (#84) — supabase/schema/orders/order_payments.sql
 -- [x] product_stock             -> Stock (#83) — supabase/schema/stock/product_stock.sql
 -- [x] stock_movement_log        -> Stock (#83) — supabase/schema/stock/stock_movement_log.sql
 -- [ ] product_affinity          -> Recomendaciones/Informes (#90)
 -- [ ] category_affinity_rules   -> Recomendaciones/Informes (#90)
--- [ ] product_price_history     -> Orders (#84)
+-- [x] product_price_history     -> Orders (#84) — supabase/schema/orders/product_price_history.sql
 -- [ ] combo_components          -> Combos (#86)
 -- ============================================================================
 -- Migración puramente ADITIVA: crea `stores` y agrega `store_id` (nullable,
