@@ -8,9 +8,9 @@
 -- extraer, no antes.
 --
 -- [ ] stores                    -> Store (#87)
--- [ ] products                  -> Products/Categories (#85)
--- [ ] categories                -> Products/Categories (#85)
--- [ ] subcategories             -> Products/Categories (#85)
+-- [x] products                  -> Products/Categories (#85) — supabase/schema/products/products.sql
+-- [x] categories                -> Products/Categories (#85) — supabase/schema/products/categories.sql
+-- [x] subcategories             -> Products/Categories (#85) — supabase/schema/products/subcategories.sql
 -- [ ] clients                   -> Clients (#88)
 -- [x] orders                    -> Orders (#84) — supabase/schema/orders/orders.sql
 -- [x] order_items               -> Orders (#84) — supabase/schema/orders/order_items.sql

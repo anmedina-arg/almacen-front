@@ -43,8 +43,8 @@ CREATE INDEX IF NOT EXISTS idx_product_stock_store_id ON public.product_stock(st
 -- ── Trigger: updated_at ──────────────────────────────────────────────────
 -- update_updated_at_column() es una función compartida entre varias tablas
 -- (products, stores, categories, ...) — su definición no pertenece a este
--- dominio, se relocaliza en el ticket de Store/Platform (#87). Acá solo se
--- declara el trigger que la usa.
+-- dominio, vive en supabase/schema/products/update_updated_at_column.sql
+-- (Products #85). Acá solo se declara el trigger que la usa.
 DROP TRIGGER IF EXISTS update_product_stock_updated_at ON public.product_stock;
 CREATE TRIGGER update_product_stock_updated_at
   BEFORE UPDATE ON public.product_stock

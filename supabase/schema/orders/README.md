@@ -31,15 +31,15 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | `update_orders_updated_at.sql` | Al UPDATE en `orders`. |
 | `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware. |
 | `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock, combo-aware. |
-| `sync_order_items_unit_cost.sql` | Al UPDATE de `products.cost` — sincroniza `order_items.unit_cost` en pedidos con `unit_cost = 0`. **Dispara sobre `products`, tabla de Products (#85)** — la sentencia `CREATE TRIGGER` que la ata queda pendiente de que #85 la agregue a su `products.sql`, no vive en este archivo. |
-| `log_price_change.sql` | Al INSERT/UPDATE en `products` — registra en `product_price_history`. Mismo caso: dispara sobre `products`, la sentencia `CREATE TRIGGER` le corresponde a #85. |
+| `sync_order_items_unit_cost.sql` | Al UPDATE de `products.cost` — sincroniza `order_items.unit_cost` en pedidos con `unit_cost = 0`. Dispara sobre `products`, tabla de Products (#85) — el `CREATE TRIGGER` que la ata vive en `supabase/schema/products/products.sql` (agregado por #85), no acá. |
+| `log_price_change.sql` | Al INSERT/UPDATE en `products` — registra en `product_price_history`. Mismo caso: el `CREATE TRIGGER` vive en `supabase/schema/products/products.sql`. |
 
 ## Archivos compartidos entre dominios
 
 Ninguno de estos se descarta hasta que el otro dominio confirme su parte:
 
-- **`supabase_combos.sql`** (Combos, #86) — de acá se extrajeron las versiones combo-aware de `cancel_order`/`adjust_stock_on_item_update`/`return_stock_on_item_delete`. Lo que falta: `combo_components`, `sync_combo_cost`, `get_combo_effective_stock`, columnas `is_combo`/`max_stock` de `products`.
-- **`supabase_pricing.sql`** (Products, #85) — de acá se extrajo `product_price_history`, `log_price_change`, `sync_order_items_unit_cost`, columna `order_items.unit_cost`. Lo que falta: columna `products.cost`.
+- **`supabase_combos.sql`** (Combos, #86 — pendiente) — de acá se extrajeron las versiones combo-aware de `cancel_order`/`adjust_stock_on_item_update`/`return_stock_on_item_delete`. Lo que falta: `combo_components`, `sync_combo_cost`, `get_combo_effective_stock` (columnas `is_combo`/`max_stock` de `products` ya las extrajo #85).
+- **`supabase_pricing.sql`** (Products, #85 — ✅ completado) — de acá se extrajo `product_price_history`, `log_price_change`, `sync_order_items_unit_cost`, columna `order_items.unit_cost`. #85 extrajo la columna `products.cost` que faltaba — este archivo puede archivarse ahora que ambos dominios confirmaron su parte.
 - **`supabase_recommendations.sql`** (Recomendaciones, #90) — de acá se extrajo la columna `order_items.from_suggestion`. Lo que falta: `product_affinity`, `category_affinity_rules`, `get_recommendations`. (No estaba listado como compartido en el AC original de #84 — se encontró al verificar contra producción.)
 - **`supabase_clients.sql`** (Clients, #88) — de acá se extrajo la columna `orders.client_id`. Lo que falta: la tabla `clients` en sí y sus policies. (Tampoco estaba en el AC original — mismo caso que arriba.)
 - **`supabase_fix_super_admin_remaining_policies.sql`** (fix pre-existente, 2026-08-19, toca 6 tablas de 3 dominios) — de acá se extrajo la policy vigente de `product_price_history` (reconoce `super_admin` además de `admin`). Sus partes de `product_stock`/`stock_movement_log` ya están muertas (superseded por #83) y la de `combo_components` también (superseded por #18). Lo que sigue vivo y sin extraer: `clients` (#88), `category_affinity_rules` (#90).
