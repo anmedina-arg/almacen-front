@@ -7,7 +7,7 @@
 -- estén tachadas por el ticket de dominio correspondiente. Tachar acá al
 -- extraer, no antes.
 --
--- [ ] stores                    -> Store (#87)
+-- [x] stores                    -> Store (#87) — supabase/schema/store/stores.sql
 -- [x] products                  -> Products/Categories (#85) — supabase/schema/products/products.sql
 -- [x] categories                -> Products/Categories (#85) — supabase/schema/products/categories.sql
 -- [x] subcategories             -> Products/Categories (#85) — supabase/schema/products/subcategories.sql
