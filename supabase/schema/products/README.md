@@ -31,9 +31,9 @@ Ninguna en este dominio — `is_store_admin()` no es RPC (no se llama vía `supa
 
 ## Archivos compartidos entre dominios
 
-- **`supabase_combos.sql`** (Combos, #86 — pendiente) — de acá se extrajeron las columnas `is_combo`/`max_stock` de `products`. Lo que falta: `combo_components`, `sync_combo_cost`, `get_combo_effective_stock`.
+`supabase_combos.sql` ya no es compartido — de acá se extrajeron las columnas `is_combo`/`max_stock` de `products`; Orders (#84) y Combos (#86) confirmaron después sus partes, así que el archivo se archivó completo en #86.
 
-`supabase_pricing.sql` ya no es compartido — Orders (#84) y Products (#85) confirmaron ambas sus partes, así que se archivó completo en este ticket.
+`supabase_pricing.sql` tampoco es compartido — Orders (#84) y Products (#85) confirmaron ambas sus partes, así que se archivó completo en este ticket.
 
 ## Gaps conocidos, no corregidos acá
 

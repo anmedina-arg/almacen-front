@@ -20,7 +20,7 @@
 -- [ ] product_affinity          -> Recomendaciones/Informes (#90)
 -- [ ] category_affinity_rules   -> Recomendaciones/Informes (#90)
 -- [x] product_price_history     -> Orders (#84) — supabase/schema/orders/product_price_history.sql
--- [ ] combo_components          -> Combos (#86)
+-- [x] combo_components          -> Combos (#86) — supabase/schema/combos/combo_components.sql
 -- ============================================================================
 -- Migración puramente ADITIVA: crea `stores` y agrega `store_id` (nullable,
 -- FK a stores, sin default) a cada tabla de negocio existente. No modifica

@@ -38,7 +38,7 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 
 Ninguno de estos se descarta hasta que el otro dominio confirme su parte:
 
-- **`supabase_combos.sql`** (Combos, #86 — pendiente) — de acá se extrajeron las versiones combo-aware de `cancel_order`/`adjust_stock_on_item_update`/`return_stock_on_item_delete`. Lo que falta: `combo_components`, `sync_combo_cost`, `get_combo_effective_stock` (columnas `is_combo`/`max_stock` de `products` ya las extrajo #85).
+- **`supabase_combos.sql`** (Combos, #86 — ✅ completado) — de acá se extrajeron las versiones combo-aware de `cancel_order`/`adjust_stock_on_item_update`/`return_stock_on_item_delete`. #86 extrajo `combo_components`/`sync_combo_cost`/`get_combo_effective_stock`, último dominio en confirmar su parte — este archivo se archivó completo en #86.
 - **`supabase_pricing.sql`** (Products, #85 — ✅ completado) — de acá se extrajo `product_price_history`, `log_price_change`, `sync_order_items_unit_cost`, columna `order_items.unit_cost`. #85 extrajo la columna `products.cost` que faltaba — este archivo puede archivarse ahora que ambos dominios confirmaron su parte.
 - **`supabase_recommendations.sql`** (Recomendaciones, #90) — de acá se extrajo la columna `order_items.from_suggestion`. Lo que falta: `product_affinity`, `category_affinity_rules`, `get_recommendations`. (No estaba listado como compartido en el AC original de #84 — se encontró al verificar contra producción.)
 - **`supabase_clients.sql`** (Clients, #88) — de acá se extrajo la columna `orders.client_id`. Lo que falta: la tabla `clients` en sí y sus policies. (Tampoco estaba en el AC original — mismo caso que arriba.)
