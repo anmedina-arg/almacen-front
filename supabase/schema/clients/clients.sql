@@ -1,0 +1,83 @@
+-- ============================================================================
+-- Tabla: clients
+-- Dominio: Clients (#88, spec #81, mapa #74). Prepara terreno para #19
+-- (Scoping por Store: Clientes) — esta tabla todavía NO está scoped por
+-- Store en sus policies (solo admin/super_admin globales), a propósito,
+-- fuera de alcance acá.
+-- ============================================================================
+-- Identifica clientes por lote (barrio + manzana_lote) o como "otros" con
+-- una descripción libre (portero, vecino, etc.). Verificado contra
+-- producción el 2026-08-22. Fuentes: supabase_clients.sql (creación,
+-- incluye también el client_id FK que fue agregado a orders — ya extraído
+-- por Orders #84) + supabase_clients_otros_description.sql (permite
+-- múltiples "otros" diferenciados por descripción) +
+-- supabase_multitenant_schema_expand.sql (store_id) +
+-- supabase_store_scoping_orders.sql (#16 — scopeó los dos índices únicos
+-- por Store, a pesar de vivir en un archivo nombrado "orders"; encontrado
+-- en #84 al leer ese archivo completo) +
+-- supabase_fix_super_admin_remaining_policies.sql (2026-08-19 — policy
+-- actualizada para reconocer super_admin además de admin; encontrado en
+-- #87 al verificar contra producción, este dominio es el último en
+-- confirmar su parte de ese archivo — ver Gaps conocidos).
+--
+-- LÓGICA DE "OTROS": barrio = 'otros' permite manzana_lote como nota libre
+-- de texto (ej: "portero", "vino un albañil") en vez de lote estructurado.
+-- clients_unique_lot excluye 'otros' a propósito (WHERE barrio != 'otros')
+-- — un "otros" con nota puede repetirse sin conflicto, solo se exige que
+-- haya un único "otros" SIN nota (el catch-all real,
+-- clients_unique_otros_sin_desc). El comentario original de
+-- supabase_clients_otros_description.sql decía que los "otros" con
+-- descripción quedaban cubiertos por el índice de (barrio, manzana_lote)
+-- — impreciso, ese índice los excluye explícitamente; el comportamiento
+-- real (sin unicidad entre "otros" con descripción) es intencional, no un
+-- bug, confirmado en #84/supabase_store_scoping_orders.sql.
+-- ============================================================================
+
+CREATE TABLE IF NOT EXISTS public.clients (
+  id           SERIAL PRIMARY KEY,
+  barrio       TEXT NOT NULL CHECK (barrio IN ('AC1', 'AC2', 'otros')),
+  manzana_lote TEXT,
+  display_code TEXT GENERATED ALWAYS AS (
+    CASE WHEN barrio = 'otros' THEN 'otros' ELSE barrio || '-' || manzana_lote END
+  ) STORED,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  store_id     INTEGER REFERENCES public.stores(id),
+
+  -- manzana_lote requerido y con formato letra + 2 dígitos (01-30) cuando
+  -- barrio != 'otros'; libre (cualquier texto, o NULL) cuando es 'otros'.
+  CONSTRAINT manzana_lote_required CHECK (
+    barrio = 'otros'
+    OR (manzana_lote IS NOT NULL AND manzana_lote ~ '^[A-Z](0[1-9]|[12][0-9]|30)$')
+  )
+);
+
+-- ── Índices ──────────────────────────────────────────────────────────────
+CREATE UNIQUE INDEX IF NOT EXISTS clients_unique_lot
+  ON public.clients (store_id, barrio, manzana_lote)
+  WHERE barrio != 'otros';
+
+CREATE UNIQUE INDEX IF NOT EXISTS clients_unique_otros_sin_desc
+  ON public.clients (store_id, barrio)
+  WHERE barrio = 'otros' AND manzana_lote IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_clients_store_id ON public.clients(store_id);
+
+-- ── RLS ──────────────────────────────────────────────────────────────────
+ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
+
+-- NO scoped por Store todavía — chequea rol global (admin/super_admin), no
+-- is_store_admin(store_id). Ver #19 (Scoping por Store: Clientes) y Gaps
+-- conocidos abajo.
+DROP POLICY IF EXISTS "Admins can manage clients" ON public.clients;
+CREATE POLICY "Admins can manage clients"
+  ON public.clients FOR ALL
+  USING (
+    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
+    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'super_admin')
+  );
+
+-- No hay policy pública de lectura — a pesar de que el comentario original
+-- de supabase_clients.sql decía "anyone can read display_code", esa policy
+-- nunca se creó (verificado: una sola policy FOR ALL existe en
+-- producción/test). Cualquier lectura pública de display_code hoy pasa por
+-- server-side con service role, no por RLS anónima.

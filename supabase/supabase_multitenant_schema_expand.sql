@@ -11,7 +11,7 @@
 -- [x] products                  -> Products/Categories (#85) — supabase/schema/products/products.sql
 -- [x] categories                -> Products/Categories (#85) — supabase/schema/products/categories.sql
 -- [x] subcategories             -> Products/Categories (#85) — supabase/schema/products/subcategories.sql
--- [ ] clients                   -> Clients (#88)
+-- [x] clients                   -> Clients (#88) — supabase/schema/clients/clients.sql
 -- [x] orders                    -> Orders (#84) — supabase/schema/orders/orders.sql
 -- [x] order_items               -> Orders (#84) — supabase/schema/orders/order_items.sql
 -- [x] order_payments            -> Orders (#84) — supabase/schema/orders/order_payments.sql
