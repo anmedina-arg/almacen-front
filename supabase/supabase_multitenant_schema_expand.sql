@@ -2,6 +2,26 @@
 -- Multi-tenant: tabla stores + store_id nullable en tablas de negocio
 -- Ticket: #10 (https://github.com/anmedina-arg/almacen-front/issues/10)
 -- ============================================================================
+-- CHECKLIST DE MIGRACIÓN A supabase/schema/ (#82, spec #81, mapa #74)
+-- Este archivo toca 14 dominios/tablas. NO SE DESCARTA hasta que las 14
+-- estén tachadas por el ticket de dominio correspondiente. Tachar acá al
+-- extraer, no antes.
+--
+-- [ ] stores                    -> Store (#87)
+-- [ ] products                  -> Products/Categories (#85)
+-- [ ] categories                -> Products/Categories (#85)
+-- [ ] subcategories             -> Products/Categories (#85)
+-- [ ] clients                   -> Clients (#88)
+-- [ ] orders                    -> Orders (#84)
+-- [ ] order_items               -> Orders (#84)
+-- [ ] order_payments            -> Orders (#84)
+-- [ ] product_stock             -> Stock (#83)
+-- [ ] stock_movement_log        -> Stock (#83)
+-- [ ] product_affinity          -> Recomendaciones/Informes (#90)
+-- [ ] category_affinity_rules   -> Recomendaciones/Informes (#90)
+-- [ ] product_price_history     -> Orders (#84)
+-- [ ] combo_components          -> Combos (#86)
+-- ============================================================================
 -- Migración puramente ADITIVA: crea `stores` y agrega `store_id` (nullable,
 -- FK a stores, sin default) a cada tabla de negocio existente. No modifica
 -- RLS ni backfillea datos — eso lo cubren los tickets #11 (backfill) y

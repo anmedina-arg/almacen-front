@@ -11,3 +11,7 @@ Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `read
 ### Domain docs
 
 Single-context layout — root `CONTEXT.md` + `docs/adr/`. See `docs/agents/domain.md`.
+
+### Schema changes
+
+Any change to a Supabase function, policy, trigger, or table follows the 8-step verify-against-live-DB workflow. See `docs/agents/schema-changes.md` and `supabase/README.md`.
