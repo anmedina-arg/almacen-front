@@ -19,6 +19,14 @@
 -- eliminar el duplicado de 4 parámetros (#70). Cualquier cambio futuro a
 -- create_order() va en este archivo, con CREATE OR REPLACE FUNCTION sobre
 -- esta misma firma — no crear un archivo nuevo para tocar esta función.
+--
+-- GRANTs (histórico, NO re-verificado en #84 — supabase_create_order.sql
+-- tampoco los tenía, por eso no se re-escriben acá; ver supabase_orders.sql
+-- en supabase/_archive/): esta función necesita EXECUTE para `anon` además
+-- de `authenticated` — sostiene el checkout público por WhatsApp sin login.
+-- Si se toca la firma de create_order() en el futuro, confirmar contra
+-- pg_proc_acl / information_schema.routine_privileges que ambos roles
+-- siguen con EXECUTE antes de dar el cambio por completo.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.create_order(

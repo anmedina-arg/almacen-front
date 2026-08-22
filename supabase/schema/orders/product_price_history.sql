@@ -23,25 +23,25 @@
 -- get_stock_value_per_day en el dominio Stock — fuera de alcance de #84.
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS product_price_history (
+CREATE TABLE IF NOT EXISTS public.product_price_history (
   id          BIGSERIAL PRIMARY KEY,
-  product_id  INTEGER NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+  product_id  INTEGER NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   sale_price  NUMERIC(12, 2) NOT NULL,
   cost        NUMERIC(12, 2) NOT NULL DEFAULT 0,
   changed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   store_id    INTEGER REFERENCES public.stores(id)
 );
 
-CREATE INDEX IF NOT EXISTS idx_price_history_product_id ON product_price_history(product_id, changed_at DESC);
-CREATE INDEX IF NOT EXISTS idx_product_price_history_store_id ON product_price_history(store_id);
+CREATE INDEX IF NOT EXISTS idx_price_history_product_id ON public.product_price_history(product_id, changed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_product_price_history_store_id ON public.product_price_history(store_id);
 
 -- ── RLS ──────────────────────────────────────────────────────────────────
-ALTER TABLE product_price_history ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.product_price_history ENABLE ROW LEVEL SECURITY;
 
 -- Sin scoping por Store — ver gap conocido arriba.
-DROP POLICY IF EXISTS "Admins can view price history" ON product_price_history;
+DROP POLICY IF EXISTS "Admins can view price history" ON public.product_price_history;
 CREATE POLICY "Admins can view price history"
-  ON product_price_history FOR SELECT
+  ON public.product_price_history FOR SELECT
   USING (
     EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
     OR EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'super_admin')

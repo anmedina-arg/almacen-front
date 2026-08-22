@@ -10,9 +10,9 @@
 -- is_store_admin() con WITH CHECK explícito).
 -- ============================================================================
 
-CREATE TABLE IF NOT EXISTS order_payments (
+CREATE TABLE IF NOT EXISTS public.order_payments (
   id         SERIAL PRIMARY KEY,
-  order_id   INTEGER NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+  order_id   INTEGER NOT NULL REFERENCES public.orders(id) ON DELETE CASCADE,
   method     TEXT NOT NULL CHECK (method IN ('efectivo', 'transferencia')),
   amount     NUMERIC(10, 2),  -- NULL cuando es el único método (implica el total de la orden)
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -22,29 +22,33 @@ CREATE TABLE IF NOT EXISTS order_payments (
   CONSTRAINT order_payments_unique_method UNIQUE (order_id, method)
 );
 
-CREATE INDEX IF NOT EXISTS order_payments_order_id_idx ON order_payments(order_id);
-CREATE INDEX IF NOT EXISTS idx_order_payments_store_id ON order_payments(store_id);
+CREATE INDEX IF NOT EXISTS order_payments_order_id_idx ON public.order_payments(order_id);
+CREATE INDEX IF NOT EXISTS idx_order_payments_store_id ON public.order_payments(store_id);
 
 -- ── RLS ──────────────────────────────────────────────────────────────────
-ALTER TABLE order_payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.order_payments ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Admins can view order payments" ON order_payments;
+DROP POLICY IF EXISTS "Admins can view order payments" ON public.order_payments;
 CREATE POLICY "Admins can view order payments"
-  ON order_payments FOR SELECT
+  ON public.order_payments FOR SELECT
   USING (public.is_store_admin(order_payments.store_id));
 
-DROP POLICY IF EXISTS "Admins can insert order payments" ON order_payments;
+DROP POLICY IF EXISTS "Admins can insert order payments" ON public.order_payments;
 CREATE POLICY "Admins can insert order payments"
-  ON order_payments FOR INSERT
+  ON public.order_payments FOR INSERT
   WITH CHECK (public.is_store_admin(order_payments.store_id));
 
-DROP POLICY IF EXISTS "Admins can update order payments" ON order_payments;
+DROP POLICY IF EXISTS "Admins can update order payments" ON public.order_payments;
 CREATE POLICY "Admins can update order payments"
-  ON order_payments FOR UPDATE
+  ON public.order_payments FOR UPDATE
   USING (public.is_store_admin(order_payments.store_id))
   WITH CHECK (public.is_store_admin(order_payments.store_id));
 
-DROP POLICY IF EXISTS "Admins can delete order payments" ON order_payments;
+DROP POLICY IF EXISTS "Admins can delete order payments" ON public.order_payments;
 CREATE POLICY "Admins can delete order payments"
-  ON order_payments FOR DELETE
+  ON public.order_payments FOR DELETE
   USING (public.is_store_admin(order_payments.store_id));
+
+-- Puente permisivo (is_store_admin(NULL) = true) aplica a las policies de
+-- escritura mientras existan filas legacy con store_id NULL — ver
+-- ADR-0008. Se cierra en el ticket de contract (#22).
