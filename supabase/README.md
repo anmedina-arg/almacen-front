@@ -14,6 +14,8 @@
 - **Backfill de datos**: permanece en `supabase/backfills/` de forma indefinida.
 - **`supabase/_archive/`**: se disuelve entre las dos categorías de arriba — no queda como carpeta propia una vez terminada la migración.
 
+**Excepción temporal (desde #83):** los archivos fuente ya consolidados y confirmados contra producción se están moviendo a `supabase/_archive/` como respaldo, en vez de borrarse directamente al momento de cada ticket de dominio — decisión explícita para tener margen de reversión mientras la migración está en curso. El borrado real y definitivo de lo que sea fix de schema (no backfill) queda pendiente, a pedirse explícitamente más adelante — no asumir que un archivo en `_archive/` sigue vigente en ningún lado solo porque no se borró.
+
 ## Archivos compartidos entre dominios
 
 Un archivo fuente que toca objetos de más de un dominio (el caso más grande: `supabase_multitenant_schema_expand.sql`, con 14 tablas) **no se descarta** hasta que **todos** los dominios que lo tocan confirmen que ya extrajeron su parte al canónico correspondiente. Ver el comentario-checklist al tope de ese archivo.
