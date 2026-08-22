@@ -15,8 +15,8 @@
 -- [ ] orders                    -> Orders (#84)
 -- [ ] order_items               -> Orders (#84)
 -- [ ] order_payments            -> Orders (#84)
--- [ ] product_stock             -> Stock (#83)
--- [ ] stock_movement_log        -> Stock (#83)
+-- [x] product_stock             -> Stock (#83) — supabase/schema/stock/product_stock.sql
+-- [x] stock_movement_log        -> Stock (#83) — supabase/schema/stock/stock_movement_log.sql
 -- [ ] product_affinity          -> Recomendaciones/Informes (#90)
 -- [ ] category_affinity_rules   -> Recomendaciones/Informes (#90)
 -- [ ] product_price_history     -> Orders (#84)
