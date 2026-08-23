@@ -11,6 +11,10 @@
 -- NO ESTÁ SCOPED POR STORE — mismo gap que get_top_products, resuelto en
 -- #20, no en #89.
 --
+-- Comparte el mismo JOIN order_items/orders/products/categories y la misma
+-- forma de WHERE que get_top_products.sql — duplicación preexistente, no
+-- introducida acá, no resuelta en esta migración (relocación verbatim).
+--
 -- Verificado con pg_get_functiondef contra producción el 2026-08-23 — sin
 -- cambios desde supabase_ranking.sql (creación original).
 -- ============================================================================

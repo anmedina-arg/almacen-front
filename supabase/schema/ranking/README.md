@@ -13,7 +13,7 @@ Ninguna en este dominio.
 | Archivo | Qué hace |
 |---|---|
 | `get_top_products.sql` | Top productos por unidades o facturación, ventana de fechas opcional, filtrable por categoría. Incluye margen al costo actual (no snapshot histórico). |
-| `get_top_categories.sql` | Top categorías por facturación, ventana de fechas opcional. Solo facturación — las unidades no son comparables entre tipos de producto. |
+| `get_top_categories.sql` | Top categorías por facturación, ventana de fechas opcional. Solo facturación — las unidades no son comparables entre tipos de producto. Mismo JOIN/WHERE que `get_top_products.sql` — duplicación preexistente, no resuelta acá. |
 | `get_top_seller_ids.sql` | IDs de los top 3 productos más vendidos por subcategoría (badge "más vendido" del catálogo), con `DENSE_RANK` para empates. |
 
 ## Funciones trigger (no se llaman directo)
