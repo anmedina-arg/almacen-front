@@ -24,6 +24,8 @@
 -- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
 -- falta el DROP FUNCTION exacto de nuevo):
 -- export_ventas(timestamp with time zone, timestamp with time zone).
+--
+-- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION export_ventas(

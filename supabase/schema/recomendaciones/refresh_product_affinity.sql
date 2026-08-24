@@ -38,6 +38,8 @@
 --
 -- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
 -- falta el DROP FUNCTION exacto de nuevo): refresh_product_affinity().
+--
+-- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION refresh_product_affinity(p_store_id INTEGER)

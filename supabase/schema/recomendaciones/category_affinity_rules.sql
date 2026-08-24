@@ -20,6 +20,8 @@
 -- global — no hay UI de CRUD para estas reglas todavía, solo se tocan a
 -- mano en el SQL Editor, pero la policy sí queda alineada con el resto de
 -- las tablas de negocio).
+--
+-- Policy aplicada y confirmada en producción el 2026-08-24 (pg_policies).
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.category_affinity_rules (
