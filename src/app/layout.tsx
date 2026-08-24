@@ -25,8 +25,8 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://chaskyapp.vercel.a
 // mostraban este mismo fallback en vez de su propio nombre - confirmado en
 // produccion tras el deploy, no solo en teoria.
 export const metadata: Metadata = {
-  title: 'Catálogo online',
-  description: 'Catálogo de productos - tienda online',
+  title: 'Catálogos online con pedidos por WhatsApp',
+  description: 'Plataforma para vender por catálogo online con pedidos por WhatsApp',
   themeColor: '#000000',
   appleWebApp: {
     capable: true,
@@ -34,8 +34,8 @@ export const metadata: Metadata = {
     title: 'Catálogo online',
   },
   openGraph: {
-    title: 'Catálogo online',
-    description: 'Catálogo de productos',
+    title: 'Catálogos online con pedidos por WhatsApp',
+    description: 'Plataforma para vender por catálogo online con pedidos por WhatsApp',
     url: SITE_URL,
     type: 'website',
     images: [

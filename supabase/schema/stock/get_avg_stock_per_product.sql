@@ -10,18 +10,26 @@
 --
 -- Usada por /admin/dashboard (rotación de stock, src/app/[store]/api/dashboard/rotation).
 --
--- NO ESTÁ SCOPED POR STORE: sin p_store_id, sin filtro por store_id en
--- ninguna tabla — confirmado tanto en el código (la ruta usa
--- verifyAdminAuth, no verifyStoreAdminAuth) como en la definición viva.
--- Gap real y conocido, no introducido ni corregido por #83 — el scoping del
--- dashboard/informes es un ticket aparte, no #17 ni #83.
+-- Scoped por Store desde #21 — p_store_id requerido (sin default). Filtra
+-- vía products.store_id (join), no stock_movement_log.store_id: esa columna
+-- queda siempre NULL por un gap conocido y no corregido (#52 — ni
+-- log_initial_stock() ni log_stock_change() la setean al insertar), así que
+-- filtrar por ahí ocultaría todo. products.store_id sí es confiable (mismo
+-- criterio que get_all_products_with_stock, Stock #17). Autorización vía
+-- is_store_admin(p_store_id) — puente permisivo, ver ADR-0008.
 --
 -- Verificado con pg_get_functiondef contra producción el 2026-08-22 —
 -- coincide byte a byte con test. Sin cambios desde
--- supabase_rotation_avg_stock.sql (creación original).
+-- supabase_rotation_avg_stock.sql (creación original) hasta este #21.
+--
+-- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
+-- falta el DROP FUNCTION exacto de nuevo): get_avg_stock_per_product(date, date).
+--
+-- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_avg_stock_per_product(
+  p_store_id   INTEGER,
   p_start_date DATE,
   p_end_date   DATE
 )
@@ -35,8 +43,8 @@ AS $$
 DECLARE
   v_day DATE;
 BEGIN
-  IF auth.uid() IS NULL THEN
-    RAISE EXCEPTION 'Authentication required';
+  IF NOT public.is_store_admin(p_store_id) THEN
+    RAISE EXCEPTION 'Forbidden: Store admin access required';
   END IF;
 
   CREATE TEMP TABLE IF NOT EXISTS _snapshots (
@@ -59,7 +67,8 @@ BEGIN
         ps.quantity
       FROM product_stock ps
       JOIN products p ON p.id = ps.product_id
-      WHERE p.active = true;
+      WHERE p.active = true
+        AND p.store_id = p_store_id;
 
     ELSE
       INSERT INTO _snapshots (product_id, day_date, qty)
@@ -70,6 +79,7 @@ BEGIN
       FROM stock_movement_log sml
       JOIN products p ON p.id = sml.product_id
       WHERE p.active = true
+        AND p.store_id = p_store_id
         AND sml.created_at < (v_day + INTERVAL '1 day')
       ORDER BY sml.product_id, sml.created_at DESC;
     END IF;
@@ -88,5 +98,5 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.get_avg_stock_per_product IS
-  'Promedio de stock diario por producto en una ventana de fechas. '
+  'Promedio de stock diario por producto en una ventana de fechas, scoped por Store (#21). '
   'Usa product_stock para el día actual y stock_movement_log para días anteriores.';

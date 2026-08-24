@@ -11,16 +11,24 @@
 --
 -- Usada por /admin/dashboard (src/app/[store]/api/dashboard/stock-value-history).
 --
--- NO ESTÁ SCOPED POR STORE — mismo gap que get_avg_stock_per_product (ruta
--- usa verifyAdminAuth, no verifyStoreAdminAuth). No introducido ni
--- corregido por #83.
+-- Scoped por Store desde #21 — mismo criterio que get_avg_stock_per_product:
+-- p_store_id requerido, filtro vía products.store_id (no
+-- stock_movement_log.store_id, siempre NULL por el gap #52 — ver la nota en
+-- get_avg_stock_per_product.sql). Autorización vía is_store_admin(p_store_id)
+-- — puente permisivo, ver ADR-0008.
 --
 -- Verificado con pg_get_functiondef contra producción el 2026-08-22 —
 -- coincide byte a byte con test. Sin cambios desde
--- supabase_stock_value_per_day.sql (creación original).
+-- supabase_stock_value_per_day.sql (creación original) hasta este #21.
+--
+-- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
+-- falta el DROP FUNCTION exacto de nuevo): get_stock_value_per_day(date, date).
+--
+-- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_stock_value_per_day(
+  p_store_id   INTEGER,
   p_start_date DATE,
   p_end_date   DATE
 )
@@ -35,8 +43,8 @@ AS $$
 DECLARE
   v_day DATE;
 BEGIN
-  IF auth.uid() IS NULL THEN
-    RAISE EXCEPTION 'Authentication required';
+  IF NOT public.is_store_admin(p_store_id) THEN
+    RAISE EXCEPTION 'Forbidden: Store admin access required';
   END IF;
 
   CREATE TEMP TABLE IF NOT EXISTS _sv_snapshots (
@@ -56,7 +64,8 @@ BEGIN
       SELECT ps.product_id, v_day, ps.quantity
       FROM product_stock ps
       JOIN products p ON p.id = ps.product_id
-      WHERE p.active = true AND p.cost > 0;
+      WHERE p.active = true AND p.cost > 0
+        AND p.store_id = p_store_id;
 
     ELSE
       INSERT INTO _sv_snapshots (product_id, day_date, qty)
@@ -66,6 +75,7 @@ BEGIN
       JOIN products p ON p.id = sml.product_id
       WHERE p.active = true
         AND p.cost > 0
+        AND p.store_id = p_store_id
         AND sml.created_at < (v_day + INTERVAL '1 day')
       ORDER BY sml.product_id, sml.created_at DESC;
     END IF;
@@ -101,6 +111,6 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.get_stock_value_per_day IS
-  'Valor del stock al costo por categoría y por día. '
+  'Valor del stock al costo por categoría y por día, scoped por Store (#21). '
   'Usa product_stock para hoy y stock_movement_log para días anteriores. '
   'Misma lógica de snapshot que get_avg_stock_per_product.';

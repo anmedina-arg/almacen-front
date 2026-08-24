@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockByCategoryItem {
@@ -7,19 +7,32 @@ export interface StockByCategoryItem {
   total_value: number;
 }
 
-export async function GET() {
-  const { isAdmin } = await verifyAdminAuth();
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
+  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+  if (!isStoreAdmin || storeId == null) {
+    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
   }
 
   const supabase = await createSupabaseServerClient();
 
+  // products tiene una policy de lectura pública sin restricción de Store
+  // (catálogo público) — el filtro por store_id acá tiene que ser explícito
+  // en la query, RLS por sí sola no aisla esta tabla para un contexto
+  // admin. product_stock se sigue trayendo sin filtrar (igual que antes):
+  // el stockMap de abajo solo se consulta con ids de `products`, que ya
+  // vienen filtrados, y filtrar product_stock.store_id directamente
+  // ocultaría stock legacy cuyo store_id todavía no se backfilleó (mismo
+  // motivo documentado en get_all_products_with_stock.sql, Stock #17).
   const [{ data: products, error: productsError }, { data: stockData }] = await Promise.all([
     supabase
       .from('products')
       .select('id, cost, sale_type, cat:categories!products_category_id_fkey(name)')
-      .eq('active', true),
+      .eq('active', true)
+      .eq('store_id', storeId),
     supabase.from('product_stock').select('product_id, quantity'),
   ]);
 
