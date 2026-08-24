@@ -29,6 +29,9 @@
 -- stock_movement_log (2 filas) — ver los backfills de #46/#52, que ya
 -- resolvían todo lo demás vía JOIN pero no podían resolver estas por
 -- depender de que el producto en sí tuviera store_id primero.
+--
+-- Aplicado y confirmado en producción el 2026-08-24 — las 13 tablas dieron
+-- 0 filas NULL antes del ALTER TABLE ... SET NOT NULL que le siguió.
 -- ============================================================================
 
 UPDATE products SET store_id = 1 WHERE id = 750 AND store_id IS NULL;

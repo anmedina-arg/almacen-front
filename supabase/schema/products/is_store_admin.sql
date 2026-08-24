@@ -20,13 +20,12 @@
 -- admin autenticado, no solo el dueño real.
 --
 -- Aplicado y confirmado en el proyecto de test el 2026-08-24 (91/91 tests).
--- Producción: pendiente — requiere primero el backfill del cluster
--- huérfano de "Pascualina" (ver
+-- Aplicado y confirmado en producción el 2026-08-24, en este orden: backfill
+-- del cluster huérfano de "Pascualina" (ver
 -- supabase/backfills/supabase_backfill_pascualina_cluster_store_id.sql),
--- luego el ALTER TABLE ... SET NOT NULL en las 13 tablas, y recién
--- entonces este CREATE OR REPLACE. No asumir que ya corrió en producción
--- solo porque este archivo cambió — verificar contra la base antes de
--- depender de que el puente ya esté cerrado ahí.
+-- ALTER TABLE ... SET NOT NULL en las 13 tablas, este CREATE OR REPLACE —
+-- verificado con information_schema.columns (13/13 is_nullable = 'NO') y
+-- pg_get_functiondef (sin la rama OR check_store_id IS NULL).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.is_store_admin(check_store_id INTEGER)

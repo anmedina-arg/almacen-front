@@ -44,6 +44,9 @@
 -- falta el DROP FUNCTION exacto de nuevo): refresh_product_affinity().
 --
 -- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
+-- La simplificación del JOIN contra category_affinity_rules (#22, sacar
+-- OR r.store_id IS NULL) se aplicó y confirmó ese mismo día, después del
+-- ALTER TABLE ... SET NOT NULL de category_affinity_rules.store_id.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION refresh_product_affinity(p_store_id INTEGER)
