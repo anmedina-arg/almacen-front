@@ -7,13 +7,13 @@
 -- supabase_multitenant_schema_expand.sql (store_id) +
 -- supabase_store_scoping_stock.sql (#17, policies scoped por Store).
 --
--- GAP CONOCIDO (#52, sin resolver, fuera de alcance de #83 y de #17):
--- ni log_initial_stock() ni log_stock_change() (ver sus archivos) setean
--- store_id al insertar acá — toda fila nueva queda con store_id NULL. Por
--- el puente permisivo de is_store_admin() (ADR-0008), eso significa que HOY
--- cualquier Store admin autenticado puede leer ("Admins can view stock log")
--- e insertar en el log de movimientos de cualquier Store, no solo la propia.
--- No se corrige acá — está documentado y pendiente en #52.
+-- log_initial_stock() y log_stock_change() (ver sus archivos) setean
+-- store_id desde NEW.store_id de product_stock (#52) — hasta ese fix, toda
+-- fila nueva quedaba con store_id NULL, y por el puente permisivo de
+-- is_store_admin() (ADR-0008) cualquier Store admin autenticado podía leer
+-- e insertar en el log de movimientos de cualquier Store, no solo la
+-- propia. 676 filas huérfanas backfilleadas en producción, ver
+-- supabase/backfills/supabase_backfill_stock_movement_log_store_id.sql.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.stock_movement_log (
