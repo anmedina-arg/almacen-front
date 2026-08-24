@@ -10,15 +10,15 @@
 --
 -- Scoped por Store desde #21 — p_store_id requerido. Autorización vía
 -- is_store_admin(p_store_id). Co-ocurrencias filtradas por o.store_id =
--- p_store_id. category_affinity_rules se lee con un puente de negocio
--- propio (r.store_id = p_store_id OR r.store_id IS NULL) — no el puente
--- permisivo de autorización de ADR-0008 (cerrado en #22, is_store_admin()
--- ya no lo tiene). category_affinity_rules.store_id es NOT NULL desde #22
--- (las 2 reglas reales que hay hoy en producción ya estaban scoped, no
--- eran globales como se asumía en #21 sin verificar) — el puente de
--- negocio queda sin filas que cubrir hoy, pero se mantiene en el código
--- como diseño para el día que exista una UI de reglas realmente globales,
--- no como una migración pendiente.
+-- p_store_id. category_affinity_rules se lee filtrando por
+-- r.store_id = p_store_id — sin puente ("reglas globales con store_id
+-- NULL") porque category_affinity_rules.store_id es NOT NULL desde #22:
+-- ese diseño de #21 se basaba en una suposición nunca verificada (que las
+-- reglas existentes tenían store_id NULL); en la práctica las 2 reglas
+-- reales de producción ya estaban scoped a una Store. Si en el futuro
+-- hace falta una regla que aplique a todas las Stores, va a necesitar su
+-- propio mecanismo (ej. una columna `is_global`), no reabrir store_id a
+-- nullable.
 --
 -- TRUNCATE TABLE (que vaciaba toda la tabla, de todas las Stores) pasa a un
 -- DELETE scoped: filas propias de esta Store (re-refresh) + filas legacy
@@ -96,7 +96,7 @@ BEGIN
   LEFT JOIN category_affinity_rules r
     ON ((r.from_category_id = pa.category_id AND r.to_category_id = pb.category_id)
         OR (r.from_category_id = pb.category_id AND r.to_category_id = pa.category_id))
-    AND (r.store_id = p_store_id OR r.store_id IS NULL)
+    AND r.store_id = p_store_id
   GROUP BY c.product_id_a, c.product_id_b, c.co_count;
 
   -- Solo esta Store (re-refresh) + legacy NULL de los pares que se están

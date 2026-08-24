@@ -10,17 +10,23 @@
 -- store_admin de esa Store, o super_admin.
 --
 -- Puente permisivo (`OR check_store_id IS NULL`, ver ADR-0008) removido en
--- #22: las 13 tablas de negocio ya están en store_id NOT NULL (backfill de
--- las últimas filas huérfanas — #22, #46, #52 — más las tablas que ya
--- estaban limpias desde #11), así que check_store_id nunca debería ser NULL
+-- #22: las 13 tablas de negocio pasan a store_id NOT NULL (backfill de las
+-- últimas filas huérfanas — #22, #46, #52 — más las tablas que ya estaban
+-- limpias desde #11), así que check_store_id nunca debería ser NULL
 -- viniendo de una columna real de la base. Si igual llega NULL (bug de
 -- resolución de storeId upstream, no una fila legacy), ahora se deniega en
 -- vez de dejarse pasar — antes era exactamente el escenario contrario:
 -- cualquier fila con store_id NULL era gestionable por cualquier store
 -- admin autenticado, no solo el dueño real.
 --
--- Verificado con pg_get_functiondef contra producción el 2026-08-22 — sin
--- cambios desde supabase_store_scoping_products.sql (#15) hasta este #22.
+-- Aplicado y confirmado en el proyecto de test el 2026-08-24 (91/91 tests).
+-- Producción: pendiente — requiere primero el backfill del cluster
+-- huérfano de "Pascualina" (ver
+-- supabase/backfills/supabase_backfill_pascualina_cluster_store_id.sql),
+-- luego el ALTER TABLE ... SET NOT NULL en las 13 tablas, y recién
+-- entonces este CREATE OR REPLACE. No asumir que ya corrió en producción
+-- solo porque este archivo cambió — verificar contra la base antes de
+-- depender de que el puente ya esté cerrado ahí.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.is_store_admin(check_store_id INTEGER)
