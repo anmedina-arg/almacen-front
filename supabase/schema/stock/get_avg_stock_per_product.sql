@@ -15,11 +15,15 @@
 -- queda siempre NULL por un gap conocido y no corregido (#52 — ni
 -- log_initial_stock() ni log_stock_change() la setean al insertar), así que
 -- filtrar por ahí ocultaría todo. products.store_id sí es confiable (mismo
--- criterio que get_all_products_with_stock, Stock #17).
+-- criterio que get_all_products_with_stock, Stock #17). Autorización vía
+-- is_store_admin(p_store_id) — puente permisivo, ver ADR-0008.
 --
 -- Verificado con pg_get_functiondef contra producción el 2026-08-22 —
 -- coincide byte a byte con test. Sin cambios desde
 -- supabase_rotation_avg_stock.sql (creación original) hasta este #21.
+--
+-- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
+-- falta el DROP FUNCTION exacto de nuevo): get_avg_stock_per_product(date, date).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_avg_stock_per_product(

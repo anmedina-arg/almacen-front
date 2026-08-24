@@ -326,6 +326,36 @@ describe('store scoping — dashboard & informes: stock/export/afinidad (#21)', 
       expect(data).toBeNull();
       expect(error?.message).toContain('Forbidden');
     });
+
+    it.skipIf(!hasCredentials)('el refresh de la Store A no borra filas legacy (store_id NULL) de pares ajenos a esta Store', async () => {
+      // Regresión: una versión anterior de refresh_product_affinity() hacía
+      // DELETE ... WHERE store_id = p_store_id OR store_id IS NULL sin
+      // acotar por los pares recalculados — el refresh de una Store
+      // borraba TODAS las filas legacy de la tabla, incluidas las de una
+      // Store que todavía no había corrido su propio refresh.
+      const { error: seedError } = await admin.from('product_affinity').insert({
+        product_id_a: storeB.productAId,
+        product_id_b: storeB.productBId,
+        score: 0.5,
+        store_id: null,
+      });
+      expect(seedError).toBeNull();
+
+      const { error } = await storeA.client.rpc('refresh_product_affinity', {
+        p_store_id: storeA.storeId,
+      });
+      expect(error).toBeNull();
+
+      const { data: legacyRow } = await admin
+        .from('product_affinity')
+        .select('store_id')
+        .eq('product_id_a', storeB.productAId)
+        .eq('product_id_b', storeB.productBId)
+        .maybeSingle();
+
+      expect(legacyRow).not.toBeNull();
+      expect(legacyRow?.store_id).toBeNull();
+    });
   });
 
   describe('category_affinity_rules RLS', () => {

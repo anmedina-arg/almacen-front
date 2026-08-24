@@ -16,20 +16,28 @@
 -- store_id NULL) siguen aplicando a todas las Stores hasta que se creen
 -- reglas propias.
 --
--- TRUNCATE TABLE (que vaciaba toda la tabla, de todas las Stores) pasa a
--- DELETE FROM ... WHERE store_id = p_store_id OR store_id IS NULL — borra
--- las filas propias de esta Store más cualquier fila legacy sin store_id
--- (dato mezclado de antes de #21, nunca fue correcto para ninguna Store).
--- Sigue teniendo WHERE, así que no pisa el bloqueo de Supabase a DELETE sin
--- WHERE (ver supabase_recommendations_fix2.sql, motivo original del
--- TRUNCATE).
+-- TRUNCATE TABLE (que vaciaba toda la tabla, de todas las Stores) pasa a un
+-- DELETE scoped: filas propias de esta Store (re-refresh) + filas legacy
+-- (store_id NULL, dato mezclado de antes de #21) para los pares de producto
+-- que esta Store está por recalcular — join contra _scored, ambas
+-- direcciones, no "cualquier fila NULL de la tabla". Como
+-- product_id_a/product_id_b siempre pertenecen a la misma Store
+-- (order_items solo junta productos de un mismo pedido, que es de una sola
+-- Store), acotar por los pares de _scored es seguro: nunca pisa datos NULL
+-- de otra Store que todavía no corrió su propio refresh, y tampoco deja
+-- ningún NULL huérfano de esta Store sin limpiar. Sigue teniendo WHERE, así
+-- que no pisa el bloqueo de Supabase a DELETE sin WHERE (ver
+-- supabase_recommendations_fix2.sql, motivo original del TRUNCATE).
 --
 -- GAP CONOCIDO, no corregido acá: get_recommendations() (dominio público,
 -- fuera de alcance de #21 — ver README) todavía lee product_affinity sin
 -- filtrar por store_id. Hasta que un ticket futuro la scope, las
--- recomendaciones del catálogo público pueden mezclar el afinity score de
+-- recomendaciones del catálogo público pueden mezclar el affinity score de
 -- distintas Stores. Este ticket solo scopea el recálculo (quién puede
 -- dispararlo y con qué datos se calcula), no la lectura pública.
+--
+-- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
+-- falta el DROP FUNCTION exacto de nuevo): refresh_product_affinity().
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION refresh_product_affinity(p_store_id INTEGER)
@@ -85,7 +93,16 @@ BEGIN
     AND (r.store_id = p_store_id OR r.store_id IS NULL)
   GROUP BY c.product_id_a, c.product_id_b, c.co_count;
 
-  DELETE FROM product_affinity WHERE store_id = p_store_id OR store_id IS NULL;
+  -- Solo esta Store (re-refresh) + legacy NULL de los pares que se están
+  -- por recalcular (ambas direcciones) — nunca datos NULL de otra Store que
+  -- todavía no corrió su propio refresh (ver nota del header).
+  DELETE FROM product_affinity pa
+  WHERE pa.store_id = p_store_id
+     OR EXISTS (
+          SELECT 1 FROM _scored s
+          WHERE (pa.product_id_a = s.product_id_a AND pa.product_id_b = s.product_id_b)
+             OR (pa.product_id_a = s.product_id_b AND pa.product_id_b = s.product_id_a)
+        );
 
   INSERT INTO product_affinity (product_id_a, product_id_b, score, calculated_at, store_id)
   SELECT product_id_a, product_id_b, score, NOW(), p_store_id FROM _scored

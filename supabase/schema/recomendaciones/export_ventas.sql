@@ -11,8 +11,8 @@
 -- SIN default (mismo criterio que el resto de #21/#20/#17: is_store_admin(NULL)
 -- es true por el puente permisivo de ADR-0008, así que un default hubiera
 -- dejado pasar el chequeo de autorización sin querer). Chequeo de
--- autorización vía is_store_admin(p_store_id) + filtro AND o.store_id =
--- p_store_id.
+-- autorización vía is_store_admin(p_store_id) — puente permisivo, ver
+-- ADR-0008 — + filtro AND o.store_id = p_store_id.
 --
 -- Esto cierra de paso el GAP DE ENTORNO documentado en #90 (test no tenía
 -- la columna desde_sugerencia, firma más vieja que producción): al cambiar
@@ -20,6 +20,10 @@
 -- desde_sugerencia) a ambos entornos — ya no hace falta la excepción de "no
 -- tocar test" de #90, que era solo para no forzar un DROP FUNCTION
 -- innecesario en ese momento.
+--
+-- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
+-- falta el DROP FUNCTION exacto de nuevo):
+-- export_ventas(timestamp with time zone, timestamp with time zone).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION export_ventas(

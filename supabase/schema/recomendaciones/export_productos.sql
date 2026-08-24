@@ -10,11 +10,15 @@
 --
 -- Scoped por Store desde #21 — p_store_id requerido (sin default). Pasa de
 -- LANGUAGE sql a plpgsql para el chequeo de autorización (mismo criterio
--- que Ranking #20).
+-- que Ranking #20). Autorización vía is_store_admin(p_store_id) — puente
+-- permisivo, ver ADR-0008.
 --
 -- Sin cambios de lógica de negocio desde supabase_export_productos_fn.sql
 -- (creación original) más allá del scoping — solo se agrega p_store_id +
 -- el WHERE y el chequeo de autorización.
+--
+-- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
+-- falta el DROP FUNCTION exacto de nuevo): export_productos().
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION export_productos(p_store_id INTEGER)

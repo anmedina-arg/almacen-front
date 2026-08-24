@@ -14,11 +14,15 @@
 -- Scoped por Store desde #21 — mismo criterio que get_avg_stock_per_product:
 -- p_store_id requerido, filtro vía products.store_id (no
 -- stock_movement_log.store_id, siempre NULL por el gap #52 — ver la nota en
--- get_avg_stock_per_product.sql).
+-- get_avg_stock_per_product.sql). Autorización vía is_store_admin(p_store_id)
+-- — puente permisivo, ver ADR-0008.
 --
 -- Verificado con pg_get_functiondef contra producción el 2026-08-22 —
 -- coincide byte a byte con test. Sin cambios desde
 -- supabase_stock_value_per_day.sql (creación original) hasta este #21.
+--
+-- Firma anterior a #21 (histórico, NO ejecutar — solo referencia si hiciera
+-- falta el DROP FUNCTION exacto de nuevo): get_stock_value_per_day(date, date).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_stock_value_per_day(
