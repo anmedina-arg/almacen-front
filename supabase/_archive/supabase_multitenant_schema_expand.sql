@@ -17,8 +17,8 @@
 -- [x] order_payments            -> Orders (#84) — supabase/schema/orders/order_payments.sql
 -- [x] product_stock             -> Stock (#83) — supabase/schema/stock/product_stock.sql
 -- [x] stock_movement_log        -> Stock (#83) — supabase/schema/stock/stock_movement_log.sql
--- [ ] product_affinity          -> Recomendaciones/Informes (#90)
--- [ ] category_affinity_rules   -> Recomendaciones/Informes (#90)
+-- [x] product_affinity          -> Recomendaciones/Informes (#90) — supabase/schema/recomendaciones/product_affinity.sql
+-- [x] category_affinity_rules   -> Recomendaciones/Informes (#90) — supabase/schema/recomendaciones/category_affinity_rules.sql
 -- [x] product_price_history     -> Orders (#84) — supabase/schema/orders/product_price_history.sql
 -- [x] combo_components          -> Combos (#86) — supabase/schema/combos/combo_components.sql
 -- ============================================================================

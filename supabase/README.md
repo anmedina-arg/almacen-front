@@ -1,12 +1,12 @@
 # `supabase/`
 
-**Reorganización en curso.** Ver el mapa de decisiones [#74](https://github.com/anmedina-arg/almacen-front/issues/74) y el spec [#81](https://github.com/anmedina-arg/almacen-front/issues/81): esta carpeta está migrando de archivos `.sql` sueltos (uno por cambio histórico, con responsabilidades mezcladas y sin fuente única de verdad por objeto) a `supabase/schema/<dominio>/` — un archivo canónico por objeto (tabla, función, policy), agrupado por dominio de negocio.
+**Reorganización completa (#82-#90).** Ver el mapa de decisiones [#74](https://github.com/anmedina-arg/almacen-front/issues/74) y el spec [#81](https://github.com/anmedina-arg/almacen-front/issues/81): esta carpeta migró de archivos `.sql` sueltos (uno por cambio histórico, con responsabilidades mezcladas y sin fuente única de verdad por objeto) a `supabase/schema/<dominio>/` — un archivo canónico por objeto (tabla, función, policy), agrupado por dominio de negocio. Los 8 dominios (stock, orders, products, combos, store, clients, ranking, recomendaciones) están consolidados; lo que queda en `supabase/_archive/` es historial (fixes ya aplicados, propuestas nunca desplegadas) según la regla de retención de abajo — no fuente de verdad vigente de nada.
 
 ## Estructura destino
 
 - `supabase/schema/<dominio>/` — un archivo canónico por objeto de ese dominio. Dominios: `stock`, `orders`, `products`, `combos`, `store`, `clients`, `ranking`, `recomendaciones`.
 - `supabase/backfills/` — scripts de backfill de datos (no de schema). Permanentes: a diferencia de un fix de schema, un backfill documenta una migración de datos puntual que puede necesitar reconsultarse.
-- Los archivos `.sql` sueltos existentes en la raíz de `supabase/` se van consolidando a medida que cada ticket de dominio (#83-#90) extrae su parte. Antes de tocar cualquiera, seguir el flujo de [`docs/agents/schema-changes.md`](../docs/agents/schema-changes.md).
+- La raíz de `supabase/` ya no tiene archivos `.sql` sueltos — todos se consolidaron en `supabase/schema/<dominio>/` o se archivaron. Cualquier cambio de schema nuevo va directo al archivo canónico del dominio que corresponda, siguiendo el flujo de [`docs/agents/schema-changes.md`](../docs/agents/schema-changes.md).
 
 ### README.md de dominio
 
