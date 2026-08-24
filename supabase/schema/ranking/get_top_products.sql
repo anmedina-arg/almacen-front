@@ -1,25 +1,31 @@
 -- ============================================================================
 -- Función: get_top_products
--- Dominio: Ranking (#89, spec #81, mapa #74). Prepara terreno para #20
--- (Scoping por Store: Ranking).
+-- Dominio: Ranking (#89, spec #81, mapa #74). Scoping por Store: #20.
 -- ============================================================================
 -- Top productos por unidades vendidas o facturación, en una ventana de
 -- fechas opcional, filtrable por categoría. Incluye margen/margen% al
 -- costo actual del producto (no snapshot histórico).
 --
--- NO ESTÁ SCOPED POR STORE: sin p_store_id, sin filtro por store_id en
--- ninguna tabla — gap real y conocido, resuelto en #20, no en #89.
+-- Scoped por Store desde #20 — p_store_id requerido (sin default, no hay
+-- caller legacy, mismo criterio que Stock #17). Autorización vía
+-- is_store_admin(p_store_id) (puente permisivo, ver ADR-0008) + filtro de
+-- datos por o.store_id — mismo patrón que get_all_products_with_stock
+-- (Stock). Requirió pasar de LANGUAGE sql a plpgsql para poder hacer el
+-- chequeo de autorización con IF/RAISE.
 --
--- Comparte el mismo JOIN order_items/orders/products/categories y la misma
--- forma de WHERE (status IN pending/confirmed + rango de fechas opcional)
--- que get_top_categories.sql — duplicación preexistente, no introducida
--- acá, no resuelta en esta migración (relocación verbatim).
+-- get_top_seller_ids (dominio Ranking, no tocada acá) queda fuera de
+-- alcance de #20 a propósito — la usa el catálogo público
+-- (fetchPublicProducts.ts), no /admin/ranking; scoping de esa función es
+-- un ticket aparte.
 --
--- Verificado con pg_get_functiondef contra producción el 2026-08-23 — sin
--- cambios desde supabase_ranking.sql (creación original).
+-- Aplicada y confirmada en producción el 2026-08-25: DROP FUNCTION de los
+-- 2 overloads viejos (4 y 5 params, ver Gaps/hallazgo en el README de este
+-- dominio) + CREATE OR REPLACE de esta versión — verificado con
+-- pg_get_function_identity_arguments que quedó una sola firma.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_top_products(
+  p_store_id    INT,
   p_start_date  TIMESTAMPTZ DEFAULT NULL,
   p_end_date    TIMESTAMPTZ DEFAULT NULL,
   p_limit       INT         DEFAULT 10,
@@ -39,9 +45,15 @@ RETURNS TABLE (
   margin        NUMERIC,
   margin_pct    NUMERIC
 )
-LANGUAGE sql
+LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+BEGIN
+  IF NOT public.is_store_admin(p_store_id) THEN
+    RAISE EXCEPTION 'Forbidden: Store admin access required';
+  END IF;
+
+  RETURN QUERY
   SELECT
     p.id                                          AS product_id,
     p.name                                        AS product_name,
@@ -65,6 +77,7 @@ AS $$
   JOIN products  p   ON oi.product_id = p.id
   LEFT JOIN categories cat ON p.category_id = cat.id
   WHERE o.status IN ('pending', 'confirmed')
+    AND o.store_id = p_store_id
     AND (p_start_date  IS NULL OR o.created_at >= p_start_date)
     AND (p_end_date    IS NULL OR o.created_at <= p_end_date)
     AND (p_category_id IS NULL OR p.category_id = p_category_id)
@@ -75,4 +88,5 @@ AS $$
     END DESC,
     p.name ASC
   LIMIT p_limit;
+END;
 $$;
