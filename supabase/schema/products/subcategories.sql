@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS public.subcategories (
   created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   sort_order  INTEGER NOT NULL DEFAULT 0,
-  store_id    INTEGER REFERENCES public.stores(id),
+  store_id    INTEGER NOT NULL REFERENCES public.stores(id),
 
   UNIQUE (category_id, name)
 );
@@ -58,6 +58,6 @@ CREATE POLICY "Admins can delete subcategories"
   ON public.subcategories FOR DELETE
   USING (public.is_store_admin(subcategories.store_id));
 
--- Puente permisivo (is_store_admin(NULL) = true) aplica a las policies de
--- escritura mientras existan filas legacy con store_id NULL — ver
--- ADR-0008. Se cierra en el ticket de contract (#22).
+-- El puente permisivo (is_store_admin(NULL) = true) que aplicaba acá se
+-- cerró en #22 — is_store_admin() ya no tiene esa rama, y store_id es
+-- NOT NULL en esta tabla. Ver ADR-0008 (marcado cerrado).

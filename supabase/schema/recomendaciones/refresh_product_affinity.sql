@@ -10,11 +10,15 @@
 --
 -- Scoped por Store desde #21 — p_store_id requerido. Autorización vía
 -- is_store_admin(p_store_id). Co-ocurrencias filtradas por o.store_id =
--- p_store_id. category_affinity_rules se lee con puente permisivo
--- (r.store_id = p_store_id OR r.store_id IS NULL — ADR-0008): hoy no hay
--- UI para crear reglas por Store, así que las reglas existentes (todas con
--- store_id NULL) siguen aplicando a todas las Stores hasta que se creen
--- reglas propias.
+-- p_store_id. category_affinity_rules se lee con un puente de negocio
+-- propio (r.store_id = p_store_id OR r.store_id IS NULL) — no el puente
+-- permisivo de autorización de ADR-0008 (cerrado en #22, is_store_admin()
+-- ya no lo tiene). category_affinity_rules.store_id es NOT NULL desde #22
+-- (las 2 reglas reales que hay hoy en producción ya estaban scoped, no
+-- eran globales como se asumía en #21 sin verificar) — el puente de
+-- negocio queda sin filas que cubrir hoy, pero se mantiene en el código
+-- como diseño para el día que exista una UI de reglas realmente globales,
+-- no como una migración pendiente.
 --
 -- TRUNCATE TABLE (que vaciaba toda la tabla, de todas las Stores) pasa a un
 -- DELETE scoped: filas propias de esta Store (re-refresh) + filas legacy

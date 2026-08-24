@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS public.stock_movement_log (
   performed_by    UUID NOT NULL REFERENCES public.profiles(id) ON DELETE SET NULL,
   notes           TEXT DEFAULT NULL,
   created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  store_id        INTEGER REFERENCES public.stores(id),
+  store_id        INTEGER NOT NULL REFERENCES public.stores(id),
 
   CONSTRAINT chk_movement_type CHECK (
     movement_type IN (

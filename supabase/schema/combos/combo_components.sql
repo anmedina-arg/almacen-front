@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS public.combo_components (
   combo_product_id      INTEGER NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   component_product_id  INTEGER NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   quantity              NUMERIC(12, 3) NOT NULL DEFAULT 1,
-  store_id              INTEGER REFERENCES public.stores(id),
+  store_id              INTEGER NOT NULL REFERENCES public.stores(id),
 
   UNIQUE (combo_product_id, component_product_id)
 );
@@ -50,8 +50,7 @@ CREATE POLICY "Admins can manage combo_components"
   USING (public.is_store_admin(combo_components.store_id))
   WITH CHECK (public.is_store_admin(combo_components.store_id));
 
--- Puente permisivo (is_store_admin(NULL) = true) aplica a la policy de
--- escritura mientras existan filas legacy con store_id NULL — ver
--- ADR-0008. Se cierra en el ticket de contract (#22). En la práctica
--- combo_components.store_id ya está 100% backfilleada (80/80 filas,
--- verificado en #18) — el puente queda sin filas que cubrir hoy.
+-- El puente permisivo (is_store_admin(NULL) = true) que aplicaba acá se
+-- cerró en #22 — is_store_admin() ya no tiene esa rama, y store_id es
+-- NOT NULL en esta tabla (ya estaba 100% backfilleada desde #18, 80/80
+-- filas). Ver ADR-0008 (marcado cerrado).
