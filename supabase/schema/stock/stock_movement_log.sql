@@ -12,7 +12,8 @@
 -- fila nueva quedaba con store_id NULL, y por el puente permisivo de
 -- is_store_admin() (ADR-0008) cualquier Store admin autenticado podía leer
 -- e insertar en el log de movimientos de cualquier Store, no solo la
--- propia. 676 filas huérfanas backfilleadas en producción, ver
+-- propia. 676 filas huérfanas encontradas en producción, backfill
+-- documentado (pendiente de aplicar) en
 -- supabase/backfills/supabase_backfill_stock_movement_log_store_id.sql.
 -- ============================================================================
 
