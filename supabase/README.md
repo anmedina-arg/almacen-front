@@ -2,6 +2,8 @@
 
 **Reorganización completa (#82-#90).** Ver el mapa de decisiones [#74](https://github.com/anmedina-arg/almacen-front/issues/74) y el spec [#81](https://github.com/anmedina-arg/almacen-front/issues/81): esta carpeta migró de archivos `.sql` sueltos (uno por cambio histórico, con responsabilidades mezcladas y sin fuente única de verdad por objeto) a `supabase/schema/<dominio>/` — un archivo canónico por objeto (tabla, función, policy), agrupado por dominio de negocio. Los 8 dominios (stock, orders, products, combos, store, clients, ranking, recomendaciones) están consolidados; lo que queda en `supabase/_archive/` es historial (fixes ya aplicados, propuestas nunca desplegadas) según la regla de retención de abajo — no fuente de verdad vigente de nada. Por qué esta convención en vez del flujo declarativo de la Supabase CLI: [ADR-0011](../docs/adr/0011-supabase-canonical-files-not-declarative-cli.md).
 
+**Scoping por Store completo (#15-#22).** Las 13 tablas de negocio tienen `store_id NOT NULL` (confirmado en producción el 2026-08-24) y el puente permisivo de `is_store_admin()` (ver [ADR-0008](../docs/adr/0008-permissive-bridge-null-store-id.md), ahora cerrado) ya no existe — cualquier fila sin `store_id` es un error de schema, no un caso a tolerar. `verifyAdminAuth()` (el auth helper viejo, sin scoping) se eliminó del código.
+
 ## Estructura destino
 
 - `supabase/schema/<dominio>/` — un archivo canónico por objeto de ese dominio. Dominios: `stock`, `orders`, `products`, `combos`, `store`, `clients`, `ranking`, `recomendaciones`.

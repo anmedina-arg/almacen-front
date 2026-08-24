@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.order_payments (
   method     TEXT NOT NULL CHECK (method IN ('efectivo', 'transferencia')),
   amount     NUMERIC(10, 2),  -- NULL cuando es el único método (implica el total de la orden)
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  store_id   INTEGER REFERENCES public.stores(id),
+  store_id   INTEGER NOT NULL REFERENCES public.stores(id),
 
   -- El mismo método no puede aparecer dos veces en la misma orden
   CONSTRAINT order_payments_unique_method UNIQUE (order_id, method)
@@ -49,6 +49,6 @@ CREATE POLICY "Admins can delete order payments"
   ON public.order_payments FOR DELETE
   USING (public.is_store_admin(order_payments.store_id));
 
--- Puente permisivo (is_store_admin(NULL) = true) aplica a las policies de
--- escritura mientras existan filas legacy con store_id NULL — ver
--- ADR-0008. Se cierra en el ticket de contract (#22).
+-- El puente permisivo (is_store_admin(NULL) = true) que aplicaba acá se
+-- cerró en #22 — is_store_admin() ya no tiene esa rama, y store_id es
+-- NOT NULL en esta tabla. Ver ADR-0008 (marcado cerrado).

@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   cost            NUMERIC(12, 2) NOT NULL DEFAULT 0,
   is_combo        BOOLEAN NOT NULL DEFAULT FALSE,
   max_stock       NUMERIC(12, 3),
-  store_id        INTEGER REFERENCES public.stores(id),
+  store_id        INTEGER NOT NULL REFERENCES public.stores(id),
 
   CONSTRAINT main_category_check CHECK (main_category IN (
     'panaderia', 'congelados', 'combos', 'snaks', 'otros',
@@ -108,6 +108,6 @@ CREATE POLICY "Admins can delete products"
   ON public.products FOR DELETE
   USING (public.is_store_admin(products.store_id));
 
--- Puente permisivo (is_store_admin(NULL) = true) aplica a las policies de
--- escritura mientras existan filas legacy con store_id NULL — ver
--- ADR-0008. Se cierra en el ticket de contract (#22).
+-- El puente permisivo (is_store_admin(NULL) = true) que aplicaba acá se
+-- cerró en #22 — is_store_admin() ya no tiene esa rama, y store_id es
+-- NOT NULL en esta tabla. Ver ADR-0008 (marcado cerrado).

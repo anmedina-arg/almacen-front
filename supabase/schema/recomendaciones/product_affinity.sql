@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.product_affinity (
   product_id_b  INTEGER NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   score         NUMERIC(8, 4) NOT NULL DEFAULT 0,
   calculated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  store_id      INTEGER REFERENCES public.stores(id),
+  store_id      INTEGER NOT NULL REFERENCES public.stores(id),
 
   PRIMARY KEY (product_id_a, product_id_b)
 );

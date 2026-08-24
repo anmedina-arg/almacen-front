@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS public.product_price_history (
   sale_price  NUMERIC(12, 2) NOT NULL,
   cost        NUMERIC(12, 2) NOT NULL DEFAULT 0,
   changed_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  store_id    INTEGER REFERENCES public.stores(id)
+  store_id    INTEGER NOT NULL REFERENCES public.stores(id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_price_history_product_id ON public.product_price_history(product_id, changed_at DESC);

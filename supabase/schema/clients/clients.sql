@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS public.clients (
     CASE WHEN barrio = 'otros' THEN 'otros' ELSE barrio || '-' || manzana_lote END
   ) STORED,
   created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  store_id     INTEGER REFERENCES public.stores(id),
+  store_id     INTEGER NOT NULL REFERENCES public.stores(id),
 
   -- manzana_lote requerido y con formato letra + 2 dígitos (01-30) cuando
   -- barrio != 'otros'; libre (cualquier texto, o NULL) cuando es 'otros'.
@@ -77,9 +77,9 @@ CREATE POLICY "Admins can manage clients"
   USING (public.is_store_admin(clients.store_id))
   WITH CHECK (public.is_store_admin(clients.store_id));
 
--- Puente permisivo (is_store_admin(NULL) = true) aplica mientras existan
--- filas legacy con store_id NULL — ver ADR-0008. Se cierra en el ticket de
--- contract (#22).
+-- El puente permisivo (is_store_admin(NULL) = true) que aplicaba acá se
+-- cerró en #22 — is_store_admin() ya no tiene esa rama, y store_id es
+-- NOT NULL en esta tabla. Ver ADR-0008 (marcado cerrado).
 
 -- No hay policy pública de lectura — a pesar de que el comentario original
 -- de supabase_clients.sql decía "anyone can read display_code", esa policy

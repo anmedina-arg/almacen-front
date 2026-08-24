@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS public.category_affinity_rules (
   from_category_id INTEGER NOT NULL REFERENCES public.categories(id) ON DELETE CASCADE,
   to_category_id   INTEGER NOT NULL REFERENCES public.categories(id) ON DELETE CASCADE,
   boost            NUMERIC(5, 2) NOT NULL DEFAULT 1.5,
-  store_id         INTEGER REFERENCES public.stores(id),
+  store_id         INTEGER NOT NULL REFERENCES public.stores(id),
 
   CONSTRAINT category_affinity_rules_unique UNIQUE (from_category_id, to_category_id)
 );
@@ -45,6 +45,9 @@ CREATE POLICY "Admins can manage category_affinity_rules"
   USING (public.is_store_admin(category_affinity_rules.store_id))
   WITH CHECK (public.is_store_admin(category_affinity_rules.store_id));
 
--- Puente permisivo (is_store_admin(NULL) = true) aplica mientras existan
--- filas legacy con store_id NULL — ver ADR-0008. Se cierra en el ticket de
--- contract (#22).
+-- El puente permisivo (is_store_admin(NULL) = true) que aplicaba acá se
+-- cerró en #22 — is_store_admin() ya no tiene esa rama, y store_id es
+-- NOT NULL en esta tabla. Ver ADR-0008 (marcado cerrado). No confundir con
+-- el puente de negocio de refresh_product_affinity.sql (reglas globales
+-- con store_id NULL aplicando a todas las Stores) — ese es un diseño
+-- deliberado y permanente, no el bridge de autorización de este ADR.
