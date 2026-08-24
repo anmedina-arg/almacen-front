@@ -29,6 +29,18 @@ _Avoid_: Admin a secas (ambiguo entre Store admin y Platform admin).
 **Platform admin**:
 El dueño de la plataforma (rol `super_admin`), con acceso a todas las Stores. No es un Store admin de ninguna Store en particular.
 
+**Variedad**:
+Una opción elegible entre las que se puede componer un Producto Surtido (ej. sabor de helado "Chocolate", tipo de masa "Bombón de dulce de leche"). Es una etiqueta administrable, sin precio ni stock propio — no es una fila de `products`.
+_Avoid_: Sabor (válido solo como ejemplo dentro del dominio helados, no como término canónico — el modelo tiene que servir también para masas y futuros casos), variante, opción (a secas).
+
+**Familia** (de Productos Surtidos):
+Un grupo de Productos Surtidos definido por el admin de la Store que comparte una misma lista de Variedades (ej. la Familia "Helado" agrupa los productos "Helado 1/4kg", "Helado 1/2kg" y "Helado 1kg"; la Familia "Masas" agrupa "Masas 1/2kg" y "Masas 2kg"). Solo pueden pertenecer a una Familia productos que sean Producto Surtido. Deshabilitar una Variedad la saca de elección para toda la Familia a la que pertenece. Una Variedad pertenece a una sola Familia.
+_Avoid_: Familia de Variedades (la Familia agrupa Productos Surtidos; las Variedades son un atributo compartido de esa agrupación, no lo que se agrupa).
+
+**Producto Surtido**:
+Un producto normal de `products` que, en vez de venderse tal cual, se arma eligiendo un número de Variedades de su Familia entre un mínimo y un máximo, ambos configurables por producto, sin que el precio cambie según qué Variedades se elijan. Distinto de un Combo: un Combo es una composición fija de otros productos con cantidad fija por componente; un Producto Surtido es una composición que elige el comprador al momento del pedido, entre opciones que son etiquetas, no productos.
+_Avoid_: Combo (concepto ya usado en el código para composición fija — ver `is_combo`/`combo_components`, no confundir).
+
 ## Deployment model
 
 Un único deployment comparte todas las Stores — no hay una instancia/infraestructura separada por cliente. El middleware resuelve la Store activa según el primer segmento del path de la URL (no hay dominio propio todavía, ver [ADR-0003](./docs/adr/0003-path-based-tenant-resolution.md)) e inyecta el slug como header para que los endpoints de API filtren por Store.
