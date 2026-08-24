@@ -11,6 +11,10 @@
 -- p_store_id requerido (sin default), autorización vía
 -- is_store_admin(p_store_id), filtro de datos por o.store_id. Pasa de
 -- LANGUAGE sql a plpgsql para poder hacer el chequeo de autorización.
+--
+-- Aplicada y confirmada en producción el 2026-08-25 (DROP FUNCTION de la
+-- firma vieja + CREATE OR REPLACE, verificado con
+-- pg_get_function_identity_arguments).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_top_categories(

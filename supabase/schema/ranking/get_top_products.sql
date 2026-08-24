@@ -17,6 +17,11 @@
 -- alcance de #20 a propósito — la usa el catálogo público
 -- (fetchPublicProducts.ts), no /admin/ranking; scoping de esa función es
 -- un ticket aparte.
+--
+-- Aplicada y confirmada en producción el 2026-08-25: DROP FUNCTION de los
+-- 2 overloads viejos (4 y 5 params, ver Gaps/hallazgo en el README de este
+-- dominio) + CREATE OR REPLACE de esta versión — verificado con
+-- pg_get_function_identity_arguments que quedó una sola firma.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_top_products(
