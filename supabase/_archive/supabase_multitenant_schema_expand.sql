@@ -2,6 +2,26 @@
 -- Multi-tenant: tabla stores + store_id nullable en tablas de negocio
 -- Ticket: #10 (https://github.com/anmedina-arg/almacen-front/issues/10)
 -- ============================================================================
+-- CHECKLIST DE MIGRACIÓN A supabase/schema/ (#82, spec #81, mapa #74)
+-- Este archivo toca 14 dominios/tablas. NO SE DESCARTA hasta que las 14
+-- estén tachadas por el ticket de dominio correspondiente. Tachar acá al
+-- extraer, no antes.
+--
+-- [x] stores                    -> Store (#87) — supabase/schema/store/stores.sql
+-- [x] products                  -> Products/Categories (#85) — supabase/schema/products/products.sql
+-- [x] categories                -> Products/Categories (#85) — supabase/schema/products/categories.sql
+-- [x] subcategories             -> Products/Categories (#85) — supabase/schema/products/subcategories.sql
+-- [x] clients                   -> Clients (#88) — supabase/schema/clients/clients.sql
+-- [x] orders                    -> Orders (#84) — supabase/schema/orders/orders.sql
+-- [x] order_items               -> Orders (#84) — supabase/schema/orders/order_items.sql
+-- [x] order_payments            -> Orders (#84) — supabase/schema/orders/order_payments.sql
+-- [x] product_stock             -> Stock (#83) — supabase/schema/stock/product_stock.sql
+-- [x] stock_movement_log        -> Stock (#83) — supabase/schema/stock/stock_movement_log.sql
+-- [x] product_affinity          -> Recomendaciones/Informes (#90) — supabase/schema/recomendaciones/product_affinity.sql
+-- [x] category_affinity_rules   -> Recomendaciones/Informes (#90) — supabase/schema/recomendaciones/category_affinity_rules.sql
+-- [x] product_price_history     -> Orders (#84) — supabase/schema/orders/product_price_history.sql
+-- [x] combo_components          -> Combos (#86) — supabase/schema/combos/combo_components.sql
+-- ============================================================================
 -- Migración puramente ADITIVA: crea `stores` y agrega `store_id` (nullable,
 -- FK a stores, sin default) a cada tabla de negocio existente. No modifica
 -- RLS ni backfillea datos — eso lo cubren los tickets #11 (backfill) y
