@@ -24,7 +24,7 @@ Cada `supabase/schema/<dominio>/` lleva su propio `README.md` — un glosario de
 - **Backfill de datos**: permanece en `supabase/backfills/` de forma indefinida.
 - **`supabase/_archive/`**: se disuelve entre las dos categorías de arriba — no queda como carpeta propia una vez terminada la migración.
 
-**Excepción temporal (desde #83):** los archivos fuente ya consolidados y confirmados contra producción se están moviendo a `supabase/_archive/` como respaldo, en vez de borrarse directamente al momento de cada ticket de dominio — decisión explícita para tener margen de reversión mientras la migración está en curso. El borrado real y definitivo de lo que sea fix de schema (no backfill) queda pendiente, a pedirse explícitamente más adelante — no asumir que un archivo en `_archive/` sigue vigente en ningún lado solo porque no se borró.
+**Excepción temporal (desde #83, sigue vigente tras cerrar la migración en #90):** los archivos fuente ya consolidados y confirmados contra producción se movieron a `supabase/_archive/` como respaldo, en vez de borrarse directamente al cerrar cada ticket de dominio — decisión explícita para tener margen de reversión. El borrado real y definitivo de lo que sea fix de schema (no backfill) sigue pendiente, a pedirse explícitamente más adelante — no asumir que un archivo en `_archive/` sigue vigente en ningún lado solo porque no se borró.
 
 ## Archivos compartidos entre dominios
 
