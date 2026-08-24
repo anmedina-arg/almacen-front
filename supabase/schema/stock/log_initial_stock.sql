@@ -16,6 +16,11 @@
 -- Gap encontrado el 2026-08-18 durante #16: la fila insertada nunca llevaba
 -- store_id, dejando cada carga inicial real con store_id NULL en
 -- stock_movement_log — bloqueaba el NOT NULL de #22.
+--
+-- Aplicado en producción el 2026-08-24, junto con el backfill de las 676
+-- filas huérfanas (ver supabase/backfills/supabase_backfill_stock_movement_log_store_id.sql)
+-- — confirmadas 2 filas NULL restantes (producto huérfano "Pascualina",
+-- #750, pendiente de #22), como se esperaba.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.log_initial_stock()

@@ -17,6 +17,11 @@
 -- Gap encontrado el 2026-08-18 durante #16: la fila insertada nunca llevaba
 -- store_id, dejando cada movimiento de stock real con store_id NULL en
 -- stock_movement_log — bloqueaba el NOT NULL de #22.
+--
+-- Aplicado en producción el 2026-08-24, junto con log_initial_stock() y el
+-- backfill de las 676 filas huérfanas — confirmadas 2 filas NULL restantes
+-- (producto huérfano "Pascualina", #750, pendiente de #22), como se
+-- esperaba.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.log_stock_change()
