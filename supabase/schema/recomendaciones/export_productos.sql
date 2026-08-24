@@ -1,18 +1,23 @@
 -- ============================================================================
 -- Función: export_productos
--- Dominio: Recomendaciones/Informes (#90, spec #81, mapa #74). Prepara
--- terreno para #21.
+-- Dominio: Recomendaciones/Informes (#90, spec #81, mapa #74). Scoping por
+-- Store: #21.
 -- ============================================================================
 -- Catálogo completo de productos con costo, precio, margen, categoría,
 -- subcategoría y stock actual (virtual para combos, vía
 -- get_combo_effective_stock — dominio Combos #86). Consumida por
 -- /admin/informes para el CSV de catálogo.
 --
--- Verificado con pg_get_functiondef contra producción el 2026-08-24 — sin
--- cambios desde supabase_export_productos_fn.sql (creación original).
+-- Scoped por Store desde #21 — p_store_id requerido (sin default). Pasa de
+-- LANGUAGE sql a plpgsql para el chequeo de autorización (mismo criterio
+-- que Ranking #20).
+--
+-- Sin cambios de lógica de negocio desde supabase_export_productos_fn.sql
+-- (creación original) más allá del scoping — solo se agrega p_store_id +
+-- el WHERE y el chequeo de autorización.
 -- ============================================================================
 
-CREATE OR REPLACE FUNCTION export_productos()
+CREATE OR REPLACE FUNCTION export_productos(p_store_id INTEGER)
 RETURNS TABLE (
   producto_id         INTEGER,
   nombre              TEXT,
@@ -29,10 +34,15 @@ RETURNS TABLE (
   stock_minimo        NUMERIC,
   stock_bajo          TEXT
 )
-LANGUAGE sql
-STABLE
+LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+BEGIN
+  IF NOT public.is_store_admin(p_store_id) THEN
+    RAISE EXCEPTION 'Forbidden: Store admin access required';
+  END IF;
+
+  RETURN QUERY
   SELECT
     p.id,
     p.name,
@@ -82,5 +92,8 @@ AS $$
   LEFT JOIN subcategories sub ON sub.id = p.subcategory_id
   LEFT JOIN product_stock ps  ON ps.product_id = p.id
 
+  WHERE p.store_id = p_store_id
+
   ORDER BY cat.name ASC NULLS LAST, sub.name ASC NULLS LAST, p.name ASC;
+END;
 $$;

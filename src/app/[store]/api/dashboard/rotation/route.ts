@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface RotationItem {
@@ -12,9 +12,15 @@ export interface RotationItem {
   rotation: number;
 }
 
-export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminAuth();
-  if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
+  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+  if (!isStoreAdmin || storeId == null) {
+    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
+  }
 
   const days = Math.min(Number(request.nextUrl.searchParams.get('days') ?? 7), 365);
 
@@ -35,12 +41,14 @@ export async function GET(request: NextRequest) {
   const [salesRes, avgStockRes, productsRes] = await Promise.all([
     supabase
       .from('order_items')
-      .select('product_id, quantity, orders!inner(status, created_at)')
+      .select('product_id, quantity, orders!inner(status, created_at, store_id)')
       .filter('orders.status', 'in', '("pending","confirmed")')
+      .eq('orders.store_id', storeId)
       .gte('orders.created_at', startIso)
       .limit(10000),
 
     supabase.rpc('get_avg_stock_per_product', {
+      p_store_id: storeId,
       p_start_date: startDateStr,
       p_end_date: endDateStr,
     }),
@@ -48,7 +56,8 @@ export async function GET(request: NextRequest) {
     supabase
       .from('products')
       .select('id, name, sale_type, cat:categories!products_category_id_fkey(name)')
-      .eq('active', true),
+      .eq('active', true)
+      .eq('store_id', storeId),
   ]);
 
   if (salesRes.error || avgStockRes.error || productsRes.error) {

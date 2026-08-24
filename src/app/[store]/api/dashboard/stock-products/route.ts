@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockProductItem {
@@ -11,10 +11,14 @@ export interface StockProductItem {
   stock_value: number;     // stock_raw converted * cost
 }
 
-export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminAuth();
-  if (!isAdmin) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
+  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+  if (!isStoreAdmin || storeId == null) {
+    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
   }
 
   const category = request.nextUrl.searchParams.get('category');
@@ -24,11 +28,16 @@ export async function GET(request: NextRequest) {
 
   const supabase = await createSupabaseServerClient();
 
+  // Mismo criterio que stock-by-category: products filtrado explícitamente
+  // por store_id (lectura pública sin restricción de Store), product_stock
+  // sin filtrar (evita ocultar stock legacy no backfilleado — ver
+  // get_all_products_with_stock.sql, Stock #17).
   const [{ data: products, error }, { data: stockData }] = await Promise.all([
     supabase
       .from('products')
       .select('id, name, cost, sale_type, cat:categories!products_category_id_fkey(name)')
-      .eq('active', true),
+      .eq('active', true)
+      .eq('store_id', storeId),
     supabase.from('product_stock').select('product_id, quantity'),
   ]);
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -8,9 +8,13 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * Params: start_date (ISO), end_date (ISO) — ambos opcionales.
  * Admin only.
  */
-export async function GET(request: NextRequest) {
-  const { isAdmin, error: authError } = await verifyAdminAuth();
-  if (!isAdmin) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
+  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+  if (!isStoreAdmin || storeId == null) {
     return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
   }
 
@@ -24,6 +28,7 @@ export async function GET(request: NextRequest) {
   // Uses a raw SQL query via rpc-like approach — Supabase JS doesn't support
   // complex multi-join queries natively, so we use the PostgREST SQL endpoint.
   const { data, error } = await supabase.rpc('export_ventas', {
+    p_store_id: storeId,
     p_start_date: startDate ?? null,
     p_end_date:   endDate   ?? null,
   });

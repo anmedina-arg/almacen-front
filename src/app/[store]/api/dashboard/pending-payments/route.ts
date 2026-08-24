@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Order } from '@/features/admin/types/order.types';
 
@@ -20,9 +20,15 @@ export interface PendingPaymentsResponse {
   totalPages: number;
 }
 
-export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminAuth();
-  if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
+  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+  if (!isStoreAdmin || storeId == null) {
+    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
+  }
 
   const page = Math.max(1, Number(request.nextUrl.searchParams.get('page') ?? 1));
   const supabase = await createSupabaseServerClient();
@@ -32,6 +38,7 @@ export async function GET(request: NextRequest) {
   const { data: lightweight, error: lwErr } = await supabase
     .from('orders')
     .select('id, total, order_payments(amount)')
+    .eq('store_id', storeId)
     .neq('status', 'cancelled')
     .gte('created_at', '2026-03-20T00:00:00.000Z')
     .order('created_at', { ascending: false });
@@ -61,6 +68,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase
     .from('orders')
     .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
+    .eq('store_id', storeId)
     .in('id', pageIds)
     .order('created_at', { ascending: false });
 

@@ -1,27 +1,29 @@
 -- ============================================================================
 -- Función: export_ventas
--- Dominio: Recomendaciones/Informes (#90, spec #81, mapa #74). Prepara
--- terreno para #21.
+-- Dominio: Recomendaciones/Informes (#90, spec #81, mapa #74). Scoping por
+-- Store: #21.
 -- ============================================================================
 -- Detalle de ventas, una fila por ítem de orden — consumida por
 -- /api/reports/ventas para el CSV de "Informes". `desde_sugerencia` viene
 -- de order_items.from_suggestion (dominio Orders, #84).
 --
--- Verificado con pg_get_functiondef contra producción el 2026-08-24 — la
--- versión vigente es la de supabase_export_ventas_fn.sql (con parámetros
--- p_start_date/p_end_date y GROUP BY), no la query cruda sin parametrizar
--- de supabase_export_ventas.sql (esa era para pegar a mano en el SQL
--- Editor y usar el botón "Download CSV" — superseded, sin objeto propio).
+-- Scoped por Store desde #21 — p_store_id agregado como primer parámetro,
+-- SIN default (mismo criterio que el resto de #21/#20/#17: is_store_admin(NULL)
+-- es true por el puente permisivo de ADR-0008, así que un default hubiera
+-- dejado pasar el chequeo de autorización sin querer). Chequeo de
+-- autorización vía is_store_admin(p_store_id) + filtro AND o.store_id =
+-- p_store_id.
 --
--- GAP DE ENTORNO, no corregido acá: la versión vigente en el proyecto de
--- test NO tiene la columna desde_sugerencia (firma más vieja que
--- producción) — aplicar este canónico ahí requiere DROP FUNCTION primero
--- (cambia el tipo de retorno). Decisión explícita, consultada con el
--- usuario: no tocar test en #90, mismo criterio que el trigger
--- on_auth_user_created en #87.
+-- Esto cierra de paso el GAP DE ENTORNO documentado en #90 (test no tenía
+-- la columna desde_sugerencia, firma más vieja que producción): al cambiar
+-- la firma para #21 de todos modos, se aplica esta misma versión (con
+-- desde_sugerencia) a ambos entornos — ya no hace falta la excepción de "no
+-- tocar test" de #90, que era solo para no forzar un DROP FUNCTION
+-- innecesario en ese momento.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION export_ventas(
+  p_store_id   INTEGER,
   p_start_date TIMESTAMPTZ DEFAULT NULL,
   p_end_date   TIMESTAMPTZ DEFAULT NULL
 )
@@ -51,10 +53,15 @@ RETURNS TABLE (
   margen_pct           NUMERIC,
   desde_sugerencia     TEXT
 )
-LANGUAGE sql
-STABLE
+LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
+BEGIN
+  IF NOT public.is_store_admin(p_store_id) THEN
+    RAISE EXCEPTION 'Forbidden: Store admin access required';
+  END IF;
+
+  RETURN QUERY
   SELECT
     o.id,
     o.status::TEXT,
@@ -110,7 +117,8 @@ AS $$
   LEFT JOIN clients c     ON c.id  = o.client_id
   LEFT JOIN order_payments op ON op.order_id = o.id
 
-  WHERE (p_start_date IS NULL OR o.created_at >= p_start_date)
+  WHERE o.store_id = p_store_id
+    AND (p_start_date IS NULL OR o.created_at >= p_start_date)
     AND (p_end_date   IS NULL OR o.created_at <= p_end_date)
 
   GROUP BY
@@ -121,4 +129,5 @@ AS $$
     cat.name
 
   ORDER BY o.created_at DESC, o.id, oi.id;
+END;
 $$;

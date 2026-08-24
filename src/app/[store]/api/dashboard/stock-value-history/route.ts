@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockValueDayItem {
@@ -16,9 +16,15 @@ export interface StockValueHistoryResponse {
 
 const DAYS = 7;
 
-export async function GET() {
-  const { isAdmin } = await verifyAdminAuth();
-  if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
+  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+  if (!isStoreAdmin || storeId == null) {
+    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
+  }
 
   // Fechas en hora Argentina (UTC-3)
   const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
@@ -32,6 +38,7 @@ export async function GET() {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase.rpc('get_stock_value_per_day', {
+    p_store_id: storeId,
     p_start_date: startDateStr,
     p_end_date:   endDateStr,
   });

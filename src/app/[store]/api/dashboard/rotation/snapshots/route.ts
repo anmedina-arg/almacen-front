@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockSnapshotItem {
@@ -8,19 +8,39 @@ export interface StockSnapshotItem {
   movement_type: string | null;
 }
 
-export async function GET(request: NextRequest) {
-  const { isAdmin } = await verifyAdminAuth();
-  if (!isAdmin) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
+  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
+  if (!isStoreAdmin || storeId == null) {
+    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
+  }
 
   const productId = Number(request.nextUrl.searchParams.get('product_id'));
   if (!productId) return NextResponse.json({ error: 'product_id requerido' }, { status: 400 });
+
+  const supabase = await createSupabaseServerClient();
+
+  // stock_movement_log.store_id queda siempre NULL (gap #52, no corregido
+  // acá) — no se puede aislar por Store filtrando esa columna. En cambio,
+  // se verifica que el producto pertenezca a esta Store antes de leer su
+  // historial (mismo criterio que upsert_product_stock.sql, Stock #17).
+  const { data: product, error: productError } = await supabase
+    .from('products')
+    .select('id')
+    .eq('id', productId)
+    .eq('store_id', storeId)
+    .maybeSingle();
+  if (productError) return NextResponse.json({ error: productError.message }, { status: 500 });
+  if (!product) return NextResponse.json({ error: 'Product not found in this store' }, { status: 404 });
 
   const DAYS = 7;
   const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
   const nowAr = new Date(Date.now() - AR_OFFSET_MS);
   const todayUtc = new Date(Date.UTC(nowAr.getUTCFullYear(), nowAr.getUTCMonth(), nowAr.getUTCDate()));
 
-  const supabase = await createSupabaseServerClient();
   const snapshots: StockSnapshotItem[] = [];
 
   for (let i = DAYS - 1; i >= 0; i--) {
