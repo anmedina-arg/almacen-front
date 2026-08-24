@@ -1,9 +1,6 @@
 -- ============================================================================
 -- Tabla: clients
--- Dominio: Clients (#88, spec #81, mapa #74). Prepara terreno para #19
--- (Scoping por Store: Clientes) — esta tabla todavía NO está scoped por
--- Store en sus policies (solo admin/super_admin globales), a propósito,
--- fuera de alcance acá.
+-- Dominio: Clients (#88, spec #81, mapa #74; scoping por Store: #19).
 -- ============================================================================
 -- Identifica clientes por lote (barrio + manzana_lote) o como "otros" con
 -- una descripción libre (portero, vecino, etc.). Verificado contra
@@ -65,16 +62,19 @@ CREATE INDEX IF NOT EXISTS idx_clients_store_id ON public.clients(store_id);
 -- ── RLS ──────────────────────────────────────────────────────────────────
 ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 
--- NO scoped por Store todavía — chequea rol global (admin/super_admin), no
--- is_store_admin(store_id). Ver #19 (Scoping por Store: Clientes) y Gaps
--- conocidos abajo.
+-- Scoped por Store desde #19 — reemplaza el chequeo de rol global
+-- (admin/super_admin) por membership vía is_store_admin(). La policy vieja
+-- no tenía WITH CHECK (ninguna validación en INSERT/UPDATE de qué store_id
+-- se guardaba) — se agrega acá, mismo patrón que combo_components.sql.
 DROP POLICY IF EXISTS "Admins can manage clients" ON public.clients;
 CREATE POLICY "Admins can manage clients"
   ON public.clients FOR ALL
-  USING (
-    EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
-    OR EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'super_admin')
-  );
+  USING (public.is_store_admin(clients.store_id))
+  WITH CHECK (public.is_store_admin(clients.store_id));
+
+-- Puente permisivo (is_store_admin(NULL) = true) aplica mientras existan
+-- filas legacy con store_id NULL — ver ADR-0008. Se cierra en el ticket de
+-- contract (#22).
 
 -- No hay policy pública de lectura — a pesar de que el comentario original
 -- de supabase_clients.sql decía "anyone can read display_code", esa policy
