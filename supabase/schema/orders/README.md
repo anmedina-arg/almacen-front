@@ -11,7 +11,7 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | `orders.sql` | La orden en sí (incluye el tipo `order_status`). `client_id` (FK a `clients`) y `store_id` los agregaron migraciones de otros dominios — ver "Archivos compartidos" abajo. |
 | `order_items.sql` | Ítems de una orden. `unit_cost`/`from_suggestion` los agregaron migraciones de otros dominios — ídem. |
 | `order_payments.sql` | Método(s) de pago de una orden (efectivo/transferencia). |
-| `product_price_history.sql` | Historial append-only de precio/costo — alimentado por `log_price_change` (ver abajo), no por escritura directa. **No está scoped por Store** — ver Gaps conocidos. |
+| `product_price_history.sql` | Historial append-only de precio/costo — alimentado por `log_price_change` (ver abajo), no por escritura directa. Su policy de lectura no está scoped por Store — ver Gaps conocidos. |
 
 ## Funciones RPC (llamadas desde la API)
 
@@ -32,7 +32,7 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware. |
 | `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock, combo-aware. |
 | `sync_order_items_unit_cost.sql` | Al UPDATE de `products.cost` — sincroniza `order_items.unit_cost` en pedidos con `unit_cost = 0`. Dispara sobre `products`, tabla de Products (#85) — el `CREATE TRIGGER` que la ata vive en `supabase/schema/products/products.sql` (agregado por #85), no acá. |
-| `log_price_change.sql` | Al INSERT/UPDATE en `products` — registra en `product_price_history`. Mismo caso: el `CREATE TRIGGER` vive en `supabase/schema/products/products.sql`. |
+| `log_price_change.sql` | Al INSERT/UPDATE en `products` — registra en `product_price_history`. Mismo caso: el `CREATE TRIGGER` vive en `supabase/schema/products/products.sql`. Setea `store_id` desde `NEW.store_id` (#46) — antes no lo seteaba, dejando cada cambio de precio real con `store_id NULL`. |
 
 ## Archivos compartidos entre dominios
 
