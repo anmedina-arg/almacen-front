@@ -66,6 +66,11 @@ ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
 -- (admin/super_admin) por membership vía is_store_admin(). La policy vieja
 -- no tenía WITH CHECK (ninguna validación en INSERT/UPDATE de qué store_id
 -- se guardaba) — se agrega acá, mismo patrón que combo_components.sql.
+-- Aplicada y confirmada en producción el 2026-08-25 (el commit que
+-- introdujo esto había quedado "pendiente aplicar en producción" al
+-- momento de commitear — se aplicó y verificó inmediatamente después, este
+-- comentario deja la confirmación donde importa en vez de solo en el
+-- historial de git).
 DROP POLICY IF EXISTS "Admins can manage clients" ON public.clients;
 CREATE POLICY "Admins can manage clients"
   ON public.clients FOR ALL
