@@ -13,7 +13,9 @@ sistema). Consolidado en #87 (spec #81, mapa #74).
 
 ## Funciones RPC (las que llama la API)
 
-Ninguna en este dominio.
+| Archivo | Qué hace |
+|---|---|
+| `provision_store.sql` | Alta de una Store nueva (#26, ADR-0006): INSERT en `stores` + `store_admins` en una sola transacción. Sin `SECURITY DEFINER` ni `GRANT` — pensada para llamarse solo con el `service_role` key (bypassea RLS por rol de Postgres), nunca desde una ruta pública. Ver `src/lib/store/provisionStore.ts` y `scripts/provision-store.ts`. |
 
 ## Funciones trigger (no se llaman directo)
 
