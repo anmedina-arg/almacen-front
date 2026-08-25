@@ -51,6 +51,7 @@ CREATE POLICY "Anyone can read stores"
   ON public.stores FOR SELECT USING (true);
 
 -- Sin policies de INSERT/UPDATE/DELETE — default-deny total a propósito
--- (#10/#12/#13). El alta/edición de Stores es manual vía SQL Editor, como
--- rol postgres (bypassea RLS) — ver ADR-0006. #13 dejó pendiente el ticket
--- #26 (herramienta de alta manual de Store) para definir ese flujo.
+-- (#10/#12/#13). El alta de Stores pasa por provision_store() (#26, ADR-0006),
+-- llamada con el service_role key (bypassea RLS por rol de Postgres) — ver
+-- supabase/schema/store/provision_store.sql. La edición sigue siendo manual
+-- vía SQL Editor, como rol postgres.

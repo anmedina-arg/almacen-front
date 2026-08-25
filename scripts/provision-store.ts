@@ -14,6 +14,7 @@
  * Uso:
  *  npx tsx scripts/provision-store.ts \
  *    --slug=nueva-store --name="Nueva Store" --owner-email=cliente@example.com \
+ *    --operator-email=vos@example.com \
  *    [--whatsapp=5493810000000] [--flags=stock,pos,pagos]
  *
  * Requisitos:
@@ -22,11 +23,13 @@
  *      NEXT_PUBLIC_SUPABASE_URL
  *      SUPABASE_SERVICE_ROLE_KEY   ← necesita permisos de admin (auth + bypass RLS)
  *
- * "Solo accesible a super_admin" (#26 AC) no es un chequeo en runtime: es
- * este mismo límite — SUPABASE_SERVICE_ROLE_KEY solo vive en .env.local del
- * Platform admin, nunca en el bundle del cliente ni en ninguna ruta pública.
- * Mismo mecanismo que el resto de los scripts de scripts/ (ver
- * migrate-images-to-supabase.ts).
+ * "Solo accesible a super_admin" (#26 AC) tiene dos capas: SUPABASE_SERVICE_ROLE_KEY
+ * solo vive en .env.local del Platform admin (nunca en el bundle del cliente
+ * ni en ninguna ruta pública, mismo mecanismo que el resto de scripts/ — ver
+ * migrate-images-to-supabase.ts), Y --operator-email se verifica de verdad
+ * contra profiles.role = 'super_admin' antes de escribir nada (ver
+ * assertOperatorIsSuperAdmin en provisionStore.ts) — reusa la maquinaria de
+ * #13 en vez de confiar solo en la posesión del key.
  */
 
 import * as fs from 'fs';
@@ -73,10 +76,10 @@ function parseFlags(raw: string | undefined): Partial<Record<FeatureFlagKey, boo
 
 async function main() {
   const args = parseArgs(process.argv.slice(2));
-  const { slug, name, 'owner-email': ownerEmail, whatsapp, flags } = args;
+  const { slug, name, 'owner-email': ownerEmail, 'operator-email': operatorEmail, whatsapp, flags } = args;
 
-  if (!slug || !name || !ownerEmail) {
-    console.error('Uso: npx tsx scripts/provision-store.ts --slug=... --name=... --owner-email=... [--whatsapp=...] [--flags=stock,pos]');
+  if (!slug || !name || !ownerEmail || !operatorEmail) {
+    console.error('Uso: npx tsx scripts/provision-store.ts --slug=... --name=... --owner-email=... --operator-email=... [--whatsapp=...] [--flags=stock,pos]');
     process.exit(1);
   }
 
@@ -93,6 +96,7 @@ async function main() {
     slug,
     name,
     ownerEmail,
+    operatorEmail,
     whatsappNumber: whatsapp ?? null,
     featureFlags: parseFlags(flags),
   });

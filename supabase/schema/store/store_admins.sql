@@ -47,5 +47,6 @@ CREATE POLICY "Super admins can read all memberships"
   );
 
 -- Sin policies de INSERT/UPDATE/DELETE — default-deny total a propósito,
--- igual que stores (#10/#13). El alta de membership es manual vía SQL
--- Editor, como rol postgres (bypassea RLS), hasta que #26 defina el flujo.
+-- igual que stores (#10/#13). El alta de membership pasa por
+-- provision_store() (#26), llamada con el service_role key (bypassea RLS
+-- por rol de Postgres) — ver supabase/schema/store/provision_store.sql.

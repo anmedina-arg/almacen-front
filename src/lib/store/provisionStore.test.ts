@@ -11,25 +11,25 @@ describe('provisionStore — validación de slug', () => {
 
   it('rechaza un slug con mayúsculas', async () => {
     await expect(
-      provisionStore(supabaseStub, { slug: 'Nueva-Store', name: 'x', ownerEmail: 'a@b.com' })
+      provisionStore(supabaseStub, { slug: 'Nueva-Store', name: 'x', ownerEmail: 'a@b.com', operatorEmail: 'op@b.com' })
     ).rejects.toThrow(/Slug inválido/);
   });
 
   it('rechaza un slug con espacios', async () => {
     await expect(
-      provisionStore(supabaseStub, { slug: 'nueva store', name: 'x', ownerEmail: 'a@b.com' })
+      provisionStore(supabaseStub, { slug: 'nueva store', name: 'x', ownerEmail: 'a@b.com', operatorEmail: 'op@b.com' })
     ).rejects.toThrow(/Slug inválido/);
   });
 
   it('rechaza un slug con guion al inicio o al final', async () => {
     await expect(
-      provisionStore(supabaseStub, { slug: '-nueva-store', name: 'x', ownerEmail: 'a@b.com' })
+      provisionStore(supabaseStub, { slug: '-nueva-store', name: 'x', ownerEmail: 'a@b.com', operatorEmail: 'op@b.com' })
     ).rejects.toThrow(/Slug inválido/);
   });
 
   it('rechaza un slug reservado por el sitio (api)', async () => {
     await expect(
-      provisionStore(supabaseStub, { slug: 'api', name: 'x', ownerEmail: 'a@b.com' })
+      provisionStore(supabaseStub, { slug: 'api', name: 'x', ownerEmail: 'a@b.com', operatorEmail: 'op@b.com' })
     ).rejects.toThrow(/Slug reservado/);
   });
 });

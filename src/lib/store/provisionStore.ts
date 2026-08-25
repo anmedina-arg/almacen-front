@@ -5,6 +5,15 @@ export type ProvisionStoreParams = {
   slug: string;
   name: string;
   ownerEmail: string;
+  /**
+   * Email de quien corre la herramienta — se verifica contra profiles.role
+   * (#13) antes de hacer nada más. El service_role key ya es de por sí un
+   * límite de acceso fuerte (solo vive en .env.local/.env.test), pero #26
+   * pide explícitamente "solo accesible a super_admin" como AC verificable,
+   * y #13 (bloqueante de este ticket) ya deja la maquinaria de profiles.role
+   * lista para eso — no tiene sentido no reusarla acá.
+   */
+  operatorEmail: string;
   whatsappNumber?: string | null;
   featureFlags?: Partial<FeatureFlags>;
 };
@@ -33,6 +42,13 @@ function assertValidSlug(slug: string): void {
 async function findProfileIdByEmail(supabaseAdmin: SupabaseClient, email: string): Promise<string | null> {
   const { data } = await supabaseAdmin.from('profiles').select('id').eq('email', email).maybeSingle();
   return data?.id ?? null;
+}
+
+async function assertOperatorIsSuperAdmin(supabaseAdmin: SupabaseClient, operatorEmail: string): Promise<void> {
+  const { data } = await supabaseAdmin.from('profiles').select('role').eq('email', operatorEmail).maybeSingle();
+  if (data?.role !== 'super_admin') {
+    throw new Error(`"${operatorEmail}" no es super_admin — esta herramienta es solo para el Platform admin.`);
+  }
 }
 
 /**
@@ -65,13 +81,18 @@ async function inviteOwner(supabaseAdmin: SupabaseClient, email: string): Promis
  * whatsapp_number inicial, sin SQL a mano. Requiere un client construido
  * con el service_role key — bypassea RLS a propósito (stores/store_admins
  * no tienen policies de INSERT, ver provision_store.sql).
+ *
+ * "Solo accesible a super_admin" (#26 AC) se verifica de verdad acá contra
+ * profiles.role, no solo por posesión del service_role key — ver
+ * assertOperatorIsSuperAdmin.
  */
 export async function provisionStore(
   supabaseAdmin: SupabaseClient,
   params: ProvisionStoreParams
 ): Promise<ProvisionStoreResult> {
-  const { slug, name, ownerEmail, whatsappNumber = null } = params;
+  const { slug, name, ownerEmail, operatorEmail, whatsappNumber = null } = params;
   assertValidSlug(slug);
+  await assertOperatorIsSuperAdmin(supabaseAdmin, operatorEmail);
   const featureFlags = resolveFeatureFlags(params.featureFlags ?? {});
 
   const { data: existingStore } = await supabaseAdmin

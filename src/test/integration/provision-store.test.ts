@@ -7,10 +7,12 @@ import { FEATURE_FLAG_KEYS } from '@/lib/store/featureFlags';
 // Verifica provisionStore() (#26, ADR-0006) contra el proyecto de test real,
 // sin mocks — mismo criterio que verify-store-admin-auth.test.ts. Cubre el
 // camino "el dueño ya tiene profile" (la mayoría de los casos reales, un
-// cliente que ya se registró en algún momento); el camino de invitación de
-// un dueño sin cuenta (inviteUserByEmail) queda fuera de este test porque
-// dispara un side-effect real contra Supabase Auth (manda un email) — no es
-// algo que un test automatizado deba ejecutar contra el proyecto de test.
+// cliente que ya se registró en algún momento) y el chequeo real de
+// "solo accesible a super_admin" contra profiles.role; el camino de
+// invitación de un dueño sin cuenta (inviteUserByEmail) queda fuera de este
+// test porque dispara un side-effect real contra Supabase Auth (manda un
+// email) — no es algo que un test automatizado deba ejecutar contra el
+// proyecto de test.
 //
 // Usa service_role para poder sembrar un profile descartable directamente
 // (bypassea RLS) y para que provisionStore() pueda escribir en
@@ -39,10 +41,10 @@ describe('provisionStore (#26)', () => {
     }
   });
 
-  async function createDisposableProfile() {
+  async function createDisposableProfile(role: 'user' | 'super_admin' = 'user') {
     const id = randomUUID();
     const email = `__test_provision_store_${id}@example.invalid`;
-    const { error } = await supabase.from('profiles').insert({ id, email, role: 'user' });
+    const { error } = await supabase.from('profiles').insert({ id, email, role });
     expect(error).toBeNull();
     profileCleanupIds.push(id);
     return { id, email };
@@ -52,12 +54,14 @@ describe('provisionStore (#26)', () => {
     'crea stores + store_admins con las 8 flags y el whatsapp_number pedidos, dueño ya existente',
     async () => {
       const owner = await createDisposableProfile();
+      const operator = await createDisposableProfile('super_admin');
       const slug = `test-provision-${randomUUID().slice(0, 8)}`;
 
       const result = await provisionStore(supabase, {
         slug,
         name: 'Store de prueba #26',
         ownerEmail: owner.email,
+        operatorEmail: operator.email,
         whatsappNumber: '5493810000000',
         featureFlags: { pos: true, stock: true },
       });
@@ -93,13 +97,32 @@ describe('provisionStore (#26)', () => {
 
   it.skipIf(!hasServiceRoleCredentials)('rechaza un slug ya existente', async () => {
     const owner = await createDisposableProfile();
+    const operator = await createDisposableProfile('super_admin');
     const slug = `test-provision-dup-${randomUUID().slice(0, 8)}`;
 
-    const first = await provisionStore(supabase, { slug, name: 'Primera', ownerEmail: owner.email });
+    const first = await provisionStore(supabase, {
+      slug,
+      name: 'Primera',
+      ownerEmail: owner.email,
+      operatorEmail: operator.email,
+    });
     storeCleanupId = first.storeId;
 
     await expect(
-      provisionStore(supabase, { slug, name: 'Segunda', ownerEmail: owner.email })
+      provisionStore(supabase, { slug, name: 'Segunda', ownerEmail: owner.email, operatorEmail: operator.email })
     ).rejects.toThrow(/Ya existe una Store/);
+  });
+
+  it.skipIf(!hasServiceRoleCredentials)('rechaza si quien opera la herramienta no es super_admin', async () => {
+    const owner = await createDisposableProfile();
+    const notSuperAdmin = await createDisposableProfile('user');
+    const slug = `test-provision-noauth-${randomUUID().slice(0, 8)}`;
+
+    await expect(
+      provisionStore(supabase, { slug, name: 'x', ownerEmail: owner.email, operatorEmail: notSuperAdmin.email })
+    ).rejects.toThrow(/no es super_admin/);
+
+    const { data: store } = await supabase.from('stores').select('id').eq('slug', slug).maybeSingle();
+    expect(store).toBeNull();
   });
 });
