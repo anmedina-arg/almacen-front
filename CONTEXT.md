@@ -9,7 +9,7 @@ Un negocio cliente de la plataforma, con su propio catálogo, pedidos y configur
 _Avoid_: Tenant (usar Store como término de dominio; "tenant" es aceptable solo al hablar de infraestructura/aislamiento de datos), cliente (ambiguo con "cliente" = comprador final del catálogo).
 
 **Feature flag**:
-Un interruptor que activa o desactiva una capacidad completa (stock, combos, ranking, clientes, pagos, POS, dashboard, informes) para una Store puntual. Catálogo, productos, pedidos/WhatsApp y ventas quedan siempre encendidos — son el núcleo, no son flageables. Permite ofrecer una versión minimalista de la plataforma a Stores que no necesitan el resto. Ver [ADR-0007](./docs/adr/0007-feature-flags-db-column.md).
+Un interruptor que activa o desactiva una capacidad completa (stock, combos, ranking, clientes, pagos, POS, dashboard, informes) para una Store puntual. Catálogo, productos, pedidos/WhatsApp y ventas quedan siempre encendidos — son el núcleo, no son flageables. Existen para vender suscripciones por módulo: un Store paga solo por las capacidades que necesita. Por eso cada flag tiene que ser mutuamente independiente de las demás y de las capacidades siempre-encendidas — apagar una nunca puede romper ni degradar otra (ver [ADR-0012](./docs/adr/0012-feature-flags-mutual-independence.md); dónde viven técnicamente en [ADR-0007](./docs/adr/0007-feature-flags-db-column.md)).
 _Avoid_: Instance config (nombre legado de un intento previo sin terminar, pensado para instalación dedicada por cliente — no aplica a este deployment compartido, ver "Deployment model" abajo).
 
 **Informes**:
