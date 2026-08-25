@@ -11,6 +11,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 import { useStoreSlug } from '@/hooks/useStoreSlug';
+import { isAdminRole } from '@/features/auth/utils/roleHelpers';
 
 interface HeaderClientProps {
 	logo: React.ReactNode;
@@ -40,10 +41,11 @@ function UserMenu() {
 		staleTime: 5 * 60 * 1000,
 	});
 
-	// Visibilidad del link "Panel de administración": super_admin opera
-	// cualquier Store, o el usuario tiene membership en store_admins para la
-	// Store activa (#13/ADR-0005) — no alcanza con profiles.role='admin'
-	// global, ese chequeo dejaba afuera a un admin scoped por Store (#63).
+	// Visibilidad del link "Panel de administración" — predicado compartido
+	// isAdminRole (#43): super_admin opera cualquier Store, o el usuario
+	// tiene membership en store_admins para la Store activa (#13/ADR-0005).
+	// No alcanza con profiles.role='admin' global, ese chequeo dejaba afuera
+	// a un admin scoped por Store (#63).
 	const { data: storeAdminMembership } = useQuery({
 		queryKey: ['store-admin-membership', user?.id, slug],
 		queryFn: async () => {
@@ -66,7 +68,7 @@ function UserMenu() {
 		staleTime: 5 * 60 * 1000,
 	});
 
-	const canAccessAdminPanel = profile?.role === 'super_admin' || storeAdminMembership != null;
+	const canAccessAdminPanel = isAdminRole(profile?.role, storeAdminMembership != null);
 
 	const fullName =
 		profile?.full_name ||
