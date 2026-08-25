@@ -10,6 +10,9 @@
 -- versión vigente es la combo-aware de supabase_combos.sql (PART 1i), NO
 -- la versión simple de supabase_orders_v2.sql (PART 5) — mismo reemplazo
 -- limpio que cancel_order/adjust_stock_on_item_update.
+--
+-- #97 (ADR-0012): con is_stock_tracked(OLD.store_id) = false, no devuelve
+-- stock — mismo criterio que create_order.sql.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION return_stock_on_item_delete()
@@ -29,6 +32,10 @@ BEGIN
   END IF;
 
   IF OLD.product_id IS NULL THEN
+    RETURN OLD;
+  END IF;
+
+  IF NOT is_stock_tracked(OLD.store_id) THEN
     RETURN OLD;
   END IF;
 

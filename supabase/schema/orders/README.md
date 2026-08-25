@@ -17,9 +17,9 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 
 | Archivo | Qué hace |
 |---|---|
-| `create_order.sql` | Crea la orden + ítems, descuenta stock (combo-aware). Ya resuelta en #49 — reubicada sin re-verificar. |
+| `create_order.sql` | Crea la orden + ítems, descuenta stock (combo-aware). Ya resuelta en #49 — reubicada sin re-verificar. Desde #97: si la Store tiene `stock:false` (`is_stock_tracked()`, dominio Stock), no chequea ni descuenta — todo producto se trata como siempre disponible. |
 | `confirm_order.sql` | Pasa una orden `pending` a `confirmed`. No estaba en el AC original de #84 — se agregó al notar que vivía en el mismo archivo fuente que `cancel_order`, para no dejarla huérfana. |
-| `cancel_order.sql` | Cancela una orden, devuelve stock (combo-aware). |
+| `cancel_order.sql` | Cancela una orden, devuelve stock (combo-aware). Desde #97: no devuelve stock si `stock:false` para esa Store — mismo criterio que `create_order`. |
 
 `confirm_order`/`cancel_order` son `SECURITY DEFINER` sin `p_store_id` — la verificación de que la orden pertenece a la Store del caller se hace en la ruta de API, antes de invocar el RPC.
 
@@ -29,8 +29,8 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 |---|---|
 | `recalculate_order_total.sql` | Al INSERT/UPDATE/DELETE en `order_items` — recalcula `orders.total`. |
 | `update_orders_updated_at.sql` | Al UPDATE en `orders`. |
-| `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware. |
-| `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock, combo-aware. |
+| `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware. Desde #97: no-op si `stock:false` para esa Store. |
+| `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock, combo-aware. Desde #97: no-op si `stock:false` para esa Store. |
 | `sync_order_items_unit_cost.sql` | Al UPDATE de `products.cost` — sincroniza `order_items.unit_cost` en pedidos con `unit_cost = 0`. Dispara sobre `products`, tabla de Products (#85) — el `CREATE TRIGGER` que la ata vive en `supabase/schema/products/products.sql` (agregado por #85), no acá. |
 | `log_price_change.sql` | Al INSERT/UPDATE en `products` — registra en `product_price_history`. Mismo caso: el `CREATE TRIGGER` vive en `supabase/schema/products/products.sql`. Setea `store_id` desde `NEW.store_id` (#46) — antes no lo seteaba, dejando cada cambio de precio real con `store_id NULL`. |
 

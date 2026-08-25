@@ -12,6 +12,9 @@
 -- la versión simple de supabase_orders_v2.sql (PART 4) — mismo reemplazo
 -- limpio que cancel_order (misma firma, sin parámetros, ninguna función
 -- trigger los tiene).
+--
+-- #97 (ADR-0012): con is_stock_tracked(NEW.store_id) = false, no ajusta
+-- product_stock — mismo criterio que create_order.sql.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION adjust_stock_on_item_update()
@@ -38,6 +41,10 @@ BEGIN
   END IF;
 
   IF NEW.product_id IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  IF NOT is_stock_tracked(NEW.store_id) THEN
     RETURN NEW;
   END IF;
 

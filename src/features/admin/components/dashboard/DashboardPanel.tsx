@@ -7,6 +7,7 @@ import { useStockProducts } from '../../hooks/useStockProducts';
 import { StockProductsTable } from './StockProductsTable';
 import { InventoryRotationDashboard } from './InventoryRotationDashboard';
 import { PendingPaymentsTable } from './PendingPaymentsTable';
+import { useFeatureFlags } from '../../context/FeatureFlagsContext';
 
 const StockByCategoryChart = dynamic(
   () => import('./StockByCategoryChart').then((m) => ({ default: m.StockByCategoryChart })),
@@ -30,6 +31,7 @@ function ChartSkeleton() {
 
 export function DashboardPanel() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const { pagos: pagosEnabled } = useFeatureFlags();
 
   const { data: categoryData, isLoading: isCategoryLoading, isError: isCategoryError } = useStockByCategory();
   const { data: productData, isLoading: isProductLoading } = useStockProducts(selectedCategory);
@@ -42,7 +44,10 @@ export function DashboardPanel() {
     <div className="p-4 max-w-6xl mx-auto">
       <h1 className="text-xl font-bold text-gray-800 mb-4">Dashboard</h1>
 
-      <PendingPaymentsTable />
+      {/* #97: sin esto, un Store con pagos:false ve todos los pedidos como
+          "debe" para siempre (order_payments nunca se llena) — dato falso
+          con apariencia legítima, no un estado vacío. Ver ADR-0012. */}
+      {pagosEnabled && <PendingPaymentsTable />}
 
       <div className="mt-6 space-y-6">
         <StockValueHistoryChart />
