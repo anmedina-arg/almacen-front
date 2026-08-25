@@ -84,6 +84,11 @@ BEGIN
   SET status = 'cancelled'
   WHERE id = p_order_id;
 
+  -- items_returned cuenta ítems procesados por el loop, no ítems cuyo
+  -- stock efectivamente se devolvió — con stock:false es no-cero aunque
+  -- no se tocó product_stock. Ningún consumidor TS lee esta key hoy
+  -- (confirmado en el code review de #97); si alguno la empieza a usar,
+  -- reconsiderar el nombre.
   RETURN jsonb_build_object(
     'order_id',       p_order_id,
     'status',         'cancelled',

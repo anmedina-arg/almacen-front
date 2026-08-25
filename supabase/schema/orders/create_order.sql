@@ -32,6 +32,14 @@
 -- (combo o no) chequea ni descuenta product_stock — se trata como siempre
 -- disponible. Antes de este fix, una Store con stock:false no podía crear
 -- NINGÚN pedido (ver is_stock_tracked.sql, dominio Stock, para el porqué).
+--
+-- Al aplicar #97 en test se encontró un duplicado de 4 parámetros (sin
+-- p_store_id) todavía activo ahí — el que #70 debía haber eliminado.
+-- Producción está limpia (confirmado por el usuario contra
+-- pg_get_function_identity_arguments el 2026-08-25); el duplicado se
+-- borró solo en test (DROP FUNCTION operativo, sin script separado dado
+-- que no tenía impacto de datos — a diferencia de las 126 órdenes reales
+-- que sí afectó el overload original de #70).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.create_order(
