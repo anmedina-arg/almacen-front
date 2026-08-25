@@ -28,6 +28,12 @@ alertas de stock bajo. Consolidado en #83 (spec #81, mapa #74).
 | `log_initial_stock.sql` | Al INSERT en `product_stock` (si `quantity > 0`) — registra la carga inicial en `stock_movement_log`. Setea `store_id` desde `NEW.store_id` (#52). |
 | `log_stock_change.sql` | Al UPDATE en `product_stock` (si `quantity` cambió) — registra el movimiento, leyendo el `movement_type` que las RPCs de arriba setean vía `set_config`. Setea `store_id` desde `NEW.store_id` (#52). |
 
+## Funciones auxiliares (no son RPC ni trigger)
+
+| Archivo | Qué hace |
+|---|---|
+| `is_stock_tracked.sql` | Resuelve si una Store trackea stock (flag `stock` de `stores.feature_flags`, #23). Usada desde Orders (#97, ver ADR-0012) por `create_order`/`adjust_stock_on_item_update`/`cancel_order`/`return_stock_on_item_delete` — con `stock:false`, ninguna de las 4 chequea ni escribe `product_stock`. Mismo criterio que `is_store_admin()` (Products): función dedicada y específica, no genérica. |
+
 ## Gaps conocidos, no corregidos acá
 
 Ninguno — el último gap de este dominio (`stock_movement_log` sin `store_id` en sus inserts) se cerró en #52.

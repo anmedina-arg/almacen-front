@@ -16,6 +16,11 @@
 --
 -- SECURITY DEFINER: bypassea RLS. Sin p_store_id — mismo patrón que
 -- confirm_order, verificación de Store en la ruta de API.
+--
+-- #97 (ADR-0012): con is_stock_tracked(v_order.store_id) = false, no
+-- devuelve stock a ningún ítem — mismo criterio que create_order.sql.
+-- items_returned del jsonb de retorno sigue contando los ítems procesados
+-- igual, se use o no stock (es información sobre la orden, no sobre stock).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION cancel_order(
@@ -26,11 +31,12 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  v_order        orders%ROWTYPE;
-  v_item         order_items%ROWTYPE;
-  v_items_count  INTEGER := 0;
-  v_is_combo     BOOLEAN;
-  v_component    RECORD;
+  v_order         orders%ROWTYPE;
+  v_item          order_items%ROWTYPE;
+  v_items_count   INTEGER := 0;
+  v_is_combo      BOOLEAN;
+  v_component     RECORD;
+  v_stock_tracked BOOLEAN;
 BEGIN
   -- Lock la orden para evitar cancelaciones concurrentes
   SELECT * INTO v_order FROM orders WHERE id = p_order_id FOR UPDATE;
@@ -43,6 +49,8 @@ BEGIN
     RAISE EXCEPTION 'Order % is already cancelled', p_order_id;
   END IF;
 
+  v_stock_tracked := is_stock_tracked(v_order.store_id);
+
   -- Tag de auditoría: 'return'
   PERFORM set_config('app.movement_type', 'return', true);
 
@@ -50,7 +58,7 @@ BEGIN
   FOR v_item IN
     SELECT * FROM order_items WHERE order_id = p_order_id
   LOOP
-    IF v_item.product_id IS NOT NULL THEN
+    IF v_stock_tracked AND v_item.product_id IS NOT NULL THEN
       SELECT is_combo INTO v_is_combo FROM products WHERE id = v_item.product_id;
 
       IF v_is_combo THEN
@@ -76,6 +84,11 @@ BEGIN
   SET status = 'cancelled'
   WHERE id = p_order_id;
 
+  -- items_returned cuenta ítems procesados por el loop, no ítems cuyo
+  -- stock efectivamente se devolvió — con stock:false es no-cero aunque
+  -- no se tocó product_stock. Ningún consumidor TS lee esta key hoy
+  -- (confirmado en el code review de #97); si alguno la empieza a usar,
+  -- reconsiderar el nombre.
   RETURN jsonb_build_object(
     'order_id',       p_order_id,
     'status',         'cancelled',
