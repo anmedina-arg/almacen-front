@@ -8,7 +8,10 @@
 -- de ese archivo confirmen su parte, ver su checklist) +
 -- supabase_stores_read_policy.sql (#12, lectura pública) +
 -- supabase_store_logo.sql (#50, logo_url) +
--- supabase_store_whatsapp.sql (#24, whatsapp_number).
+-- supabase_store_whatsapp.sql (#24, whatsapp_number) +
+-- #23 (feature_flags — reabre ADR-0002, ver ADR-0007: columna DB en vez de
+-- archivo estático versionado, porque el deployment es compartido por
+-- todas las Stores, ver ADR-0001).
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.stores (
@@ -18,13 +21,16 @@ CREATE TABLE IF NOT EXISTS public.stores (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   logo_url   TEXT,
-  whatsapp_number TEXT
+  whatsapp_number TEXT,
+  feature_flags JSONB NOT NULL DEFAULT '{}'
 );
 
 COMMENT ON COLUMN public.stores.logo_url IS
   'URL absoluta del logo de la Store. NULL = usa el asset genérico compartido (ver DEFAULT_LOGO_URL en el código).';
 COMMENT ON COLUMN public.stores.whatsapp_number IS
   'Número de WhatsApp (con código de país, sin +) para recibir pedidos de esta Store. NULL = usa NEXT_PUBLIC_WHATSAPP_NUMBER como fallback.';
+COMMENT ON COLUMN public.stores.feature_flags IS
+  'Catálogo de 8 keys booleanas por Store (#23): stock, combos, clientes, pagos, ranking, pos, dashboard, informes. Todas requeridas al escribir — omitir una es un estado inválido — pero src/lib/store/featureFlags.ts resuelve cualquier key faltante a false (apagado) para no romper si una fila queda parcialmente seteada. Catálogo/productos/pedidos-WhatsApp/ventas siempre están encendidos, no son flags. Escritura manual vía SQL Editor (ADR-0006) — sin UI de super-admin todavía.';
 
 -- ── Trigger: updated_at ──────────────────────────────────────────────────
 -- update_updated_at_column() es la función genérica del dominio Products

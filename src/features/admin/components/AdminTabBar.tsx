@@ -2,39 +2,44 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { features } from '@/lib/features';
 import { useStoreSlug } from '@/hooks/useStoreSlug';
+import { useFeatureFlags } from '../context/FeatureFlagsContext';
+import type { FeatureFlagKey } from '@/lib/store/featureFlags';
 
-const MANAGEMENT_LINKS = [
-  ...(features.dashboard ? [{ href: '/admin/dashboard', label: 'Dashboard' }] : []),
+const MANAGEMENT_LINKS: { href: string; label: string; flag?: FeatureFlagKey }[] = [
+  { href: '/admin/dashboard', label: 'Dashboard', flag: 'dashboard' },
   { href: '/admin/products', label: 'Productos' },
   { href: '/admin/categories', label: 'Categorías' },
-  { href: '/admin/stock', label: 'Stock' },
+  { href: '/admin/stock', label: 'Stock', flag: 'stock' },
   { href: '/admin/orders', label: 'Pedidos' },
   { href: '/admin/sales', label: 'Ventas' },
-  { href: '/admin/ranking', label: 'Ranking' },
-  { href: '/admin/informes', label: 'Informes' },
+  { href: '/admin/ranking', label: 'Ranking', flag: 'ranking' },
+  { href: '/admin/informes', label: 'Informes', flag: 'informes' },
 ];
 
 export function AdminTabBar() {
   const pathname = usePathname();
   const slug = useStoreSlug();
+  const flags = useFeatureFlags();
   const isPOS = pathname.startsWith(`/${slug}/admin/pos`);
+  const visibleLinks = MANAGEMENT_LINKS.filter((item) => !item.flag || flags[item.flag]);
 
   return (
     <div className="bg-white border-b border-gray-200">
       {/* Tabs principales */}
       <div className="flex">
-        <Link
-          href={`/${slug}/admin/pos`}
-          className={`flex-1 py-3 text-sm font-semibold text-center border-b-2 transition-colors ${
-            isPOS
-              ? 'border-green-600 text-green-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
-          }`}
-        >
-          🛒 Punto de Venta
-        </Link>
+        {flags.pos && (
+          <Link
+            href={`/${slug}/admin/pos`}
+            className={`flex-1 py-3 text-sm font-semibold text-center border-b-2 transition-colors ${
+              isPOS
+                ? 'border-green-600 text-green-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            🛒 Punto de Venta
+          </Link>
+        )}
         <Link
           href={`/${slug}/admin/products`}
           className={`flex-1 py-3 text-sm font-semibold text-center border-b-2 transition-colors ${
@@ -50,7 +55,7 @@ export function AdminTabBar() {
       {/* Sub-nav de Gestión (solo visible fuera del POS) */}
       {!isPOS && (
         <nav className="flex overflow-x-auto px-2 border-t border-gray-100">
-          {MANAGEMENT_LINKS.map((item) => {
+          {visibleLinks.map((item) => {
             const href = `/${slug}${item.href}`;
             const isActive = pathname.startsWith(href);
             return (

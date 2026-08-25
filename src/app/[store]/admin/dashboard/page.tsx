@@ -1,5 +1,5 @@
-import { redirect } from 'next/navigation';
-import { features } from '@/lib/features';
+import { supabaseServer } from '@/lib/supabase/server';
+import { requireFeatureFlag } from '@/lib/store/requireFeatureFlag';
 import { DashboardPanel } from '@/features/admin/components/dashboard/DashboardPanel';
 
 export default async function AdminDashboardPage({
@@ -8,6 +8,6 @@ export default async function AdminDashboardPage({
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
-  if (!features.dashboard) redirect(`/${store}/admin/products`);
+  await requireFeatureFlag(supabaseServer, store, 'dashboard');
   return <DashboardPanel />;
 }
