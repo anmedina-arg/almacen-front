@@ -12,8 +12,10 @@
 -- para llamarse únicamente con el service_role key (bypassea RLS por rol de
 -- Postgres, no por definer) — ver src/lib/store/provisionStore.ts y
 -- scripts/provision-store.ts. Ese key solo vive en .env.local/.env.test,
--- nunca en el bundle del cliente: es el mecanismo real detrás de "solo
--- accesible a super_admin" (el único que tiene el key es el Platform admin).
+-- nunca en el bundle del cliente — primera capa de "solo accesible a
+-- super_admin". La segunda capa (la que de verdad se testea) es el chequeo
+-- contra profiles.role = 'super_admin' en provisionStore.ts, antes de
+-- llegar a esta función — ver assertOperatorIsSuperAdmin.
 --
 -- p_owner_profile_id ya viene resuelto (profile existente o recién invitado
 -- vía Supabase Auth Admin API) — esta función no crea perfiles ni usuarios,
