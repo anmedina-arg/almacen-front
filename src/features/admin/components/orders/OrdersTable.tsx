@@ -13,6 +13,7 @@ import type { OrderFilters, OrderStatus } from '../../types/order.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
 import { formatPrice } from '@/utils/formatPrice';
+import { useFeatureFlags } from '../../context/FeatureFlagsContext';
 
 /**
  * Main orders management table component.
@@ -20,6 +21,7 @@ import { formatPrice } from '@/utils/formatPrice';
  */
 export function OrdersTable() {
   const { data: orders, isLoading, error } = useOrders();
+  const { clientes: clientesEnabled, pagos: pagosEnabled } = useFeatureFlags();
 
   const { quickFilter, dateFrom, dateTo, setQuickFilter, setDateFrom, setDateTo, filteredOrders: dateFilteredOrders } =
     useSalesFilters(orders);
@@ -214,35 +216,39 @@ export function OrdersTable() {
           </option>
         </select>
 
-        <select
-          value={filters.clientFilter}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, clientFilter: e.target.value }))
-          }
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-        >
-          <option value="all">Todos los clientes</option>
-          <option value="unassigned">Sin cliente</option>
-          {clientOptions.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        {clientesEnabled && (
+          <select
+            value={filters.clientFilter}
+            onChange={(e) =>
+              setFilters((prev) => ({ ...prev, clientFilter: e.target.value }))
+            }
+            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+          >
+            <option value="all">Todos los clientes</option>
+            <option value="unassigned">Sin cliente</option>
+            {clientOptions.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        )}
 
-        <select
-          value={filters.paymentFilter}
-          onChange={(e) =>
-            setFilters((prev) => ({
-              ...prev,
-              paymentFilter: e.target.value as 'all' | 'debe',
-            }))
-          }
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-        >
-          <option value="all">Todos los pagos</option>
-          <option value="debe">Debe ({debeCount})</option>
-        </select>
+        {pagosEnabled && (
+          <select
+            value={filters.paymentFilter}
+            onChange={(e) =>
+              setFilters((prev) => ({
+                ...prev,
+                paymentFilter: e.target.value as 'all' | 'debe',
+              }))
+            }
+            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+          >
+            <option value="all">Todos los pagos</option>
+            <option value="debe">Debe ({debeCount})</option>
+          </select>
+        )}
       </div>
 
       {/* Counter */}
@@ -269,12 +275,16 @@ export function OrdersTable() {
                   <th className="text-right py-3 px-4 font-semibold text-gray-600">
                     Margen
                   </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-600">
-                    Cliente
-                  </th>
-                  <th className="text-left py-3 px-4 font-semibold text-gray-600">
-                    Pago
-                  </th>
+                  {clientesEnabled && (
+                    <th className="text-left py-3 px-4 font-semibold text-gray-600">
+                      Cliente
+                    </th>
+                  )}
+                  {pagosEnabled && (
+                    <th className="text-left py-3 px-4 font-semibold text-gray-600">
+                      Pago
+                    </th>
+                  )}
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">
                     Estado
                   </th>
@@ -292,7 +302,7 @@ export function OrdersTable() {
                   >
                     <td className="py-3 px-4 font-mono font-medium text-gray-800 whitespace-nowrap">
                       #{order.id}
-                      {order.client && (
+                      {clientesEnabled && order.client && (
                         <span className="text-indigo-600 font-semibold"> · {order.client.display_code}</span>
                       )}
                     </td>
@@ -312,16 +322,20 @@ export function OrdersTable() {
                         />
                       )}
                     </td>
-                    <td className="py-3 px-4">
-                      <ClientAssignCell orderId={order.id} client={order.client} />
-                    </td>
-                    <td className="py-3 px-4">
-                      <PaymentCell
-                        orderId={order.id}
-                        orderTotal={order.total}
-                        payments={order.order_payments ?? []}
-                      />
-                    </td>
+                    {clientesEnabled && (
+                      <td className="py-3 px-4">
+                        <ClientAssignCell orderId={order.id} client={order.client} />
+                      </td>
+                    )}
+                    {pagosEnabled && (
+                      <td className="py-3 px-4">
+                        <PaymentCell
+                          orderId={order.id}
+                          orderTotal={order.total}
+                          payments={order.order_payments ?? []}
+                        />
+                      </td>
+                    )}
                     <td className="py-3 px-4 text-center">
                       <OrderStatusBadge status={order.status} />
                     </td>
@@ -353,7 +367,7 @@ export function OrdersTable() {
                 <div className="flex items-center justify-between">
                   <div className="font-mono font-bold text-gray-800">
                     <span>Pedido #{order.id}</span>
-                    {order.client && (
+                    {clientesEnabled && order.client && (
                       <span className="ml-1.5 text-indigo-600 font-semibold text-sm">
                         · {order.client.display_code}
                       </span>
@@ -361,16 +375,20 @@ export function OrdersTable() {
                   </div>
                   <OrderStatusBadge status={order.status} />
                 </div>
-                <div onClick={(e) => e.stopPropagation()}>
-                  <ClientAssignCell orderId={order.id} client={order.client} />
-                </div>
-                <div onClick={(e) => e.stopPropagation()}>
-                  <PaymentCell
-                    orderId={order.id}
-                    orderTotal={order.total}
-                    payments={order.order_payments ?? []}
-                  />
-                </div>
+                {clientesEnabled && (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <ClientAssignCell orderId={order.id} client={order.client} />
+                  </div>
+                )}
+                {pagosEnabled && (
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <PaymentCell
+                      orderId={order.id}
+                      orderTotal={order.total}
+                      payments={order.order_payments ?? []}
+                    />
+                  </div>
+                )}
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-500">
                     {formatAdminDate(order.created_at)}

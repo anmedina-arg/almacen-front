@@ -10,7 +10,6 @@ import { useQuery } from '@tanstack/react-query';
 import { supabaseBrowser } from '@/lib/supabase/client';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { useRouter } from 'next/navigation';
-import { features } from '@/lib/features';
 import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 interface HeaderClientProps {
@@ -129,8 +128,12 @@ function UserMenu() {
 						<p className="text-sm font-medium text-gray-700 truncate">{displayName}</p>
 					</div>
 					{canAccessAdminPanel && (
+						// Siempre a /admin/dashboard: si la flag "dashboard" está apagada
+						// para esta Store, el guard de esa página (#23,
+						// requireFeatureFlag) redirige a /admin/products — no hace falta
+						// resolver la flag acá para elegir el link correcto de antemano.
 						<Link
-							href={`/${slug}${features.dashboard ? '/admin/dashboard' : '/admin/products'}`}
+							href={`/${slug}/admin/dashboard`}
 							onClick={() => setOpen(false)}
 							className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors border-b border-gray-100"
 						>

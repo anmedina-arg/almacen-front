@@ -2,8 +2,10 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { AdminTabBar } from '@/features/admin/components/AdminTabBar';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
+import { getStoreFeatureFlags } from '@/lib/store/getStoreFeatureFlags';
 import { supabaseServer } from '@/lib/supabase/server';
 import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { FeatureFlagsProvider } from '@/features/admin/context/FeatureFlagsContext';
 
 export default async function AdminLayout({
   children,
@@ -31,30 +33,33 @@ export default async function AdminLayout({
 
   const storeData = await getStoreBySlug(supabaseServer, store);
   const storeName = storeData?.name ?? 'la tienda';
+  const flags = await getStoreFeatureFlags(supabaseServer, store);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header del admin */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
-        <div className="container mx-auto flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold text-gray-800">Panel de Administración</h1>
-            <p className="text-sm text-gray-600">Gestión de productos - {storeName}</p>
+    <FeatureFlagsProvider flags={flags}>
+      <div className="min-h-screen bg-gray-50">
+        {/* Header del admin */}
+        <div className="bg-white border-b border-gray-200 px-4 py-3 shadow-sm">
+          <div className="container mx-auto flex items-center justify-between">
+            <div>
+              <h1 className="text-xl font-bold text-gray-800">Panel de Administración</h1>
+              <p className="text-sm text-gray-600">Gestión de productos - {storeName}</p>
+            </div>
+            <Link
+              href={`/${store}`}
+              className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
+            >
+              ← Volver al sitio
+            </Link>
           </div>
-          <Link
-            href={`/${store}`}
-            className="text-sm text-gray-600 hover:text-gray-800 transition-colors"
-          >
-            ← Volver al sitio
-          </Link>
         </div>
+
+        {/* Tab bar de navegación */}
+        <AdminTabBar />
+
+        {/* Contenido */}
+        <div className="container mx-auto px-4 py-4">{children}</div>
       </div>
-
-      {/* Tab bar de navegación */}
-      <AdminTabBar />
-
-      {/* Contenido */}
-      <div className="container mx-auto px-4 py-4">{children}</div>
-    </div>
+    </FeatureFlagsProvider>
   );
 }

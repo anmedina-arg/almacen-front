@@ -12,11 +12,13 @@ import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils/formatPrice';
+import { useFeatureFlags } from '../context/FeatureFlagsContext';
 
 export function AdminProductList() {
   const { data: products, isLoading, error } = useProducts({ includeInactive: true });
   const toggleMutation = useToggleProductActive();
   const deleteMutation = useDeleteProduct();
+  const { combos: combosEnabled } = useFeatureFlags();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
@@ -83,12 +85,14 @@ export function AdminProductList() {
           <p className="text-sm text-gray-500">Gestión del catálogo de productos</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
-          <button
-            onClick={() => setIsCreateComboModalOpen(true)}
-            className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
-          >
-            + Nuevo Combo
-          </button>
+          {combosEnabled && (
+            <button
+              onClick={() => setIsCreateComboModalOpen(true)}
+              className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
+            >
+              + Nuevo Combo
+            </button>
+          )}
           <button
             onClick={() => setIsCreateModalOpen(true)}
             className="flex-1 sm:flex-none bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors font-medium text-sm"
@@ -116,15 +120,17 @@ export function AdminProductList() {
           <option value="active">Activos</option>
           <option value="inactive">Inactivos</option>
         </select>
-        <select
-          value={filterType}
-          onChange={(e) => setFilterType(e.target.value as 'all' | 'products' | 'combos')}
-          className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
-        >
-          <option value="all">Tipo: Todos</option>
-          <option value="products">Solo productos</option>
-          <option value="combos">Solo combos</option>
-        </select>
+        {combosEnabled && (
+          <select
+            value={filterType}
+            onChange={(e) => setFilterType(e.target.value as 'all' | 'products' | 'combos')}
+            className="px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+          >
+            <option value="all">Tipo: Todos</option>
+            <option value="products">Solo productos</option>
+            <option value="combos">Solo combos</option>
+          </select>
+        )}
       </div>
 
       {/* Contador */}
