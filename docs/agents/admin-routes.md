@@ -18,6 +18,8 @@ export const POST = withStoreAdmin(async (req, { storeId, userId }, ctx) => {
 
 `withStoreAdmin` solo resuelve `store` (siempre presente en `[store]/...`) → `{ storeId, userId }`. Cualquier otro param dinámico (`orderId`, `id`, `productId`, etc.) lo sigue extrayendo el handler, sin intervención del wrapper.
 
+El mensaje default del 403 es siempre `'Forbidden: Admin access required'` (cuando `verifyStoreAdminAuth` no trae un `error` propio). Al migrar #101, 8 archivos usaban antes solo `'Forbidden'` (sin el sufijo) — se normalizó a un único texto en vez de preservar variantes por archivo. Confirmado sin impacto: ningún componente de dashboard/informes lee ese texto, y los 4 que sí lo hacen (`OrdersTable`, `AdminProductList`, `StockManagement`, `CategoryManagement`) chequean `.includes('Forbidden')`, que matchea las dos versiones.
+
 ## Qué NO hacer
 
 ```ts
@@ -31,6 +33,15 @@ if (!isStoreAdmin || storeId == null) {
 ## Excepciones: rutas intencionalmente públicas
 
 No todo endpoint bajo `[store]/api/` requiere admin. Ejemplos vivos hoy: `POST /api/orders` (creación de pedido por WhatsApp, sin login), `GET /api/categories` y `GET /api/categories/[id]/subcategories` (lectura pública del catálogo), `GET /api/recommendations` (recomendaciones públicas). Estas rutas no usan `withStoreAdmin` — dejarlas así, no envolverlas "por consistencia". Si un archivo mezcla métodos públicos y admin-gated (ej. `orders/route.ts`: `POST` público, `GET` admin), solo el método admin-gated se envuelve.
+
+## Excepción: método mixto público/admin dentro de un mismo handler
+
+`withStoreAdmin` asume que el handler ENTERO requiere admin — no encaja cuando un mismo método es condicionalmente admin. Dos casos así, sin migrar a propósito, con el chequeo viejo (`verifyStoreAdminAuth` inline) intacto:
+
+- `products/route.ts` `GET`: público por default (catálogo), solo pide admin dentro del branch `if (includeInactive)`.
+- `products/[id]/route.ts` `GET`: público por default, solo pide admin dentro del branch `if (!product.active)` (visibilidad de producto inactivo).
+
+Sus otros métodos (`POST` en el primero, `PUT`/`DELETE` en el segundo) sí están migrados. No "arreglar" estos dos `GET` moviéndolos a `withStoreAdmin` — perderían su mitad pública. Si algún día se separan en dos rutas (una pública, una admin-only), ahí sí migra la parte admin.
 
 ## Qué sigue siendo responsabilidad del caller
 
