@@ -58,6 +58,11 @@ export const POST = withStoreAdmin<{ orderId: string }>(async (request, { storeI
     }
 
     // Fetch product cost to calculate unit_cost (same formula as order creation)
+    // #103: el producto tiene que pertenecer a esta Store — antes, si no
+    // pertenecía, seguía igual con unit_cost=0 en vez de cortar, dejando
+    // insertar un ítem de otra tienda. El trigger validate_order_item_store
+    // ya lo bloquearía a nivel de base, pero acá cortamos antes con un
+    // mensaje claro en vez de dejar que reviente como error 500 genérico.
     const { data: product } = await supabase
       .from('products')
       .select('price, cost')
@@ -65,8 +70,15 @@ export const POST = withStoreAdmin<{ orderId: string }>(async (request, { storeI
       .eq('store_id', storeId)
       .single();
 
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Producto no encontrado en esta Store' },
+        { status: 400 }
+      );
+    }
+
     const unit_cost =
-      product && Number(product.price) > 0
+      Number(product.price) > 0
         ? validation.data.unit_price * (Number(product.cost ?? 0) / Number(product.price))
         : 0;
 

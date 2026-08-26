@@ -8,6 +8,10 @@
 -- products.cost) + supabase_recommendations.sql (from_suggestion —
 -- Recomendaciones #90 no se descarta hasta que confirme su parte) +
 -- supabase_multitenant_schema_expand.sql (store_id).
+--
+-- #103: trg_validate_order_item_store agregado — hasta entonces nada
+-- impedía que product_id apuntara a un producto de otra Store distinta de
+-- store_id en esta misma fila. Ver validate_order_item_store.sql.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.order_items (
@@ -31,7 +35,13 @@ CREATE INDEX IF NOT EXISTS idx_order_items_product_id ON public.order_items(prod
 CREATE INDEX IF NOT EXISTS idx_order_items_store_id ON public.order_items(store_id);
 
 -- ── Triggers ─────────────────────────────────────────────────────────────
--- Las tres funciones viven en sus propios archivos (mismo dominio, Orders).
+-- Las funciones viven en sus propios archivos (mismo dominio, Orders).
+DROP TRIGGER IF EXISTS trg_validate_order_item_store ON public.order_items;
+CREATE TRIGGER trg_validate_order_item_store
+  BEFORE INSERT OR UPDATE OF product_id, store_id ON public.order_items
+  FOR EACH ROW
+  EXECUTE FUNCTION validate_order_item_store();
+
 DROP TRIGGER IF EXISTS trg_recalculate_order_total ON public.order_items;
 CREATE TRIGGER trg_recalculate_order_total
   AFTER INSERT OR UPDATE OR DELETE ON public.order_items

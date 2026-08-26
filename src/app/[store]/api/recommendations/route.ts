@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import type { RecommendedProduct } from '@/features/catalog/types/recommendation.types';
 
-export async function GET(request: NextRequest) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ store: string }> }
+) {
+  const { store } = await params;
   const { searchParams } = new URL(request.url);
 
   // Parse product_ids[] from query: ?product_ids=1&product_ids=2
@@ -17,10 +22,18 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = await createSupabaseServerClient();
 
+    // #103: sin esto, get_recommendations() no tiene forma de saber a qué
+    // Store limitarse — antes mezclaba sugerencias de todas las tiendas.
+    const storeId = await getStoreIdBySlug(supabase, store);
+    if (storeId == null) {
+      return NextResponse.json([]);
+    }
+
     const { data: rpcData, error: rpcError } = await supabase.rpc('get_recommendations', {
       p_product_ids: productIds,
       p_exclude_ids: excludeIds.length > 0 ? excludeIds : [],
       p_limit: limit,
+      p_store_id: storeId,
     });
 
     if (rpcError) {
