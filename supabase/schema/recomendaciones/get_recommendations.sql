@@ -27,16 +27,21 @@
 -- afinidad, stock y "más vendidos" de TODAS las Stores — sugería productos
 -- de otras tiendas en el checkout, agregables al pedido sin rechazo (nada
 -- validaba ownership del lado de escritura tampoco, ver
--- validate_order_item_store.sql). p_store_id sin default: un caller que se
--- olvide de pasarlo obtiene 0 filas (todo NULL = NULL en SQL), nunca
--- resultados sin scope.
+-- validate_order_item_store.sql). p_store_id con DEFAULT NULL a propósito
+-- (no lo omite, falla cerrado): un caller que se olvide de pasarlo no
+-- obtiene todas las Stores, obtiene 0 filas (todo NULL = NULL en SQL) —
+-- elegido así, y no sin default como una RPC admin (ver
+-- upsert_product_stock.sql), porque esta es una lectura pública best-effort
+-- (sugerencias del catálogo): degradar a "sin sugerencias" es preferible a
+-- que un parámetro faltante rompa el checkout entero con un error duro.
 --
 -- Agregar p_store_id al final NO alcanza con CREATE OR REPLACE: Postgres lo
 -- trató como una firma nueva, dejó la de 3 parámetros viva como overload
 -- (mismo patrón que #70/#49 con create_order) — PostgREST no podía elegir
 -- cuál usar. Hizo falta un DROP FUNCTION operativo de la firma vieja
--- (get_recommendations(int[], int[], int)) antes de aplicar esto, en test
--- y en producción — no es un statement de este archivo, ya corrió una vez.
+-- (get_recommendations(int[], int[], int)) antes de aplicar esto — no es un
+-- statement de este archivo. Corrido en test; producción todavía pendiente
+-- al momento de este commit (ver #103).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_recommendations(
