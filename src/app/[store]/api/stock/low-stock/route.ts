@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -8,20 +8,8 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * Usa la funcion RPC get_low_stock_products.
  * Requiere autenticacion de admin de la Store.
  */
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const GET = withStoreAdmin(async (_request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase.rpc('get_low_stock_products', { p_store_id: storeId });
@@ -45,4 +33,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});

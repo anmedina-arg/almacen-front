@@ -1,9 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { assignClientSchema } from '@/features/admin/schemas/clientSchemas';
-
-type RouteParams = { params: Promise<{ store: string; orderId: string }> };
 
 function parseOrderId(param: string) {
   const id = parseInt(param);
@@ -15,17 +13,9 @@ function parseOrderId(param: string) {
  * Find-or-create a client by barrio+manzana_lote, then assign to the order.
  * Admin only.
  */
-export async function PATCH(request: NextRequest, { params }: RouteParams) {
+export const PATCH = withStoreAdmin<{ orderId: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, orderId: orderIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { orderId: orderIdParam } = await params;
     const orderId = parseOrderId(orderIdParam);
     if (!orderId) {
       return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
@@ -114,23 +104,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     console.error('Error in PATCH /api/orders/[orderId]/client:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});
 
 /**
  * DELETE /api/orders/[orderId]/client
  * Remove client assignment from an order. Admin only.
  */
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+export const DELETE = withStoreAdmin<{ orderId: string }>(async (_request, { storeId }, { params }) => {
   try {
-    const { store, orderId: orderIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { orderId: orderIdParam } = await params;
     const orderId = parseOrderId(orderIdParam);
     if (!orderId) {
       return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
@@ -154,4 +136,4 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     console.error('Error in DELETE /api/orders/[orderId]/client:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

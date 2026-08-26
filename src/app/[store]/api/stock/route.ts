@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -7,20 +7,8 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * Retorna todos los productos con su nivel de stock usando la vista v_product_stock.
  * Requiere autenticacion de admin de la Store.
  */
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const GET = withStoreAdmin(async (_request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const supabase = await createSupabaseServerClient();
 
     // Usar la función RPC optimizada que hace LEFT JOIN en PostgreSQL
@@ -45,4 +33,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});

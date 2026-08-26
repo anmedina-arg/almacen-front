@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -8,16 +8,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * Params: start_date (ISO), end_date (ISO) — ambos opcionales.
  * Admin only.
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
-  const { store } = await params;
-  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-  if (!isStoreAdmin || storeId == null) {
-    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
-  }
-
+export const GET = withStoreAdmin(async (request, { storeId }) => {
   const { searchParams } = new URL(request.url);
   const startDate = searchParams.get('start_date');
   const endDate   = searchParams.get('end_date');
@@ -70,4 +61,4 @@ export async function GET(
       'Content-Disposition': `attachment; filename="${filename}"`,
     },
   });
-}
+});

@@ -1,25 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
-
-type RouteParams = { params: Promise<{ store: string; orderId: string; paymentId: string }> };
 
 /**
  * DELETE /api/orders/[orderId]/payments/[paymentId]
  * Remove one payment from an order. Admin only.
  * If the remaining payment has an amount, it is cleared (single method = full order total).
  */
-export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+export const DELETE = withStoreAdmin<{ orderId: string; paymentId: string }>(async (_request, { storeId }, { params }) => {
   try {
-    const { store, orderId: orderIdParam, paymentId: paymentIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { orderId: orderIdParam, paymentId: paymentIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     const paymentId = parseInt(paymentIdParam);
 
@@ -68,4 +58,4 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     console.error('Error in DELETE /api/orders/[orderId]/payments/[paymentId]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

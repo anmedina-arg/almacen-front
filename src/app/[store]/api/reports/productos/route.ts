@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -8,16 +8,7 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * costo, precio, márgenes, categoría, subcategoría y stock actual.
  * Admin only.
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
-  const { store } = await params;
-  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-  if (!isStoreAdmin || storeId == null) {
-    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
-  }
-
+export const GET = withStoreAdmin(async (_request, { storeId }) => {
   const supabase = await createSupabaseServerClient();
 
   const { data, error } = await supabase.rpc('export_productos', { p_store_id: storeId });
@@ -58,4 +49,4 @@ export async function GET(
       'Content-Disposition': `attachment; filename="${filename}"`,
     },
   });
-}
+});

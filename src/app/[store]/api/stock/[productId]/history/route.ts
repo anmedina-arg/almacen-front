@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -7,20 +7,9 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * Retorna el historial de movimientos de stock de un producto.
  * Requiere autenticacion de admin de la Store.
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string; productId: string }> }
-) {
+export const GET = withStoreAdmin<{ productId: string }>(async (_request, { storeId }, { params }) => {
   try {
-    const { store, productId: productIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { productId: productIdParam } = await params;
     const productId = parseInt(productIdParam);
     if (isNaN(productId)) {
       return NextResponse.json(
@@ -75,4 +64,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});

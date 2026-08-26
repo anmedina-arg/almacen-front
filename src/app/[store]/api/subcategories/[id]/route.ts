@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -11,20 +11,9 @@ const updateSubcategorySchema = z.object({
  * PUT /api/subcategories/[id]
  * Updates a subcategory's name. Admin only.
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, id } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id } = await params;
     const subcategoryId = parseInt(id, 10);
     if (isNaN(subcategoryId)) {
       return NextResponse.json({ error: 'Invalid subcategory id' }, { status: 400 });
@@ -61,26 +50,15 @@ export async function PUT(
     console.error('Error in PUT /api/subcategories/[id]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});
 
 /**
  * DELETE /api/subcategories/[id]
  * Deletes a subcategory. Admin only.
  */
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const DELETE = withStoreAdmin<{ id: string }>(async (_request, { storeId }, { params }) => {
   try {
-    const { store, id } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id } = await params;
     const subcategoryId = parseInt(id, 10);
     if (isNaN(subcategoryId)) {
       return NextResponse.json({ error: 'Invalid subcategory id' }, { status: 400 });
@@ -103,4 +81,4 @@ export async function DELETE(
     console.error('Error in DELETE /api/subcategories/[id]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

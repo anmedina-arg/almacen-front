@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockByCategoryItem {
@@ -7,16 +7,7 @@ export interface StockByCategoryItem {
   total_value: number;
 }
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
-  const { store } = await params;
-  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-  if (!isStoreAdmin || storeId == null) {
-    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
-  }
-
+export const GET = withStoreAdmin(async (_request, { storeId }) => {
   const supabase = await createSupabaseServerClient();
 
   // products tiene una policy de lectura pública sin restricción de Store
@@ -67,4 +58,4 @@ export async function GET(
     .sort((a, b) => b.total_value - a.total_value);
 
   return NextResponse.json(result);
-}
+});

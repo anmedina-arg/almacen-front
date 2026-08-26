@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockValueDayItem {
@@ -16,16 +16,7 @@ export interface StockValueHistoryResponse {
 
 const DAYS = 7;
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
-  const { store } = await params;
-  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-  if (!isStoreAdmin || storeId == null) {
-    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
-  }
-
+export const GET = withStoreAdmin(async (_request, { storeId }) => {
   // Fechas en hora Argentina (UTC-3)
   const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
   const nowAr = new Date(Date.now() - AR_OFFSET_MS);
@@ -73,4 +64,4 @@ export async function GET(
     { items, categories, dates },
     { headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0', Pragma: 'no-cache', Expires: '0' } }
   );
-}
+});

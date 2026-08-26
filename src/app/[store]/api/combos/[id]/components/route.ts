@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -24,20 +24,9 @@ async function comboBelongsToStore(
   return data != null;
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const GET = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, id: idParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid combo ID' }, { status: 400 });
@@ -91,22 +80,11 @@ export async function GET(
     console.error('Error in GET /api/combos/[id]/components:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, id: idParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid combo ID' }, { status: 400 });
@@ -184,4 +162,4 @@ export async function PUT(
     console.error('Error in PUT /api/combos/[id]/components:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

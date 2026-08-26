@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { z } from 'zod';
@@ -52,20 +52,9 @@ export async function GET(
  * POST /api/categories/[id]/subcategories
  * Creates a new subcategory under the given category. Admin only.
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const POST = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, id } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
@@ -123,4 +112,4 @@ export async function POST(
     console.error('Error in POST /api/categories/[id]/subcategories:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

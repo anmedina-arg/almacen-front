@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { stockEntryBatchSchema } from '@/features/admin/schemas/stockEntrySchema';
 
@@ -12,20 +12,8 @@ import { stockEntryBatchSchema } from '@/features/admin/schemas/stockEntrySchema
  * Body: { entries: Array<{ product_id: number; increment: number; notes: string }> }
  * Returns: { results: Array<{ product_id: number; success: boolean; error?: string }> }
  */
-export async function POST(
-  request: Request,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const POST = withStoreAdmin(async (request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const body = await request.json();
     const parsed = stockEntryBatchSchema.safeParse(body.entries);
 
@@ -69,4 +57,4 @@ export async function POST(
     console.error('Error in POST /api/stock/entry:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

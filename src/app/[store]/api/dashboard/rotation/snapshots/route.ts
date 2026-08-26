@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockSnapshotItem {
@@ -8,16 +8,7 @@ export interface StockSnapshotItem {
   movement_type: string | null;
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
-  const { store } = await params;
-  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-  if (!isStoreAdmin || storeId == null) {
-    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
-  }
-
+export const GET = withStoreAdmin(async (request, { storeId }) => {
   const productId = Number(request.nextUrl.searchParams.get('product_id'));
   if (!productId) return NextResponse.json({ error: 'product_id requerido' }, { status: 400 });
 
@@ -81,4 +72,4 @@ export async function GET(
   }
 
   return NextResponse.json(snapshots);
-}
+});

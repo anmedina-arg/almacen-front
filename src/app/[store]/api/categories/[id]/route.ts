@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { categorySchema } from '@/features/admin/schemas/categorySchemas';
 
@@ -7,20 +7,9 @@ import { categorySchema } from '@/features/admin/schemas/categorySchemas';
  * PUT /api/categories/[id]
  * Updates a category's name. Admin only.
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, id } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
@@ -54,26 +43,15 @@ export async function PUT(
     console.error('Error in PUT /api/categories/[id]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});
 
 /**
  * DELETE /api/categories/[id]
  * Deletes a category. Subcategories are deleted via ON DELETE CASCADE. Admin only.
  */
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const DELETE = withStoreAdmin<{ id: string }>(async (_request, { storeId }, { params }) => {
   try {
-    const { store, id } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
@@ -96,4 +74,4 @@ export async function DELETE(
     console.error('Error in DELETE /api/categories/[id]:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

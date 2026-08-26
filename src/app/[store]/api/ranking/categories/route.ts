@@ -1,21 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const GET = withStoreAdmin(async (request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const { searchParams } = new URL(request.url);
     const startDate = searchParams.get('start_date') || null;
     const endDate = searchParams.get('end_date') || null;
@@ -40,4 +28,4 @@ export async function GET(
     console.error('Error in GET /api/ranking/categories:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});
