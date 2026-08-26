@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { createOrderSchema } from '@/features/admin/schemas/orderSchemas';
@@ -123,20 +123,8 @@ export async function POST(
  * List all orders. Admin only.
  * Returns orders sorted by creation date (newest first).
  */
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const GET = withStoreAdmin(async (_request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const supabase = await createSupabaseServerClient();
 
     // Fetch orders with their items in one query (same pattern as GET /api/orders/[orderId]).
@@ -189,4 +177,4 @@ export async function GET(
       { status: 500 }
     );
   }
-}
+});

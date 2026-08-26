@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { categorySchema } from '@/features/admin/schemas/categorySchemas';
@@ -51,20 +51,8 @@ export async function GET(
  * POST /api/categories
  * Creates a new category. Admin only.
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const POST = withStoreAdmin(async (request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const body = await request.json();
     const parsed = categorySchema.safeParse(body);
     if (!parsed.success) {
@@ -103,4 +91,4 @@ export async function POST(
     console.error('Error in POST /api/categories:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { updateOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
 
@@ -7,20 +7,9 @@ import { updateOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
  * DELETE /api/orders/[orderId]/items/[itemId]
  * Remove an item from an order. Admin only.
  */
-export async function DELETE(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string; orderId: string; itemId: string }> }
-) {
+export const DELETE = withStoreAdmin<{ orderId: string; itemId: string }>(async (_request, { storeId }, { params }) => {
   try {
-    const { store, orderId: orderIdParam, itemId: itemIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { orderId: orderIdParam, itemId: itemIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     const itemId = parseInt(itemIdParam);
     if (isNaN(orderId) || isNaN(itemId)) {
@@ -74,26 +63,15 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+});
 
 /**
  * PUT /api/orders/[orderId]/items/[itemId]
  * Update an order item (quantity, unit_price). Admin only.
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; orderId: string; itemId: string }> }
-) {
+export const PUT = withStoreAdmin<{ orderId: string; itemId: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, orderId: orderIdParam, itemId: itemIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { orderId: orderIdParam, itemId: itemIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     const itemId = parseInt(itemIdParam);
     if (isNaN(orderId) || isNaN(itemId)) {
@@ -189,4 +167,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
+});

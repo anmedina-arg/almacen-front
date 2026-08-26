@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import type { Product } from '@/types';
 import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { fetchPublicProducts } from '@/features/catalog/services/fetchPublicProducts';
@@ -59,21 +60,8 @@ export async function GET(
   }
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const POST = withStoreAdmin(async (request, { storeId }) => {
   try {
-    const { store } = await params;
-    // Verificar que sea admin de esta Store
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const body = await request.json();
 
     // Validar datos básicos
@@ -178,4 +166,4 @@ export async function POST(
       { status: 500 }
     );
   }
-}
+});

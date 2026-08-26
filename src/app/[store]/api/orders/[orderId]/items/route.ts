@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { addOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
 
@@ -7,20 +7,9 @@ import { addOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
  * POST /api/orders/[orderId]/items
  * Add a new item to an existing order. Admin only.
  */
-export async function POST(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; orderId: string }> }
-) {
+export const POST = withStoreAdmin<{ orderId: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, orderId: orderIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { orderId: orderIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -110,4 +99,4 @@ export async function POST(
       { status: 500 }
     );
   }
-}
+});

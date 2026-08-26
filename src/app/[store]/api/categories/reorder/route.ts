@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { z } from 'zod';
 
@@ -14,20 +14,8 @@ const reorderSchema = z.object({
  *
  * Body: { orderedIds: number[] }
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const PUT = withStoreAdmin(async (request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const body = await request.json();
     const parsed = reorderSchema.safeParse(body);
     if (!parsed.success) {
@@ -54,4 +42,4 @@ export async function PUT(
     console.error('Error in PUT /api/categories/reorder:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});

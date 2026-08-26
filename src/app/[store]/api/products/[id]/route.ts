@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Product } from '@/types';
 import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 
@@ -86,21 +87,9 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, id: idParam } = await params;
-    // Verificar admin de esta Store
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
@@ -226,23 +215,11 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
+});
 
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; id: string }> }
-) {
+export const DELETE = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, id: idParam } = await params;
-    // Verificar admin de esta Store
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { id: idParam } = await params;
     const id = parseInt(idParam);
     if (isNaN(id)) {
       return NextResponse.json({ error: 'Invalid product ID' }, { status: 400 });
@@ -269,4 +246,4 @@ export async function DELETE(
       { status: 500 }
     );
   }
-}
+});

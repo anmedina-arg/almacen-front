@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
@@ -7,20 +7,9 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * Confirm an order. Admin only.
  * Uses the confirm_order RPC function to enforce business rules.
  */
-export async function PUT(
-  _request: NextRequest,
-  { params }: { params: Promise<{ store: string; orderId: string }> }
-) {
+export const PUT = withStoreAdmin<{ orderId: string }>(async (_request, { storeId, userId }, { params }) => {
   try {
-    const { store, orderId: orderIdParam } = await params;
-    const { isStoreAdmin, storeId, userId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || !userId || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { orderId: orderIdParam } = await params;
     const orderId = parseInt(orderIdParam);
     if (isNaN(orderId)) {
       return NextResponse.json(
@@ -75,4 +64,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
+});

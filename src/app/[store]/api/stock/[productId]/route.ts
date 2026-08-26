@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { stockUpdateSchema } from '@/features/admin/schemas/stockUpdateSchema';
 
@@ -10,20 +10,9 @@ import { stockUpdateSchema } from '@/features/admin/schemas/stockUpdateSchema';
  *
  * Body esperado: { p_product_id, p_quantity, p_min_stock, p_notes, p_movement_type }
  */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string; productId: string }> }
-) {
+export const PUT = withStoreAdmin<{ productId: string }>(async (request, { storeId }, { params }) => {
   try {
-    const { store, productId: productIdParam } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
+    const { productId: productIdParam } = await params;
     const productId = parseInt(productIdParam);
     if (isNaN(productId)) {
       return NextResponse.json(
@@ -79,4 +68,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-}
+});

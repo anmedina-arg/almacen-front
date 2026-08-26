@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 export interface StockProductItem {
@@ -11,16 +11,7 @@ export interface StockProductItem {
   stock_value: number;     // stock_raw converted * cost
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
-  const { store } = await params;
-  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-  if (!isStoreAdmin || storeId == null) {
-    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
-  }
-
+export const GET = withStoreAdmin(async (request, { storeId }) => {
   const category = request.nextUrl.searchParams.get('category');
   if (!category) {
     return NextResponse.json({ error: 'Missing category param' }, { status: 400 });
@@ -70,4 +61,4 @@ export async function GET(
     .sort((a, b) => b.stock_value - a.stock_value);
 
   return NextResponse.json(result);
-}
+});

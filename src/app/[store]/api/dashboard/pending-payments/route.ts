@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { NextResponse } from 'next/server';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Order } from '@/features/admin/types/order.types';
 
@@ -20,16 +20,7 @@ export interface PendingPaymentsResponse {
   totalPages: number;
 }
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
-  const { store } = await params;
-  const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-  if (!isStoreAdmin || storeId == null) {
-    return NextResponse.json({ error: authError || 'Forbidden' }, { status: 403 });
-  }
-
+export const GET = withStoreAdmin(async (request, { storeId }) => {
   const page = Math.max(1, Number(request.nextUrl.searchParams.get('page') ?? 1));
   const supabase = await createSupabaseServerClient();
 
@@ -96,4 +87,4 @@ export async function GET(
     { orders, total, page: clampedPage, totalPages },
     { headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0', Pragma: 'no-cache', Expires: '0' } }
   );
-}
+});

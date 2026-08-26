@@ -1,25 +1,13 @@
 import { NextResponse } from 'next/server';
-import { verifyStoreAdminAuth } from '@/features/auth/utils/roleHelpers';
+import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 
 /**
  * GET /api/clients
  * List all clients of the current Store, ordered by barrio + manzana_lote. Admin only.
  */
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const GET = withStoreAdmin(async (_request, { storeId }) => {
   try {
-    const { store } = await params;
-    const { isStoreAdmin, storeId, error: authError } = await verifyStoreAdminAuth(store);
-    if (!isStoreAdmin || storeId == null) {
-      return NextResponse.json(
-        { error: authError || 'Forbidden: Admin access required' },
-        { status: 403 }
-      );
-    }
-
     const supabase = await createSupabaseServerClient();
 
     const { data, error } = await supabase
@@ -39,4 +27,4 @@ export async function GET(
     console.error('Error in GET /api/clients:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-}
+});
