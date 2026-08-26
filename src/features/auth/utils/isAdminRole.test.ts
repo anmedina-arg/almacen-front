@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { isAdminRole } from './roleHelpers';
+import { isAdminRole } from './isAdminRole';
 
 // Predicado compartido (#43): único punto de verdad para "¿puede este
 // usuario administrar esta Store?", reusado por resolveStoreAdminStatus

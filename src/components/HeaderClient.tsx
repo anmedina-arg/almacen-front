@@ -11,7 +11,7 @@ import { supabaseBrowser } from '@/lib/supabase/client';
 import { useLogout } from '@/features/auth/hooks/useLogout';
 import { useRouter } from 'next/navigation';
 import { useStoreSlug } from '@/hooks/useStoreSlug';
-import { isAdminRole } from '@/features/auth/utils/roleHelpers';
+import { isAdminRole } from '@/features/auth/utils/isAdminRole';
 
 interface HeaderClientProps {
 	logo: React.ReactNode;
