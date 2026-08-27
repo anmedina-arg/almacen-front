@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
 import { create } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 import type { CartItem, VariedadSelection } from '../types';
 import type { Product } from '@/types';
 import {
@@ -349,14 +350,17 @@ export function usePendingSurtidoCount(productId: number) {
   return useCartStore(selector);
 }
 
+// useShallow (no useCartItemQuantity/usePendingSurtidoCount arriba): esas
+// devuelven un número (comparación por valor, sin problema). Estas dos
+// devuelven un array nuevo en cada llamada (.filter()) — sin useShallow,
+// useSyncExternalStore nunca ve dos snapshots iguales y entra en loop
+// infinito de renders (React #185, "Maximum update depth exceeded"),
+// tumbando el catálogo entero porque useUnconfirmedSurtidoProducts corre
+// siempre en OrderFlowController, montado en cada carga de la página.
 export function useUnconfirmedSurtidoProducts() {
-  return useCartStore((s) => s.pendingSurtido.filter((p) => p.count > 0));
+  return useCartStore(useShallow((s) => s.pendingSurtido.filter((p) => p.count > 0)));
 }
 
 export function useSurtidoLines(productId: number) {
-  const selector = useCallback(
-    (s: CartStore) => s.items.filter((i) => i.id === productId),
-    [productId]
-  );
-  return useCartStore(selector);
+  return useCartStore(useShallow((s: CartStore) => s.items.filter((i) => i.id === productId)));
 }
