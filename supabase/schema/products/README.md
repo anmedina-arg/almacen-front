@@ -7,7 +7,7 @@ Catálogo: productos, categorías y subcategorías. Consolidado en #85 (spec
 
 | Archivo | Qué es |
 |---|---|
-| `products.sql` | Nunca tuvo `CREATE TABLE` en el repo — creada a mano antes de que empezara la disciplina de migraciones en archivo. Reconstruida íntegramente desde producción. Incluye una columna legacy sin documentar (`categories`, texto libre, todavía en uso) y un `CHECK` de `main_category` tampoco documentado antes. Policies: lectura pública ve solo `active = true`; admins ven todo vía `is_store_admin()` (mismo split que `product_stock` en Stock). También incluye 2 `CREATE TRIGGER` cuyas funciones son de Orders (#84) — ver nota debajo de la tabla de triggers. |
+| `products.sql` | Nunca tuvo `CREATE TABLE` en el repo — creada a mano antes de que empezara la disciplina de migraciones en archivo. Reconstruida íntegramente desde producción. Incluye una columna legacy sin documentar (`categories`, texto libre, todavía en uso) y un `CHECK` de `main_category` tampoco documentado antes. Policies: lectura pública ve solo `active = true`; admins ven todo vía `is_store_admin()` (mismo split que `product_stock` en Stock). También incluye 2 `CREATE TRIGGER` cuyas funciones son de Orders (#84) — ver nota debajo de la tabla de triggers. Desde #92: `is_producto_surtido`/`familia_id`/`min_variedades`/`max_variedades` — FK compuesta `(familia_id, store_id)` contra `producto-surtido/familias.sql`, ver ese dominio. |
 | `categories.sql` | Categorías. `UNIQUE(store_id, name)` reemplazó un `UNIQUE(name)` global en #15. |
 | `subcategories.sql` | Subcategorías (1 categoría → N subcategorías). Su `UNIQUE(category_id, name)` no se tocó en #15 — ya es indirectamente por-Store vía `category_id`. |
 
