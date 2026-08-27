@@ -1,6 +1,15 @@
 import { z } from 'zod';
 
 /**
+ * Una Variedad elegida para una línea de Producto Surtido (#95) — el nombre
+ * viaja acá porque es lo que se congela como snapshot al persistir.
+ */
+export const orderItemVariedadSchema = z.object({
+  id: z.number().int().positive(),
+  name: z.string().min(1),
+});
+
+/**
  * Schema for a single order item when creating an order.
  */
 export const createOrderItemSchema = z.object({
@@ -14,6 +23,7 @@ export const createOrderItemSchema = z.object({
     .min(0, 'El precio no puede ser negativo'),
   is_by_weight: z.boolean().default(false),
   from_suggestion: z.boolean().default(false),
+  variedades: z.array(orderItemVariedadSchema).optional(),
 });
 
 /**

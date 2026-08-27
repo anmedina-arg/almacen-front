@@ -108,6 +108,27 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
+    // Producto Surtido (#95): paso adicional posterior a create_order(), a
+    // propósito no forma parte de su cuerpo (#73). Best-effort — la orden
+    // ya quedó creada completa arriba; un fallo acá solo se loguea, no
+    // rompe la respuesta al cliente. p_selections viaja en el mismo orden
+    // que items (sin reordenar/filtrar), que es el mismo orden en el que
+    // create_order() insertó los order_items correspondientes.
+    const orderId = (data as { order_id?: number } | null)?.order_id;
+    if (orderId != null) {
+      const { error: variedadesError } = await supabase.rpc('add_order_item_variedades', {
+        p_order_id: orderId,
+        p_store_id: storeId,
+        p_selections: items.map((item) => item.variedades ?? []),
+      });
+      if (variedadesError) {
+        console.error(
+          '[POST /api/orders] RPC add_order_item_variedades error (orden ya creada, solo falta el detalle de Variedades):',
+          JSON.stringify(variedadesError, null, 2)
+        );
+      }
+    }
+
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/orders:', error);

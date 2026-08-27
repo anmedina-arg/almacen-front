@@ -12,6 +12,7 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | `order_items.sql` | Ítems de una orden. `unit_cost`/`from_suggestion` los agregaron migraciones de otros dominios — ídem. |
 | `order_payments.sql` | Método(s) de pago de una orden (efectivo/transferencia). |
 | `product_price_history.sql` | Historial append-only de precio/costo — alimentado por `log_price_change` (ver abajo), no por escritura directa. Su policy de lectura no está scoped por Store — ver Gaps conocidos. |
+| `order_item_variedades.sql` | Variedades elegidas por línea de Producto Surtido (#95). Depende del dominio Familias/Variedades (#92) — `variedad_id` es FK nullable a `variedades`, `variedad_name` es un snapshot congelado que sobrevive a que la Variedad se deshabilite o se borre. |
 
 ## Funciones RPC (llamadas desde la API)
 
@@ -20,6 +21,7 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | `create_order.sql` | Crea la orden + ítems, descuenta stock (combo-aware). Ya resuelta en #49 — reubicada sin re-verificar. Desde #97: si la Store tiene `stock:false` (`is_stock_tracked()`, dominio Stock), no chequea ni descuenta — todo producto se trata como siempre disponible. |
 | `confirm_order.sql` | Pasa una orden `pending` a `confirmed`. No estaba en el AC original de #84 — se agregó al notar que vivía en el mismo archivo fuente que `cancel_order`, para no dejarla huérfana. |
 | `cancel_order.sql` | Cancela una orden, devuelve stock (combo-aware). Desde #97: no devuelve stock si `stock:false` para esa Store — mismo criterio que `create_order`. |
+| `add_order_item_variedades.sql` | Paso posterior a `create_order()` (#95) — guarda las Variedades elegidas por línea de Producto Surtido. A propósito NO modifica `create_order()` (#73): correlaciona los `order_items` recién creados por orden de inserción (`ORDER BY id`), ya que `create_order()` no devuelve sus ids. Best-effort: si falla, la orden ya quedó creada igual. |
 
 `confirm_order`/`cancel_order` son `SECURITY DEFINER` sin `p_store_id` — la verificación de que la orden pertenece a la Store del caller se hace en la ruta de API, antes de invocar el RPC.
 
@@ -49,3 +51,4 @@ Ninguno de estos se descarta hasta que el otro dominio confirme su parte:
 ## Gaps conocidos, no corregidos acá
 
 - `product_price_history`: su policy de lectura no filtra por `is_store_admin(store_id)`, a pesar de tener `store_id` con FK e índice propios — chequea rol global (`admin`/`super_admin`). Mismo tipo de gap que `get_avg_stock_per_product`/`get_stock_value_per_day` en el dominio Stock.
+- `order_item_variedades` (#95): se llena best-effort desde `POST /api/orders`, en un segundo paso después de `create_order()` (a propósito, ver `add_order_item_variedades.sql`). Si ese segundo paso falla, la orden queda creada igual pero sin el detalle de Variedades de esa línea — no hay reintento automático ni alerta; el caller solo loguea el error. Aceptado a cambio de no acoplar el checkout core (#73) a este detalle.

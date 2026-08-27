@@ -46,6 +46,10 @@ export function useOrderSubmit(
         : item.unitPrice,
       is_by_weight: item.isByWeight,
       from_suggestion: item.from_suggestion ?? false,
+      // Producto Surtido (#95): viaja el array completo (incluso vacío)
+      // para que el server pueda correlacionar posicionalmente contra los
+      // order_items que create_order() inserta en este mismo orden.
+      variedades: item.variedades,
     }));
     const message = whatsAppMessage;
 
