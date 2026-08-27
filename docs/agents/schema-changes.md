@@ -15,6 +15,31 @@ Flujo obligatorio para cualquier cambio a una función, policy, trigger o tabla 
 7. **`NOTIFY pgrst, 'reload schema';` siempre** que se toque una función, policy, o tabla — no solo cuando "parece" necesario. El cache de schema de PostgREST no se invalida solo de forma confiable.
 8. **Verificar manualmente** el resultado (re-correr el template de verificación contra el objeto recién aplicado) y **commitear referenciando el número de issue** explícito en el mensaje — necesario para saber, más adelante, si un archivo de fix ya aplicado y confirmado puede descartarse (ver regla de retención de archivos, `supabase/README.md`).
 
+## Validar que una fila pertenece a la misma Store que su padre
+
+Cuando una tabla tiene una FK a otra tabla store-scoped (ej. `variedades.familia_id` →
+`familias`, `order_items.product_id` → `products`), nada garantiza por sí solo que las dos
+filas sean de la misma Store — hay que elegir cómo se impone eso. Dos técnicas usadas en
+este repo para el mismo tipo de problema, con criterio explícito de cuándo usar cada una
+(no es una preferencia estética, ver #92/#103 para el porqué):
+
+- **FK compuesta** `FOREIGN KEY (padre_id, store_id) REFERENCES padre(id, store_id)` —
+  preferirla cuando la tabla padre ya tiene (o puede agregarse sin fricción) un
+  `UNIQUE(id, store_id)`, y la regla es simplemente "el padre tiene que ser de la misma
+  Store" sin lógica condicional adicional. Declarativa, la valida Postgres nativamente,
+  sin función que mantener. Ejemplo: `variedades`/`products.familia_id` → `familias`
+  (`familias_id_store_id_key`, #92).
+- **Trigger** `BEFORE INSERT OR UPDATE ... CHECK EXISTS (...)` — usarlo cuando la tabla
+  padre no tiene (y no conviene agregarle) ese `UNIQUE(id, store_id)`, o cuando la
+  validación necesita lógica más allá de "¿existe esta combinación?" (ej. dejar pasar un
+  valor `NULL` en casos particulares). Ejemplo: `order_items.product_id` → `products`
+  (`validate_order_item_store()`, #103) — `products` no tiene `UNIQUE(id, store_id)`, y el
+  trigger además tiene que dejar pasar `product_id IS NULL` (producto borrado,
+  `ON DELETE SET NULL`).
+
+No usar ninguna de las dos es la falla real que originó #103 (incidente de producción) —
+la elección entre FK compuesta y trigger es secundaria a elegir *alguna*.
+
 ## Agregar un objeto o dominio nuevo
 
 Los dominios actuales (`stock`, `orders`, `products`, `combos`, `store`, `clients`, `ranking`, `recomendaciones`, `producto-surtido` — ver `supabase/README.md`) no son una lista cerrada; los 8 primeros existían al momento de la reorganización de #74/#81 (issues #82-#90), `producto-surtido` se sumó en #92 como ejemplo de dominio nuevo agregado siguiendo esta misma convención. Un objeto nuevo:
