@@ -22,7 +22,9 @@ export const GET = withStoreAdmin<{ orderId: string }>(async (_request, { storeI
 
     const { data, error } = await supabase
       .from('orders')
-      .select('*, order_items(*)')
+      // order_item_variedades (#95): Variedades elegidas por línea de
+      // Producto Surtido, si corresponde.
+      .select('*, order_items(*, order_item_variedades(id, variedad_id, variedad_name))')
       .eq('id', orderId)
       .eq('store_id', storeId)
       .single();

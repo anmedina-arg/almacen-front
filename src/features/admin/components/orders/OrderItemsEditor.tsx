@@ -212,6 +212,11 @@ export function OrderItemsEditor({
                   <p className="text-sm font-medium text-gray-800 truncate">
                     {item.product_name}
                   </p>
+                  {item.order_item_variedades && item.order_item_variedades.length > 0 && (
+                    <p className="text-xs text-green-700 truncate">
+                      {item.order_item_variedades.map((v) => v.variedad_name).join(', ')}
+                    </p>
+                  )}
                   <p className="text-xs text-gray-500">
                     {item.quantity} x {formatPrice(item.unit_price)}
                   </p>

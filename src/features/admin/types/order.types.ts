@@ -42,6 +42,18 @@ export interface Order {
 }
 
 /**
+ * Una Variedad elegida para una línea de Producto Surtido (#95).
+ * variedad_name es un snapshot congelado al momento del pedido — sobrevive
+ * a que la Variedad original se deshabilite o se borre. variedad_id es
+ * nullable (ON DELETE SET NULL) por el mismo motivo.
+ */
+export interface OrderItemVariedad {
+  id: number;
+  variedad_id: number | null;
+  variedad_name: string;
+}
+
+/**
  * Represents a row from the order_items table.
  */
 export interface OrderItem {
@@ -55,6 +67,8 @@ export interface OrderItem {
   subtotal: number;
   is_by_weight: boolean;
   created_at: string;
+  // Solo presente en líneas de Producto Surtido (#95).
+  order_item_variedades?: OrderItemVariedad[];
 }
 
 /**
@@ -74,6 +88,10 @@ export interface CreateOrderItemInput {
   unit_price: number;
   is_by_weight: boolean;
   from_suggestion?: boolean;
+  // Producto Surtido (#95): Variedades elegidas para esta línea, si
+  // corresponde. El nombre viaja acá (no solo el id) porque es lo que se
+  // congela como snapshot en order_item_variedades.variedad_name.
+  variedades?: { id: number; name: string }[];
 }
 
 /**
