@@ -40,8 +40,14 @@
 -- (mismo patrón que #70/#49 con create_order) — PostgREST no podía elegir
 -- cuál usar. Hizo falta un DROP FUNCTION operativo de la firma vieja
 -- (get_recommendations(int[], int[], int)) antes de aplicar esto — no es un
--- statement de este archivo. Corrido en test; producción todavía pendiente
--- al momento de este commit (ver #103).
+-- statement de este archivo, corrió una sola vez (la firma ya no existe
+-- desde entonces, cualquier cambio posterior a esta función es
+-- CREATE OR REPLACE normal sobre la firma de 4 parámetros).
+--
+-- p.store_id agregado al CTE top_sold en una segunda pasada, verificando el
+-- fix contra producción con el item corrupto #11924 todavía sin limpiar:
+-- faltaba filtrar el producto del ítem por Store, no solo la orden — ver el
+-- comentario en ese CTE.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_recommendations(
@@ -95,6 +101,13 @@ AS $$
     WHERE o.status IN ('pending', 'confirmed')
       AND o.created_at >= NOW() - INTERVAL '30 days'
       AND o.store_id = p_store_id
+      -- p.store_id, no solo o.store_id (#103, encontrado verificando el fix
+      -- contra producción con el item #11924 todavía sin limpiar): asumir
+      -- que el producto de un ítem pertenece a la misma Store que la orden
+      -- es exactamente el supuesto que causó el incidente original — con
+      -- una fila vieja/corrupta (o el trigger deshabilitado a mano), sin
+      -- este filtro el fallback la sigue mostrando igual.
+      AND p.store_id = p_store_id
       AND oi.product_id IS NOT NULL
       AND oi.product_id <> ALL(COALESCE(p_exclude_ids, '{}'))
       AND p.active = TRUE
