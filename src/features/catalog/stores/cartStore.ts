@@ -15,6 +15,16 @@ function nextLineId(): string {
   return `line-${Date.now()}-${lineIdCounter}`;
 }
 
+// Compartido por addToCart/addSuggestedItem/stagePendingSurtidoUnit — mismo
+// chequeo de tope de stock (sin stock_quantity = sin límite conocido, se
+// trata como disponible).
+function isAtStockLimit(product: Product, currentQty: number): boolean {
+  return (
+    product.stock_quantity !== undefined &&
+    (product.stock_quantity === 0 || currentQty >= product.stock_quantity)
+  );
+}
+
 // Unidades de un Producto Surtido, marcadas por "+" pero todavía sin elegir
 // Variedades — no son líneas de carrito (#94, ADR-0010). Se guarda
 // productName acá (no solo el id) para poder armar el aviso de bloqueo de
@@ -56,7 +66,7 @@ interface CartActions {
 
 export type CartStore = CartState & CartActions;
 
-export const useCartStore = create<CartStore>()((set, get) => ({
+export const useCartStore = create<CartStore>()((set) => ({
   items: [],
   totalItems: 0,
   totalPrice: 0,
@@ -67,11 +77,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
     set((state) => {
       const existing = state.items.find((i) => i.id === product.id);
 
-      if (product.stock_quantity !== undefined) {
-        const currentQty = existing?.quantity ?? 0;
-        if (product.stock_quantity === 0 || currentQty >= product.stock_quantity) {
-          return state;
-        }
+      if (isAtStockLimit(product, existing?.quantity ?? 0)) {
+        return state;
       }
 
       if (existing) {
@@ -112,11 +119,8 @@ export const useCartStore = create<CartStore>()((set, get) => ({
     set((state) => {
       const existing = state.items.find((i) => i.id === product.id);
 
-      if (product.stock_quantity !== undefined) {
-        const currentQty = existing?.quantity ?? 0;
-        if (product.stock_quantity === 0 || currentQty >= product.stock_quantity) {
-          return state;
-        }
+      if (isAtStockLimit(product, existing?.quantity ?? 0)) {
+        return state;
       }
 
       if (existing) {
@@ -204,10 +208,7 @@ export const useCartStore = create<CartStore>()((set, get) => ({
       const pendingEntry = state.pendingSurtido.find((p) => p.productId === product.id);
       const pendingCount = pendingEntry?.count ?? 0;
 
-      if (
-        product.stock_quantity !== undefined &&
-        (product.stock_quantity === 0 || confirmedCount + pendingCount >= product.stock_quantity)
-      ) {
+      if (isAtStockLimit(product, confirmedCount + pendingCount)) {
         return state;
       }
 
@@ -228,10 +229,13 @@ export const useCartStore = create<CartStore>()((set, get) => ({
     });
   },
 
-  // "-" en la card de un Producto Surtido: si hay unidades pendientes sin
+  // "-" en la card de un Producto Surtido. El AC de #94 solo especifica el
+  // caso sin pendientes ("quita directamente la última línea confirmada,
+  // sin abrir el modal"); acá se extiende con un criterio no pedido
+  // explícitamente pero razonable: si hay unidades pendientes sin
   // configurar, descarta la más reciente primero (nunca tocó el carrito,
-  // no hace falta abrir el modal). Si no hay pendientes, quita directamente
-  // la última línea confirmada — tal como pide el AC de #94.
+  // no hace falta abrir el modal para deshacer un "+" de más). Solo cuando
+  // no hay pendientes cae al caso del AC y quita la última línea confirmada.
   removeSurtidoUnit: (product) => {
     set((state) => {
       const pendingEntry = state.pendingSurtido.find((p) => p.productId === product.id);

@@ -76,7 +76,10 @@ export function CatalogCard({ product, view, priority = false }: CatalogCardProp
       <button
         type="button"
         onClick={() => setIsModalOpen(true)}
-        disabled={pendingCount === 0}
+        // Habilitado tanto con unidades pendientes de configurar como con
+        // líneas ya confirmadas — si no, reabrir para "revisarlas o
+        // cambiarlas" (AC de #94) sería inalcanzable apenas se confirma.
+        disabled={pendingCount === 0 && quantity === 0}
         className="mt-1 w-full text-xs font-medium text-center py-1.5 rounded border border-green-500 text-green-700 bg-green-50 hover:bg-green-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-green-50"
       >
         Elegir sabores{pendingCount > 0 ? ` (${pendingCount})` : ''}
