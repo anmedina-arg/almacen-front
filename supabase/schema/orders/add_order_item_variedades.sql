@@ -77,3 +77,5 @@ $function$;
 -- para `anon` además de `authenticated` (ver GRANT de get_recommendations
 -- como precedente de una función RPC nueva con acceso anon explícito).
 GRANT EXECUTE ON FUNCTION public.add_order_item_variedades(INTEGER, INTEGER, JSONB) TO anon, authenticated;
+
+NOTIFY pgrst, 'reload schema';

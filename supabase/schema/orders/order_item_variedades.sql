@@ -47,3 +47,5 @@ DROP POLICY IF EXISTS "Admins can view order item variedades" ON public.order_it
 CREATE POLICY "Admins can view order item variedades"
   ON public.order_item_variedades FOR SELECT
   USING (public.is_store_admin(order_item_variedades.store_id));
+
+NOTIFY pgrst, 'reload schema';
