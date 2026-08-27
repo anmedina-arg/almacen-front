@@ -1,9 +1,14 @@
 'use client';
 
-import { useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductSquareCard } from './ProductSquareCard';
-import { useCartItemQuantity, useCartStore } from '../stores/cartStore';
+import { SurtidoVariedadesModal } from './SurtidoVariedadesModal';
+import {
+  useCartItemQuantity,
+  useCartStore,
+  usePendingSurtidoCount,
+} from '../stores/cartStore';
 import type { Product } from '../types';
 
 interface CatalogCardProps {
@@ -16,6 +21,10 @@ export function CatalogCard({ product, view, priority = false }: CatalogCardProp
   const quantity = useCartItemQuantity(product.id);
   const addToCart = useCartStore((s) => s.addToCart);
   const removeFromCart = useCartStore((s) => s.removeFromCart);
+  const stagePendingSurtidoUnit = useCartStore((s) => s.stagePendingSurtidoUnit);
+  const removeSurtidoUnit = useCartStore((s) => s.removeSurtidoUnit);
+  const pendingCount = usePendingSurtidoCount(product.id);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Ref trick: keeps the latest product reference without being a useCallback dependency.
   // Prevents onAdd/onRemove from being recreated when the parent re-renders with a new
@@ -23,11 +32,25 @@ export function CatalogCard({ product, view, priority = false }: CatalogCardProp
   const productRef = useRef(product);
   productRef.current = product;
 
-  const onAdd = useCallback(() => addToCart(productRef.current), [addToCart]);
-  const onRemove = useCallback(() => removeFromCart(productRef.current), [removeFromCart]);
+  const isSurtido = product.is_producto_surtido === true;
 
-  if (view === 'grid') {
-    return (
+  const onAdd = useCallback(
+    () =>
+      isSurtido
+        ? stagePendingSurtidoUnit(productRef.current)
+        : addToCart(productRef.current),
+    [addToCart, isSurtido, stagePendingSurtidoUnit]
+  );
+  const onRemove = useCallback(
+    () =>
+      isSurtido
+        ? removeSurtidoUnit(productRef.current)
+        : removeFromCart(productRef.current),
+    [isSurtido, removeFromCart, removeSurtidoUnit]
+  );
+
+  const card =
+    view === 'grid' ? (
       <ProductSquareCard
         product={product}
         quantity={quantity}
@@ -35,16 +58,34 @@ export function CatalogCard({ product, view, priority = false }: CatalogCardProp
         onRemove={onRemove}
         priority={priority}
       />
+    ) : (
+      <ProductCard
+        product={product}
+        quantity={quantity}
+        onAdd={onAdd}
+        onRemove={onRemove}
+        priority={priority}
+      />
     );
-  }
+
+  if (!isSurtido) return card;
 
   return (
-    <ProductCard
-      product={product}
-      quantity={quantity}
-      onAdd={onAdd}
-      onRemove={onRemove}
-      priority={priority}
-    />
+    <div className={view === 'grid' ? '' : 'w-full'}>
+      {card}
+      <button
+        type="button"
+        onClick={() => setIsModalOpen(true)}
+        disabled={pendingCount === 0}
+        className="mt-1 w-full text-xs font-medium text-center py-1.5 rounded border border-green-500 text-green-700 bg-green-50 hover:bg-green-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-green-50"
+      >
+        Elegir sabores{pendingCount > 0 ? ` (${pendingCount})` : ''}
+      </button>
+      <SurtidoVariedadesModal
+        isOpen={isModalOpen}
+        product={product}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </div>
   );
 }

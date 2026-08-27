@@ -6,14 +6,28 @@ import type { CartItem } from '../types';
 import { generateWhatsAppMessage, openWhatsApp } from '../utils/messageUtils';
 import { calculateItemPrice } from '../utils/productUtils';
 import { orderService } from '@/features/admin/services/orderService';
+import type { PendingSurtidoEntry } from '../stores/cartStore';
 
-export function useOrderSubmit(cartItems: CartItem[], whatsappNumber: string) {
+export function useOrderSubmit(
+  cartItems: CartItem[],
+  whatsappNumber: string,
+  pendingSurtidoProducts: PendingSurtidoEntry[] = []
+) {
   const router = useRouter();
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   const whatsAppMessage = useMemo(() => generateWhatsAppMessage(cartItems), [cartItems]);
 
   const handleSendMessage = () => {
+    // Producto Surtido con unidades marcadas por "+" pero sin confirmar
+    // Variedades: bloquea el envío en vez de mandar un pedido incompleto
+    // (#94, ADR-0010).
+    if (pendingSurtidoProducts.length > 0) {
+      const names = pendingSurtidoProducts.map((p) => p.productName).join(', ');
+      alert(`Te faltan elegir sabores para ${names}`);
+      return;
+    }
+
     if (cartItems.length === 0) {
       openWhatsApp('Hola! Quiero hacerte un pedido', whatsappNumber);
     } else {

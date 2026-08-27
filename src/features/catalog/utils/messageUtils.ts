@@ -39,6 +39,11 @@ export const generateWhatsAppMessage = (cartItems: CartItem[]): string => {
 
     // Construir la línea con las tres columnas
     message += `${quantityColumn}${productColumn}${priceColumn}\n`;
+
+    // Producto Surtido (#94): mostrar qué Variedades eligió para esta línea.
+    if (item.variedades && item.variedades.length > 0) {
+      message += `   ${item.variedades.map((v) => v.name).join(', ')}\n`;
+    }
   });
 
   message += `\nTotal = $${total}`;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCartItems, useCartStore } from '../stores/cartStore';
+import { useCartItems, useCartStore, useUnconfirmedSurtidoProducts } from '../stores/cartStore';
 import { useOrderSubmit } from '../hooks/useOrderSubmit';
 import { WhatsAppButton } from './WhatsAppButton';
 import { ConfirmationModal } from './ConfirmationModal';
@@ -8,9 +8,10 @@ import { ConfirmationModal } from './ConfirmationModal';
 export function OrderFlowController({ whatsappNumber }: { whatsappNumber: string }) {
   const items = useCartItems();
   const clearCart = useCartStore((s) => s.clearCart);
+  const pendingSurtidoProducts = useUnconfirmedSurtidoProducts();
 
   const { showConfirmation, whatsAppMessage, handleSendMessage, handleConfirmOrder, handleCancelOrder } =
-    useOrderSubmit(items, whatsappNumber);
+    useOrderSubmit(items, whatsappNumber, pendingSurtidoProducts);
 
   return (
     <>

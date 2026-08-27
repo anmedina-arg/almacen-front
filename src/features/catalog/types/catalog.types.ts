@@ -51,8 +51,23 @@ export interface ProductWithDescription extends Product {
 // union de tipos para unificar productos con y sin descripcion
 export type ProductWithOptionalDescription = Product | ProductWithDescription;
 
+// Una Variedad elegida para una unidad de Producto Surtido (#94) — nombre
+// congelado al momento de elegir, mismo criterio de snapshot que
+// order_items.product_name (sobrevive a que la Variedad se deshabilite).
+export interface VariedadSelection {
+  id: number;
+  name: string;
+}
+
 export interface CartItem {
   id: number;
+  // Identificador único por línea (#94) — un Producto Surtido puede tener
+  // varias líneas simultáneas para el mismo product id (una por unidad
+  // configurada), que nunca se fusionan aunque compartan combinación de
+  // Variedades (ADR-0010). Para productos normales sigue habiendo una sola
+  // línea por producto, pero igual necesita lineId para tener una key
+  // estable propia en vez de depender de `id`.
+  lineId: string;
   name: string;
   price: number;
   quantity: number;
@@ -60,6 +75,8 @@ export interface CartItem {
   isByWeight: boolean;
   saleType: WeightType;
   from_suggestion?: boolean;
+  // Solo presente en líneas de Producto Surtido (#94).
+  variedades?: VariedadSelection[];
 }
 
 // Tipos para el sistema de pesos
