@@ -30,6 +30,14 @@
 -- con familia_id NULL (violaría products_surtido_fields_check) — ahí sí
 -- tiene que bloquearse el DELETE de la Familia mientras haya productos
 -- activos apuntándole.
+--
+-- Nota operativa: contra una base donde `variedades` ya existe, este
+-- `CREATE TABLE IF NOT EXISTS` no aplica el ON DELETE CASCADE por sí solo
+-- (es un no-op sobre una tabla existente) — hace falta un ALTER TABLE
+-- explícito (DROP CONSTRAINT + ADD CONSTRAINT) corrido una vez contra la
+-- base (test y luego producción, paso 5/6 de schema-changes.md). Mismo
+-- criterio que el DROP FUNCTION del paso 4: es un paso operativo, no hace
+-- falta que quede como sentencia literal acá.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.variedades (
