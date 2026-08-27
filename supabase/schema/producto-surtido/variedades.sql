@@ -50,12 +50,15 @@ CREATE TRIGGER trg_variedades_updated_at
 -- ── RLS ──────────────────────────────────────────────────────────────────
 ALTER TABLE public.variedades ENABLE ROW LEVEL SECURITY;
 
--- Lectura pública sin restricción, incluidas las inactivas: el catálogo
--- público solo necesita ofrecer las activas (filtrado a nivel aplicación,
--- mismo patrón que products/"active"), pero el admin necesita poder listar
--- también las deshabilitadas para reactivarlas — una sola policy de
--- lectura sin restricción es más simple que separar "pública" de "admin"
--- acá, y el nombre de una Variedad no es dato sensible.
+-- Lectura pública sin restricción, incluidas las inactivas — a diferencia
+-- de products.sql, que sí separa esto en dos policies de RLS ("Public can
+-- view active products" USING active=true vs. "Admins can view all
+-- products"). Acá se resuelve con una sola policy sin restricción y el
+-- filtrado por "active" queda del lado de la aplicación, porque el admin
+-- necesita listar también las deshabilitadas para reactivarlas y el nombre
+-- de una Variedad no es dato sensible — no es "el mismo patrón que
+-- products", es una decisión distinta con el mismo resultado de fondo
+-- (nunca exponer más de lo necesario).
 DROP POLICY IF EXISTS "Anyone can read variedades" ON public.variedades;
 CREATE POLICY "Anyone can read variedades"
   ON public.variedades FOR SELECT USING (true);
