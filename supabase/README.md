@@ -6,7 +6,7 @@
 
 ## Estructura destino
 
-- `supabase/schema/<dominio>/` — un archivo canónico por objeto de ese dominio. Dominios: `stock`, `orders`, `products`, `combos`, `store`, `clients`, `ranking`, `recomendaciones`.
+- `supabase/schema/<dominio>/` — un archivo canónico por objeto de ese dominio. Dominios: `stock`, `orders`, `products`, `combos`, `store`, `clients`, `ranking`, `recomendaciones`, `producto-surtido` (#92).
 - `supabase/backfills/` — scripts de backfill de datos (no de schema). Permanentes: a diferencia de un fix de schema, un backfill documenta una migración de datos puntual que puede necesitar reconsultarse.
 - La raíz de `supabase/` ya no tiene archivos `.sql` sueltos — todos se consolidaron en `supabase/schema/<dominio>/` o se archivaron. Cualquier cambio de schema nuevo va directo al archivo canónico del dominio que corresponda, siguiendo el flujo de [`docs/agents/schema-changes.md`](../docs/agents/schema-changes.md).
 

@@ -13,7 +13,8 @@
 -- cost (supabase_pricing.sql — Orders #84, ya extraído por ese ticket),
 -- is_combo/max_stock (supabase_combos.sql — Combos #86, no se descarta
 -- hasta que confirme su parte), store_id
--- (supabase_multitenant_schema_expand.sql).
+-- (supabase_multitenant_schema_expand.sql), is_producto_surtido/familia_id/
+-- min_variedades/max_variedades (#92, dominio nuevo Producto Surtido).
 --
 -- COLUMNA LEGACY SIN DOCUMENTAR: `categories` (texto libre, NOT NULL, sin
 -- default) — distinta de la tabla `categories` y de `category_id`. Sigue en
@@ -21,6 +22,14 @@
 -- texto libre complementario, no reemplazado todavía por el sistema
 -- normalizado de category_id/subcategory_id. No se toca ni se elimina acá
 -- — solo se documenta por primera vez.
+--
+-- is_producto_surtido/familia_id/min_variedades/max_variedades (#92, spec
+-- #91): marcan un producto como Producto Surtido (se arma eligiendo
+-- Variedades de su Familia en vez de venderse tal cual, ver
+-- supabase/schema/producto-surtido/). Mínimo y máximo configurables por
+-- producto, no fijos por Familia (corrección de alcance documentada en
+-- #91, sección Further Notes) — el 1kg de una Familia puede exigir un
+-- mínimo más alto que el 1/4kg de la misma Familia.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.products (
@@ -41,17 +50,41 @@ CREATE TABLE IF NOT EXISTS public.products (
   is_combo        BOOLEAN NOT NULL DEFAULT FALSE,
   max_stock       NUMERIC(12, 3),
   store_id        INTEGER NOT NULL REFERENCES public.stores(id),
+  is_producto_surtido BOOLEAN NOT NULL DEFAULT FALSE,
+  familia_id      INTEGER,
+  min_variedades  INTEGER,
+  max_variedades  INTEGER,
 
   CONSTRAINT main_category_check CHECK (main_category IN (
     'panaderia', 'congelados', 'combos', 'snaks', 'otros',
     'bebidas', 'lacteos', 'almacen', 'fiambres', 'pizzas'
-  ))
+  )),
+
+  -- Un Producto Surtido tiene que traer Familia + mínimo + máximo siempre
+  -- juntos — no tiene sentido is_producto_surtido=true sin ellos (quedaría
+  -- sin poder armarse), ni tenerlos seteados si is_producto_surtido=false
+  -- (datos huérfanos de un flag que se apagó).
+  CONSTRAINT products_surtido_fields_check CHECK (
+    (is_producto_surtido = FALSE AND familia_id IS NULL AND min_variedades IS NULL AND max_variedades IS NULL)
+    OR
+    (is_producto_surtido = TRUE AND familia_id IS NOT NULL AND min_variedades IS NOT NULL AND max_variedades IS NOT NULL)
+  ),
+  CONSTRAINT products_variedades_range_check CHECK (
+    min_variedades IS NULL OR (min_variedades >= 1 AND max_variedades >= min_variedades)
+  ),
+
+  -- FK compuesta, no una FK simple a familia_id: garantiza que un Producto
+  -- Surtido no pueda referenciar una Familia de otra Store a nivel de
+  -- schema (ver la nota en producto-surtido/familias.sql).
+  CONSTRAINT products_familia_store_fk
+    FOREIGN KEY (familia_id, store_id) REFERENCES public.familias(id, store_id)
 );
 
 -- ── Índices ──────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_products_category_id ON public.products(category_id);
 CREATE INDEX IF NOT EXISTS idx_products_subcategory_id ON public.products(subcategory_id);
 CREATE INDEX IF NOT EXISTS idx_products_store_id ON public.products(store_id);
+CREATE INDEX IF NOT EXISTS idx_products_familia_id ON public.products(familia_id);
 
 -- ── Triggers ─────────────────────────────────────────────────────────────
 DROP TRIGGER IF EXISTS update_products_updated_at ON public.products;

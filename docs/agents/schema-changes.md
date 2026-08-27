@@ -17,7 +17,7 @@ Flujo obligatorio para cualquier cambio a una función, policy, trigger o tabla 
 
 ## Agregar un objeto o dominio nuevo
 
-Los 8 dominios actuales (`stock`, `orders`, `products`, `combos`, `store`, `clients`, `ranking`, `recomendaciones` — ver `supabase/README.md`) no son una lista cerrada; son los que existían al momento de la reorganización de #74/#81 (issues #82-#90). Un objeto nuevo:
+Los dominios actuales (`stock`, `orders`, `products`, `combos`, `store`, `clients`, `ranking`, `recomendaciones`, `producto-surtido` — ver `supabase/README.md`) no son una lista cerrada; los 8 primeros existían al momento de la reorganización de #74/#81 (issues #82-#90), `producto-surtido` se sumó en #92 como ejemplo de dominio nuevo agregado siguiendo esta misma convención. Un objeto nuevo:
 
 - **Encaja en un dominio existente** (ej. una función más para Orders): agregá el archivo en `supabase/schema/<dominio>/<objeto>.sql` siguiendo el paso 2 de arriba, y sumalo a la tabla correspondiente (Tablas / Funciones RPC / Funciones trigger / Funciones auxiliares) del `README.md` de ese dominio.
 - **No encaja en ninguno** (un concepto de negocio nuevo, ej. una feature que necesita tablas propias): creá `supabase/schema/<dominio-nuevo>/` con su propio `README.md`, mismo formato de 5 secciones que los demás (ver la sección "README.md de dominio" en `supabase/README.md`). No hace falta pedir permiso especial ni abrir un ticket de "scaffolding" — ese costo ya se pagó una vez en #82, la convención está para reusarse directo.
