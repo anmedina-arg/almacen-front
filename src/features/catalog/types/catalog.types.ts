@@ -32,6 +32,12 @@ export interface Product {
   subcategory_id?: number | null;
   category_name?: string | null;    // from JOIN with categories table
   subcategory_name?: string | null; // from JOIN with subcategories table
+  // Producto Surtido (#92/#93): se arma eligiendo Variedades de su Familia
+  // en vez de venderse tal cual — ver supabase/schema/producto-surtido/.
+  is_producto_surtido?: boolean;
+  familia_id?: number | null;
+  min_variedades?: number | null;
+  max_variedades?: number | null;
 }
 
 // description esctructurada

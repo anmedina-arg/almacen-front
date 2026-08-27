@@ -19,6 +19,17 @@
 -- garantiza que una Variedad no pueda apuntar a una Familia de otra Store
 -- a nivel de schema — ver la nota en familias.sql sobre por qué (misma
 -- lección de #103).
+--
+-- ON DELETE CASCADE (#93): borrar una Familia borra sus Variedades, mismo
+-- criterio que subcategories.category_id → categories (categories/[id]/route.ts
+-- dice explícitamente "Subcategories are deleted via ON DELETE CASCADE").
+-- No estaba en la versión original de #92 — encontrado implementando el
+-- admin de #93, antes de que nadie llegara a depender del comportamiento
+-- viejo (bloquear el DELETE). products.familia_id NO tiene este cascade a
+-- propósito: un Producto Surtido que sigue marcado como tal no puede quedar
+-- con familia_id NULL (violaría products_surtido_fields_check) — ahí sí
+-- tiene que bloquearse el DELETE de la Familia mientras haya productos
+-- activos apuntándole.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.variedades (
@@ -34,7 +45,7 @@ CREATE TABLE IF NOT EXISTS public.variedades (
   -- familia_id, mismo criterio que subcategories.sql (UNIQUE(category_id, name)).
   CONSTRAINT variedades_familia_id_name_key UNIQUE (familia_id, name),
   CONSTRAINT variedades_familia_store_fk
-    FOREIGN KEY (familia_id, store_id) REFERENCES public.familias(id, store_id)
+    FOREIGN KEY (familia_id, store_id) REFERENCES public.familias(id, store_id) ON DELETE CASCADE
 );
 
 -- ── Índices ──────────────────────────────────────────────────────────────

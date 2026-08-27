@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
 import { useCategories } from '../hooks/useCategories';
+import { useFamilias } from '../hooks/useFamilias';
 import { useCloudinaryUpload } from '../hooks/useCloudinaryUpload';
 import { productCreateSchema } from '../schemas/productCreateSchema';
 import { ImageUploadField } from './ImageUploadField';
@@ -21,6 +22,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const { data: categories = [] } = useCategories();
+  const { data: familias = [] } = useFamilias();
   const { uploadFile, uploading, uploadError } = useCloudinaryUpload();
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -39,6 +41,10 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
     max_stock: null,
     category_id: product?.category_id ?? null,
     subcategory_id: product?.subcategory_id ?? null,
+    is_producto_surtido: product?.is_producto_surtido ?? false,
+    familia_id: product?.familia_id ?? null,
+    min_variedades: product?.min_variedades ?? null,
+    max_variedades: product?.max_variedades ?? null,
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -60,6 +66,10 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
         max_stock: null,
         category_id: product.category_id ?? null,
         subcategory_id: product.subcategory_id ?? null,
+        is_producto_surtido: product.is_producto_surtido ?? false,
+        familia_id: product.familia_id ?? null,
+        min_variedades: product.min_variedades ?? null,
+        max_variedades: product.max_variedades ?? null,
       });
     }
   }, [product]);
@@ -276,6 +286,102 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
             <label htmlFor="active" className="text-sm font-medium text-gray-700">
               Producto activo
             </label>
+          </div>
+
+          {/* Producto Surtido (#93) */}
+          <div className="border border-gray-200 rounded-md p-3 space-y-3">
+            <div className="flex items-center gap-2">
+              <input
+                id="is_producto_surtido"
+                type="checkbox"
+                checked={formData.is_producto_surtido}
+                onChange={(e) => {
+                  const checked = e.target.checked;
+                  setFormData({
+                    ...formData,
+                    is_producto_surtido: checked,
+                    // Apagar el toggle limpia los 3 campos — mismo motivo
+                    // que category_id→subcategory_id se resetea al cambiar
+                    // de categoría: no dejar datos residuales que el
+                    // refine de productCreateSchema (espejo del CHECK de
+                    // la base) va a rechazar igual.
+                    ...(checked ? {} : { familia_id: null, min_variedades: null, max_variedades: null }),
+                  });
+                }}
+                className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                disabled={isPending}
+              />
+              <label htmlFor="is_producto_surtido" className="text-sm font-medium text-gray-700">
+                Es Producto Surtido
+              </label>
+            </div>
+
+            {formData.is_producto_surtido && (
+              <div className="space-y-3 pl-6">
+                <div>
+                  <label htmlFor="familia_id" className="block text-sm font-medium text-gray-700 mb-1">
+                    Familia *
+                  </label>
+                  <select
+                    id="familia_id"
+                    value={formData.familia_id ?? ''}
+                    onChange={(e) =>
+                      setFormData({ ...formData, familia_id: e.target.value ? Number(e.target.value) : null })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 bg-white"
+                    disabled={isPending}
+                  >
+                    <option value="">Elegir familia...</option>
+                    {familias.map((fam) => (
+                      <option key={fam.id} value={fam.id}>{fam.name}</option>
+                    ))}
+                  </select>
+                  {errors.familia_id && <p className="mt-1 text-sm text-red-600">{errors.familia_id}</p>}
+                  {familias.length === 0 && (
+                    <p className="mt-1 text-xs text-amber-600">
+                      No hay familias creadas todavía — creá una en la sección &quot;Familias&quot;.
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label htmlFor="min_variedades" className="block text-sm font-medium text-gray-700 mb-1">
+                      Mínimo de Variedades *
+                    </label>
+                    <input
+                      id="min_variedades"
+                      type="number"
+                      min="1"
+                      value={formData.min_variedades ?? ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, min_variedades: e.target.value ? Number(e.target.value) : null })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={isPending}
+                    />
+                    {errors.min_variedades && <p className="mt-1 text-sm text-red-600">{errors.min_variedades}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="max_variedades" className="block text-sm font-medium text-gray-700 mb-1">
+                      Máximo de Variedades *
+                    </label>
+                    <input
+                      id="max_variedades"
+                      type="number"
+                      min="1"
+                      value={formData.max_variedades ?? ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, max_variedades: e.target.value ? Number(e.target.value) : null })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                      disabled={isPending}
+                    />
+                    {errors.max_variedades && <p className="mt-1 text-sm text-red-600">{errors.max_variedades}</p>}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Error message */}

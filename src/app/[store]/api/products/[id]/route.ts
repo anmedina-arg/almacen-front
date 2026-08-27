@@ -39,6 +39,10 @@ export async function GET(
         max_stock,
         category_id,
         subcategory_id,
+        is_producto_surtido,
+        familia_id,
+        min_variedades,
+        max_variedades,
         cat:categories!products_category_id_fkey(id, name),
         sub:subcategories!products_subcategory_id_fkey(id, name)
       `
@@ -113,11 +117,16 @@ export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, {
     // FK-based category fields (Phase 2)
     if ('category_id' in body) updates.category_id = body.category_id ?? null;
     if ('subcategory_id' in body) updates.subcategory_id = body.subcategory_id ?? null;
+    // Producto Surtido (#93)
+    if (body.is_producto_surtido !== undefined) updates.is_producto_surtido = body.is_producto_surtido;
+    if ('familia_id' in body) updates.familia_id = body.familia_id ?? null;
+    if ('min_variedades' in body) updates.min_variedades = body.min_variedades ?? null;
+    if ('max_variedades' in body) updates.max_variedades = body.max_variedades ?? null;
 
     const supabase = await createSupabaseServerClient();
 
     // Mismo chequeo de ownership que en POST /api/products: category_id /
-    // subcategory_id deben pertenecer a esta Store.
+    // subcategory_id / familia_id deben pertenecer a esta Store.
     if (updates.category_id != null) {
       const { data: cat } = await supabase
         .from('categories')
@@ -138,6 +147,17 @@ export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, {
         .maybeSingle();
       if (!sub) {
         return NextResponse.json({ error: 'Subcategory not found' }, { status: 404 });
+      }
+    }
+    if (updates.familia_id != null) {
+      const { data: fam } = await supabase
+        .from('familias')
+        .select('id')
+        .eq('id', updates.familia_id)
+        .eq('store_id', storeId)
+        .maybeSingle();
+      if (!fam) {
+        return NextResponse.json({ error: 'Familia not found' }, { status: 404 });
       }
     }
 
@@ -161,6 +181,10 @@ export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, {
         max_stock,
         category_id,
         subcategory_id,
+        is_producto_surtido,
+        familia_id,
+        min_variedades,
+        max_variedades,
         cat:categories!products_category_id_fkey(id, name),
         sub:subcategories!products_subcategory_id_fkey(id, name)
       `
@@ -170,6 +194,12 @@ export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, {
     if (error) {
       if (error.code === 'PGRST116') {
         return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+      }
+      if (error.code === '23514') {
+        return NextResponse.json(
+          { error: 'Un Producto Surtido necesita Familia, mínimo y máximo de Variedades consistentes' },
+          { status: 400 }
+        );
       }
       console.error('Error updating product:', error);
       return NextResponse.json({ error: error.message }, { status: 500 });
