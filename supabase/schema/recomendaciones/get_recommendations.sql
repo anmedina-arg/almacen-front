@@ -22,12 +22,39 @@
 -- definición de abajo es la realmente vigente. category_affinity_rules
 -- solo participa hoy como multiplicador dentro de
 -- refresh_product_affinity() (ver ese archivo), no acá.
+--
+-- #103 (incidente en producción): sin p_store_id, esta función mezclaba
+-- afinidad, stock y "más vendidos" de TODAS las Stores — sugería productos
+-- de otras tiendas en el checkout, agregables al pedido sin rechazo (nada
+-- validaba ownership del lado de escritura tampoco, ver
+-- validate_order_item_store.sql). p_store_id con DEFAULT NULL a propósito
+-- (no lo omite, falla cerrado): un caller que se olvide de pasarlo no
+-- obtiene todas las Stores, obtiene 0 filas (todo NULL = NULL en SQL) —
+-- elegido así, y no sin default como una RPC admin (ver
+-- upsert_product_stock.sql), porque esta es una lectura pública best-effort
+-- (sugerencias del catálogo): degradar a "sin sugerencias" es preferible a
+-- que un parámetro faltante rompa el checkout entero con un error duro.
+--
+-- Agregar p_store_id al final NO alcanza con CREATE OR REPLACE: Postgres lo
+-- trató como una firma nueva, dejó la de 3 parámetros viva como overload
+-- (mismo patrón que #70/#49 con create_order) — PostgREST no podía elegir
+-- cuál usar. Hizo falta un DROP FUNCTION operativo de la firma vieja
+-- (get_recommendations(int[], int[], int)) antes de aplicar esto — no es un
+-- statement de este archivo, corrió una sola vez (la firma ya no existe
+-- desde entonces, cualquier cambio posterior a esta función es
+-- CREATE OR REPLACE normal sobre la firma de 4 parámetros).
+--
+-- p.store_id agregado al CTE top_sold en una segunda pasada, verificando el
+-- fix contra producción con el item corrupto #11924 todavía sin limpiar:
+-- faltaba filtrar el producto del ítem por Store, no solo la orden — ver el
+-- comentario en ese CTE.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION get_recommendations(
   p_product_ids  INT[]  DEFAULT '{}',
   p_exclude_ids  INT[]  DEFAULT '{}',
-  p_limit        INT    DEFAULT 3
+  p_limit        INT    DEFAULT 3,
+  p_store_id     INT    DEFAULT NULL
 )
 RETURNS TABLE (product_id INT, score NUMERIC)
 LANGUAGE sql
@@ -42,6 +69,7 @@ AS $$
     FROM product_affinity pa
     WHERE pa.product_id_a = ANY(p_product_ids)
       AND pa.product_id_b <> ALL(COALESCE(p_exclude_ids, '{}'))
+      AND pa.store_id = p_store_id
     GROUP BY pa.product_id_b
   ),
   with_stock AS (
@@ -50,6 +78,7 @@ AS $$
     FROM cart_affinity ca
     JOIN products p ON p.id = ca.product_id
     WHERE p.active = TRUE
+      AND p.store_id = p_store_id
       AND (
         (p.is_combo = TRUE AND get_combo_effective_stock(p.id) > 0)
         OR
@@ -61,7 +90,7 @@ AS $$
     ORDER BY ca.total_score DESC
     LIMIT p_limit
   ),
-  -- Fallback: más vendidos globales (últimos 30 días) para completar si hay pocos resultados
+  -- Fallback: más vendidos de esta Store (últimos 30 días) para completar si hay pocos resultados
   top_sold AS (
     SELECT
       oi.product_id,
@@ -71,6 +100,14 @@ AS $$
     JOIN products p ON p.id = oi.product_id
     WHERE o.status IN ('pending', 'confirmed')
       AND o.created_at >= NOW() - INTERVAL '30 days'
+      AND o.store_id = p_store_id
+      -- p.store_id, no solo o.store_id (#103, encontrado verificando el fix
+      -- contra producción con el item #11924 todavía sin limpiar): asumir
+      -- que el producto de un ítem pertenece a la misma Store que la orden
+      -- es exactamente el supuesto que causó el incidente original — con
+      -- una fila vieja/corrupta (o el trigger deshabilitado a mano), sin
+      -- este filtro el fallback la sigue mostrando igual.
+      AND p.store_id = p_store_id
       AND oi.product_id IS NOT NULL
       AND oi.product_id <> ALL(COALESCE(p_exclude_ids, '{}'))
       AND p.active = TRUE

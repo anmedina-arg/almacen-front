@@ -27,6 +27,7 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 
 | Archivo | Cuándo dispara |
 |---|---|
+| `validate_order_item_store.sql` | Al INSERT/UPDATE de `product_id`/`store_id` en `order_items` — rechaza si el producto no pertenece a esa Store (#103, incidente en producción: nada lo impedía antes). |
 | `recalculate_order_total.sql` | Al INSERT/UPDATE/DELETE en `order_items` — recalcula `orders.total`. |
 | `update_orders_updated_at.sql` | Al UPDATE en `orders`. |
 | `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware. Desde #97: no-op si `stock:false` para esa Store. |
