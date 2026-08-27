@@ -64,6 +64,10 @@ export async function fetchPublicProducts(
       max_stock,
       category_id,
       subcategory_id,
+      is_producto_surtido,
+      familia_id,
+      min_variedades,
+      max_variedades,
       cat:categories!products_category_id_fkey(id, name),
       sub:subcategories!products_subcategory_id_fkey(id, name)
     `

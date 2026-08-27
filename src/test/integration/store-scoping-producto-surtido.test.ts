@@ -233,4 +233,72 @@ describe('store scoping — familias/variedades (#92)', () => {
       await admin.from('variedades').delete().eq('name', name);
     }
   );
+
+  it.skipIf(!hasCredentials)(
+    'borrar una Familia borra sus Variedades en cascada (#93)',
+    async () => {
+      const { data: familia } = await admin
+        .from('familias')
+        .insert({ name: `cascade-${randomUUID().slice(0, 8)}`, store_id: storeA.storeId })
+        .select('id')
+        .single();
+      const { data: variedad } = await admin
+        .from('variedades')
+        .insert({ name: 'sabor-cascade', familia_id: familia!.id, store_id: storeA.storeId })
+        .select('id')
+        .single();
+
+      const { error: deleteError } = await admin.from('familias').delete().eq('id', familia!.id);
+      expect(deleteError).toBeNull();
+
+      const { data: orphanVariedad } = await admin
+        .from('variedades')
+        .select('id')
+        .eq('id', variedad!.id)
+        .maybeSingle();
+      expect(orphanVariedad).toBeNull();
+    }
+  );
+
+  it.skipIf(!hasCredentials)(
+    'NO se puede borrar una Familia mientras un producto la referencia como Producto Surtido (#93)',
+    async () => {
+      const { data: familia } = await admin
+        .from('familias')
+        .insert({ name: `blocked-${randomUUID().slice(0, 8)}`, store_id: storeA.storeId })
+        .select('id')
+        .single();
+      const { data: producto } = await admin
+        .from('products')
+        .insert({
+          name: 'surtido-bloquea-delete',
+          price: 100,
+          image: '',
+          categories: '',
+          store_id: storeA.storeId,
+          active: false,
+          is_producto_surtido: true,
+          familia_id: familia!.id,
+          min_variedades: 1,
+          max_variedades: 2,
+        })
+        .select('id')
+        .single();
+      await admin.from('product_price_history').delete().eq('product_id', producto!.id);
+
+      const { error: deleteError } = await admin.from('familias').delete().eq('id', familia!.id);
+      expect(deleteError).not.toBeNull();
+
+      const { data: stillThere } = await admin
+        .from('familias')
+        .select('id')
+        .eq('id', familia!.id)
+        .maybeSingle();
+      expect(stillThere?.id).toBe(familia!.id);
+
+      // Limpieza: primero el producto (libera la referencia), después la Familia.
+      await admin.from('products').delete().eq('id', producto!.id);
+      await admin.from('familias').delete().eq('id', familia!.id);
+    }
+  );
 });

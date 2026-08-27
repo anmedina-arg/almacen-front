@@ -103,6 +103,21 @@ export const POST = withStoreAdmin(async (request, { storeId }) => {
       }
     }
 
+    // familia_id debe pertenecer a esta Store — mismo caso que
+    // category_id/subcategory_id arriba (#93). La FK compuesta de #92 ya lo
+    // garantiza a nivel de schema; esto es solo para devolver un 404 claro.
+    if (body.familia_id != null) {
+      const { data: fam } = await supabase
+        .from('familias')
+        .select('id')
+        .eq('id', body.familia_id)
+        .eq('store_id', storeId)
+        .maybeSingle();
+      if (!fam) {
+        return NextResponse.json({ error: 'Familia not found' }, { status: 404 });
+      }
+    }
+
     // Crear producto
     const { data, error } = await supabase
       .from('products')
@@ -120,6 +135,10 @@ export const POST = withStoreAdmin(async (request, { storeId }) => {
           max_stock: body.max_stock ?? null,
           category_id: body.category_id ?? null,
           subcategory_id: body.subcategory_id ?? null,
+          is_producto_surtido: body.is_producto_surtido ?? false,
+          familia_id: body.familia_id ?? null,
+          min_variedades: body.min_variedades ?? null,
+          max_variedades: body.max_variedades ?? null,
           store_id: storeId,
         },
       ])
@@ -138,6 +157,10 @@ export const POST = withStoreAdmin(async (request, { storeId }) => {
         max_stock,
         category_id,
         subcategory_id,
+        is_producto_surtido,
+        familia_id,
+        min_variedades,
+        max_variedades,
         cat:categories!products_category_id_fkey(id, name),
         sub:subcategories!products_subcategory_id_fkey(id, name)
       `
@@ -145,6 +168,12 @@ export const POST = withStoreAdmin(async (request, { storeId }) => {
       .single();
 
     if (error) {
+      if (error.code === '23514') {
+        return NextResponse.json(
+          { error: 'Un Producto Surtido necesita Familia, mínimo y máximo de Variedades consistentes' },
+          { status: 400 }
+        );
+      }
       console.error('Error creating product:', error);
       return NextResponse.json(
         { error: error.message },

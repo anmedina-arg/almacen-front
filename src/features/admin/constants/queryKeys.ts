@@ -25,6 +25,10 @@ export const adminKeys = {
   categoriesList: () => [...adminKeys.categories(), 'list'] as const,
   categorySubcategories: (id: number) => [...adminKeys.categories(), 'subcategories', id] as const,
 
+  // Familias/Variedades query keys (#93)
+  familias: () => [...adminKeys.all, 'familias'] as const,
+  familiasList: () => [...adminKeys.familias(), 'list'] as const,
+
   // Clients query keys
   clients: () => [...adminKeys.all, 'clients'] as const,
   clientsList: () => [...adminKeys.clients(), 'list'] as const,
