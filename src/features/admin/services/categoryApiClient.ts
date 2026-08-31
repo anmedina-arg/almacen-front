@@ -3,10 +3,18 @@ import type {
   CategoryWithSubcategories,
   Subcategory,
 } from '../types/category.types';
-import type { CategoryInput } from '../schemas/categorySchemas';
+import type { CategoryInput } from '@/features/products/schemas/categorySchemas';
 import { apiFetch } from '@/lib/api/apiFetch';
 
-export const categoryService = {
+/**
+ * Cliente HTTP para Client Components — pasa por /api/categories/*, a
+ * diferencia del service del dominio (features/products/services/
+ * categoryService.ts) que llama a Supabase directo y también lo usan los
+ * Server Components sin pasar por HTTP (ver ADR-0013 / ticket #107).
+ * Antes se llamaba categoryService — renombrado para no confundir las dos
+ * capas (mismo nombre, responsabilidades distintas).
+ */
+export const categoryApiClient = {
   async getAll(): Promise<Category[]> {
     const res = await apiFetch('/categories', { cache: 'no-store' });
     if (!res.ok) {

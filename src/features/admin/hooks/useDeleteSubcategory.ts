@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { categoryService } from '../services/categoryService';
+import { categoryApiClient } from '../services/categoryApiClient';
 
 interface DeleteSubcategoryInput {
   id: number;
@@ -11,7 +11,7 @@ export function useDeleteSubcategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id }: DeleteSubcategoryInput) => categoryService.deleteSubcategory(id),
+    mutationFn: ({ id }: DeleteSubcategoryInput) => categoryApiClient.deleteSubcategory(id),
 
     onSuccess: (_data, { categoryId }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.categoriesList() });

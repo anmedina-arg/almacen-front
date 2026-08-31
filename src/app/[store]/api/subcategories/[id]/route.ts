@@ -1,54 +1,31 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { z } from 'zod';
-
-const updateSubcategorySchema = z.object({
-  name: z.string().min(1, 'El nombre es requerido').max(100),
-});
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { subcategoryNameSchema } from '@/features/products/schemas/categorySchemas';
+import { updateSubcategory, deleteSubcategory } from '@/features/products/services/categoryService';
 
 /**
  * PUT /api/subcategories/[id]
  * Updates a subcategory's name. Admin only.
  */
-export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
+export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id }) => {
   try {
-    const { id } = await params;
     const subcategoryId = parseInt(id, 10);
     if (isNaN(subcategoryId)) {
       return NextResponse.json({ error: 'Invalid subcategory id' }, { status: 400 });
     }
 
-    const body = await request.json();
-    const parsed = updateSubcategorySchema.safeParse(body);
+    const body = await ctx.request.json();
+    const parsed = subcategoryNameSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
-      .from('subcategories')
-      .update({ name: parsed.data.name })
-      .eq('id', subcategoryId)
-      .eq('store_id', storeId)
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        return NextResponse.json(
-          { error: 'Ya existe una subcategoría con ese nombre en esta categoría' },
-          { status: 409 }
-        );
-      }
-      console.error('Error updating subcategory:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const subcategory = await updateSubcategory(ctx.supabase, ctx.storeId, subcategoryId, parsed.data.name);
+    return NextResponse.json(subcategory);
   } catch (error) {
-    console.error('Error in PUT /api/subcategories/[id]:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'PUT /api/subcategories/[id]');
   }
 });
 
@@ -56,29 +33,16 @@ export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, {
  * DELETE /api/subcategories/[id]
  * Deletes a subcategory. Admin only.
  */
-export const DELETE = withStoreAdmin<{ id: string }>(async (_request, { storeId }, { params }) => {
+export const DELETE = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id }) => {
   try {
-    const { id } = await params;
     const subcategoryId = parseInt(id, 10);
     if (isNaN(subcategoryId)) {
       return NextResponse.json({ error: 'Invalid subcategory id' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase
-      .from('subcategories')
-      .delete()
-      .eq('id', subcategoryId)
-      .eq('store_id', storeId);
-
-    if (error) {
-      console.error('Error deleting subcategory:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
+    await deleteSubcategory(ctx.supabase, ctx.storeId, subcategoryId);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error in DELETE /api/subcategories/[id]:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'DELETE /api/subcategories/[id]');
   }
 });

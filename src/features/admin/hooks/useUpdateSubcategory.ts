@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { categoryService } from '../services/categoryService';
+import { categoryApiClient } from '../services/categoryApiClient';
 
 interface UpdateSubcategoryInput {
   id: number;
@@ -13,7 +13,7 @@ export function useUpdateSubcategory() {
 
   return useMutation({
     mutationFn: ({ id, name }: UpdateSubcategoryInput) =>
-      categoryService.updateSubcategory(id, name),
+      categoryApiClient.updateSubcategory(id, name),
 
     onSuccess: (_data, { categoryId }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.categoriesList() });
