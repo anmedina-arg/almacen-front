@@ -16,11 +16,18 @@
 -- product_stock/stock_movement_log/combo_components ya están muertas,
 -- superseded por #83 y #18 respectivamente).
 --
--- GAP CONOCIDO, no corregido acá: la policy de lectura NO está scoped por
--- Store (chequea role IN admin/super_admin globalmente, no
--- is_store_admin(store_id)), a pesar de tener store_id con FK e índice
--- propios. Mismo tipo de gap que get_avg_stock_per_product/
--- get_stock_value_per_day en el dominio Stock — fuera de alcance de #84.
+-- #100: la policy de lectura no reconocía Store admin (solo profiles.role
+-- IN admin/super_admin, chequeo global) ni scopeaba por store_id, pese a
+-- tener la columna con FK e índice propios — mismo patrón de bug que
+-- motivó #43, pero en una RLS policy en vez de código de aplicación.
+-- Reescrita contra is_store_admin(store_id) (products/is_store_admin.sql),
+-- el mismo predicado que usa el resto del dominio (ver
+-- category_affinity_rules.sql) — cubre Store admin scoped y Platform admin
+-- (super_admin) en una sola función, sin repetir el chequeo de rol global.
+--
+-- GAP CONOCIDO RELACIONADO, no corregido acá: get_avg_stock_per_product/
+-- get_stock_value_per_day (dominio Stock) pueden arrastrar el mismo patrón
+-- — no investigado todavía, candidato a ticket aparte (ver #100).
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.product_price_history (
@@ -38,14 +45,13 @@ CREATE INDEX IF NOT EXISTS idx_product_price_history_store_id ON public.product_
 -- ── RLS ──────────────────────────────────────────────────────────────────
 ALTER TABLE public.product_price_history ENABLE ROW LEVEL SECURITY;
 
--- Sin scoping por Store — ver gap conocido arriba.
+-- Scoped por Store vía is_store_admin(store_id) — #100.
 DROP POLICY IF EXISTS "Admins can view price history" ON public.product_price_history;
 CREATE POLICY "Admins can view price history"
   ON public.product_price_history FOR SELECT
-  USING (
-    EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin')
-    OR EXISTS (SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'super_admin')
-  );
+  USING (public.is_store_admin(product_price_history.store_id));
+
+NOTIFY pgrst, 'reload schema';
 
 -- Sin policies de INSERT/UPDATE/DELETE — solo escribe el trigger
 -- log_price_change() (SECURITY DEFINER, bypassea RLS). Tabla append-only
