@@ -55,7 +55,7 @@ export async function GET(
       .select(
         `id, name, price, cost, image, active, categories,
          mainCategory:main_category, sale_type, is_combo, max_stock,
-         category_id, subcategory_id,
+         category_id, subcategory_id, is_producto_surtido,
          cat:categories!products_category_id_fkey(id, name),
          sub:subcategories!products_subcategory_id_fkey(id, name)`
       )
@@ -78,7 +78,16 @@ export async function GET(
     const result: RecommendedProduct[] = recommendedIds
       .map((pid) => {
         const p = products.find((x) => x.id === pid);
-        if (!p) return null;
+        // Producto Surtido requires the two-step Variedades selection
+        // (ADR-0010) that every add-to-cart entry point routes through
+        // (CatalogCard.tsx) except this one — excluded here rather than
+        // reimplementing that flow in a one-click suggestion card.
+        // Known limitation: get_recommendations() already applied LIMIT
+        // before this filter runs, so a Surtido item among the top
+        // candidates reduces the count shown instead of being backfilled —
+        // fixing that means moving this filter inside the RPC (schema
+        // change, its own verify-against-live-DB pass), deferred for now.
+        if (!p || p.is_producto_surtido) return null;
         const { cat, sub, ...rest } = p as typeof p & {
           cat?: { id: number; name: string } | null;
           sub?: { id: number; name: string } | null;
