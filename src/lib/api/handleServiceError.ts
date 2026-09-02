@@ -16,6 +16,9 @@ export function handleServiceError(error: unknown, context: string): NextRespons
     return NextResponse.json({ error: error.message }, { status: 409 });
   }
   console.error(`Error in ${context}:`, error);
-  const message = error instanceof Error ? error.message : 'Internal server error';
-  return NextResponse.json({ error: message }, { status: 500 });
+  // Nunca el mensaje real acá — puede traer detalle interno (query de
+  // Postgres, stack de una excepción no prevista) que no debería llegar a
+  // un caller no autenticado en una ruta pública. El detalle real ya quedó
+  // logueado server-side arriba.
+  return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 }

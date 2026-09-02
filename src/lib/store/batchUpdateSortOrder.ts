@@ -31,11 +31,23 @@ interface BatchUpdateSortOrderOptions {
  * extra) rechaza todo el batch — más estricto, pero más correcto: el
  * llamador nunca debería mandar ids ajenos en uso normal, y si lo hace
  * merece un error explícito, no un reorder parcial sin feedback.
+ *
+ * Limitación conocida, no resuelta acá: el SELECT de ownership y el UPSERT
+ * no corren en una transacción — una fila borrada por otro admin entre las
+ * dos queries puede resucitar vía la rama INSERT del upsert, con el nombre
+ * viejo capturado en el SELECT. Requeriría una función RPC transaccional
+ * (mismo tipo de mejora que #105 dejó deliberadamente diferida, "fix de N+1
+ * vía RPC" — no bloquea nada, ventana de carrera angosta en uso normal).
  */
 export async function batchUpdateSortOrder(
   supabase: SupabaseClient,
-  { table, storeId, ids, requiredColumns, knownColumns = {}, extraOwnershipFilter }: BatchUpdateSortOrderOptions
+  { table, storeId, ids: rawIds, requiredColumns, knownColumns = {}, extraOwnershipFilter }: BatchUpdateSortOrderOptions
 ): Promise<void> {
+  // Deduplicado a propósito: SQL IN() ya colapsa duplicados, así que sin
+  // esto un id repetido en el array hacía que existing.length < ids.length
+  // y rechazaba el batch entero con un NotFoundError falso, aunque todos
+  // los ids fueran válidos.
+  const ids = Array.from(new Set(rawIds));
   if (ids.length === 0) return;
 
   let ownershipQuery = supabase

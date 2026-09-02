@@ -1,6 +1,13 @@
-# Rutas de API admin-gated: usar `withStoreAdmin`, no reimplementar el guard
+# Rutas de API admin-gated: usar el guard compartido, no reimplementarlo
 
-Toda ruta bajo `src/app/[store]/api/**/route.ts` que requiera ser Store admin o Platform admin para ejecutarse tiene que envolver su handler con `withStoreAdmin` (`src/features/auth/utils/apiAuth.ts`). Nunca llamar a `verifyStoreAdminAuth(store)` directo desde un `route.ts` y armar el `403` a mano.
+Toda ruta bajo `src/app/[store]/api/**/route.ts` que requiera ser Store admin o Platform admin para ejecutarse tiene que usar un guard compartido — nunca llamar a `verifyStoreAdminAuth(store)` directo desde un `route.ts` y armar el `403`/`401` a mano.
+
+**Dos patrones coexisten hoy, a propósito, mientras dura la migración de #114 (ADR-0013):**
+
+- **`withStoreAdmin`** (`src/features/auth/utils/apiAuth.ts`) — el patrón establecido, todavía usado por la mayoría de las rutas sin migrar. Ver "Cómo usarlo" abajo.
+- **`createApiRoute(requireAdmin)`** (`src/lib/api/createApiRoute.ts` + `src/lib/auth/requireAdmin.ts`) — el patrón nuevo, usado por las rutas ya migradas a la capa de servicios (`categories`/`subcategories`, #115, y las que sigan según el orden de #112). Ver ADR-0013 para el pipeline de guards completo.
+
+No mezclar los dos en una ruta que no fue migrada — una ruta sin migrar sigue con `withStoreAdmin` hasta que le toque su turno en la migración, no se cambia de a una ad hoc. Una diferencia real entre ambos, no un descuido: `requireAdmin` devuelve `401` cuando no hay sesión (semánticamente correcto, RFC 7235); `withStoreAdmin` devuelve `403` para el mismo caso — no se homologó al migrar, alinear las ~39 rutas restantes es trabajo de la migración misma, no de este documento.
 
 ## Por qué existe esta regla
 
