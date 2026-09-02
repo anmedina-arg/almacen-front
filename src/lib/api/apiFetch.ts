@@ -17,3 +17,23 @@ export function apiFetch(path: string, init?: RequestInit): Promise<Response> {
   const normalizedPath = path.startsWith('/') ? path : `/${path}`;
   return fetch(`/${slug}/api${normalizedPath}`, init);
 }
+
+/**
+ * `error.error` puede ser un string (la mayoría de las rutas) o el shape de
+ * z.flatten() (rutas migradas a la capa de servicios, ver #115/#116:
+ * `{ error: parsed.error.flatten() }` en un 400) — sin esto, `new
+ * Error(objeto)` termina mostrando el `[object Object]` de String(objeto)
+ * en vez de un mensaje legible.
+ */
+export function extractErrorMessage(body: unknown, fallback: string): string {
+  const error = (body as { error?: unknown } | undefined)?.error;
+  if (typeof error === 'string') return error;
+  if (error && typeof error === 'object') {
+    const flattened = error as { formErrors?: string[]; fieldErrors?: Record<string, string[]> };
+    const firstFieldError = flattened.fieldErrors
+      ? Object.values(flattened.fieldErrors).flat()[0]
+      : undefined;
+    return flattened.formErrors?.[0] || firstFieldError || fallback;
+  }
+  return fallback;
+}

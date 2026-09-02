@@ -30,7 +30,7 @@ COMMENT ON COLUMN public.stores.logo_url IS
 COMMENT ON COLUMN public.stores.whatsapp_number IS
   'Número de WhatsApp (con código de país, sin +) para recibir pedidos de esta Store. NULL = usa NEXT_PUBLIC_WHATSAPP_NUMBER como fallback.';
 COMMENT ON COLUMN public.stores.feature_flags IS
-  'Catálogo de 8 keys booleanas por Store (#23): stock, combos, clientes, pagos, ranking, pos, dashboard, informes. Todas requeridas al escribir — omitir una es un estado inválido — pero src/lib/store/featureFlags.ts resuelve cualquier key faltante a false (apagado) para no romper si una fila queda parcialmente seteada. Catálogo/productos/pedidos-WhatsApp/ventas siempre están encendidos, no son flags. Escritura manual vía SQL Editor (ADR-0006) — sin UI de super-admin todavía.';
+  'Catálogo de 7 keys booleanas por Store (#23): stock, clientes, pagos, ranking, pos, dashboard, informes. Todas requeridas al escribir — omitir una es un estado inválido — pero src/lib/store/featureFlags.ts resuelve cualquier key faltante a false (apagado) para no romper si una fila queda parcialmente seteada. Catálogo/productos/pedidos-WhatsApp/ventas siempre están encendidos, no son flags — combos tampoco lo es desde #117 (ADR-0013), pasó a ser siempre-encendida junto con Producto Surtido. Escritura manual vía SQL Editor (ADR-0006) — sin UI de super-admin todavía.';
 
 -- ── Trigger: updated_at ──────────────────────────────────────────────────
 -- update_updated_at_column() es la función genérica del dominio Products

@@ -51,7 +51,7 @@ describe('provisionStore (#26)', () => {
   }
 
   it.skipIf(!hasServiceRoleCredentials)(
-    'crea stores + store_admins con las 8 flags y el whatsapp_number pedidos, dueño ya existente',
+    'crea stores + store_admins con las 7 flags y el whatsapp_number pedidos, dueño ya existente',
     async () => {
       const owner = await createDisposableProfile();
       const operator = await createDisposableProfile('super_admin');
