@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { categoryService } from '../services/categoryService';
-import type { CategoryInput } from '../schemas/categorySchemas';
+import { categoryApiClient } from '../services/categoryApiClient';
+import type { CategoryInput } from '@/features/products/schemas/categorySchemas';
 import type { CategoryWithSubcategories } from '../types/category.types';
 
 interface UpdateCategoryInput {
@@ -13,7 +13,7 @@ export function useUpdateCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: UpdateCategoryInput) => categoryService.update(id, data),
+    mutationFn: ({ id, data }: UpdateCategoryInput) => categoryApiClient.update(id, data),
 
     onMutate: async ({ id, data }) => {
       await queryClient.cancelQueries({ queryKey: adminKeys.categoriesList() });

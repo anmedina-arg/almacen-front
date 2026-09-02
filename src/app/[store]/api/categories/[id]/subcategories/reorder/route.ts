@@ -1,11 +1,9 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { z } from 'zod';
-
-const reorderSchema = z.object({
-  orderedIds: z.array(z.number().int().positive()),
-});
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { reorderSchema } from '@/features/products/schemas/categorySchemas';
+import { reorderSubcategories } from '@/features/products/services/categoryService';
 
 /**
  * PUT /api/categories/[id]/subcategories/reorder
@@ -14,36 +12,22 @@ const reorderSchema = z.object({
  *
  * Body: { orderedIds: number[] }
  */
-export const PUT = withStoreAdmin<{ id: string }>(async (request, { storeId }, { params }) => {
+export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id }) => {
   try {
-    const { id } = await params;
     const categoryId = parseInt(id, 10);
     if (isNaN(categoryId)) {
       return NextResponse.json({ error: 'Invalid category id' }, { status: 400 });
     }
 
-    const body = await request.json();
+    const body = await ctx.request.json();
     const parsed = reorderSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-
-    await Promise.all(
-      parsed.data.orderedIds.map((subId, index) =>
-        supabase
-          .from('subcategories')
-          .update({ sort_order: index + 1 })
-          .eq('id', subId)
-          .eq('category_id', categoryId) // safety: only update subcategories that belong to this category
-          .eq('store_id', storeId)
-      )
-    );
-
+    await reorderSubcategories(ctx.supabase, ctx.storeId, categoryId, parsed.data.orderedIds);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error in PUT /api/categories/[id]/subcategories/reorder:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'PUT /api/categories/[id]/subcategories/reorder');
   }
 });

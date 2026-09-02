@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { categoryService } from '../services/categoryService';
+import { categoryApiClient } from '../services/categoryApiClient';
 
 export function useCategories() {
   return useQuery({
     queryKey: adminKeys.categoriesList(),
-    queryFn: categoryService.getAllWithSubcategories,
+    queryFn: categoryApiClient.getAllWithSubcategories,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 }
