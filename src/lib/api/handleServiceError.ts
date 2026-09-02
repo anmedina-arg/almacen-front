@@ -1,12 +1,12 @@
 import { NextResponse } from 'next/server';
-import { NotFoundError, ConflictError } from './errors';
+import { NotFoundError, ConflictError, ValidationError } from './errors';
 
 /**
  * Convención única de manejo de errores para rutas de API — resuelve el
  * hallazgo del audit #106 (shape de response en éxito/error inconsistente
- * entre rutas). El service lanza NotFoundError/ConflictError para fallas de
- * negocio esperadas; cualquier otra excepción (error de Supabase no
- * previsto, bug) cae al catch-all como 500, logueado server-side.
+ * entre rutas). El service lanza NotFoundError/ConflictError/ValidationError
+ * para fallas de negocio esperadas; cualquier otra excepción (error de
+ * Supabase no previsto, bug) cae al catch-all como 500, logueado server-side.
  */
 export function handleServiceError(error: unknown, context: string): NextResponse {
   if (error instanceof NotFoundError) {
@@ -14,6 +14,9 @@ export function handleServiceError(error: unknown, context: string): NextRespons
   }
   if (error instanceof ConflictError) {
     return NextResponse.json({ error: error.message }, { status: 409 });
+  }
+  if (error instanceof ValidationError) {
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
   console.error(`Error in ${context}:`, error);
   // Nunca el mensaje real acá — puede traer detalle interno (query de

@@ -5,3 +5,5 @@
  */
 export class NotFoundError extends Error {}
 export class ConflictError extends Error {}
+/** Datos válidos en su tipo pero que violan una regla de negocio (ej. un CHECK constraint) — 400, no 409: no hay otro recurso en conflicto, el request en sí es inválido. */
+export class ValidationError extends Error {}
