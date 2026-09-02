@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { familiaService } from '../services/familiaService';
+import { familiaApiClient } from '../services/familiaApiClient';
 
 interface UpdateVariedadInput {
   id: number;
@@ -13,7 +13,7 @@ export function useUpdateVariedad() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, data }: UpdateVariedadInput) => familiaService.updateVariedad(id, data),
+    mutationFn: ({ id, data }: UpdateVariedadInput) => familiaApiClient.updateVariedad(id, data),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.familiasList() });
