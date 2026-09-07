@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { stockService } from '../services/stockService';
+import { stockApiClient } from '../services/stockApiClient';
 import type { StockEntryInput, StockEntryResult } from '../types/stock.types';
 
 /**
@@ -12,7 +12,7 @@ export function useBatchIncrementStock() {
   const queryClient = useQueryClient();
 
   return useMutation<StockEntryResult[], Error, StockEntryInput[]>({
-    mutationFn: (entries) => stockService.incrementStock(entries),
+    mutationFn: (entries) => stockApiClient.incrementStock(entries),
 
     onSuccess: async (_results, variables) => {
       // Invalidar lista de stock y alertas de stock bajo

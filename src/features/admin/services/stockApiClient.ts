@@ -8,13 +8,15 @@ import type {
 } from '../types/stock.types';
 import { apiFetch } from '@/lib/api/apiFetch';
 
-// ============================================================================
-// Stock Service
-// ============================================================================
-// Client-side service that communicates with the API route handlers.
-// Follows the same pattern as adminProductService.ts.
-
-export const stockService = {
+/**
+ * Cliente HTTP para Client Components — pasa por /api/stock/*, a
+ * diferencia del service del dominio (features/stock/services/
+ * stockService.ts, #122) que llama a Supabase directo y también lo usan
+ * los Server Components sin pasar por HTTP (ver ADR-0013 / ticket #107).
+ * Antes se llamaba stockService — renombrado para no confundir las dos
+ * capas, mismo criterio que category/combo/familia/orderApiClient.
+ */
+export const stockApiClient = {
   /**
    * Fetch all products with their stock levels.
    * Uses the v_product_stock view via the API route.
@@ -77,8 +79,8 @@ export const stockService = {
 
   /**
    * Increment stock for multiple products in a single batch.
-   * Calls the RPC function increment_product_stock for each entry.
-   * Uses best-effort: errors per item do not stop the rest.
+   * Server-side calls increment_product_stock_batch() (#122) — one
+   * round-trip, best-effort per row (errors per item do not stop the rest).
    */
   async incrementStock(entries: StockEntryInput[]): Promise<StockEntryResult[]> {
     const res = await apiFetch('/stock/entry', {
