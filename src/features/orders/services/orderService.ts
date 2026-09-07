@@ -101,6 +101,12 @@ export async function createOrder(
     p_whatsapp_message: whatsapp_message,
     p_items: items.map((item) => {
       const prod = productMap.get(item.product_id);
+      // price=0 (ej. promocional/regalo con costo real cargado) -> unit_cost
+      // 0, no el costo real — así se comportaba ya el checkout de WhatsApp
+      // antes de #121. POS antes mandaba el costo crudo del producto
+      // directo (sin este guard), pero unificarlo acá es el objetivo del
+      // ticket: mismo cálculo para las dos entradas al mismo dominio
+      // (code review de #121, aceptado a propósito, no es un bug nuevo).
       const unit_cost = prod && prod.price > 0 ? item.unit_price * (prod.cost / prod.price) : 0;
       return {
         product_id: item.product_id,

@@ -1,15 +1,13 @@
 import { z } from 'zod';
 
 /**
- * Schemas de Orders (#119 núcleo + #120 items/payments/client). POS (#121)
- * sigue en features/admin/schemas/orderSchemas.ts, que importa
- * addOrderItemSchema de acá (posOrderItemSchema la extiende) — dependencia
- * en un solo sentido (admin -> orders), a propósito: definir
- * createOrderItemSchema acá E importarla desde admin, mientras admin a su
- * vez exportaba algo que acá se necesitaba, generaba un import circular
- * real entre los dos archivos (TDZ en runtime: "Cannot access
- * 'addOrderItemSchema' before initialization", encontrado en smoke test
- * manual). Cuando #121 migre POS, esto se termina de consolidar acá.
+ * Schemas de Orders (#119 núcleo + #120 items/payments/client + #121 POS).
+ * features/admin/schemas/orderSchemas.ts ya no existe — llegó a definir
+ * createOrderItemSchema acá E importarla desde admin (para
+ * posOrderItemSchema) mientras acá se importaba algo de vuelta desde admin,
+ * un import circular real (TDZ en runtime: "Cannot access
+ * 'addOrderItemSchema' before initialization", encontrado en un smoke test
+ * manual durante #120) — resuelto consolidando todo en un solo archivo.
  */
 
 /**
@@ -105,3 +103,26 @@ export const updateOrderItemSchema = z.object({
 });
 
 export type UpdateOrderItemSchemaInput = z.infer<typeof updateOrderItemSchema>;
+
+/**
+ * POS (#121): mismo dominio de negocio que el checkout de WhatsApp, otro
+ * punto de entrada (ADR-0013) — no un schema propio de un dominio aparte.
+ * unit_cost queda en el schema porque el frontend (POSView.tsx) lo sigue
+ * mandando, pero el service ya no lo usa: recalcula unit_cost server-side
+ * con el mismo criterio que el resto de Orders (createOrder en
+ * orderService.ts), matemáticamente equivalente acá porque POS manda
+ * unit_price = product.price sin escalar (a diferencia del carrito público,
+ * que normaliza a precio-por-unidad-base).
+ */
+export const posOrderItemSchema = addOrderItemSchema.extend({
+  unit_cost: z.number().min(0).default(0),
+});
+
+export type PosOrderItemInput = z.infer<typeof posOrderItemSchema>;
+
+export const posOrderSchema = z.object({
+  customer_name: z.string().max(200).optional(),
+  items: z.array(posOrderItemSchema).min(1, 'Debe incluir al menos un producto'),
+});
+
+export type PosOrderInput = z.infer<typeof posOrderSchema>;

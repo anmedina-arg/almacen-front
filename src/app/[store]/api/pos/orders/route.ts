@@ -1,64 +1,50 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { posOrderSchema } from '@/features/admin/schemas/orderSchemas';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { posOrderSchema } from '@/features/orders/schemas/orderSchemas';
+import { createOrder, InsufficientStockError } from '@/features/orders/services/orderService';
 
 /**
  * POST /api/pos/orders
- * Creates an order from the admin Point of Sale panel.
- * Admin only. Uses the same create_order() RPC (transactional + stock decrement).
- * Does not require a WhatsApp message.
+ * Creates an order from the admin Point of Sale panel. Admin only.
+ *
+ * #121: POS es otro punto de entrada al mismo dominio Orders (ADR-0013),
+ * no un flujo propio — reusa orderService.createOrder(), el mismo que usa
+ * el checkout público de WhatsApp (#119). unit_cost del body se ignora a
+ * propósito: createOrder() ya lo recalcula server-side desde el
+ * precio/costo vigente del producto, con un resultado matemáticamente
+ * equivalente acá (ver comentario en posOrderItemSchema).
  */
-export const POST = withStoreAdmin(async (request, { storeId }) => {
+export const POST = createApiRoute(requireAdmin)(async (ctx) => {
   try {
-    const body = await request.json();
-    const validation = posOrderSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.errors[0]?.message || 'Datos inválidos' },
-        { status: 400 }
-      );
+    const body = await ctx.request.json();
+    const parsed = posOrderSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0]?.message || 'Datos inválidos' }, { status: 400 });
     }
 
-    const { customer_name, items } = validation.data;
+    const { customer_name, items } = parsed.data;
     const notes = customer_name?.trim() || 'Venta directa';
 
-    const supabase = await createSupabaseServerClient();
-
-    const { data, error } = await supabase.rpc('create_order', {
-      p_user_id: null,
-      p_notes: notes,
-      p_whatsapp_message: `[POS] ${notes}`,
-      p_items: items.map((item) => ({
+    const result = await createOrder(ctx.supabase, ctx.storeId, {
+      notes,
+      whatsapp_message: `[POS] ${notes}`,
+      items: items.map((item) => ({
         product_id: item.product_id,
         product_name: item.product_name,
         quantity: item.quantity,
         unit_price: item.unit_price,
-        unit_cost: item.unit_cost,
         is_by_weight: item.is_by_weight,
+        from_suggestion: false,
       })),
-      p_store_id: storeId,
     });
 
-    if (error) {
-      try {
-        const parsed = JSON.parse(error.message);
-        if (parsed.error === 'insufficient_stock') {
-          return NextResponse.json(
-            { error: 'insufficient_stock', products: parsed.products },
-            { status: 409 }
-          );
-        }
-      } catch {
-        // Not JSON — fall through to generic error
-      }
-      console.error('Error creating POS order via RPC:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/pos/orders:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    if (error instanceof InsufficientStockError) {
+      return NextResponse.json({ error: 'insufficient_stock', products: error.products }, { status: 409 });
+    }
+    return handleServiceError(error, 'POST /api/pos/orders');
   }
 });
