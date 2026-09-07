@@ -1,7 +1,14 @@
 import type { RecommendedProduct } from '../types/recommendation.types';
 import { apiFetch } from '@/lib/api/apiFetch';
 
-export const recommendationService = {
+/**
+ * Cliente HTTP para Client Components — pasa por /api/recommendations, a
+ * diferencia del service del dominio (features/recomendaciones/services/
+ * recommendationService.ts, #125). Antes se llamaba recommendationService
+ * — renombrado para no confundir las dos capas, mismo criterio que
+ * order/category/combo/familia/stock/rankingApiClient.
+ */
+export const recommendationApiClient = {
   async getRecommendations(
     productIds: number[],
     excludeIds: number[] = [],

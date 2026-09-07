@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { exportProductos, rowsToCsv } from '@/features/recomendaciones/services/reportsService';
 
 /**
  * GET /api/reports/productos
@@ -8,45 +10,20 @@ import { createSupabaseServerClient } from '@/lib/supabase/server';
  * costo, precio, márgenes, categoría, subcategoría y stock actual.
  * Admin only.
  */
-export const GET = withStoreAdmin(async (_request, { storeId }) => {
-  const supabase = await createSupabaseServerClient();
+export const GET = createApiRoute(requireAdmin)(async (ctx) => {
+  try {
+    const rows = await exportProductos(ctx.supabase, ctx.storeId);
+    const csv = rowsToCsv(rows);
+    const today = new Date().toISOString().slice(0, 10);
 
-  const { data, error } = await supabase.rpc('export_productos', { p_store_id: storeId });
-
-  if (error) {
-    console.error('[GET /api/reports/productos] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return new NextResponse(csv, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/csv; charset=utf-8',
+        'Content-Disposition': `attachment; filename="productos_${today}.csv"`,
+      },
+    });
+  } catch (error) {
+    return handleServiceError(error, 'GET /api/reports/productos');
   }
-
-  if (!data || data.length === 0) {
-    return NextResponse.json({ error: 'Sin productos para exportar' }, { status: 404 });
-  }
-
-  const rows = data as Record<string, unknown>[];
-  const headers = Object.keys(rows[0]);
-
-  const escape = (val: unknown): string => {
-    if (val === null || val === undefined) return '';
-    const str = String(val);
-    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
-      return `"${str.replace(/"/g, '""')}"`;
-    }
-    return str;
-  };
-
-  const csv = [
-    headers.join(','),
-    ...rows.map((row) => headers.map((h) => escape(row[h])).join(',')),
-  ].join('\n');
-
-  const today = new Date().toISOString().slice(0, 10);
-  const filename = `productos_${today}.csv`;
-
-  return new NextResponse(csv, {
-    status: 200,
-    headers: {
-      'Content-Type': 'text/csv; charset=utf-8',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-    },
-  });
 });
