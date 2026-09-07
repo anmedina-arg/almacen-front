@@ -1,31 +1,19 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { getTopCategories } from '@/features/ranking/services/rankingService';
 
-export const GET = withStoreAdmin(async (request, { storeId }) => {
+export const GET = createApiRoute(requireAdmin)(async (ctx) => {
   try {
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(ctx.request.url);
     const startDate = searchParams.get('start_date') || null;
     const endDate = searchParams.get('end_date') || null;
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    const supabase = await createSupabaseServerClient();
-
-    const { data, error } = await supabase.rpc('get_top_categories', {
-      p_store_id: storeId,
-      p_start_date: startDate,
-      p_end_date: endDate,
-      p_limit: limit,
-    });
-
-    if (error) {
-      console.error('Error calling get_top_categories RPC:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const categories = await getTopCategories(ctx.supabase, ctx.storeId, { startDate, endDate, limit });
+    return NextResponse.json(categories);
   } catch (error) {
-    console.error('Error in GET /api/ranking/categories:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'GET /api/ranking/categories');
   }
 });

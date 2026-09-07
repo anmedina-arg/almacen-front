@@ -1,7 +1,14 @@
 import type { TopCategory, TopCategoriesParams, TopProduct, TopProductsParams } from '../types/ranking.types';
-import { apiFetch } from '@/lib/api/apiFetch';
+import { apiFetch, extractErrorMessage } from '@/lib/api/apiFetch';
 
-export const rankingService = {
+/**
+ * Cliente HTTP para Client Components — pasa por /api/ranking/*, a
+ * diferencia del service del dominio (features/ranking/services/
+ * rankingService.ts, #124). Antes se llamaba rankingService — renombrado
+ * para no confundir las dos capas, mismo criterio que order/category/
+ * combo/familia/stockApiClient.
+ */
+export const rankingApiClient = {
   async getTopProducts(params: TopProductsParams): Promise<TopProduct[]> {
     const query = new URLSearchParams();
     if (params.startDate) query.set('start_date', params.startDate);
@@ -13,7 +20,7 @@ export const rankingService = {
     const res = await apiFetch(`/ranking?${query.toString()}`, { cache: 'no-store' });
     if (!res.ok) {
       const body = await res.json();
-      throw new Error(body.error || 'Error al obtener el ranking');
+      throw new Error(extractErrorMessage(body, 'Error al obtener el ranking'));
     }
     return res.json();
   },
@@ -27,7 +34,7 @@ export const rankingService = {
     const res = await apiFetch(`/ranking/categories?${query.toString()}`, { cache: 'no-store' });
     if (!res.ok) {
       const body = await res.json();
-      throw new Error(body.error || 'Error al obtener el ranking de categorías');
+      throw new Error(extractErrorMessage(body, 'Error al obtener el ranking de categorías'));
     }
     return res.json();
   },
