@@ -1,13 +1,17 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Order, OrderWithItems } from '@/features/admin/types/order.types';
-import type { CreateOrderSchemaInput, UpdateOrderSchemaInput } from '../schemas/orderSchemas';
+import type { Order, OrderWithItems, OrderItem } from '@/features/admin/types/order.types';
+import type { Client } from '@/features/admin/types/client.types';
+import type { OrderPayment } from '@/features/admin/types/payment.types';
+import type { CreateOrderSchemaInput, UpdateOrderSchemaInput, AddOrderItemSchemaInput, UpdateOrderItemSchemaInput } from '../schemas/orderSchemas';
+import type { SetPaymentsSchema } from '../schemas/paymentSchemas';
+import type { AssignClientSchema } from '../schemas/clientSchemas';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
 
 /**
- * Service del núcleo de Orders (#119) — ver ADR-0013, mismo patrón que
- * productService.ts. Cada función recibe storeId explícito. Items, payments
- * y asignación de cliente quedan en features/admin/ hasta que migren en
- * #120; POS (#121) sigue llamando a create_order() por su cuenta.
+ * Service de Orders (#119 núcleo + #120 items/payments/client) — ver
+ * ADR-0013, mismo patrón que productService.ts. Cada función recibe
+ * storeId explícito. POS (#121) sigue llamando a create_order() por su
+ * cuenta, sin pasar por acá todavía.
  */
 
 /** Un producto de la orden se quedó sin stock — create_order() ya devuelve la lista completa de faltantes, no solo el primero (ver reserve_order_stock.sql, #73). */
@@ -24,7 +28,7 @@ export async function getOrders(supabase: SupabaseClient, storeId: number): Prom
     .from('orders')
     // Trae los ítems en la misma query (evita un segundo round-trip que
     // pueda fallar/devolver vacío de forma independiente del principal).
-    .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
+    .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code, created_at), order_payments(id, method, amount)')
     .eq('store_id', storeId)
     .order('created_at', { ascending: false });
 
@@ -191,8 +195,7 @@ export async function confirmOrder(
   // confirm_order es SECURITY DEFINER y bypassea RLS — la verificación de
   // que la orden pertenece a esta Store tiene que hacerse acá, antes de
   // invocar el RPC.
-  const { data: order } = await supabase.from('orders').select('id').eq('id', orderId).eq('store_id', storeId).maybeSingle();
-  if (!order) throw new NotFoundError('Orden no encontrada');
+  await assertOrderInStore(supabase, storeId, orderId);
 
   const { data, error } = await supabase.rpc('confirm_order', {
     p_order_id: orderId,
@@ -213,8 +216,7 @@ export async function cancelOrder(
   orderId: number
 ): Promise<{ order_id: number; status: string; items_returned: number }> {
   // cancel_order es SECURITY DEFINER — mismo motivo que confirmOrder.
-  const { data: order } = await supabase.from('orders').select('id').eq('id', orderId).eq('store_id', storeId).maybeSingle();
-  if (!order) throw new NotFoundError('Orden no encontrada');
+  await assertOrderInStore(supabase, storeId, orderId);
 
   const { data, error } = await supabase.rpc('cancel_order', { p_order_id: orderId });
 
@@ -224,4 +226,201 @@ export async function cancelOrder(
     throw new Error(error.message);
   }
   return data;
+}
+
+/**
+ * Chequeo compartido "¿esta orden existe y es de esta Store?" — usado por
+ * confirm/cancel/payments/client (solo existencia) y assertOrderIsPending
+ * (existencia + status). Extraído en el code review de #120: vivía
+ * copiado, sin variar, en 5 funciones distintas de este archivo.
+ */
+async function assertOrderInStore(supabase: SupabaseClient, storeId: number, orderId: number): Promise<{ id: number; status: string }> {
+  const { data: order } = await supabase.from('orders').select('id, status').eq('id', orderId).eq('store_id', storeId).maybeSingle();
+  if (!order) throw new NotFoundError('Orden no encontrada');
+  return order;
+}
+
+async function assertOrderIsPending(supabase: SupabaseClient, storeId: number, orderId: number): Promise<void> {
+  const order = await assertOrderInStore(supabase, storeId, orderId);
+  if (order.status !== 'pending') throw new ValidationError('Solo se pueden editar ordenes pendientes');
+}
+
+export async function addOrderItem(
+  supabase: SupabaseClient,
+  storeId: number,
+  orderId: number,
+  input: AddOrderItemSchemaInput
+): Promise<OrderItem> {
+  // #103: el producto tiene que pertenecer a esta Store — el trigger
+  // validate_order_item_store ya lo bloquearía a nivel de base, pero acá
+  // cortamos antes con un mensaje claro en vez de un 500 genérico. En
+  // paralelo con el chequeo de la orden (independientes entre sí) —
+  // code review de #120.
+  const [, productResult] = await Promise.all([
+    assertOrderIsPending(supabase, storeId, orderId),
+    supabase.from('products').select('price, cost').eq('id', input.product_id).eq('store_id', storeId).maybeSingle(),
+  ]);
+  const product = productResult.data;
+  if (!product) throw new ValidationError('Producto no encontrado en esta Store');
+
+  const unit_cost = Number(product.price) > 0 ? input.unit_price * (Number(product.cost ?? 0) / Number(product.price)) : 0;
+
+  const { data, error } = await supabase
+    .from('order_items')
+    .insert({
+      order_id: orderId,
+      product_id: input.product_id,
+      product_name: input.product_name,
+      quantity: input.quantity,
+      unit_price: input.unit_price,
+      unit_cost,
+      is_by_weight: input.is_by_weight,
+      store_id: storeId,
+    })
+    .select()
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data;
+}
+
+export async function updateOrderItem(
+  supabase: SupabaseClient,
+  storeId: number,
+  orderId: number,
+  itemId: number,
+  input: UpdateOrderItemSchemaInput
+): Promise<OrderItem> {
+  // Recalcula unit_cost desde el costo vigente del producto (corrige ítems
+  // agregados sin costo en su momento). En paralelo con el chequeo de la
+  // orden (independientes entre sí) — code review de #120.
+  const [, existingItemResult] = await Promise.all([
+    assertOrderIsPending(supabase, storeId, orderId),
+    supabase.from('order_items').select('product_id, unit_price').eq('id', itemId).eq('order_id', orderId).maybeSingle(),
+  ]);
+  const existingItem = existingItemResult.data;
+
+  let unit_cost: number | undefined;
+  if (existingItem) {
+    const { data: product } = await supabase.from('products').select('price, cost').eq('id', existingItem.product_id).eq('store_id', storeId).maybeSingle();
+    if (product && Number(product.price) > 0) {
+      const effectiveUnitPrice = input.unit_price ?? existingItem.unit_price;
+      unit_cost = effectiveUnitPrice * (Number(product.cost ?? 0) / Number(product.price));
+    } else {
+      unit_cost = 0;
+    }
+  }
+
+  // Si esto sube la cantidad, adjust_stock_on_item_update() (trigger, #73)
+  // puede rechazar por stock insuficiente — ese error sigue cayendo acá
+  // como Error genérico (500), sin caso especial: mismo comportamiento que
+  // antes de esta migración, no es parte del alcance de #120.
+  const { data, error } = await supabase
+    .from('order_items')
+    .update({ ...input, ...(unit_cost !== undefined && { unit_cost }) })
+    .eq('id', itemId)
+    .eq('order_id', orderId)
+    .select()
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') throw new NotFoundError('Item no encontrado');
+    throw new Error(error.message);
+  }
+  return data;
+}
+
+export async function removeOrderItem(supabase: SupabaseClient, storeId: number, orderId: number, itemId: number): Promise<void> {
+  await assertOrderIsPending(supabase, storeId, orderId);
+
+  const { error } = await supabase.from('order_items').delete().eq('id', itemId).eq('order_id', orderId);
+  if (error) throw new Error(error.message);
+}
+
+export async function setPayments(
+  supabase: SupabaseClient,
+  storeId: number,
+  orderId: number,
+  payments: SetPaymentsSchema['payments']
+): Promise<OrderPayment[]> {
+  await assertOrderInStore(supabase, storeId, orderId);
+
+  // Replace: borrar todo e insertar de nuevo — operación admin-only, no
+  // necesita una transacción real (RPC) para este volumen (0-2 filas).
+  const { error: deleteError } = await supabase.from('order_payments').delete().eq('order_id', orderId);
+  if (deleteError) throw new Error(deleteError.message);
+
+  const { data, error: insertError } = await supabase
+    .from('order_payments')
+    .insert(payments.map((p) => ({ order_id: orderId, method: p.method, amount: p.amount ?? null, store_id: storeId })))
+    .select('id, order_id, method, amount, created_at');
+
+  if (insertError) throw new Error(insertError.message);
+  return data;
+}
+
+export async function deletePayment(supabase: SupabaseClient, storeId: number, orderId: number, paymentId: number): Promise<void> {
+  await assertOrderInStore(supabase, storeId, orderId);
+
+  const { error: deleteError } = await supabase.from('order_payments').delete().eq('id', paymentId).eq('order_id', orderId);
+  if (deleteError) throw new Error(deleteError.message);
+
+  // Si queda un pago, se le limpia el monto (ahora cubre el total completo).
+  const { error: clearError } = await supabase.from('order_payments').update({ amount: null }).eq('order_id', orderId);
+  if (clearError) throw new Error(clearError.message);
+}
+
+export async function assignClient(
+  supabase: SupabaseClient,
+  storeId: number,
+  orderId: number,
+  input: AssignClientSchema
+): Promise<{ id: number; client_id: number; client: Client }> {
+  const { barrio, manzana_lote } = input;
+
+  await assertOrderInStore(supabase, storeId, orderId);
+
+  // Find-or-create, scoped a esta Store — barrio + manzana_lote no son
+  // globalmente únicos entre Stores distintas. Partial unique indexes no
+  // se pueden usar con upsert onConflict, de ahí el select-then-insert.
+  let findQuery = supabase.from('clients').select('id, barrio, manzana_lote, display_code, created_at').eq('barrio', barrio).eq('store_id', storeId);
+  findQuery = barrio === 'otros'
+    ? (manzana_lote ? findQuery.eq('manzana_lote', manzana_lote) : findQuery.is('manzana_lote', null))
+    : findQuery.eq('manzana_lote', manzana_lote!);
+
+  const { data: existing, error: findError } = await findQuery.maybeSingle();
+  if (findError) throw new Error(findError.message);
+
+  let client: Client;
+  if (existing) {
+    client = existing;
+  } else {
+    const { data: created, error: insertError } = await supabase
+      .from('clients')
+      .insert({ barrio, manzana_lote: manzana_lote ?? null, store_id: storeId })
+      .select('id, barrio, manzana_lote, display_code, created_at')
+      .single();
+    if (insertError) throw new Error(insertError.message);
+    client = created;
+  }
+
+  const { data: updatedOrder, error: updateError } = await supabase
+    .from('orders')
+    .update({ client_id: client.id })
+    .eq('id', orderId)
+    .eq('store_id', storeId)
+    .select('id, client_id')
+    .single();
+  if (updateError) throw new Error(updateError.message);
+
+  return { ...updatedOrder, client };
+}
+
+export async function unassignClient(supabase: SupabaseClient, storeId: number, orderId: number): Promise<void> {
+  // Mismo comportamiento que antes de #120: sin chequeo previo de
+  // existencia — un orderId de otra Store no matchea el .eq('store_id'),
+  // 0 filas afectadas sin error, "éxito" silencioso. No es parte de este
+  // ticket cambiarlo.
+  const { error } = await supabase.from('orders').update({ client_id: null }).eq('id', orderId).eq('store_id', storeId);
+  if (error) throw new Error(error.message);
 }

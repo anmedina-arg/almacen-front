@@ -1,71 +1,16 @@
 import { z } from 'zod';
+import { addOrderItemSchema } from '@/features/orders/schemas/orderSchemas';
 
 /**
- * createOrderSchema/updateOrderSchema se movieron a
- * features/orders/schemas/orderSchemas.ts (#119, núcleo de Orders). Lo que
- * queda acá (items/POS) todavía no migró — #120 (items) y #121 (POS).
- * createOrderItemSchema se queda acá porque también lo usa
- * posOrderItemSchema, no solo createOrderSchema.
+ * Todo lo que vivía acá (createOrderSchema/updateOrderSchema en #119,
+ * addOrderItemSchema/updateOrderItemSchema/orderItemVariedadSchema/
+ * createOrderItemSchema en #120) se movió a
+ * features/orders/schemas/orderSchemas.ts. Lo único que queda es POS
+ * (#121, todavía sin migrar) — importa addOrderItemSchema de ahí porque
+ * posOrderItemSchema la extiende. Dependencia en un solo sentido
+ * (admin -> orders): tenerla en los dos sentidos causó un import circular
+ * real (TDZ en runtime), ver el comentario en el archivo de orders.
  */
-
-/**
- * Una Variedad elegida para una línea de Producto Surtido (#95) — el nombre
- * viaja acá porque es lo que se congela como snapshot al persistir.
- */
-export const orderItemVariedadSchema = z.object({
-  id: z.number().int().positive(),
-  name: z.string().min(1),
-});
-
-/**
- * Schema for a single order item when creating an order.
- */
-export const createOrderItemSchema = z.object({
-  product_id: z.number().int().positive('ID de producto invalido'),
-  product_name: z.string().min(1, 'Nombre de producto requerido').max(500),
-  quantity: z
-    .number({ invalid_type_error: 'La cantidad debe ser un numero' })
-    .positive('La cantidad debe ser mayor a 0'),
-  unit_price: z
-    .number({ invalid_type_error: 'El precio debe ser un numero' })
-    .min(0, 'El precio no puede ser negativo'),
-  is_by_weight: z.boolean().default(false),
-  from_suggestion: z.boolean().default(false),
-  variedades: z.array(orderItemVariedadSchema).optional(),
-});
-
-/**
- * Schema for adding an item to an existing order (admin).
- */
-export const addOrderItemSchema = z.object({
-  product_id: z.number().int().positive('ID de producto invalido'),
-  product_name: z.string().min(1, 'Nombre de producto requerido').max(500),
-  quantity: z
-    .number({ invalid_type_error: 'La cantidad debe ser un numero' })
-    .positive('La cantidad debe ser mayor a 0'),
-  unit_price: z
-    .number({ invalid_type_error: 'El precio debe ser un numero' })
-    .min(0, 'El precio no puede ser negativo'),
-  is_by_weight: z.boolean().default(false),
-});
-
-export type AddOrderItemSchemaInput = z.infer<typeof addOrderItemSchema>;
-
-/**
- * Schema for updating an order item quantity/price (admin).
- */
-export const updateOrderItemSchema = z.object({
-  quantity: z
-    .number({ invalid_type_error: 'La cantidad debe ser un numero' })
-    .positive('La cantidad debe ser mayor a 0')
-    .optional(),
-  unit_price: z
-    .number({ invalid_type_error: 'El precio debe ser un numero' })
-    .min(0, 'El precio no puede ser negativo')
-    .optional(),
-});
-
-export type UpdateOrderItemSchemaInput = z.infer<typeof updateOrderItemSchema>;
 
 export const posOrderItemSchema = addOrderItemSchema.extend({
   unit_cost: z.number().min(0).default(0),
