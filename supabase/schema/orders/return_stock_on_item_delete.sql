@@ -13,6 +13,11 @@
 --
 -- #97 (ADR-0012): con is_stock_tracked(OLD.store_id) = false, no devuelve
 -- stock — mismo criterio que create_order.sql.
+--
+-- #73: la devolución de stock (combo-aware) se extrajo a
+-- return_order_stock() — vivía duplicada acá, en cancel_order() y en
+-- adjust_stock_on_item_update() (rama de baja de cantidad). Sin cambio de
+-- comportamiento.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION return_stock_on_item_delete()
@@ -22,8 +27,6 @@ SECURITY DEFINER
 AS $$
 DECLARE
   v_order_status order_status;
-  v_is_combo     BOOLEAN;
-  v_component    RECORD;
 BEGIN
   SELECT status INTO v_order_status FROM orders WHERE id = OLD.order_id;
 
@@ -35,27 +38,8 @@ BEGIN
     RETURN OLD;
   END IF;
 
-  IF NOT is_stock_tracked(OLD.store_id) THEN
-    RETURN OLD;
-  END IF;
-
   PERFORM set_config('app.movement_type', 'return', true);
-
-  SELECT is_combo INTO v_is_combo FROM products WHERE id = OLD.product_id;
-
-  IF v_is_combo THEN
-    FOR v_component IN
-      SELECT * FROM combo_components WHERE combo_product_id = OLD.product_id
-    LOOP
-      UPDATE product_stock
-      SET quantity = quantity + (OLD.quantity * v_component.quantity)
-      WHERE product_id = v_component.component_product_id;
-    END LOOP;
-  ELSE
-    UPDATE product_stock
-    SET quantity = quantity + OLD.quantity
-    WHERE product_id = OLD.product_id;
-  END IF;
+  PERFORM return_order_stock(OLD.product_id, OLD.quantity, OLD.store_id);
 
   RETURN OLD;
 END;

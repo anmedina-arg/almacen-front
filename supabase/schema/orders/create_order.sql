@@ -40,6 +40,13 @@
 -- borró solo en test (DROP FUNCTION operativo, sin script separado dado
 -- que no tenía impacto de datos — a diferencia de las 126 órdenes reales
 -- que sí afectó el overload original de #70).
+--
+-- #73: el chequeo+descuento de stock por línea (combo-aware) se extrajo a
+-- reserve_order_stock() — vivía duplicado acá y en
+-- adjust_stock_on_item_update(). El comportamiento externo no cambia: sigue
+-- acumulando todos los ítems sin stock suficiente y recién al final hace
+-- RAISE EXCEPTION (revierte toda la transacción, incluidos los descuentos
+-- ya aplicados a otros ítems). Ver reserve_order_stock.sql.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.create_order(
@@ -57,18 +64,13 @@ DECLARE
   v_order_id         BIGINT;
   v_item             JSONB;
   v_total            NUMERIC(12, 2) := 0;
-  v_current_stock    NUMERIC(12, 3);
   v_needed           NUMERIC(12, 3);
   v_product_id       INTEGER;
-  v_is_combo         BOOLEAN;
-  v_component        RECORD;
-  v_component_needed NUMERIC(12, 3);
+  v_reserved         BOOLEAN;
+  v_available        NUMERIC(12, 3);
   v_failed_products  JSONB    := '[]'::JSONB;
   v_has_insufficient BOOLEAN  := FALSE;
-  v_stock_tracked    BOOLEAN;
 BEGIN
-  v_stock_tracked := is_stock_tracked(p_store_id);
-
   INSERT INTO orders (user_id, status, total, notes, whatsapp_message, store_id)
   VALUES (p_user_id, 'pending', 0, p_notes, p_whatsapp_message, p_store_id)
   RETURNING id INTO v_order_id;
@@ -80,55 +82,18 @@ BEGIN
     v_product_id := (v_item->>'product_id')::INTEGER;
     v_needed     := (v_item->>'quantity')::NUMERIC;
 
-    IF v_stock_tracked THEN
-      SELECT is_combo INTO v_is_combo FROM products WHERE id = v_product_id;
+    SELECT success, available INTO v_reserved, v_available
+    FROM reserve_order_stock(v_product_id, v_needed, p_store_id);
 
-      IF v_is_combo THEN
-        -- Para combos: verificar y descontar stock de componentes
-        FOR v_component IN
-          SELECT * FROM combo_components WHERE combo_product_id = v_product_id
-        LOOP
-          v_component_needed := v_needed * v_component.quantity;
-          SELECT quantity INTO v_current_stock
-          FROM product_stock WHERE product_id = v_component.component_product_id FOR UPDATE;
-
-          IF NOT FOUND OR v_current_stock < v_component_needed THEN
-            v_has_insufficient := TRUE;
-            v_failed_products  := v_failed_products || jsonb_build_object(
-              'id',        v_product_id,
-              'name',      v_item->>'product_name',
-              'requested', v_needed,
-              'available', COALESCE(FLOOR(v_current_stock / NULLIF(v_component.quantity, 0)), 0)
-            );
-            EXIT;
-          END IF;
-
-          UPDATE product_stock
-          SET quantity = quantity - v_component_needed
-          WHERE product_id = v_component.component_product_id;
-        END LOOP;
-
-        IF v_has_insufficient THEN CONTINUE; END IF;
-      ELSE
-        -- Producto normal
-        SELECT quantity INTO v_current_stock
-        FROM product_stock WHERE product_id = v_product_id FOR UPDATE;
-
-        IF NOT FOUND OR v_current_stock < v_needed THEN
-          v_has_insufficient := TRUE;
-          v_failed_products  := v_failed_products || jsonb_build_object(
-            'id',        v_product_id,
-            'name',      v_item->>'product_name',
-            'requested', v_needed,
-            'available', COALESCE(v_current_stock, 0)
-          );
-          CONTINUE;
-        END IF;
-
-        UPDATE product_stock
-        SET quantity = quantity - v_needed
-        WHERE product_id = v_product_id;
-      END IF;
+    IF NOT v_reserved THEN
+      v_has_insufficient := TRUE;
+      v_failed_products  := v_failed_products || jsonb_build_object(
+        'id',        v_product_id,
+        'name',      v_item->>'product_name',
+        'requested', v_needed,
+        'available', v_available
+      );
+      CONTINUE;
     END IF;
 
     INSERT INTO order_items (

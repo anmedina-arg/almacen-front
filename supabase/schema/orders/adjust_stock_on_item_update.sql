@@ -15,6 +15,17 @@
 --
 -- #97 (ADR-0012): con is_stock_tracked(NEW.store_id) = false, no ajusta
 -- product_stock — mismo criterio que create_order.sql.
+--
+-- #73: el chequeo+descuento (rama de suba) y la devolución (rama de baja)
+-- se extrajeron a reserve_order_stock()/return_order_stock() — vivían
+-- duplicados acá, en create_order() y (la devolución) en
+-- cancel_order()/return_stock_on_item_delete(). El mensaje de error de
+-- stock insuficiente para combo cambia de forma (antes nombraba el
+-- componente puntual con cantidades crudas; ahora es el mismo mensaje
+-- genérico que un producto simple, con la cantidad de combos disponibles) —
+-- ningún caller parsea este texto (confirmado: PUT /api/orders/[id]/items/[id]
+-- solo reenvía error.message tal cual), así que no es un cambio observable
+-- para nadie que dependa de su forma exacta.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION adjust_stock_on_item_update()
@@ -23,12 +34,10 @@ LANGUAGE plpgsql
 SECURITY DEFINER
 AS $$
 DECLARE
-  v_order_status   order_status;
-  v_diff           NUMERIC(12, 3);
-  v_current_stock  NUMERIC(12, 3);
-  v_is_combo       BOOLEAN;
-  v_component      RECORD;
-  v_component_diff NUMERIC(12, 3);
+  v_order_status order_status;
+  v_diff         NUMERIC(12, 3);
+  v_reserved     BOOLEAN;
+  v_available    NUMERIC(12, 3);
 BEGIN
   SELECT status INTO v_order_status FROM orders WHERE id = NEW.order_id;
 
@@ -44,83 +53,21 @@ BEGIN
     RETURN NEW;
   END IF;
 
-  IF NOT is_stock_tracked(NEW.store_id) THEN
-    RETURN NEW;
-  END IF;
-
   v_diff := NEW.quantity - OLD.quantity;
 
-  SELECT is_combo INTO v_is_combo FROM products WHERE id = NEW.product_id;
+  IF v_diff > 0 THEN
+    PERFORM set_config('app.movement_type', 'sale', true);
 
-  IF v_is_combo THEN
-    IF v_diff > 0 THEN
-      PERFORM set_config('app.movement_type', 'sale', true);
+    SELECT success, available INTO v_reserved, v_available
+    FROM reserve_order_stock(NEW.product_id, v_diff, NEW.store_id);
 
-      -- Verifica que todos los componentes tengan stock suficiente primero
-      FOR v_component IN
-        SELECT * FROM combo_components WHERE combo_product_id = NEW.product_id
-      LOOP
-        v_component_diff := v_diff * v_component.quantity;
-
-        SELECT quantity INTO v_current_stock
-        FROM product_stock
-        WHERE product_id = v_component.component_product_id
-        FOR UPDATE;
-
-        IF NOT FOUND OR v_current_stock < v_component_diff THEN
-          RAISE EXCEPTION 'Stock insuficiente para componente %. Disponible: %, Requerido: %',
-            v_component.component_product_id, COALESCE(v_current_stock, 0), v_component_diff;
-        END IF;
-      END LOOP;
-
-      -- Descuenta de todos los componentes
-      FOR v_component IN
-        SELECT * FROM combo_components WHERE combo_product_id = NEW.product_id
-      LOOP
-        UPDATE product_stock
-        SET quantity = quantity - (v_diff * v_component.quantity)
-        WHERE product_id = v_component.component_product_id;
-      END LOOP;
-
-    ELSE
-      -- Cantidad disminuyó → devuelve a los componentes
-      PERFORM set_config('app.movement_type', 'return', true);
-
-      FOR v_component IN
-        SELECT * FROM combo_components WHERE combo_product_id = NEW.product_id
-      LOOP
-        UPDATE product_stock
-        SET quantity = quantity + (ABS(v_diff) * v_component.quantity)
-        WHERE product_id = v_component.component_product_id;
-      END LOOP;
+    IF NOT v_reserved THEN
+      RAISE EXCEPTION 'Stock insuficiente. Disponible: %, Requerido: %',
+        v_available, v_diff;
     END IF;
-
   ELSE
-    -- Producto normal: lógica original
-    IF v_diff > 0 THEN
-      PERFORM set_config('app.movement_type', 'sale', true);
-
-      SELECT quantity INTO v_current_stock
-      FROM product_stock
-      WHERE product_id = NEW.product_id
-      FOR UPDATE;
-
-      IF NOT FOUND OR v_current_stock < v_diff THEN
-        RAISE EXCEPTION 'Stock insuficiente. Disponible: %, Requerido: %',
-          COALESCE(v_current_stock, 0), v_diff;
-      END IF;
-
-      UPDATE product_stock
-      SET quantity = quantity - v_diff
-      WHERE product_id = NEW.product_id;
-
-    ELSE
-      PERFORM set_config('app.movement_type', 'return', true);
-
-      UPDATE product_stock
-      SET quantity = quantity + ABS(v_diff)
-      WHERE product_id = NEW.product_id;
-    END IF;
+    PERFORM set_config('app.movement_type', 'return', true);
+    PERFORM return_order_stock(NEW.product_id, ABS(v_diff), NEW.store_id);
   END IF;
 
   RETURN NEW;

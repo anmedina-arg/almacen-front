@@ -21,6 +21,11 @@
 -- devuelve stock a ningún ítem — mismo criterio que create_order.sql.
 -- items_returned del jsonb de retorno sigue contando los ítems procesados
 -- igual, se use o no stock (es información sobre la orden, no sobre stock).
+--
+-- #73: la devolución de stock por línea (combo-aware) se extrajo a
+-- return_order_stock() — vivía duplicada acá, en
+-- adjust_stock_on_item_update() (rama de baja de cantidad) y en
+-- return_stock_on_item_delete(). Sin cambio de comportamiento.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION cancel_order(
@@ -34,9 +39,6 @@ DECLARE
   v_order         orders%ROWTYPE;
   v_item          order_items%ROWTYPE;
   v_items_count   INTEGER := 0;
-  v_is_combo      BOOLEAN;
-  v_component     RECORD;
-  v_stock_tracked BOOLEAN;
 BEGIN
   -- Lock la orden para evitar cancelaciones concurrentes
   SELECT * INTO v_order FROM orders WHERE id = p_order_id FOR UPDATE;
@@ -49,8 +51,6 @@ BEGIN
     RAISE EXCEPTION 'Order % is already cancelled', p_order_id;
   END IF;
 
-  v_stock_tracked := is_stock_tracked(v_order.store_id);
-
   -- Tag de auditoría: 'return'
   PERFORM set_config('app.movement_type', 'return', true);
 
@@ -58,23 +58,8 @@ BEGIN
   FOR v_item IN
     SELECT * FROM order_items WHERE order_id = p_order_id
   LOOP
-    IF v_stock_tracked AND v_item.product_id IS NOT NULL THEN
-      SELECT is_combo INTO v_is_combo FROM products WHERE id = v_item.product_id;
-
-      IF v_is_combo THEN
-        -- Devuelve stock a cada componente
-        FOR v_component IN
-          SELECT * FROM combo_components WHERE combo_product_id = v_item.product_id
-        LOOP
-          UPDATE product_stock
-          SET quantity = quantity + (v_item.quantity * v_component.quantity)
-          WHERE product_id = v_component.component_product_id;
-        END LOOP;
-      ELSE
-        UPDATE product_stock
-        SET quantity = quantity + v_item.quantity
-        WHERE product_id = v_item.product_id;
-      END IF;
+    IF v_item.product_id IS NOT NULL THEN
+      PERFORM return_order_stock(v_item.product_id, v_item.quantity, v_order.store_id);
     END IF;
 
     v_items_count := v_items_count + 1;
