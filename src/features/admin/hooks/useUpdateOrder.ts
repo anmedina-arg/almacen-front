@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { orderService } from '../services/orderService';
+import { orderApiClient } from '../services/orderApiClient';
 
 /**
  * Mutation hook to update order fields (status, notes).
@@ -16,7 +16,7 @@ export function useUpdateOrder() {
     }: {
       orderId: number;
       updates: { status?: string; notes?: string | null; created_at?: string };
-    }) => orderService.updateOrder(orderId, updates),
+    }) => orderApiClient.updateOrder(orderId, updates),
 
     onSuccess: async (_data, variables) => {
       await queryClient.invalidateQueries({

@@ -1,6 +1,14 @@
 import { z } from 'zod';
 
 /**
+ * createOrderSchema/updateOrderSchema se movieron a
+ * features/orders/schemas/orderSchemas.ts (#119, núcleo de Orders). Lo que
+ * queda acá (items/POS) todavía no migró — #120 (items) y #121 (POS).
+ * createOrderItemSchema se queda acá porque también lo usa
+ * posOrderItemSchema, no solo createOrderSchema.
+ */
+
+/**
  * Una Variedad elegida para una línea de Producto Surtido (#95) — el nombre
  * viaja acá porque es lo que se congela como snapshot al persistir.
  */
@@ -25,30 +33,6 @@ export const createOrderItemSchema = z.object({
   from_suggestion: z.boolean().default(false),
   variedades: z.array(orderItemVariedadSchema).optional(),
 });
-
-/**
- * Schema for creating a new order (public endpoint).
- */
-export const createOrderSchema = z.object({
-  notes: z.string().max(1000, 'Maximo 1000 caracteres').optional(),
-  whatsapp_message: z.string().min(1, 'Mensaje de WhatsApp requerido').max(5000),
-  items: z
-    .array(createOrderItemSchema)
-    .min(1, 'Debe incluir al menos un item'),
-});
-
-export type CreateOrderSchemaInput = z.infer<typeof createOrderSchema>;
-
-/**
- * Schema for updating an order (admin: change status, notes).
- */
-export const updateOrderSchema = z.object({
-  status: z.enum(['pending', 'confirmed', 'cancelled']).optional(),
-  notes: z.string().max(1000).nullable().optional(),
-  created_at: z.string().datetime({ offset: true }).optional(),
-});
-
-export type UpdateOrderSchemaInput = z.infer<typeof updateOrderSchema>;
 
 /**
  * Schema for adding an item to an existing order (admin).

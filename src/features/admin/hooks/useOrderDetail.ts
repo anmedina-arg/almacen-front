@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { orderService } from '../services/orderService';
+import { orderApiClient } from '../services/orderApiClient';
 
 /**
  * Fetches a single order with its items.
@@ -9,7 +9,7 @@ import { orderService } from '../services/orderService';
 export function useOrderDetail(orderId: number) {
   return useQuery({
     queryKey: adminKeys.orderDetail(orderId),
-    queryFn: () => orderService.getOrderById(orderId),
+    queryFn: () => orderApiClient.getOrderById(orderId),
     enabled: orderId > 0,
     staleTime: 15 * 1000,
   });

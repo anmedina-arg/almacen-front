@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { orderService } from '../services/orderService';
+import { orderApiClient } from '../services/orderApiClient';
 import type { AddOrderItemInput } from '../types/order.types';
 import { useInvalidateOrderQueries } from './useInvalidateOrderQueries';
 
@@ -17,7 +17,7 @@ export function useAddOrderItem() {
     }: {
       orderId: number;
       item: AddOrderItemInput;
-    }) => orderService.addOrderItem(orderId, item),
+    }) => orderApiClient.addOrderItem(orderId, item),
 
     onSuccess: async (_data, variables) => {
       await invalidateOrderQueries(variables.orderId);

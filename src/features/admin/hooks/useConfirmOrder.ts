@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { orderService } from '../services/orderService';
+import { orderApiClient } from '../services/orderApiClient';
 import { useInvalidateOrderQueries } from './useInvalidateOrderQueries';
 
 /**
@@ -10,7 +10,7 @@ export function useConfirmOrder() {
   const invalidateOrderQueries = useInvalidateOrderQueries();
 
   return useMutation({
-    mutationFn: (orderId: number) => orderService.confirmOrder(orderId),
+    mutationFn: (orderId: number) => orderApiClient.confirmOrder(orderId),
 
     onSuccess: async (_data, orderId) => {
       await invalidateOrderQueries(orderId);

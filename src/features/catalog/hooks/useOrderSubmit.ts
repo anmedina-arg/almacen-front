@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import type { CartItem } from '../types';
 import { generateWhatsAppMessage, openWhatsApp } from '../utils/messageUtils';
 import { calculateItemPrice } from '../utils/productUtils';
-import { orderService } from '@/features/admin/services/orderService';
+import { orderApiClient } from '@/features/admin/services/orderApiClient';
 import type { PendingSurtidoEntry } from '../stores/cartStore';
 
 export function useOrderSubmit(
@@ -56,7 +56,7 @@ export function useOrderSubmit(
     // Start the fetch BEFORE opening WhatsApp so the request is already
     // in-flight when iOS switches apps. Combined with keepalive:true in the
     // service, this survives Safari being backgrounded immediately after.
-    const orderPromise = orderService.createOrder({
+    const orderPromise = orderApiClient.createOrder({
       whatsapp_message: message,
       items,
     });
