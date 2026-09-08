@@ -1,63 +1,32 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { cancelOrderSchema } from '@/features/orders/schemas/orderSchemas';
+import { cancelOrder } from '@/features/orders/services/orderService';
 
 /**
  * PUT /api/orders/[orderId]/cancel
- * Cancel an order and return its stock. Admin only.
- * Uses the cancel_order RPC to atomically return stock and update status.
+ * Cancel an order and return its stock. Admin only. Uses the cancel_order
+ * RPC to atomically return stock and update status.
  */
-export const PUT = withStoreAdmin<{ orderId: string }>(async (_request, { storeId }, { params }) => {
+export const PUT = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx, { orderId: orderIdParam }) => {
   try {
-    const { orderId: orderIdParam } = await params;
-    const orderId = parseInt(orderIdParam);
+    const orderId = parseInt(orderIdParam, 10);
     if (isNaN(orderId)) {
-      return NextResponse.json(
-        { error: 'ID de orden invalido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID de orden invalido' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-
-    // cancel_order es SECURITY DEFINER — mismo motivo que en confirm/route.ts.
-    const { data: order } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .maybeSingle();
-    if (!order) {
-      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
+    // Ver nota en confirm/route.ts (#106/#119).
+    const body = await ctx.request.json().catch(() => ({}));
+    const parsed = cancelOrderSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Datos invalidos', details: parsed.error.flatten().fieldErrors }, { status: 400 });
     }
 
-    const { data, error } = await supabase.rpc('cancel_order', {
-      p_order_id: orderId,
-    });
-
-    if (error) {
-      console.error('Error cancelling order:', error);
-      if (error.message.includes('not found')) {
-        return NextResponse.json(
-          { error: 'Orden no encontrada' },
-          { status: 404 }
-        );
-      }
-      if (error.message.includes('already cancelled')) {
-        return NextResponse.json(
-          { error: 'La orden ya está cancelada' },
-          { status: 400 }
-        );
-      }
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const result = await cancelOrder(ctx.supabase, ctx.storeId, orderId);
+    return NextResponse.json(result);
   } catch (error) {
-    console.error('Error in PUT /api/orders/[orderId]/cancel:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleServiceError(error, 'PUT /api/orders/[orderId]/cancel');
   }
 });

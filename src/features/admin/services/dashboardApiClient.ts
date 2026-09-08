@@ -1,11 +1,16 @@
-import type { StockByCategoryItem } from '@/app/[store]/api/dashboard/stock-by-category/route';
-import type { StockProductItem } from '@/app/[store]/api/dashboard/stock-products/route';
-import type { RotationItem } from '@/app/[store]/api/dashboard/rotation/route';
+import type { StockByCategoryItem, StockProductItem, RotationItem } from '@/features/admin/types/dashboard.types';
 import { apiFetch } from '@/lib/api/apiFetch';
 
 export type { RotationItem };
 
-export const dashboardService = {
+/**
+ * Cliente HTTP para Client Components — pasa por /api/dashboard/*, a
+ * diferencia del service del dominio (features/dashboard/services/
+ * dashboardService.ts, #126). Antes se llamaba dashboardService —
+ * renombrado para no confundir las dos capas, mismo criterio que
+ * order/category/combo/familia/stock/ranking/recommendationApiClient.
+ */
+export const dashboardApiClient = {
   async getStockByCategory(): Promise<StockByCategoryItem[]> {
     const res = await apiFetch('/dashboard/stock-by-category', { cache: 'no-store' });
     if (!res.ok) throw new Error('Error al obtener stock por categoría');

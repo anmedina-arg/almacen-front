@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { familiaService } from '../services/familiaService';
+import { familiaApiClient } from '../services/familiaApiClient';
 
 interface CreateVariedadInput {
   familiaId: number;
@@ -12,7 +12,7 @@ export function useCreateVariedad() {
 
   return useMutation({
     mutationFn: ({ familiaId, name }: CreateVariedadInput) =>
-      familiaService.createVariedad(familiaId, name),
+      familiaApiClient.createVariedad(familiaId, name),
 
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.familiasList() });

@@ -1,5 +1,5 @@
 import { Product } from '@/types';
-import { apiFetch } from '@/lib/api/apiFetch';
+import { apiFetch, extractErrorMessage } from '@/lib/api/apiFetch';
 
 export const adminProductService = {
   async getById(id: number): Promise<Product> {
@@ -8,7 +8,7 @@ export const adminProductService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Failed to fetch product');
+      throw new Error(extractErrorMessage(error, 'Failed to fetch product'));
     }
     return res.json();
   },
@@ -23,7 +23,7 @@ export const adminProductService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Failed to create product');
+      throw new Error(extractErrorMessage(error, 'Failed to create product'));
     }
     return res.json();
   },
@@ -38,7 +38,7 @@ export const adminProductService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Failed to update product');
+      throw new Error(extractErrorMessage(error, 'Failed to update product'));
     }
     return res.json();
   },
@@ -49,7 +49,7 @@ export const adminProductService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Failed to delete product');
+      throw new Error(extractErrorMessage(error, 'Failed to delete product'));
     }
   },
 };

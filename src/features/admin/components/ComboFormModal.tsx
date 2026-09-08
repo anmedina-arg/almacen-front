@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '../hooks/useProducts';
 import { useComboComponents } from '../hooks/useComboComponents';
 import { useUpdateComboComponents } from '../hooks/useUpdateComboComponents';
 import { useCloudinaryUpload } from '../hooks/useCloudinaryUpload';
@@ -119,6 +119,10 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
     if (formData.price <= 0) newErrors.price = 'El precio debe ser mayor a 0';
     if (components.length === 0) newErrors.components = 'Debe agregar al menos un componente';
     if (!formData.image && !pendingFile) newErrors.image = 'Imagen requerida';
+    // Categoría requerida solo al crear (#66/#116) — un combo es un producto
+    // (is_combo=true) y pasa por el mismo POST /api/products, que ahora
+    // rechaza sin category_id. Mismo criterio que ProductFormModal.
+    if (mode === 'create' && formData.category_id == null) newErrors.category_id = 'Categoría requerida';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -328,6 +332,7 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
+            {errors.category_id && <p className="mt-1 text-sm text-red-600">{errors.category_id}</p>}
           </div>
 
           {/* Subcategoría */}

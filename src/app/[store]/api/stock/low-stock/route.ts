@@ -1,36 +1,26 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { requireFlag } from '@/lib/store/requireFlag';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { getLowStockProducts } from '@/features/stock/services/stockService';
 
 /**
  * GET /api/stock/low-stock
- * Retorna productos con stock por debajo del minimo configurado.
- * Usa la funcion RPC get_low_stock_products.
- * Requiere autenticacion de admin de la Store.
+ * Retorna productos con stock por debajo del mínimo configurado. Admin
+ * only, requiere la flag 'stock' (#122).
  */
-export const GET = withStoreAdmin(async (_request, { storeId }) => {
+export const GET = createApiRoute(requireAdmin, requireFlag('stock'))(async (ctx) => {
   try {
-    const supabase = await createSupabaseServerClient();
-
-    const { data, error } = await supabase.rpc('get_low_stock_products', { p_store_id: storeId });
-
-    if (error) {
-      console.error('Error fetching low stock:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data, {
+    const products = await getLowStockProducts(ctx.supabase, ctx.storeId);
+    return NextResponse.json(products, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
-        'Pragma': 'no-cache',
-        'Expires': '0',
+        Pragma: 'no-cache',
+        Expires: '0',
       },
     });
   } catch (error) {
-    console.error('Error in GET /api/stock/low-stock:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleServiceError(error, 'GET /api/stock/low-stock');
   }
 });

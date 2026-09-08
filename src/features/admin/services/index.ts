@@ -1,4 +1,4 @@
 export * from './adminProductService';
-export * from './stockService';
-export * from './orderService';
-export * from './comboService';
+export * from './stockApiClient';
+export * from './orderApiClient';
+export * from './comboApiClient';

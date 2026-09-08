@@ -14,16 +14,45 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | `product_price_history.sql` | Historial append-only de precio/costo — alimentado por `log_price_change` (ver abajo), no por escritura directa. Su policy de lectura no está scoped por Store — ver Gaps conocidos. |
 | `order_item_variedades.sql` | Variedades elegidas por línea de Producto Surtido (#95). Depende del dominio Familias/Variedades (#92) — `variedad_id` es FK nullable a `variedades`, `variedad_name` es un snapshot congelado que sobrevive a que la Variedad se deshabilite o se borre. |
 
+## Flujo de creación de un pedido (`create_order`)
+
+Paso a paso, todo dentro de una sola transacción (todo-o-nada — si un paso
+falla, se revierte todo lo anterior, incluidos los descuentos de stock ya
+aplicados a otros ítems del mismo pedido):
+
+1. Crea la fila de `orders` en estado `pending`, total provisorio en 0.
+2. Por cada ítem del carrito: llama a `reserve_order_stock()` (ver
+   "Funciones auxiliares" abajo) para chequear+descontar stock del producto
+   (combo-aware, no-op si la Store no trackea stock). Si no alcanza, anota
+   el producto como faltante y sigue con el resto del carrito (no aborta
+   todavía) — así el error final devuelve la lista completa de lo que
+   faltó, no solo el primer producto.
+3. Si reservó stock (o no hacía falta), inserta el `order_item`
+   (producto, cantidad, precio/costo snapshot, si vino de una
+   recomendación) y acumula el total.
+4. Si algún ítem quedó sin stock, revierte todo el pedido (`RAISE
+   EXCEPTION`) con la lista de productos faltantes.
+5. Si no, graba el total real y devuelve el id del pedido.
+
 ## Funciones RPC (llamadas desde la API)
 
 | Archivo | Qué hace |
 |---|---|
-| `create_order.sql` | Crea la orden + ítems, descuenta stock (combo-aware). Ya resuelta en #49 — reubicada sin re-verificar. Desde #97: si la Store tiene `stock:false` (`is_stock_tracked()`, dominio Stock), no chequea ni descuenta — todo producto se trata como siempre disponible. |
+| `create_order.sql` | Crea la orden + ítems, descuenta stock (combo-aware). Ya resuelta en #49 — reubicada sin re-verificar. Desde #97: si la Store tiene `stock:false` (`is_stock_tracked()`, dominio Stock), no chequea ni descuenta — todo producto se trata como siempre disponible. Desde #73: el chequeo+descuento por línea vive en `reserve_order_stock()`, no inline (ver "Flujo" arriba y "Funciones auxiliares" abajo). |
 | `confirm_order.sql` | Pasa una orden `pending` a `confirmed`. No estaba en el AC original de #84 — se agregó al notar que vivía en el mismo archivo fuente que `cancel_order`, para no dejarla huérfana. |
-| `cancel_order.sql` | Cancela una orden, devuelve stock (combo-aware). Desde #97: no devuelve stock si `stock:false` para esa Store — mismo criterio que `create_order`. |
-| `add_order_item_variedades.sql` | Paso posterior a `create_order()` (#95) — guarda las Variedades elegidas por línea de Producto Surtido. A propósito NO modifica `create_order()` (#73): correlaciona los `order_items` recién creados por orden de inserción (`ORDER BY id`), ya que `create_order()` no devuelve sus ids. Best-effort: si falla, la orden ya quedó creada igual. |
+| `cancel_order.sql` | Cancela una orden, devuelve stock (combo-aware) vía `return_order_stock()` (#73). Desde #97: no devuelve stock si `stock:false` para esa Store — mismo criterio que `create_order`. |
+| `add_order_item_variedades.sql` | Paso posterior a `create_order()` (#95) — guarda las Variedades elegidas por línea de Producto Surtido. A propósito NO modifica `create_order()`: correlaciona los `order_items` recién creados por orden de inserción (`ORDER BY id`), ya que `create_order()` no devuelve sus ids. Best-effort: si falla, la orden ya quedó creada igual. |
 
 `confirm_order`/`cancel_order` son `SECURITY DEFINER` sin `p_store_id` — la verificación de que la orden pertenece a la Store del caller se hace en la ruta de API, antes de invocar el RPC.
+
+## Funciones auxiliares (no son RPC ni trigger)
+
+| Archivo | Qué hace |
+|---|---|
+| `reserve_order_stock.sql` | Chequea+descuenta (con lock) el stock de una línea de pedido, combo-aware — dos pasadas (lockea y chequea todos los componentes del combo antes de descontar ninguno). No decide qué hacer si falta stock: devuelve `success`/`available` y deja la decisión al caller. Extraída en #73 — vivía duplicada, con variantes, en `create_order()` y `adjust_stock_on_item_update()`. |
+| `return_order_stock.sql` | Inverso de `reserve_order_stock()` — devuelve stock de una línea, combo-aware, siempre "exitoso". Extraída en #73 — vivía duplicada en `cancel_order()`, `adjust_stock_on_item_update()` (rama de baja) y `return_stock_on_item_delete()`. |
+
+Ambas son no-op (sin locks) si la Store no trackea stock (`is_stock_tracked()`) — encapsulan ahí el chequeo que antes repetían las 4 funciones por separado. Sin GRANT explícito ni `SECURITY DEFINER`: solo se llaman desde adentro de otras funciones de este dominio, nunca directo desde la API (mismo criterio que `is_stock_tracked()`/`get_combo_effective_stock()`, dominio Stock/Combos).
 
 ## Funciones trigger (no se llaman directo)
 
@@ -32,8 +61,8 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | `validate_order_item_store.sql` | Al INSERT/UPDATE de `product_id`/`store_id` en `order_items` — rechaza si el producto no pertenece a esa Store (#103, incidente en producción: nada lo impedía antes). |
 | `recalculate_order_total.sql` | Al INSERT/UPDATE/DELETE en `order_items` — recalcula `orders.total`. |
 | `update_orders_updated_at.sql` | Al UPDATE en `orders`. |
-| `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware. Desde #97: no-op si `stock:false` para esa Store. |
-| `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock, combo-aware. Desde #97: no-op si `stock:false` para esa Store. |
+| `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware, vía `reserve_order_stock()`/`return_order_stock()` (#73). Desde #97: no-op si `stock:false` para esa Store. El mensaje de error de stock insuficiente para combo cambió de forma en #73 (antes nombraba el componente puntual con cantidades crudas; ahora es genérico, con la cantidad de combos disponibles) — ningún caller parsea ese texto. |
+| `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock vía `return_order_stock()` (#73), combo-aware. Desde #97: no-op si `stock:false` para esa Store. |
 | `sync_order_items_unit_cost.sql` | Al UPDATE de `products.cost` — sincroniza `order_items.unit_cost` en pedidos con `unit_cost = 0`. Dispara sobre `products`, tabla de Products (#85) — el `CREATE TRIGGER` que la ata vive en `supabase/schema/products/products.sql` (agregado por #85), no acá. |
 | `log_price_change.sql` | Al INSERT/UPDATE en `products` — registra en `product_price_history`. Mismo caso: el `CREATE TRIGGER` vive en `supabase/schema/products/products.sql`. Setea `store_id` desde `NEW.store_id` (#46) — antes no lo seteaba, dejando cada cambio de precio real con `store_id NULL`. |
 

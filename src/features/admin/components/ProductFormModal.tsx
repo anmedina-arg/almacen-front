@@ -105,6 +105,15 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
       return;
     }
 
+    // Categoría requerida solo al crear (#66) — no se agrega al schema
+    // compartido con edit para no forzar a resolver la categoría de un
+    // producto legacy sin categoría como efecto de una edición no
+    // relacionada. El backend replica esta misma regla (createProductSchema).
+    if (mode === 'create' && result.data.category_id == null) {
+      setErrors({ category_id: 'Categoría requerida' });
+      return;
+    }
+
     setErrors({});
 
     if (mode === 'create') {
@@ -230,6 +239,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
                 <option key={cat.id} value={cat.id}>{cat.name}</option>
               ))}
             </select>
+            {errors.category_id && <p className="mt-1 text-sm text-red-600">{errors.category_id}</p>}
           </div>
 
           {/* Subcategoría (dinámica) */}

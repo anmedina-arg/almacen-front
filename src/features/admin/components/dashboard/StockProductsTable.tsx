@@ -1,6 +1,6 @@
 'use client';
 
-import type { StockProductItem } from '@/app/[store]/api/dashboard/stock-products/route';
+import type { StockProductItem } from '@/features/admin/types/dashboard.types';
 
 const ARS = (v: number) =>
   new Intl.NumberFormat('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 }).format(v);

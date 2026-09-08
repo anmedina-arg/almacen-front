@@ -1,6 +1,7 @@
 'use client';
 
 import type { ConfirmationModalProps } from '../types';
+import { SuggestionsSection } from './SuggestionsSection';
 
 /**
  * Componente modal de confirmación
@@ -28,13 +29,13 @@ export function ConfirmationModal({
 							{message}
 						</div>
 					</div>
+					{cartProductIds && cartProductIds.length > 0 && (
+						<SuggestionsSection cartProductIds={cartProductIds} />
+					)}
 				</div>
 
 				{/* Botones — siempre visibles al fondo */}
 				<div className="flex-shrink-0 px-6 pb-6 pt-2">
-					{/* Sugerencias apagadas como hotfix (#103): get_recommendations() no
-					    filtra por Store, mezclaba productos de otras tiendas en el
-					    checkout — volver a habilitar recién cuando #103 esté resuelto. */}
 					<p className="text-sm text-gray-600 mb-3 text-center mt-4">¿Lo envías?</p>
 					<div className="flex gap-3">
 						<button

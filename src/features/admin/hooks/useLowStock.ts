@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { stockService } from '../services/stockService';
+import { stockApiClient } from '../services/stockApiClient';
 
 /**
  * Fetches products with low stock alerts.
@@ -9,7 +9,7 @@ import { stockService } from '../services/stockService';
 export function useLowStock() {
   return useQuery({
     queryKey: adminKeys.lowStock(),
-    queryFn: stockService.getLowStock,
+    queryFn: stockApiClient.getLowStock,
     staleTime: 30 * 1000,
   });
 }

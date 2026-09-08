@@ -1,11 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { familiaService } from '@/features/admin/services/familiaService';
+import { familiaApiClient } from '@/features/admin/services/familiaApiClient';
 import type { Variedad } from '@/features/admin/types/familia.types';
 
 // Reusa el service de admin (ruta pública, sin admin gate — ver
-// familias/route.ts) igual que useOrderSubmit ya reusa orderService.
+// familias/route.ts) igual que useOrderSubmit ya reusa orderApiClient.
 const catalogKeys = {
   familias: () => ['catalog', 'familias'] as const,
 };
@@ -13,7 +13,7 @@ const catalogKeys = {
 export function useFamiliaVariedades(familiaId: number | null | undefined) {
   const query = useQuery({
     queryKey: catalogKeys.familias(),
-    queryFn: familiaService.getAllWithVariedades,
+    queryFn: familiaApiClient.getAllWithVariedades,
     staleTime: 5 * 60 * 1000,
     enabled: familiaId != null,
   });

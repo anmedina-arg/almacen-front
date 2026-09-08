@@ -1,4 +1,15 @@
-import { productKeys } from '@/constants/queryKeys';
+// productKeys vivía en src/constants/queryKeys.ts (pre-ADR-0013) — fusionado
+// acá para seguir el mismo patrón inline que el resto de dominios (#128).
+// Exportado aparte (no solo dentro de adminKeys) porque useProducts() arma
+// keys con includeInactive dinámico, distinto del fijo que usa adminKeys.productsList().
+export const productKeys = {
+  all: ['products'] as const,
+  lists: () => [...productKeys.all, 'list'] as const,
+  list: (filters?: { includeInactive?: boolean }) =>
+    [...productKeys.lists(), filters ?? {}] as const,
+  catalog: () => [...productKeys.all, 'catalog'] as const,
+  detail: (id: number) => [...productKeys.all, id] as const,
+};
 
 export const adminKeys = {
   all: ['admin'] as const,

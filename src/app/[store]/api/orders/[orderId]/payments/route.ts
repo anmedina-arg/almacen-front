@@ -1,81 +1,36 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { setPaymentsSchema } from '@/features/admin/schemas/paymentSchemas';
-
-function parseOrderId(param: string) {
-  const id = parseInt(param);
-  return isNaN(id) ? null : id;
-}
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { requireFlag } from '@/lib/store/requireFlag';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { setPaymentsSchema } from '@/features/orders/schemas/paymentSchemas';
+import { setPayments } from '@/features/orders/services/orderService';
 
 /**
  * PUT /api/orders/[orderId]/payments
- * Replace all payment records for an order. Admin only.
+ * Replace all payment records for an order. Admin only, requiere la flag
+ * 'pagos' (#120 — gap real: antes esto funcionaba igual sin la flag,
+ * solo se ocultaba en la UI de OrdersTable).
  * Body: { payments: [{ method, amount? }], order_total: number }
  */
-export const PUT = withStoreAdmin<{ orderId: string }>(async (request, { storeId }, { params }) => {
+export const PUT = createApiRoute<{ orderId: string }>(requireAdmin, requireFlag('pagos'))(async (ctx, { orderId: orderIdParam }) => {
   try {
-    const { orderId: orderIdParam } = await params;
-    const orderId = parseOrderId(orderIdParam);
-    if (!orderId) {
+    // orderId <= 0: la rutina original (parseOrderId) rechazaba 0 además de
+    // NaN — un simple isNaN() lo dejaría pasar (code review de #120).
+    const orderId = parseInt(orderIdParam, 10);
+    if (isNaN(orderId) || orderId <= 0) {
       return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
     }
 
-    const body = await request.json();
-    const validation = setPaymentsSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.errors[0]?.message || 'Datos inválidos' },
-        { status: 400 }
-      );
+    const body = await ctx.request.json();
+    const parsed = setPaymentsSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0]?.message || 'Datos inválidos' }, { status: 400 });
     }
 
-    const { payments } = validation.data;
-    const supabase = await createSupabaseServerClient();
-
-    // Verify order belongs to this Store
-    const { data: order } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .maybeSingle();
-    if (!order) {
-      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
-    }
-
-    // Replace: delete existing then insert new (in a single transaction via RPC isn't needed;
-    // delete + insert is safe here since this is an admin-only operation)
-    const { error: deleteError } = await supabase
-      .from('order_payments')
-      .delete()
-      .eq('order_id', orderId);
-
-    if (deleteError) {
-      console.error('Error deleting existing payments:', deleteError);
-      return NextResponse.json({ error: deleteError.message }, { status: 500 });
-    }
-
-    const { data, error: insertError } = await supabase
-      .from('order_payments')
-      .insert(
-        payments.map((p) => ({
-          order_id: orderId,
-          method: p.method,
-          amount: p.amount ?? null,
-          store_id: storeId,
-        }))
-      )
-      .select('id, order_id, method, amount, created_at');
-
-    if (insertError) {
-      console.error('Error inserting payments:', insertError);
-      return NextResponse.json({ error: insertError.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const payments = await setPayments(ctx.supabase, ctx.storeId, orderId, parsed.data.payments);
+    return NextResponse.json(payments);
   } catch (error) {
-    console.error('Error in PUT /api/orders/[orderId]/payments:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'PUT /api/orders/[orderId]/payments');
   }
 });

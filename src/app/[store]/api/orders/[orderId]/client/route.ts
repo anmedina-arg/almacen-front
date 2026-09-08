@@ -1,139 +1,56 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { assignClientSchema } from '@/features/admin/schemas/clientSchemas';
-
-function parseOrderId(param: string) {
-  const id = parseInt(param);
-  return isNaN(id) ? null : id;
-}
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { requireFlag } from '@/lib/store/requireFlag';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { assignClientSchema } from '@/features/orders/schemas/clientSchemas';
+import { assignClient, unassignClient } from '@/features/orders/services/orderService';
 
 /**
  * PATCH /api/orders/[orderId]/client
- * Find-or-create a client by barrio+manzana_lote, then assign to the order.
- * Admin only.
+ * Find-or-create a client by barrio+manzana_lote, then assign to the
+ * order. Admin only, requiere la flag 'clientes' (#120 — gap real: antes
+ * funcionaba igual sin la flag, solo se ocultaba en la UI de OrdersTable).
  */
-export const PATCH = withStoreAdmin<{ orderId: string }>(async (request, { storeId }, { params }) => {
+export const PATCH = createApiRoute<{ orderId: string }>(requireAdmin, requireFlag('clientes'))(async (ctx, { orderId: orderIdParam }) => {
   try {
-    const { orderId: orderIdParam } = await params;
-    const orderId = parseOrderId(orderIdParam);
-    if (!orderId) {
+    // orderId <= 0: la rutina original (parseOrderId) rechazaba 0 además de
+    // NaN — un simple isNaN() lo dejaría pasar (code review de #120).
+    const orderId = parseInt(orderIdParam, 10);
+    if (isNaN(orderId) || orderId <= 0) {
       return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
     }
 
-    const body = await request.json();
-    const validation = assignClientSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json(
-        { error: validation.error.errors[0]?.message || 'Datos inválidos' },
-        { status: 400 }
-      );
+    const body = await ctx.request.json();
+    const parsed = assignClientSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.errors[0]?.message || 'Datos inválidos' }, { status: 400 });
     }
 
-    const { barrio, manzana_lote } = validation.data;
-    const supabase = await createSupabaseServerClient();
-
-    // Verify order belongs to this Store
-    const { data: existingOrder } = await supabase
-      .from('orders')
-      .select('id')
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .maybeSingle();
-    if (!existingOrder) {
-      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
-    }
-
-    // Find-or-create: partial unique indexes can't be used with upsert onConflict,
-    // so we do an explicit select-then-insert. Scoped a esta Store — barrio +
-    // manzana_lote no son globalmente únicos entre Stores distintas.
-    let findQuery = supabase
-      .from('clients')
-      .select('id, barrio, manzana_lote, display_code')
-      .eq('barrio', barrio)
-      .eq('store_id', storeId);
-    if (barrio === 'otros') {
-      findQuery = manzana_lote
-        ? findQuery.eq('manzana_lote', manzana_lote)
-        : findQuery.is('manzana_lote', null);
-    } else {
-      findQuery = findQuery.eq('manzana_lote', manzana_lote!);
-    }
-    const findQuerySingle = findQuery.single();
-
-    const { data: existing, error: findError } = await findQuerySingle;
-
-    let client;
-
-    if (existing) {
-      client = existing;
-    } else if (findError?.code === 'PGRST116') {
-      // Not found — insert new client
-      const { data: created, error: insertError } = await supabase
-        .from('clients')
-        .insert({ barrio, manzana_lote: manzana_lote ?? null, store_id: storeId })
-        .select('id, barrio, manzana_lote, display_code')
-        .single();
-
-      if (insertError) {
-        console.error('Error creating client:', insertError);
-        return NextResponse.json({ error: insertError.message }, { status: 500 });
-      }
-      client = created;
-    } else {
-      console.error('Error finding client:', findError);
-      return NextResponse.json({ error: findError?.message ?? 'Error buscando cliente' }, { status: 500 });
-    }
-
-    // Assign client to order
-    const { data: updatedOrder, error: updateError } = await supabase
-      .from('orders')
-      .update({ client_id: client.id })
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .select('id, client_id')
-      .single();
-
-    if (updateError) {
-      console.error('Error assigning client to order:', updateError);
-      return NextResponse.json({ error: updateError.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ ...updatedOrder, client });
+    const result = await assignClient(ctx.supabase, ctx.storeId, orderId, parsed.data);
+    return NextResponse.json(result);
   } catch (error) {
-    console.error('Error in PATCH /api/orders/[orderId]/client:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'PATCH /api/orders/[orderId]/client');
   }
 });
 
 /**
  * DELETE /api/orders/[orderId]/client
- * Remove client assignment from an order. Admin only.
+ * Remove client assignment from an order. Admin only, requiere la flag
+ * 'clientes' (#120).
  */
-export const DELETE = withStoreAdmin<{ orderId: string }>(async (_request, { storeId }, { params }) => {
+export const DELETE = createApiRoute<{ orderId: string }>(requireAdmin, requireFlag('clientes'))(async (ctx, { orderId: orderIdParam }) => {
   try {
-    const { orderId: orderIdParam } = await params;
-    const orderId = parseOrderId(orderIdParam);
-    if (!orderId) {
+    // orderId <= 0: la rutina original (parseOrderId) rechazaba 0 además de
+    // NaN — un simple isNaN() lo dejaría pasar (code review de #120).
+    const orderId = parseInt(orderIdParam, 10);
+    if (isNaN(orderId) || orderId <= 0) {
       return NextResponse.json({ error: 'ID de orden inválido' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-
-    const { error } = await supabase
-      .from('orders')
-      .update({ client_id: null })
-      .eq('id', orderId)
-      .eq('store_id', storeId);
-
-    if (error) {
-      console.error('Error removing client from order:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
+    await unassignClient(ctx.supabase, ctx.storeId, orderId);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error in DELETE /api/orders/[orderId]/client:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'DELETE /api/orders/[orderId]/client');
   }
 });

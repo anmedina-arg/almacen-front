@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useUpsertStock } from '../../hooks/useUpsertStock';
-import { stockUpdateSchema } from '../../schemas/stockUpdateSchema';
+import { stockUpdateSchema } from '@/features/stock/schemas/stockUpdateSchema';
 import { MOVEMENT_TYPE_LABELS } from '../../constants/stock';
 import type { ProductStockView, StockMovementType } from '../../types/stock.types';
 

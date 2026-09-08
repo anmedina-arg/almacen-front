@@ -1,83 +1,43 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
-import { familiaSchema } from '@/features/admin/schemas/familiaSchemas';
+import { NextResponse } from 'next/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { familiaSchema } from '@/features/products/schemas/familiaSchemas';
+import { listFamilias, createFamilia } from '@/features/products/services/familiaService';
 
 /**
  * GET /api/familias
- * Returns all familias, optionally with their variedades.
- * Public read (no admin required) — el catálogo público necesita listar
- * Variedades disponibles para un Producto Surtido sin login.
- * Query param: ?include=variedades → returns FamiliaWithVariedades[]
+ * Público (no admin) — el catálogo público necesita listar Variedades
+ * disponibles para un Producto Surtido sin login.
+ * Query param: ?include=variedades → devuelve FamiliaWithVariedades[]
  */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ store: string }> }
-) {
+export const GET = createApiRoute()(async (ctx) => {
   try {
-    const { store } = await params;
-    const supabase = await createSupabaseServerClient();
-    const storeId = await getStoreIdBySlug(supabase, store);
-    if (storeId == null) {
-      return NextResponse.json({ error: 'Store not found' }, { status: 404 });
-    }
-
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(ctx.request.url);
     const includeVariedades = searchParams.get('include') === 'variedades';
 
-    let query = supabase.from('familias').select(
-      includeVariedades
-        ? 'id, name, created_at, updated_at, variedades(id, name, familia_id, active, created_at, updated_at)'
-        : 'id, name, created_at, updated_at'
-    );
-
-    query = query.eq('store_id', storeId).order('name', { ascending: true });
-
-    const { data, error } = await query;
-
-    if (error) {
-      console.error('Error fetching familias:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data || []);
+    const familias = await listFamilias(ctx.supabase, ctx.storeId, { includeVariedades });
+    return NextResponse.json(familias);
   } catch (error) {
-    console.error('Error in GET /api/familias:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'GET /api/familias');
   }
-}
+});
 
 /**
  * POST /api/familias
- * Creates a new familia. Admin only.
+ * Crea una familia. Admin only.
  */
-export const POST = withStoreAdmin(async (request, { storeId }) => {
+export const POST = createApiRoute(requireAdmin)(async (ctx) => {
   try {
-    const body = await request.json();
+    const body = await ctx.request.json();
     const parsed = familiaSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-    const { data, error } = await supabase
-      .from('familias')
-      .insert({ name: parsed.data.name, store_id: storeId })
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === '23505') {
-        return NextResponse.json({ error: 'Ya existe una familia con ese nombre' }, { status: 409 });
-      }
-      console.error('Error creating familia:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data, { status: 201 });
+    const familia = await createFamilia(ctx.supabase, ctx.storeId, parsed.data);
+    return NextResponse.json(familia, { status: 201 });
   } catch (error) {
-    console.error('Error in POST /api/familias:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return handleServiceError(error, 'POST /api/familias');
   }
 });

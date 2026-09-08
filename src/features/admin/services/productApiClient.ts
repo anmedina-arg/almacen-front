@@ -1,7 +1,7 @@
 import type { Product } from '@/types';
 import { apiFetch } from '@/lib/api/apiFetch';
 
-export const productService = {
+export const productApiClient = {
   async fetchProducts(options?: { includeInactive?: boolean }): Promise<Product[]> {
     const params = new URLSearchParams();
     if (options?.includeInactive) params.set('includeInactive', 'true');

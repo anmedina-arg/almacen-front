@@ -6,7 +6,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { usePOSCart } from '../../hooks/usePOSCart';
 import { normalize } from '@/utils/normalize';
 import { formatPrice } from '@/utils/formatPrice';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '../../hooks/useProducts';
 
 export function POSView() {
   const [search, setSearch] = useState('');

@@ -1,30 +1,27 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { stockUpdateSchema } from '@/features/admin/schemas/stockUpdateSchema';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { requireFlag } from '@/lib/store/requireFlag';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { stockUpdateSchema } from '@/features/stock/schemas/stockUpdateSchema';
+import { upsertProductStock } from '@/features/stock/services/stockService';
 
 /**
  * PUT /api/stock/[productId]
- * Crea o actualiza el stock de un producto usando la funcion RPC upsert_product_stock.
- * Requiere autenticacion de admin de la Store.
+ * Crea o actualiza el stock de un producto. Admin only, requiere la flag
+ * 'stock' (#122).
  *
  * Body esperado: { p_product_id, p_quantity, p_min_stock, p_notes, p_movement_type }
  */
-export const PUT = withStoreAdmin<{ productId: string }>(async (request, { storeId }, { params }) => {
+export const PUT = createApiRoute<{ productId: string }>(requireAdmin, requireFlag('stock'))(async (ctx, { productId: productIdParam }) => {
   try {
-    const { productId: productIdParam } = await params;
-    const productId = parseInt(productIdParam);
+    const productId = parseInt(productIdParam, 10);
     if (isNaN(productId)) {
-      return NextResponse.json(
-        { error: 'ID de producto invalido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID de producto invalido' }, { status: 400 });
     }
 
-    const body = await request.json();
-
-    // Validar con Zod schema
-    const validation = stockUpdateSchema.safeParse({
+    const body = await ctx.request.json();
+    const parsed = stockUpdateSchema.safeParse({
       productId,
       quantity: body.p_quantity,
       minStock: body.p_min_stock,
@@ -32,40 +29,17 @@ export const PUT = withStoreAdmin<{ productId: string }>(async (request, { store
       notes: body.p_notes || '',
     });
 
-    if (!validation.success) {
-      const firstError = validation.error.errors[0];
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0];
       return NextResponse.json(
-        {
-          error: firstError?.message || 'Datos invalidos',
-          details: validation.error.flatten().fieldErrors
-        },
+        { error: firstError?.message || 'Datos invalidos', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    const supabase = await createSupabaseServerClient();
-
-    // Llamar la funcion RPC upsert_product_stock
-    const { data, error } = await supabase.rpc('upsert_product_stock', {
-      p_product_id: productId,
-      p_quantity: validation.data.quantity,
-      p_min_stock: validation.data.minStock,
-      p_notes: validation.data.notes || null,
-      p_movement_type: validation.data.movementType,
-      p_store_id: storeId,
-    });
-
-    if (error) {
-      console.error('Error upserting stock:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const result = await upsertProductStock(ctx.supabase, ctx.storeId, productId, parsed.data);
+    return NextResponse.json(result);
   } catch (error) {
-    console.error('Error in PUT /api/stock/[productId]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleServiceError(error, 'PUT /api/stock/[productId]');
   }
 });

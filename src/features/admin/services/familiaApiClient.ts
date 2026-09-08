@@ -1,13 +1,13 @@
 import type { Familia, FamiliaWithVariedades, Variedad } from '../types/familia.types';
-import type { FamiliaInput } from '../schemas/familiaSchemas';
-import { apiFetch } from '@/lib/api/apiFetch';
+import type { FamiliaInput } from '@/features/products/schemas/familiaSchemas';
+import { apiFetch, extractErrorMessage } from '@/lib/api/apiFetch';
 
-export const familiaService = {
+export const familiaApiClient = {
   async getAllWithVariedades(): Promise<FamiliaWithVariedades[]> {
     const res = await apiFetch('/familias?include=variedades', { cache: 'no-store' });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Error al obtener familias');
+      throw new Error(extractErrorMessage(error, 'Error al obtener familias'));
     }
     return res.json();
   },
@@ -20,7 +20,7 @@ export const familiaService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Error al crear la familia');
+      throw new Error(extractErrorMessage(error, 'Error al crear la familia'));
     }
     return res.json();
   },
@@ -33,7 +33,7 @@ export const familiaService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Error al actualizar la familia');
+      throw new Error(extractErrorMessage(error, 'Error al actualizar la familia'));
     }
     return res.json();
   },
@@ -42,7 +42,7 @@ export const familiaService = {
     const res = await apiFetch(`/familias/${id}`, { method: 'DELETE' });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Error al eliminar la familia');
+      throw new Error(extractErrorMessage(error, 'Error al eliminar la familia'));
     }
   },
 
@@ -54,7 +54,7 @@ export const familiaService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Error al crear la variedad');
+      throw new Error(extractErrorMessage(error, 'Error al crear la variedad'));
     }
     return res.json();
   },
@@ -67,7 +67,7 @@ export const familiaService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Error al actualizar la variedad');
+      throw new Error(extractErrorMessage(error, 'Error al actualizar la variedad'));
     }
     return res.json();
   },

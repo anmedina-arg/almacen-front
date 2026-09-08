@@ -7,7 +7,7 @@ sistema). Consolidado en #87 (spec #81, mapa #74).
 
 | Archivo | Qué es |
 |---|---|
-| `stores.sql` | El tenant. `supabase_multitenant_schema_expand.sql` es su fuente original (#10) — no se descarta hasta que las otras 13 tablas de ese archivo confirmen su parte. Policies: lectura pública sin restricción; sin escritura vía RLS (alta/edición manual, ver ADR-0006). `feature_flags JSONB NOT NULL DEFAULT '{}'` desde #23 — catálogo de 8 flags por Store, ver el comentario de columna en el archivo y `src/lib/store/featureFlags.ts`. |
+| `stores.sql` | El tenant. `supabase_multitenant_schema_expand.sql` es su fuente original (#10) — no se descarta hasta que las otras 13 tablas de ese archivo confirmen su parte. Policies: lectura pública sin restricción; sin escritura vía RLS (alta/edición manual, ver ADR-0006). `feature_flags JSONB NOT NULL DEFAULT '{}'` desde #23 — catálogo de 7 flags por Store (`combos` se retiró en #117, ADR-0013), ver el comentario de columna en el archivo y `src/lib/store/featureFlags.ts`. |
 | `store_admins.sql` | Membresía explícita de un profile como admin de una Store (ADR-0005). Sin policies de escritura — mismo motivo que `stores`. |
 | `profiles.sql` | Extiende `auth.users` con nombre/rol/avatar. Sin `store_id` — no es tabla de negocio por-Store. |
 

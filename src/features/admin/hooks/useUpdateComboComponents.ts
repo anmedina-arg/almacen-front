@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { comboService } from '../services/comboService';
+import { comboApiClient } from '../services/comboApiClient';
 
 export function useUpdateComboComponents() {
   const queryClient = useQueryClient();
@@ -12,7 +12,7 @@ export function useUpdateComboComponents() {
     }: {
       productId: number;
       components: { component_product_id: number; quantity: number }[];
-    }) => comboService.updateComponents(productId, components),
+    }) => comboApiClient.updateComponents(productId, components),
 
     onSuccess: (_, { productId }) => {
       queryClient.invalidateQueries({ queryKey: adminKeys.comboComponents(productId) });

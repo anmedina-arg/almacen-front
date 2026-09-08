@@ -1,25 +1,26 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { refreshAffinitySchema } from '@/features/recomendaciones/schemas/recommendationSchemas';
+import { refreshProductAffinity } from '@/features/recomendaciones/services/recommendationService';
 
 /**
  * POST /api/admin/recommendations/refresh
  * Recalculates product affinity matrix from order co-occurrences (last 30 days).
  * Admin only.
  */
-export const POST = withStoreAdmin(async (_request, { storeId }) => {
+export const POST = createApiRoute(requireAdmin)(async (ctx) => {
   try {
-    const supabase = await createSupabaseServerClient();
-    const { error } = await supabase.rpc('refresh_product_affinity', { p_store_id: storeId });
-
-    if (error) {
-      console.error('[POST /api/admin/recommendations/refresh] RPC error:', error.message);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    const body = await ctx.request.json().catch(() => ({}));
+    const parsed = refreshAffinitySchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Datos invalidos', details: parsed.error.flatten().fieldErrors }, { status: 400 });
     }
 
+    await refreshProductAffinity(ctx.supabase, ctx.storeId);
     return NextResponse.json({ ok: true });
-  } catch (err) {
-    console.error('[POST /api/admin/recommendations/refresh] Unexpected error:', err);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  } catch (error) {
+    return handleServiceError(error, 'POST /api/admin/recommendations/refresh');
   }
 });

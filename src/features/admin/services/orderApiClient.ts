@@ -8,13 +8,16 @@ import type {
 } from '../types/order.types';
 import { apiFetch } from '@/lib/api/apiFetch';
 
-// ============================================================================
-// Order Service
-// ============================================================================
-// Client-side service that communicates with the API route handlers.
-// Follows the same pattern as stockService.ts and adminProductService.ts.
-
-export const orderService = {
+/**
+ * Cliente HTTP para Client Components — pasa por /api/orders/*, a
+ * diferencia del service del dominio (features/orders/services/
+ * orderService.ts, #119) que llama a Supabase directo y también lo usan
+ * los Server Components sin pasar por HTTP (ver ADR-0013 / ticket #107).
+ * Antes se llamaba orderService — renombrado para no confundir las dos
+ * capas (mismo nombre, responsabilidades distintas), mismo criterio que
+ * categoryApiClient/comboApiClient/familiaApiClient.
+ */
+export const orderApiClient = {
   /**
    * Create a new order (public - called when user sends WhatsApp message).
    */

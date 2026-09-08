@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { stockService } from '../services/stockService';
+import { stockApiClient } from '../services/stockApiClient';
 import type { UpsertStockInput } from '../types/stock.types';
 
 /**
@@ -11,7 +11,7 @@ export function useUpsertStock() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: UpsertStockInput) => stockService.upsertStock(input),
+    mutationFn: (input: UpsertStockInput) => stockApiClient.upsertStock(input),
 
     onSuccess: async (_data, variables) => {
       // Invalidar y refetch inmediato de la lista de stock

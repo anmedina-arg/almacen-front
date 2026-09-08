@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { orderService } from '../services/orderService';
+import { orderApiClient } from '../services/orderApiClient';
 
 /**
  * Fetches all orders for the admin panel.
@@ -8,7 +8,7 @@ import { orderService } from '../services/orderService';
 export function useOrders() {
   return useQuery({
     queryKey: adminKeys.ordersList(),
-    queryFn: () => orderService.getAllOrders(),
+    queryFn: () => orderApiClient.getAllOrders(),
     staleTime: 30 * 1000,
   });
 }

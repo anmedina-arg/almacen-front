@@ -1,14 +1,14 @@
 import type { ComboComponent } from '../types/combo.types';
-import { apiFetch } from '@/lib/api/apiFetch';
+import { apiFetch, extractErrorMessage } from '@/lib/api/apiFetch';
 
-export const comboService = {
+export const comboApiClient = {
   async getComponents(productId: number): Promise<ComboComponent[]> {
     const res = await apiFetch(`/combos/${productId}/components`, {
       cache: 'no-store',
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Failed to fetch combo components');
+      throw new Error(extractErrorMessage(error, 'Failed to fetch combo components'));
     }
     return res.json();
   },
@@ -24,7 +24,7 @@ export const comboService = {
     });
     if (!res.ok) {
       const error = await res.json();
-      throw new Error(error.error || 'Failed to update combo components');
+      throw new Error(extractErrorMessage(error, 'Failed to update combo components'));
     }
   },
 };

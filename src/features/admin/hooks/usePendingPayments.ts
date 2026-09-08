@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
-import type { PendingPaymentsResponse } from '@/app/[store]/api/dashboard/pending-payments/route';
+import type { PendingPaymentsResponse } from '@/features/admin/types/dashboard.types';
 
 async function fetchPendingPayments(page: number): Promise<PendingPaymentsResponse> {
   const res = await apiFetch(`/dashboard/pending-payments?page=${page}`, { cache: 'no-store' });

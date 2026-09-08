@@ -1,67 +1,28 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { updateOrderItemSchema } from '@/features/admin/schemas/orderSchemas';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { updateOrderItemSchema } from '@/features/orders/schemas/orderSchemas';
+import { updateOrderItem, removeOrderItem } from '@/features/orders/services/orderService';
 
 /**
  * DELETE /api/orders/[orderId]/items/[itemId]
  * Remove an item from an order. Admin only.
+ * #120 (audit #106): antes devolvía { success: true } — normalizado a 204,
+ * convención del resto de las rutas DELETE ya migradas.
  */
-export const DELETE = withStoreAdmin<{ orderId: string; itemId: string }>(async (_request, { storeId }, { params }) => {
+export const DELETE = createApiRoute<{ orderId: string; itemId: string }>(requireAdmin)(async (ctx, { orderId: orderIdParam, itemId: itemIdParam }) => {
   try {
-    const { orderId: orderIdParam, itemId: itemIdParam } = await params;
-    const orderId = parseInt(orderIdParam);
-    const itemId = parseInt(itemIdParam);
+    const orderId = parseInt(orderIdParam, 10);
+    const itemId = parseInt(itemIdParam, 10);
     if (isNaN(orderId) || isNaN(itemId)) {
-      return NextResponse.json(
-        { error: 'ID invalido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID invalido' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-
-    // Verify order belongs to this Store and is pending
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .select('id, status')
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .single();
-
-    if (orderError || !order) {
-      return NextResponse.json(
-        { error: 'Orden no encontrada' },
-        { status: 404 }
-      );
-    }
-
-    if (order.status !== 'pending') {
-      return NextResponse.json(
-        { error: 'Solo se pueden editar ordenes pendientes' },
-        { status: 400 }
-      );
-    }
-
-    // Delete the item
-    const { error } = await supabase
-      .from('order_items')
-      .delete()
-      .eq('id', itemId)
-      .eq('order_id', orderId);
-
-    if (error) {
-      console.error('Error deleting order item:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json({ success: true });
+    await removeOrderItem(ctx.supabase, ctx.storeId, orderId, itemId);
+    return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error in DELETE /api/orders/[orderId]/items/[itemId]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleServiceError(error, 'DELETE /api/orders/[orderId]/items/[itemId]');
   }
 });
 
@@ -69,102 +30,27 @@ export const DELETE = withStoreAdmin<{ orderId: string; itemId: string }>(async 
  * PUT /api/orders/[orderId]/items/[itemId]
  * Update an order item (quantity, unit_price). Admin only.
  */
-export const PUT = withStoreAdmin<{ orderId: string; itemId: string }>(async (request, { storeId }, { params }) => {
+export const PUT = createApiRoute<{ orderId: string; itemId: string }>(requireAdmin)(async (ctx, { orderId: orderIdParam, itemId: itemIdParam }) => {
   try {
-    const { orderId: orderIdParam, itemId: itemIdParam } = await params;
-    const orderId = parseInt(orderIdParam);
-    const itemId = parseInt(itemIdParam);
+    const orderId = parseInt(orderIdParam, 10);
+    const itemId = parseInt(itemIdParam, 10);
     if (isNaN(orderId) || isNaN(itemId)) {
+      return NextResponse.json({ error: 'ID invalido' }, { status: 400 });
+    }
+
+    const body = await ctx.request.json();
+    const parsed = updateOrderItemSchema.safeParse(body);
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0];
       return NextResponse.json(
-        { error: 'ID invalido' },
+        { error: firstError?.message || 'Datos invalidos', details: parsed.error.flatten().fieldErrors },
         { status: 400 }
       );
     }
 
-    const body = await request.json();
-
-    // Validate with Zod schema
-    const validation = updateOrderItemSchema.safeParse(body);
-    if (!validation.success) {
-      const firstError = validation.error.errors[0];
-      return NextResponse.json(
-        {
-          error: firstError?.message || 'Datos invalidos',
-          details: validation.error.flatten().fieldErrors,
-        },
-        { status: 400 }
-      );
-    }
-
-    const supabase = await createSupabaseServerClient();
-
-    // Verify order belongs to this Store and is pending
-    const { data: order, error: orderError } = await supabase
-      .from('orders')
-      .select('id, status')
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .single();
-
-    if (orderError || !order) {
-      return NextResponse.json(
-        { error: 'Orden no encontrada' },
-        { status: 404 }
-      );
-    }
-
-    if (order.status !== 'pending') {
-      return NextResponse.json(
-        { error: 'Solo se pueden editar ordenes pendientes' },
-        { status: 400 }
-      );
-    }
-
-    // Recalculate unit_cost from current product cost (fixes items added without cost)
-    const { data: existingItem } = await supabase
-      .from('order_items')
-      .select('product_id, unit_price')
-      .eq('id', itemId)
-      .eq('order_id', orderId)
-      .single();
-
-    let unit_cost: number | undefined;
-    if (existingItem) {
-      const { data: product } = await supabase
-        .from('products')
-        .select('price, cost')
-        .eq('id', existingItem.product_id)
-        .eq('store_id', storeId)
-        .single();
-
-      if (product && Number(product.price) > 0) {
-        const effectiveUnitPrice = validation.data.unit_price ?? existingItem.unit_price;
-        unit_cost = effectiveUnitPrice * (Number(product.cost ?? 0) / Number(product.price));
-      } else {
-        unit_cost = 0;
-      }
-    }
-
-    // Update the item
-    const { data, error } = await supabase
-      .from('order_items')
-      .update({ ...validation.data, ...(unit_cost !== undefined && { unit_cost }) })
-      .eq('id', itemId)
-      .eq('order_id', orderId)
-      .select()
-      .single();
-
-    if (error) {
-      console.error('Error updating order item:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
+    const item = await updateOrderItem(ctx.supabase, ctx.storeId, orderId, itemId, parsed.data);
+    return NextResponse.json(item);
   } catch (error) {
-    console.error('Error in PUT /api/orders/[orderId]/items/[itemId]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleServiceError(error, 'PUT /api/orders/[orderId]/items/[itemId]');
   }
 });

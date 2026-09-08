@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { stockService } from '../services/stockService';
+import { stockApiClient } from '../services/stockApiClient';
 
 /**
  * Fetches the stock movement history for a specific product.
@@ -9,7 +9,7 @@ import { stockService } from '../services/stockService';
 export function useStockHistory(productId: number) {
   return useQuery({
     queryKey: adminKeys.stockHistory(productId),
-    queryFn: () => stockService.getHistory(productId),
+    queryFn: () => stockApiClient.getHistory(productId),
     enabled: productId > 0,
     staleTime: 30 * 1000,
   });

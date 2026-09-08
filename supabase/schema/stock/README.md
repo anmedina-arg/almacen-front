@@ -15,7 +15,8 @@ alertas de stock bajo. Consolidado en #83 (spec #81, mapa #74).
 | Archivo | Qué hace |
 |---|---|
 | `upsert_product_stock.sql` | Crea o **reemplaza** el stock de un producto. Objeto de prioridad 1 (ver `docs/agents/schema-changes.md`). |
-| `increment_product_stock.sql` | **Suma** una cantidad al stock existente, no lo reemplaza — usada por "Ingreso de Stock". Objeto de prioridad 1. |
+| `increment_product_stock.sql` | **Suma** una cantidad al stock existente, no lo reemplaza. Objeto de prioridad 1. Desde #122, "Ingreso de Stock" ya no la llama directo por fila — pasa por `increment_product_stock_batch()`, que la reusa internamente por entrada del lote. |
+| `increment_product_stock_batch.sql` | Ingreso de stock por lote (#122, arregla el N+1 del audit #106) — un solo round-trip, best-effort por fila vía un bloque `BEGIN/EXCEPTION` por entrada (savepoint implícito), delegando la validación de cada fila a `increment_product_stock()` en vez de reimplementarla. |
 | `get_all_products_with_stock.sql` | Lista todos los productos de una Store con su stock, incluyendo stock virtual de combos. Objeto de prioridad 1 — tuvo una regresión real (perdió la lógica de combos al agregarle store scoping), ver el header del archivo. |
 | `get_low_stock_products.sql` | Productos activos por debajo de su `min_stock`, para las alertas del panel admin. Objeto de prioridad 1. |
 | `get_avg_stock_per_product.sql` | Stock promedio por producto en una ventana de fechas (usa `stock_movement_log` para reconstruir días pasados). Scoped por Store desde #21. |

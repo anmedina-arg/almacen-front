@@ -1,90 +1,25 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import type { Order } from '@/features/admin/types/order.types';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { requireFlag } from '@/lib/store/requireFlag';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { getPendingPayments } from '@/features/dashboard/services/dashboardService';
 
-const PAGE_SIZE = 20;
+/**
+ * GET /api/dashboard/pending-payments
+ * Admin only, requiere la flag 'pagos' (#126 — antes solo se ocultaba el
+ * widget en la UI cliente, la ruta funcionaba igual sin la flag).
+ */
+export const GET = createApiRoute(requireAdmin, requireFlag('pagos'))(async (ctx) => {
+  try {
+    const { searchParams } = new URL(ctx.request.url);
+    const page = Math.max(1, Number(searchParams.get('page') ?? 1));
 
-function orderDebe(total: number, payments: { amount: number | null }[]): boolean {
-  if (payments.length === 0) return true;
-  const withAmount = payments.filter((p) => p.amount !== null);
-  if (withAmount.length === 0) return false;
-  const paid = withAmount.reduce((acc, p) => acc + (p.amount ?? 0), 0);
-  return total - paid > 0;
-}
-
-export interface PendingPaymentsResponse {
-  orders: Order[];
-  total: number;
-  page: number;
-  totalPages: number;
-}
-
-export const GET = withStoreAdmin(async (request, { storeId }) => {
-  const page = Math.max(1, Number(request.nextUrl.searchParams.get('page') ?? 1));
-  const supabase = await createSupabaseServerClient();
-
-  // Query 1 — lightweight: only what's needed to evaluate the DEBE condition
-  // Filtro desde el 20/03/2026 — pedidos anteriores no se muestran en el dashboard
-  const { data: lightweight, error: lwErr } = await supabase
-    .from('orders')
-    .select('id, total, order_payments(amount)')
-    .eq('store_id', storeId)
-    .neq('status', 'cancelled')
-    .gte('created_at', '2026-03-20T00:00:00.000Z')
-    .order('created_at', { ascending: false });
-
-  if (lwErr) return NextResponse.json({ error: lwErr.message }, { status: 500 });
-
-  // Filter DEBE in TypeScript (exact same logic as the client)
-  const debeIds: number[] = (lightweight ?? [])
-    .filter((o) =>
-      orderDebe(
-        Number(o.total),
-        (o.order_payments as { amount: number | null }[] | null) ?? []
-      )
-    )
-    .map((o) => o.id);
-
-  const total = debeIds.length;
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-  const clampedPage = Math.min(page, totalPages);
-  const pageIds = debeIds.slice((clampedPage - 1) * PAGE_SIZE, clampedPage * PAGE_SIZE);
-
-  if (pageIds.length === 0) {
-    return NextResponse.json({ orders: [], total, page: clampedPage, totalPages });
+    const result = await getPendingPayments(ctx.supabase, ctx.storeId, page);
+    return NextResponse.json(result, {
+      headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0', Pragma: 'no-cache', Expires: '0' },
+    });
+  } catch (error) {
+    return handleServiceError(error, 'GET /api/dashboard/pending-payments');
   }
-
-  // Query 2 — full data for this page only
-  const { data, error } = await supabase
-    .from('orders')
-    .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
-    .eq('store_id', storeId)
-    .in('id', pageIds)
-    .order('created_at', { ascending: false });
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-
-  const orders: Order[] = (data ?? []).map((order) => {
-    const items = (order.order_items as { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
-    const total_cost = items.reduce((acc, item) => {
-      const unitPrice = Number(item.unit_price);
-      return acc + (unitPrice > 0 ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice) : 0);
-    }, 0);
-    const product_names = items.map((i) => i.product_name).filter(Boolean);
-    const { order_items: _items, clients: client, order_payments, ...orderFields } = order;
-    const orderTotal = Number(orderFields.total);
-    const margin = orderTotal - total_cost;
-    const margin_pct = orderTotal > 0 ? (margin / orderTotal) * 100 : 0;
-    return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names };
-  });
-
-  // Preserve original sort order (newest first per debeIds)
-  const idOrder = new Map(pageIds.map((id, i) => [id, i]));
-  orders.sort((a, b) => (idOrder.get(a.id) ?? 0) - (idOrder.get(b.id) ?? 0));
-
-  return NextResponse.json(
-    { orders, total, page: clampedPage, totalPages },
-    { headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0', Pragma: 'no-cache', Expires: '0' } }
-  );
 });

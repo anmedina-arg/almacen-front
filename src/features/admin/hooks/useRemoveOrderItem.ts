@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { orderService } from '../services/orderService';
+import { orderApiClient } from '../services/orderApiClient';
 import { useInvalidateOrderQueries } from './useInvalidateOrderQueries';
 
 /**
@@ -16,7 +16,7 @@ export function useRemoveOrderItem() {
     }: {
       orderId: number;
       itemId: number;
-    }) => orderService.removeOrderItem(orderId, itemId),
+    }) => orderApiClient.removeOrderItem(orderId, itemId),
 
     onSuccess: async (_data, variables) => {
       await invalidateOrderQueries(variables.orderId);

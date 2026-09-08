@@ -1,46 +1,27 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
-import { updateOrderSchema } from '@/features/admin/schemas/orderSchemas';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { updateOrderSchema } from '@/features/orders/schemas/orderSchemas';
+import { getOrderById, updateOrder, deleteOrder } from '@/features/orders/services/orderService';
 
 /**
  * GET /api/orders/[orderId]
  * Get a single order with its items. Admin only.
  */
-export const GET = withStoreAdmin<{ orderId: string }>(async (_request, { storeId }, { params }) => {
+export const GET = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx, { orderId: orderIdParam }) => {
   try {
-    const { orderId: orderIdParam } = await params;
-    const orderId = parseInt(orderIdParam);
+    const orderId = parseInt(orderIdParam, 10);
     if (isNaN(orderId)) {
-      return NextResponse.json(
-        { error: 'ID de orden invalido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID de orden invalido' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-
-    const { data, error } = await supabase
-      .from('orders')
-      // order_item_variedades (#95): Variedades elegidas por línea de
-      // Producto Surtido, si corresponde.
-      .select('*, order_items(*, order_item_variedades(id, variedad_id, variedad_name))')
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Orden no encontrada' },
-          { status: 404 }
-        );
-      }
-      console.error('Error fetching order:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    const order = await getOrderById(ctx.supabase, ctx.storeId, orderId);
+    if (!order) {
+      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
     }
 
-    return NextResponse.json(data, {
+    return NextResponse.json(order, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',
         Pragma: 'no-cache',
@@ -48,11 +29,35 @@ export const GET = withStoreAdmin<{ orderId: string }>(async (_request, { storeI
       },
     });
   } catch (error) {
-    console.error('Error in GET /api/orders/[orderId]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleServiceError(error, 'GET /api/orders/[orderId]');
+  }
+});
+
+/**
+ * PUT /api/orders/[orderId]
+ * Update an order (status, notes). Admin only.
+ */
+export const PUT = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx, { orderId: orderIdParam }) => {
+  try {
+    const orderId = parseInt(orderIdParam, 10);
+    if (isNaN(orderId)) {
+      return NextResponse.json({ error: 'ID de orden invalido' }, { status: 400 });
+    }
+
+    const body = await ctx.request.json();
+    const parsed = updateOrderSchema.safeParse(body);
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0];
+      return NextResponse.json(
+        { error: firstError?.message || 'Datos invalidos', details: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const order = await updateOrder(ctx.supabase, ctx.storeId, orderId, parsed.data);
+    return NextResponse.json(order);
+  } catch (error) {
+    return handleServiceError(error, 'PUT /api/orders/[orderId]');
   }
 });
 
@@ -62,104 +67,16 @@ export const GET = withStoreAdmin<{ orderId: string }>(async (_request, { storeI
  * order_items are removed automatically via ON DELETE CASCADE.
  * Note: stock is NOT restored — handle separately if needed.
  */
-export const DELETE = withStoreAdmin<{ orderId: string }>(async (_request, { storeId }, { params }) => {
+export const DELETE = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx, { orderId: orderIdParam }) => {
   try {
-    const { orderId: orderIdParam } = await params;
-    const orderId = parseInt(orderIdParam);
+    const orderId = parseInt(orderIdParam, 10);
     if (isNaN(orderId)) {
-      return NextResponse.json(
-        { error: 'ID de orden invalido' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'ID de orden invalido' }, { status: 400 });
     }
 
-    const supabase = await createSupabaseServerClient();
-
-    const { data, error } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .select('id');
-
-    if (error) {
-      console.error('Error deleting order:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    // Sin .select() acá, un id de otra Store hubiera devuelto 204 sin
-    // borrar nada (0 filas afectadas, sin error) — silencioso.
-    if (!data || data.length === 0) {
-      return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
-    }
-
+    await deleteOrder(ctx.supabase, ctx.storeId, orderId);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    console.error('Error in DELETE /api/orders/[orderId]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-});
-
-/**
- * PUT /api/orders/[orderId]
- * Update an order (status, notes). Admin only.
- */
-export const PUT = withStoreAdmin<{ orderId: string }>(async (request, { storeId }, { params }) => {
-  try {
-    const { orderId: orderIdParam } = await params;
-    const orderId = parseInt(orderIdParam);
-    if (isNaN(orderId)) {
-      return NextResponse.json(
-        { error: 'ID de orden invalido' },
-        { status: 400 }
-      );
-    }
-
-    const body = await request.json();
-
-    // Validate with Zod schema
-    const validation = updateOrderSchema.safeParse(body);
-    if (!validation.success) {
-      const firstError = validation.error.errors[0];
-      return NextResponse.json(
-        {
-          error: firstError?.message || 'Datos invalidos',
-          details: validation.error.flatten().fieldErrors,
-        },
-        { status: 400 }
-      );
-    }
-
-    const supabase = await createSupabaseServerClient();
-
-    const { data, error } = await supabase
-      .from('orders')
-      .update(validation.data)
-      .eq('id', orderId)
-      .eq('store_id', storeId)
-      .select()
-      .single();
-
-    if (error) {
-      if (error.code === 'PGRST116') {
-        return NextResponse.json(
-          { error: 'Orden no encontrada' },
-          { status: 404 }
-        );
-      }
-      console.error('Error updating order:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-
-    return NextResponse.json(data);
-  } catch (error) {
-    console.error('Error in PUT /api/orders/[orderId]:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    return handleServiceError(error, 'DELETE /api/orders/[orderId]');
   }
 });

@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { categoryService } from '../services/categoryService';
+import { categoryApiClient } from '../services/categoryApiClient';
 import type { CategoryWithSubcategories } from '../types/category.types';
 
 export function useDeleteCategory() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: number) => categoryService.delete(id),
+    mutationFn: (id: number) => categoryApiClient.delete(id),
 
     onMutate: async (id) => {
       await queryClient.cancelQueries({ queryKey: adminKeys.categoriesList() });
