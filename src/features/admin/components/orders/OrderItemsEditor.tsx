@@ -6,7 +6,7 @@ import { computeMargin, MarginDisplay } from './MarginDisplay';
 import { useRemoveOrderItem } from '../../hooks/useRemoveOrderItem';
 import { useUpdateOrderItem } from '../../hooks/useUpdateOrderItem';
 import { useAddOrderItem } from '../../hooks/useAddOrderItem';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '../../hooks/useProducts';
 import { formatPrice } from '@/utils/formatPrice';
 
 interface OrderItemsEditorProps {

@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useCreateProduct } from '../hooks/useCreateProduct';
 import { useUpdateProduct } from '../hooks/useUpdateProduct';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '../hooks/useProducts';
 import { useComboComponents } from '../hooks/useComboComponents';
 import { useUpdateComboComponents } from '../hooks/useUpdateComboComponents';
 import { useCloudinaryUpload } from '../hooks/useCloudinaryUpload';

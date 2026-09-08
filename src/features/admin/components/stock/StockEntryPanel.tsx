@@ -5,7 +5,7 @@ import Link from 'next/link';
 import type { WeightType } from '@/features/catalog/types';
 import { getQuantityPerClick } from '@/features/catalog/utils/productUtils';
 import { useProductStock } from '../../hooks/useProductStock';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '../../hooks/useProducts';
 import { useStockEntry } from '../../hooks/useStockEntry';
 import { useBatchIncrementStock } from '../../hooks/useBatchIncrementStock';
 import { StockEntryCard } from './StockEntryCard';

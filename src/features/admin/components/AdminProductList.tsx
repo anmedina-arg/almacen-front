@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useProducts } from '@/hooks/useProducts';
+import { useProducts } from '../hooks/useProducts';
 import { useToggleProductActive } from '../hooks/useToggleProductActive';
 import { useDeleteProduct } from '../hooks/useDeleteProduct';
 import { CATEGORY_LABELS } from '../constants';
