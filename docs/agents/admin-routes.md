@@ -2,7 +2,9 @@
 
 Toda ruta bajo `src/app/[store]/api/**/route.ts` que requiera ser Store admin o Platform admin para ejecutarse tiene que usar el guard compartido — nunca reimplementar el chequeo a mano ni armar el `403`/`401` inline.
 
-**Un solo patrón vigente desde que cerró la migración de #114/#127 (ADR-0013):** `createApiRoute(requireAdmin)` (`src/lib/api/createApiRoute.ts` + `src/lib/auth/requireAdmin.ts`). Las 41 rutas de API del repo usan `createApiRoute` — confirmado sin ningún call site vivo de `withStoreAdmin` en `src/app`. `withStoreAdmin`/`verifyStoreAdminAuth` (`src/features/auth/utils/apiAuth.ts`) siguen existiendo en el código como definición + tests, pero ya no los llama ninguna ruta — el patrón viejo que este documento describía coexistiendo con el nuevo ya no coexiste con nada.
+**Un solo patrón vigente desde que cerró la migración de #114/#127 (ADR-0013):** `createApiRoute(requireAdmin)` (`src/lib/api/createApiRoute.ts` + `src/lib/auth/requireAdmin.ts`). Las 41 rutas de API del repo usan `createApiRoute` — confirmado sin ningún call site vivo de `withStoreAdmin` (`src/features/auth/utils/apiAuth.ts`) fuera de su propio test. `withStoreAdmin` es código muerto hoy — nada lo llama, es candidato a borrar junto con su test.
+
+**Distinto de `verifyStoreAdminAuth`** (`src/features/auth/utils/roleHelpers.ts`, la función que `withStoreAdmin` envolvía): esa sí sigue viva, pero fuera del alcance de este documento — la usa `src/app/[store]/admin/layout.tsx` como gate de página (Server Component, corre en cada carga de `/admin/*`, redirige a login o a "unauthorized"), no una ruta de API. `requireAdmin` no la reemplaza — reimplementa el mismo chequeo de 2 pasos (usuario + `resolveStoreAdminStatus`, el núcleo compartido por ambas) directo contra el `ctx` de `createApiRoute`, en vez de delegar a `verifyStoreAdminAuth` (que crearía su propio client de Supabase redundante). No confundir los tres nombres: `resolveStoreAdminStatus` (núcleo, compartido) → `verifyStoreAdminAuth` (wrapper para páginas) → `requireAdmin` (guard para rutas de API, este documento).
 
 ## Por qué existe esta regla
 
