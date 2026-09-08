@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { resolveFeatureFlags, type FeatureFlags } from './featureFlags';
+import { resolveFeatureFlags, type FeatureFlags } from '@/lib/store/featureFlags';
 
 export type ProvisionStoreParams = {
   slug: string;

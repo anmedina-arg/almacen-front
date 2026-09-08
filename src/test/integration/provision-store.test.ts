@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterEach, describe, expect, it } from 'vitest';
-import { provisionStore } from '@/lib/store/provisionStore';
+import { provisionStore } from '@/features/store/services/provisionStore';
 import { FEATURE_FLAG_KEYS } from '@/lib/store/featureFlags';
 
 // Verifica provisionStore() (#26, ADR-0006) contra el proyecto de test real,

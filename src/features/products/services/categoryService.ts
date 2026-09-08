@@ -2,7 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Category, Subcategory, CategoryWithSubcategories } from '@/features/admin/types/category.types';
 import type { CategoryInput } from '../schemas/categorySchemas';
 import { NotFoundError, ConflictError } from '@/lib/api/errors';
-import { batchUpdateSortOrder } from '@/lib/store/batchUpdateSortOrder';
+import { batchUpdateSortOrder } from './batchUpdateSortOrder';
 
 /**
  * Service del dominio Products (sub-área Categories) — ver ADR-0013. Cada
