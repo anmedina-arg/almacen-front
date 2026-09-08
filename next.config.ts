@@ -7,29 +7,49 @@ const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : '*.supabase.co';
 
+// Las imágenes nunca se duplican entre entornos — en TEST, los product_stock/
+// categories seedeados siguen apuntando al bucket de storage de producción.
+// NEXT_PUBLIC_IMAGE_STORAGE_URL (opcional, ver .env.test.example) whitelistea
+// ese segundo host solo cuando está seteada; en producción no hace falta
+// (supabaseHostname ya es el mismo bucket real).
+const imageStorageHostname = process.env.NEXT_PUBLIC_IMAGE_STORAGE_URL
+  ? new URL(process.env.NEXT_PUBLIC_IMAGE_STORAGE_URL).hostname
+  : undefined;
+
+const imageRemotePatterns: NonNullable<NonNullable<NextConfig['images']>['remotePatterns']> = [
+  {
+    protocol: 'https',
+    hostname: supabaseHostname,
+    port: '',
+    pathname: '/storage/v1/object/public/**',
+  },
+  {
+    protocol: 'https',
+    hostname: 'res.cloudinary.com',
+    port: '',
+    pathname: '/**',
+  },
+  {
+    protocol: 'https',
+    hostname: 'lh3.googleusercontent.com',
+    port: '',
+    pathname: '/**',
+  },
+];
+
+if (imageStorageHostname && imageStorageHostname !== supabaseHostname) {
+  imageRemotePatterns.push({
+    protocol: 'https',
+    hostname: imageStorageHostname,
+    port: '',
+    pathname: '/storage/v1/object/public/**',
+  });
+}
+
 const nextConfig: NextConfig = {
   /* config options here */
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: supabaseHostname,
-        port: '',
-        pathname: '/storage/v1/object/public/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-        port: '',
-        pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
-        port: '',
-        pathname: '/**',
-      },
-    ],
+    remotePatterns: imageRemotePatterns,
   },
   headers: async () => {
     return [
