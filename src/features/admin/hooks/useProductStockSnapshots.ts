@@ -3,7 +3,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api/apiFetch';
 import { adminKeys } from '../constants/queryKeys';
-import type { StockSnapshotItem } from '@/app/[store]/api/dashboard/rotation/snapshots/route';
+import type { StockSnapshotItem } from '@/features/admin/types/dashboard.types';
 
 async function fetchSnapshots(productId: number): Promise<StockSnapshotItem[]> {
   const res = await apiFetch(`/dashboard/rotation/snapshots?product_id=${productId}`, {

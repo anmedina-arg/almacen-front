@@ -31,10 +31,10 @@ function ChartSkeleton() {
 
 export function DashboardPanel() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { pagos: pagosEnabled } = useFeatureFlags();
+  const { pagos: pagosEnabled, stock: stockEnabled } = useFeatureFlags();
 
-  const { data: categoryData, isLoading: isCategoryLoading, isError: isCategoryError } = useStockByCategory();
-  const { data: productData, isLoading: isProductLoading } = useStockProducts(selectedCategory);
+  const { data: categoryData, isLoading: isCategoryLoading, isError: isCategoryError } = useStockByCategory(stockEnabled);
+  const { data: productData, isLoading: isProductLoading } = useStockProducts(selectedCategory, stockEnabled);
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory((prev) => (prev === category ? null : category));
@@ -49,52 +49,58 @@ export function DashboardPanel() {
           con apariencia legítima, no un estado vacío. Ver ADR-0012. */}
       {pagosEnabled && <PendingPaymentsTable />}
 
-      <div className="mt-6 space-y-6">
-        <StockValueHistoryChart />
+      {/* #126: los 3 widgets de acá abajo pegan a rutas que ahora exigen la
+          flag 'stock' server-side — sin este chequeo, una Store con
+          stock:false vería un estado de error en vez de que el widget
+          simplemente no aparezca (mismo criterio que pagosEnabled arriba). */}
+      {stockEnabled && (
+        <div className="mt-6 space-y-6">
+          <StockValueHistoryChart />
 
-        <div>
-          {isCategoryLoading && <ChartSkeleton />}
+          <div>
+            {isCategoryLoading && <ChartSkeleton />}
 
-          {isCategoryError && (
-            <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg p-4">
-              Error al cargar los datos de stock.
-            </div>
-          )}
+            {isCategoryError && (
+              <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-lg p-4">
+                Error al cargar los datos de stock.
+              </div>
+            )}
 
-          {categoryData && categoryData.length === 0 && (
-            <div className="text-sm text-gray-400 bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
-              No hay productos con stock y costo registrados.
-            </div>
-          )}
+            {categoryData && categoryData.length === 0 && (
+              <div className="text-sm text-gray-400 bg-gray-50 border border-gray-200 rounded-lg p-6 text-center">
+                No hay productos con stock y costo registrados.
+              </div>
+            )}
 
-          {categoryData && categoryData.length > 0 && (
-            <StockByCategoryChart
-              data={categoryData}
-              selectedCategory={selectedCategory}
-              onCategoryClick={handleCategoryClick}
-            />
-          )}
+            {categoryData && categoryData.length > 0 && (
+              <StockByCategoryChart
+                data={categoryData}
+                selectedCategory={selectedCategory}
+                onCategoryClick={handleCategoryClick}
+              />
+            )}
 
-          {selectedCategory && isProductLoading && (
-            <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mt-4 animate-pulse">
-              <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-8 bg-gray-100 rounded mb-2" />
-              ))}
-            </div>
-          )}
+            {selectedCategory && isProductLoading && (
+              <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm mt-4 animate-pulse">
+                <div className="h-4 w-32 bg-gray-200 rounded mb-4" />
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="h-8 bg-gray-100 rounded mb-2" />
+                ))}
+              </div>
+            )}
 
-          {selectedCategory && productData && (
-            <StockProductsTable
-              category={selectedCategory}
-              data={productData}
-              onClose={() => setSelectedCategory(null)}
-            />
-          )}
+            {selectedCategory && productData && (
+              <StockProductsTable
+                category={selectedCategory}
+                data={productData}
+                onClose={() => setSelectedCategory(null)}
+              />
+            )}
+          </div>
+
+          <InventoryRotationDashboard />
         </div>
-
-        <InventoryRotationDashboard />
-      </div>
+      )}
     </div>
   );
 }

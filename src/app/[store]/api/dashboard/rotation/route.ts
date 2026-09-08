@@ -1,93 +1,23 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { requireFlag } from '@/lib/store/requireFlag';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { getRotation } from '@/features/dashboard/services/dashboardService';
 
-export interface RotationItem {
-  id: number;
-  name: string;
-  category_name: string;
-  sale_type: string;
-  units_sold: number;
-  avg_stock: number;
-  rotation: number;
-}
+/**
+ * GET /api/dashboard/rotation
+ * Admin only, requiere la flag 'stock' (#126 — antes no se chequeaba en
+ * ningún lado, ni UI ni server).
+ */
+export const GET = createApiRoute(requireAdmin, requireFlag('stock'))(async (ctx) => {
+  try {
+    const { searchParams } = new URL(ctx.request.url);
+    const days = Math.min(Number(searchParams.get('days') ?? 7), 365);
 
-export const GET = withStoreAdmin(async (request, { storeId }) => {
-  const days = Math.min(Number(request.nextUrl.searchParams.get('days') ?? 7), 365);
-
-  // "Hoy" calculado en hora de Argentina (UTC-3, sin DST).
-  // Se resta el offset antes de leer año/mes/día para que medianoche AR
-  // no se cuente como el día siguiente en UTC.
-  const AR_OFFSET_MS = 3 * 60 * 60 * 1000;
-  const nowAr = new Date(Date.now() - AR_OFFSET_MS);
-  const endUtc = new Date(Date.UTC(nowAr.getUTCFullYear(), nowAr.getUTCMonth(), nowAr.getUTCDate()));
-  const startUtc = new Date(endUtc.getTime() - (days - 1) * 24 * 60 * 60 * 1000);
-
-  const startIso = startUtc.toISOString();
-  const startDateStr = startUtc.toISOString().split('T')[0];
-  const endDateStr = endUtc.toISOString().split('T')[0];
-
-  const supabase = await createSupabaseServerClient();
-
-  const [salesRes, avgStockRes, productsRes] = await Promise.all([
-    supabase
-      .from('order_items')
-      .select('product_id, quantity, orders!inner(status, created_at, store_id)')
-      .filter('orders.status', 'in', '("pending","confirmed")')
-      .eq('orders.store_id', storeId)
-      .gte('orders.created_at', startIso)
-      .limit(10000),
-
-    supabase.rpc('get_avg_stock_per_product', {
-      p_store_id: storeId,
-      p_start_date: startDateStr,
-      p_end_date: endDateStr,
-    }),
-
-    supabase
-      .from('products')
-      .select('id, name, sale_type, cat:categories!products_category_id_fkey(name)')
-      .eq('active', true)
-      .eq('store_id', storeId),
-  ]);
-
-  if (salesRes.error || avgStockRes.error || productsRes.error) {
-    return NextResponse.json({ error: 'Error fetching data' }, { status: 500 });
+    const result = await getRotation(ctx.supabase, ctx.storeId, days);
+    return NextResponse.json(result);
+  } catch (error) {
+    return handleServiceError(error, 'GET /api/dashboard/rotation');
   }
-
-  // Ventas por producto
-  const salesMap = new Map<number, number>();
-  for (const item of salesRes.data ?? []) {
-    if (item.product_id == null) continue;
-    salesMap.set(item.product_id, (salesMap.get(item.product_id) ?? 0) + Number(item.quantity));
-  }
-
-  // Stock promedio por producto (desde RPC)
-  const avgStockMap = new Map<number, number>();
-  for (const row of avgStockRes.data ?? []) {
-    avgStockMap.set(Number(row.product_id), parseFloat(row.avg_stock));
-  }
-
-  const result: RotationItem[] = [];
-
-  for (const product of productsRes.data ?? []) {
-    const avg_stock = avgStockMap.get(product.id) ?? 0;
-    if (avg_stock === 0) continue;
-
-    const units_sold = salesMap.get(product.id) ?? 0;
-    const cat = product.cat as unknown as { name: string } | null;
-
-    result.push({
-      id: product.id,
-      name: product.name,
-      category_name: cat?.name ?? 'Sin categoría',
-      sale_type: product.sale_type,
-      units_sold,
-      avg_stock,
-      rotation: units_sold / avg_stock,
-    });
-  }
-
-  result.sort((a, b) => b.rotation - a.rotation);
-  return NextResponse.json(result);
 });

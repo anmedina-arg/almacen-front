@@ -1,64 +1,25 @@
 import { NextResponse } from 'next/server';
-import { withStoreAdmin } from '@/features/auth/utils/apiAuth';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
+import { createApiRoute } from '@/lib/api/createApiRoute';
+import { requireAdmin } from '@/lib/auth/requireAdmin';
+import { requireFlag } from '@/lib/store/requireFlag';
+import { handleServiceError } from '@/lib/api/handleServiceError';
+import { getStockProducts } from '@/features/dashboard/services/dashboardService';
 
-export interface StockProductItem {
-  id: number;
-  name: string;
-  sale_type: string;
-  stock_raw: number;       // grams for kg/100gr, units otherwise
-  cost: number;            // cost per kg / per 100gr / per unit
-  stock_value: number;     // stock_raw converted * cost
-}
+/**
+ * GET /api/dashboard/stock-products
+ * Admin only, requiere la flag 'stock' (#126).
+ */
+export const GET = createApiRoute(requireAdmin, requireFlag('stock'))(async (ctx) => {
+  try {
+    const { searchParams } = new URL(ctx.request.url);
+    const category = searchParams.get('category');
+    if (!category) {
+      return NextResponse.json({ error: 'Missing category param' }, { status: 400 });
+    }
 
-export const GET = withStoreAdmin(async (request, { storeId }) => {
-  const category = request.nextUrl.searchParams.get('category');
-  if (!category) {
-    return NextResponse.json({ error: 'Missing category param' }, { status: 400 });
+    const result = await getStockProducts(ctx.supabase, ctx.storeId, category);
+    return NextResponse.json(result);
+  } catch (error) {
+    return handleServiceError(error, 'GET /api/dashboard/stock-products');
   }
-
-  const supabase = await createSupabaseServerClient();
-
-  // Mismo criterio que stock-by-category: products filtrado explícitamente
-  // por store_id (lectura pública sin restricción de Store), product_stock
-  // sin filtrar (evita ocultar stock legacy no backfilleado — ver
-  // get_all_products_with_stock.sql, Stock #17).
-  const [{ data: products, error }, { data: stockData }] = await Promise.all([
-    supabase
-      .from('products')
-      .select('id, name, cost, sale_type, cat:categories!products_category_id_fkey(name)')
-      .eq('active', true)
-      .eq('store_id', storeId),
-    supabase.from('product_stock').select('product_id, quantity'),
-  ]);
-
-  if (error || !products) {
-    return NextResponse.json({ error: 'Error fetching products' }, { status: 500 });
-  }
-
-  const stockMap = new Map<number, number>(
-    (stockData ?? []).map((s) => [s.product_id, s.quantity])
-  );
-
-  const result: StockProductItem[] = products
-    .filter((p) => {
-      const cat = p.cat as unknown as { name: string } | null;
-      const catName = cat?.name ?? 'Sin categoría';
-      return catName === category;
-    })
-    .map((p) => {
-      const stock_raw = stockMap.get(p.id) ?? 0;
-      const cost = p.cost ?? 0;
-      let stock_value: number;
-      switch (p.sale_type) {
-        case 'kg':    stock_value = (stock_raw / 1000) * cost; break;
-        case '100gr': stock_value = (stock_raw / 100)  * cost; break;
-        default:      stock_value = stock_raw * cost;
-      }
-      return { id: p.id, name: p.name, sale_type: p.sale_type, stock_raw, cost, stock_value: Math.round(stock_value) };
-    })
-    .filter((p) => p.stock_raw > 0)
-    .sort((a, b) => b.stock_value - a.stock_value);
-
-  return NextResponse.json(result);
 });

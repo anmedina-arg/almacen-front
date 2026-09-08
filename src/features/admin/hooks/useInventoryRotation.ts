@@ -2,12 +2,12 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { adminKeys } from '../constants/queryKeys';
-import { dashboardService } from '../services/dashboardService';
+import { dashboardApiClient } from '../services/dashboardApiClient';
 
 export function useInventoryRotation(days: number) {
   return useQuery({
     queryKey: adminKeys.dashboardRotation(days),
-    queryFn: () => dashboardService.getRotation(days),
+    queryFn: () => dashboardApiClient.getRotation(days),
     staleTime: 5 * 60 * 1000,
   });
 }
