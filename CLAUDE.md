@@ -23,3 +23,7 @@ Any capability gated by a `stores.feature_flags` key must stay independent of ev
 ### Admin-gated API routes
 
 Any route under `[store]/api/` that requires Store admin or Platform admin access must use the shared `withStoreAdmin` wrapper, never reimplement the guard inline. See `docs/agents/admin-routes.md`.
+
+### PWA
+
+Manifest is per-Store and dynamic (no `public/manifest.json`), Service Worker versioning, icon regeneration, and troubleshooting. See `docs/agents/pwa.md`.
