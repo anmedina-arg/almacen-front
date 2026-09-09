@@ -13,10 +13,10 @@
 -- (Stock). Requirió pasar de LANGUAGE sql a plpgsql para poder hacer el
 -- chequeo de autorización con IF/RAISE.
 --
--- get_top_seller_ids (dominio Ranking, no tocada acá) queda fuera de
+-- get_top_seller_ids (dominio Ranking, no tocada acá) quedó fuera de
 -- alcance de #20 a propósito — la usa el catálogo público
--- (fetchPublicProducts.ts), no /admin/ranking; scoping de esa función es
--- un ticket aparte.
+-- (fetchPublicProducts.ts), no /admin/ranking; su scoping por Store se
+-- resolvió después, en #142.
 --
 -- Aplicada y confirmada en producción el 2026-08-25: DROP FUNCTION de los
 -- 2 overloads viejos (4 y 5 params, ver Gaps/hallazgo en el README de este

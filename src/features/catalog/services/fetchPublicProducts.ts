@@ -40,13 +40,12 @@ export async function fetchPublicProducts(
   // Corta antes de tocar stock/top-seller si la Store no tiene productos
   // (o la query principal falló — fetchProductMetadata devuelve [] en
   // ambos casos) — mismo criterio que la versión pre-split, que evitaba
-  // los dos roundtrips extra (incluida la RPC de top-seller, que cruza
-  // todas las Stores) cuando no hay nada que enriquecer.
+  // los dos roundtrips extra cuando no hay nada que enriquecer.
   if (metadata.length === 0) return [];
 
   const [stockMap, topSellerIds] = await Promise.all([
     fetchProductStock(supabase, storeId),
-    fetchTopSellerIds(supabase),
+    fetchTopSellerIds(supabase, storeId),
   ]);
 
   return metadata.map((p) => ({

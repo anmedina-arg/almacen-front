@@ -174,7 +174,7 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
   });
 
   it.skipIf(!hasCredentials)('fetchTopSellerIds: devuelve un Set, sin el producto recien creado (sin ventas)', async () => {
-    const topSellerIds = await fetchTopSellerIds(admin);
+    const topSellerIds = await fetchTopSellerIds(admin, storeId);
     expect(topSellerIds instanceof Set).toBe(true);
     expect(topSellerIds.has(productId)).toBe(false);
   });
