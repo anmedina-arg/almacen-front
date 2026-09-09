@@ -1,36 +1,8 @@
-import { createServerClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { cookies } from 'next/headers';
+import { createSupabaseServerClient } from '@/lib/supabase/serverClient';
 import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { isAdminRole } from './isAdminRole';
 import { logPerf } from '@/lib/observability/logPerf';
-
-// Usado por verifyStoreAdminAuth — necesita un client de Supabase atado a
-// las cookies del request actual.
-async function createCookieBasedSupabaseClient(): Promise<SupabaseClient> {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Can't modify cookies in some contexts
-          }
-        },
-      },
-    }
-  );
-}
 
 // Núcleo de verifyStoreAdminAuth, separado del wrapper de cookies()/getUser()
 // de Next.js para poder testearlo directo con un client de service_role
@@ -45,20 +17,24 @@ export async function resolveStoreAdminStatus(
   storeId: number | null;
   error: string | null;
 }> {
-  const storeId = await getStoreIdBySlug(supabase, storeSlug);
+  // getStoreIdBySlug y la query de profiles no dependen entre sí (el
+  // primero solo necesita storeSlug, el segundo solo userId) — se corren
+  // en paralelo (#144, spec #139). Costo aceptado: si storeId termina
+  // siendo null, la query de profiles ya se disparó igual (antes cortaba
+  // acá sin tocarla) — caso raro (slug inválido), a cambio de no pagar la
+  // secuencia completa en el camino feliz, que es el que corre siempre.
+  const [storeId, profileResult] = await Promise.all([
+    getStoreIdBySlug(supabase, storeSlug),
+    // maybeSingle (no single): "sin profile" es un resultado válido a
+    // distinguir de un error real de query, ya que esta función también se
+    // llama con ids de test sembrados a mano.
+    supabase.from('profiles').select('role').eq('id', userId).maybeSingle(),
+  ]);
+  const { data: profile, error: profileError } = profileResult;
 
   if (storeId == null) {
     return { isStoreAdmin: false, storeId: null, error: 'Store not found' };
   }
-
-  // maybeSingle (no single): "sin profile" es un resultado válido a
-  // distinguir de un error real de query, ya que esta función también se
-  // llama con ids de test sembrados a mano.
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
-    .maybeSingle();
 
   if (profileError || !profile) {
     return { isStoreAdmin: false, storeId, error: 'Profile not found' };
@@ -98,7 +74,10 @@ export async function verifyStoreAdminAuth(storeSlug: string): Promise<{
   error: string | null;
 }> {
   const startedAt = Date.now();
-  const supabase = await createCookieBasedSupabaseClient();
+  // Cliente cookie-based canónico (src/lib/supabase/server.ts) — antes esta
+  // función tenía su propia copia casi idéntica de esta misma función
+  // (createCookieBasedSupabaseClient), duplicación real que #144 elimina.
+  const supabase = await createSupabaseServerClient();
   let resolvedStoreId: number | null = null;
 
   try {
