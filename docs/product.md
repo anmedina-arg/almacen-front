@@ -58,7 +58,7 @@ Market Cevil es un sistema de ventas para un almacén / rotisería que opera pri
 ### Informes (`/admin/informes`)
 - **CSV de ventas**: detalle de órdenes e ítems con cliente, pago, saldo, categoría, subtotal, costo y margen. Filtrable por rango de fechas
 - **CSV de productos**: catálogo completo con precio, costo, márgenes, categoría, subcategoría y stock
-- **Actualizar afinidad**: botón para recalcular la matriz de recomendaciones manualmente
+- **Actualizar afinidad**: botón para recalcular la matriz de recomendaciones manualmente (ver deuda técnica en issue #132 — hoy es 100% manual)
 
 ### Productos (`/admin/products`)
 - Alta, edición y baja de productos
@@ -83,39 +83,7 @@ Market Cevil es un sistema de ventas para un almacén / rotisería que opera pri
 | Ranking de productos y categorías | ✅ Completo |
 | Informes CSV | ✅ Completo |
 | Badge "Más vendido" | ✅ Completo |
-| Sistema de recomendaciones | ✅ Completo (ver deuda técnica) |
-| Reglas de afinidad por categoría | ✅ Implementado — configuración solo por SQL |
+| Sistema de recomendaciones | ✅ Completo (deuda técnica en issues #131/#132/#134) |
+| Reglas de afinidad por categoría | ✅ Implementado — configuración solo por SQL (issue #131) |
 
----
-
-## Deuda técnica
-
-### Alta prioridad
-
-**Inconsistencia histórica en `quantity` de órdenes antiguas**
-Antes de la migración a Zustand, algunas órdenes tienen `quantity = 1` significando 1 kg, en lugar de `quantity = 1000` (gramos). El ranking y los informes asumen gramos, por lo que esas órdenes muestran valores incorrectos. No hay forma de corregir masivamente sin riesgo de romper datos válidos.
-
-**Órdenes sin registro de stock**
-Algunos productos (especialmente combos) no tenían stock registrado, lo que causaba errores `409 insufficient_stock` al intentar crear una orden. Se resolvió caso a caso; puede reaparecer con productos nuevos que no tengan stock cargado.
-
-### Media prioridad
-
-**Reglas de afinidad por categoría — solo por SQL**
-La tabla `category_affinity_rules` (ej: "bebidas → snacks siempre") se administra directamente desde el SQL Editor de Supabase. No hay UI para gestionar estas reglas desde el panel de admin.
-
-**Actualización de afinidad — solo manual**
-El botón "Actualizar afinidad" en Informes debe ejecutarse manualmente. No hay actualización automática (se descartó `pg_cron` por limitaciones del plan de Supabase). Debería ejecutarse periódicamente a medida que crecen las ventas.
-
-**`supabase_ranking.sql` — pendiente validar en producción**
-Las funciones `get_top_products` y `get_top_categories` fueron ejecutadas pero no se tiene confirmación de que el ranking funcione correctamente con el volumen real de datos de producción.
-
-### Baja prioridad
-
-**Columna `category_name` en AdminProductList**
-Muestra `category_name` (sistema FK nuevo) con fallback a `mainCategory` (campo legacy). Debería migrarse completamente al sistema nuevo una vez que todos los productos tengan `category_id` asignado.
-
-**`from_suggestion` — tracking sin análisis**
-El campo `from_suggestion` en `order_items` registra si un producto fue agregado desde sugerencias, pero no hay ninguna vista o reporte que use ese dato todavía.
-
-**Precio de costo faltante en muchos productos**
-Varios productos activos no tienen `cost` cargado (`NULL` o `0`), lo que hace que el margen se muestre como `—` en las vistas de admin. Esto afecta la utilidad del ranking por facturación y los informes de rentabilidad.
+Deuda técnica conocida: ver issues [#129](https://github.com/anmedina-arg/almacen-front/issues/129)-[#135](https://github.com/anmedina-arg/almacen-front/issues/135).

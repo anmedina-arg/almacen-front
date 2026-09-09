@@ -35,7 +35,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { createClient } from '@supabase/supabase-js';
-import { provisionStore } from '../src/lib/store/provisionStore';
+import { provisionStore } from '../src/features/store/services/provisionStore';
 import { FEATURE_FLAG_KEYS, type FeatureFlagKey } from '../src/lib/store/featureFlags';
 
 function loadEnv(): Record<string, string> {

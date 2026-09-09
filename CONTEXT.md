@@ -10,7 +10,7 @@ _Avoid_: Tenant (usar Store como término de dominio; "tenant" es aceptable solo
 
 **Feature flag**:
 Un interruptor que activa o desactiva una capacidad para una Store puntual — eje puramente comercial (¿el Store pagó por esto?), independiente del eje de Dominio (ver abajo). Una flag puede gatear una página entera (`stock`, `ranking`, `pos`, `dashboard`, `informes`) o solo una porción de funcionalidad dentro de una página que ya es siempre-encendida (`clientes`/`pagos` dentro de la página de Orders). Catálogo, productos, pedidos/WhatsApp y ventas quedan siempre encendidos — son el núcleo, no son flageables. Existen para vender suscripciones por módulo: un Store paga solo por las capacidades que necesita. Por eso cada flag tiene que ser mutuamente independiente de las demás y de las capacidades siempre-encendidas — apagar una nunca puede romper ni degradar otra (ver [ADR-0012](./docs/adr/0012-feature-flags-mutual-independence.md); dónde viven técnicamente en [ADR-0007](./docs/adr/0007-feature-flags-db-column.md)).
-`combos` está implementada hoy como flag en el código pero conceptualmente no lo es — es una capacidad de composición del catálogo, igual que Producto Surtido (que nunca fue flag) — ver [ADR-0013](./docs/adr/0013-service-layer-domain-boundaries.md), pendiente de migrar en código.
+`combos` conceptualmente nunca fue flag — es una capacidad de composición del catálogo, igual que Producto Surtido (que tampoco lo fue). Se retiró como flag en código en #117 (ver [ADR-0013](./docs/adr/0013-service-layer-domain-boundaries.md)): siempre-encendida, parte del dominio Products.
 _Avoid_: Instance config (nombre legado de un intento previo sin terminar, pensado para instalación dedicada por cliente — no aplica a este deployment compartido, ver "Deployment model" abajo). Confundir con Dominio — una flag no define ni implica un límite de dominio ni de superficie de UI, son tres ejes independientes.
 
 **Dominio** (bounded context):
@@ -45,6 +45,13 @@ _Avoid_: Familia de Variedades (la Familia agrupa Productos Surtidos; las Varied
 **Producto Surtido**:
 Un producto normal de `products` que, en vez de venderse tal cual, se arma eligiendo un número de Variedades de su Familia entre un mínimo y un máximo, ambos configurables por producto, sin que el precio cambie según qué Variedades se elijan. Distinto de un Combo: un Combo es una composición fija de otros productos con cantidad fija por componente; un Producto Surtido es una composición que elige el comprador al momento del pedido, entre opciones que son etiquetas, no productos.
 _Avoid_: Combo (concepto ya usado en el código para composición fija — ver `is_combo`/`combo_components`, no confundir).
+
+**Carrito**:
+Estado del pedido mientras el comprador todavía lo está armando, previo a confirmarlo — vive solo en el cliente (`cartStore.ts`, Zustand), no toca la base de datos ni afecta el stock disponible para otros compradores.
+
+**Descuento de stock**:
+La resta real y permanente de `product_stock`, con lock, que ocurre en el momento en que el comprador confirma el pedido (`reserve_order_stock()`, llamado desde `create_order()`) — simultáneo a que se abra WhatsApp con el mensaje. No es un hold temporal ni tiene expiración automática: solo se revierte con una acción explícita y posterior — cancelar el pedido (`cancel_order()`, devuelve stock vía `return_order_stock()`) — nunca por el simple paso del tiempo. Hasta el momento de la confirmación, mientras el producto está en el Carrito, el stock sigue disponible para cualquier otro comprador.
+_Avoid_: "Reserva"/"reservar" (el nombre de la función SQL `reserve_order_stock` usa ese verbo, pero no es el concepto correcto de dominio — "reserva" implica un hold temporal que puede caducar solo, y acá no existe eso: es un descuento real, permanente hasta cancelación explícita).
 
 ## Deployment model
 

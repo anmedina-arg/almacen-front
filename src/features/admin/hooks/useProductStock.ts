@@ -10,7 +10,7 @@ export function useProductStock() {
   return useQuery({
     queryKey: adminKeys.stockList(),
     queryFn: stockApiClient.getAllStock,
-    staleTime: 0, // Sin staleTime para debugging
+    staleTime: 5 * 60 * 1000, // mismo criterio que useStockProducts/useStockByCategory (#143)
     gcTime: 5 * 60 * 1000, // 5 minutos en cache
   });
 }

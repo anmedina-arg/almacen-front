@@ -22,4 +22,12 @@ Any capability gated by a `stores.feature_flags` key must stay independent of ev
 
 ### Admin-gated API routes
 
-Any route under `[store]/api/` that requires Store admin or Platform admin access must use the shared `withStoreAdmin` wrapper, never reimplement the guard inline. See `docs/agents/admin-routes.md`.
+Any route under `[store]/api/` that requires Store admin or Platform admin access must use the shared `createApiRoute(requireAdmin)` guard, never reimplement the check inline. See `docs/agents/admin-routes.md`.
+
+### Screaming architecture scope
+
+The service layer (`features/<domain>/services/`) is 100% domain-organized — no exceptions. The client-side layer (hooks, components, `*ApiClient.ts`) intentionally stays surface-organized (`features/admin/`, `features/catalog/`) instead — not an incomplete migration, don't split it by domain without a new ADR. See [ADR-0013](docs/adr/0013-service-layer-domain-boundaries.md).
+
+### PWA
+
+Manifest is per-Store and dynamic (no `public/manifest.json`), Service Worker versioning, icon regeneration, and troubleshooting. See `docs/agents/pwa.md`.
