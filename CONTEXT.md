@@ -46,6 +46,13 @@ _Avoid_: Familia de Variedades (la Familia agrupa Productos Surtidos; las Varied
 Un producto normal de `products` que, en vez de venderse tal cual, se arma eligiendo un número de Variedades de su Familia entre un mínimo y un máximo, ambos configurables por producto, sin que el precio cambie según qué Variedades se elijan. Distinto de un Combo: un Combo es una composición fija de otros productos con cantidad fija por componente; un Producto Surtido es una composición que elige el comprador al momento del pedido, entre opciones que son etiquetas, no productos.
 _Avoid_: Combo (concepto ya usado en el código para composición fija — ver `is_combo`/`combo_components`, no confundir).
 
+**Carrito**:
+Estado del pedido mientras el comprador todavía lo está armando, previo a confirmarlo — vive solo en el cliente (`cartStore.ts`, Zustand), no toca la base de datos ni afecta el stock disponible para otros compradores.
+
+**Descuento de stock**:
+La resta real y permanente de `product_stock`, con lock, que ocurre en el momento en que el comprador confirma el pedido (`reserve_order_stock()`, llamado desde `create_order()`) — simultáneo a que se abra WhatsApp con el mensaje. No es un hold temporal ni tiene expiración automática: solo se revierte con una acción explícita y posterior — cancelar el pedido (`cancel_order()`, devuelve stock vía `return_order_stock()`) — nunca por el simple paso del tiempo. Hasta el momento de la confirmación, mientras el producto está en el Carrito, el stock sigue disponible para cualquier otro comprador.
+_Avoid_: "Reserva"/"reservar" (el nombre de la función SQL `reserve_order_stock` usa ese verbo, pero no es el concepto correcto de dominio — "reserva" implica un hold temporal que puede caducar solo, y acá no existe eso: es un descuento real, permanente hasta cancelación explícita).
+
 ## Deployment model
 
 Un único deployment comparte todas las Stores — no hay una instancia/infraestructura separada por cliente. El middleware resuelve la Store activa según el primer segmento del path de la URL (no hay dominio propio todavía, ver [ADR-0003](./docs/adr/0003-path-based-tenant-resolution.md)) e inyecta el slug como header para que los endpoints de API filtren por Store.
