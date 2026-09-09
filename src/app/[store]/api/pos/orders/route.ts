@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { posOrderSchema } from '@/features/orders/schemas/orderSchemas';
 import { createOrder, InsufficientStockError } from '@/features/orders/services/orderService';
+import { invalidateOrderStockTags } from '@/features/orders/services/invalidateOrderStock';
 
 /**
  * POST /api/pos/orders
@@ -40,6 +41,11 @@ export const POST = createApiRoute(requireAdmin)(async (ctx) => {
       })),
     });
 
+    // POS es otro punto de entrada al mismo create_order() (ver comentario
+    // arriba) — invalida stock igual que POST /api/orders (#146, spec
+    // #139), hallazgo de code review: se había cubierto el checkout
+    // público pero no este.
+    await invalidateOrderStockTags(ctx.supabase, ctx.storeId, items);
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     if (error instanceof InsufficientStockError) {

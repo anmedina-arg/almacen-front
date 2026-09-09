@@ -336,11 +336,29 @@ export async function updateOrderItem(
   return data;
 }
 
-export async function removeOrderItem(supabase: SupabaseClient, storeId: number, orderId: number, itemId: number): Promise<void> {
+/**
+ * Devuelve el product_id del item borrado (#146, spec #139) — return_stock_on_item_delete
+ * ya devuelve stock real al confirmar el borrado; el caller lo necesita
+ * para invalidar el cache de stock de ese producto sin una query aparte
+ * (.select() después de .delete() en la misma llamada).
+ */
+export async function removeOrderItem(
+  supabase: SupabaseClient,
+  storeId: number,
+  orderId: number,
+  itemId: number
+): Promise<{ product_id: number | null } | null> {
   await assertOrderIsPending(supabase, storeId, orderId);
 
-  const { error } = await supabase.from('order_items').delete().eq('id', itemId).eq('order_id', orderId);
+  const { data, error } = await supabase
+    .from('order_items')
+    .delete()
+    .eq('id', itemId)
+    .eq('order_id', orderId)
+    .select('product_id')
+    .maybeSingle();
   if (error) throw new Error(error.message);
+  return data;
 }
 
 export async function setPayments(
