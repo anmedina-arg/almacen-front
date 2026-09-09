@@ -32,6 +32,11 @@
 -- `ALTER TABLE ... ADD CONSTRAINT` explícito aparte para que se aplique
 -- donde la tabla ya exista, editar este archivo solo no alcanza (hallazgo
 -- de code review de #141).
+--
+-- Aplicado y confirmado en producción el 2026-09-09 (tabla, índice, RLS,
+-- policy de INSERT, y los 4 constraints — pkey/route check/duration_ms
+-- check/store_id fkey — verificados con pg_constraint). Antes aplicado y
+-- probado con inserts válidos/inválidos reales contra el proyecto de test.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.perf_logs (
