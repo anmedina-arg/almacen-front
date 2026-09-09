@@ -20,9 +20,12 @@
 -- DROP FUNCTION corrido antes del CREATE OR REPLACE para no dejar overload
 -- (ver #70).
 --
--- Verificado con pg_get_functiondef contra el proyecto de test el
--- 2026-09-09 (ya aplicado ahí) — pendiente verificar y aplicar contra
--- producción, ver #142.
+-- Aplicado y confirmado en producción el 2026-09-09: DROP FUNCTION de la
+-- firma vieja + CREATE OR REPLACE con la firma nueva, NOTIFY pgrst reload
+-- schema, y verificado con pg_get_function_identity_arguments (un solo
+-- overload: p_store_id integer, p_days integer) + una llamada real contra
+-- Market del Cevil devolviendo productos reales. Aplicado antes al
+-- proyecto de test, mismo resultado.
 --
 -- Trade-off aceptado (code review de #142): p_store_id no tiene guarda
 -- explícita contra NULL — a diferencia de get_top_products/
