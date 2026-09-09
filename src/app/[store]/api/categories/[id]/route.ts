@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { categorySchema } from '@/features/products/schemas/categorySchemas';
 import { updateCategory, deleteCategory } from '@/features/products/services/categoryService';
+import { productMetadataTag } from '@/lib/cache/tags';
 
 /**
  * PUT /api/categories/[id]
@@ -23,6 +25,11 @@ export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
     }
 
     const category = await updateCategory(ctx.supabase, ctx.storeId, categoryId, parsed.data);
+    // category_name viaja embebido en la metadata cacheada de cada
+    // producto de esta categoría (#145, code review) — sin esto, un
+    // rename quedaría desactualizado en el catálogo público hasta que
+    // algo no relacionado (un producto editado) invalide el cache.
+    revalidateTag(productMetadataTag(ctx.storeId));
     return NextResponse.json(category);
   } catch (error) {
     return handleServiceError(error, 'PUT /api/categories/[id]');
@@ -41,6 +48,7 @@ export const DELETE = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, {
     }
 
     await deleteCategory(ctx.supabase, ctx.storeId, categoryId);
+    revalidateTag(productMetadataTag(ctx.storeId));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return handleServiceError(error, 'DELETE /api/categories/[id]');

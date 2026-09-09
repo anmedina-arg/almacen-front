@@ -16,6 +16,11 @@ export async function fetchTopSellerIds(supabase: SupabaseClient, storeId: numbe
   // (p_store_id) se aplique también en producción, un deploy de este
   // código antes que esa migración produce un mismatch de firma silencioso
   // sin esto — el badge desaparece sin ningún rastro en logs.
+  // Degrada acá mismo (loguea y devuelve vacío) en vez de tirar — a
+  // diferencia de fetchProductMetadata.ts (#145), esta pieza nunca queda
+  // envuelta en unstable_cache, así que no hay riesgo de que un error
+  // quede cacheado indefinido; no hace falta el patrón throw-y-atajar-
+  // arriba que sí necesita metadata.
   if (error) {
     console.error('[fetchTopSellerIds] get_top_seller_ids RPC error:', error.message);
     return new Set<number>();

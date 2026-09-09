@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateProductSchema } from '@/features/products/schemas/productSchemas';
 import { getProductById, updateProduct, deleteProduct } from '@/features/products/services/productService';
+import { productMetadataTag } from '@/lib/cache/tags';
 
 /**
  * GET /api/products/[id]
@@ -62,6 +64,13 @@ export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
     }
 
     const product = await updateProduct(ctx.supabase, ctx.storeId, id, parsed.data);
+    // Invalida el Data Cache de Next (#145, spec #139) que sirve el
+    // catálogo público (SSR + este mismo GET). No toca el
+    // Cache-Control de CDN de GET /api/products sin filtros (otra capa,
+    // hasta 5 min de TTL, sin relación — un consumidor externo que
+    // pegue directo a esa URL puede seguir viendo la versión vieja hasta
+    // que ese TTL expire, 3ra pasada de code review de #145).
+    revalidateTag(productMetadataTag(ctx.storeId));
     return NextResponse.json(product);
   } catch (error) {
     return handleServiceError(error, 'PUT /api/products/[id]');
@@ -80,6 +89,7 @@ export const DELETE = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, {
     }
 
     await deleteProduct(ctx.supabase, ctx.storeId, id);
+    revalidateTag(productMetadataTag(ctx.storeId));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return handleServiceError(error, 'DELETE /api/products/[id]');

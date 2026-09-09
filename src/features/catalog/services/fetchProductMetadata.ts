@@ -1,6 +1,15 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Product } from '@/types';
 
+/** Compartido con fetchPublicProducts.ts (#145, code review) — una sola
+ * definición para no arriesgar que las 3 copias (acá, fetchPublicProducts,
+ * y su cache wrapper) se desincronicen. */
+export type FetchProductMetadataOptions = {
+  includeInactive?: boolean;
+  categoryId?: number;
+  search?: string;
+};
+
 function formatComboItem(rawName: string, qty: number, saleType: string): string {
   const name = rawName
     .replace(/\b100\s*gr\b/gi, '')
@@ -40,15 +49,17 @@ function formatComboItem(rawName: string, qty: number, saleType: string): string
  *   The caller is responsible for verifying admin access before passing this flag.
  * @param options.categoryId - When provided, returns only products of that category.
  *   Used by SSR and the catalog infinite query to load one category at a time.
+ * @throws Si la query principal de productos falla (#145) — a propósito,
+ *   para que un caller que envuelva esto en cache (getCachedProductMetadata
+ *   en fetchPublicProducts.ts) no persista un resultado malo. Un caller
+ *   directo nuevo (test, script) que asuma "en el peor caso devuelve []"
+ *   se va a encontrar con un throw en vez de eso — no es el contrato
+ *   pre-#145.
  */
 export async function fetchProductMetadata(
   supabase: SupabaseClient,
   storeId: number,
-  options?: {
-    includeInactive?: boolean;
-    categoryId?: number;
-    search?: string;
-  }
+  options?: FetchProductMetadataOptions
 ): Promise<Product[]> {
   let query = supabase
     .from('products')
@@ -92,18 +103,44 @@ export async function fetchProductMetadata(
 
   const { data, error } = await query;
 
-  if (error || !data) return [];
+  // Tira en vez de devolver [] en error (#145, code review): antes de
+  // cachear esto (ver getCachedProductMetadata en fetchPublicProducts.ts),
+  // un error transitorio silenciado como "catálogo vacío" duraba un solo
+  // request. Con cache indefinido (sin TTL, solo invalidación por evento),
+  // devolver [] acá lo cachearía como si la Store no tuviera productos
+  // hasta el próximo alta/edición/borrado — un blip de red podría vaciar
+  // el catálogo público hasta que alguien del admin edite algo, sin
+  // relación. Un throw evita que unstable_cache guarde nada en un miss
+  // fallido, así que el próximo request reintenta en vez de arrastrar el
+  // error cacheado. "Sin datos" (data null/undefined sin error) sigue
+  // siendo un catálogo vacío legítimo, no un error.
+  if (error) throw new Error(`fetchProductMetadata: ${error.message}`);
+  if (!data) return [];
 
   const comboIds = data.filter((p) => p.is_combo).map((p) => p.id);
 
-  const { data: comboData } =
+  const comboResult =
     comboIds.length > 0
       ? await supabase
           .from('combo_components')
           .select(`combo_product_id, quantity, products!combo_components_component_product_id_fkey(name, sale_type)`)
           .in('combo_product_id', comboIds)
           .order('id', { ascending: true })
-      : { data: [] as { combo_product_id: number; quantity: number; products: unknown }[] };
+      : { data: [] as { combo_product_id: number; quantity: number; products: unknown }[], error: null };
+
+  // A diferencia del error de arriba, este NO tira (3ra pasada de code
+  // review de #145): fallar acá solo degradaría los combos a "sin
+  // componentes listados" — cosmético, el resto del catálogo sigue
+  // siendo válido. Tirar acumularía blast radius de más: vaciaría TODO
+  // el catálogo (vía degradeOnError en fetchPublicProducts.ts) por un
+  // error acotado a un sub-query de combos. Sí puede quedar cacheado con
+  // combo_items vacíos hasta la próxima invalidación por evento — trade-off
+  // aceptado, es el mismo riesgo que ya existía antes de #145 para este
+  // caso puntual, solo que ahora con TTL indefinido en vez de un request.
+  if (comboResult.error) {
+    console.error('[fetchProductMetadata] combo_components error:', comboResult.error.message);
+  }
+  const comboData = comboResult.data;
 
   const comboItemsMap = new Map<number, string[]>();
   (comboData ?? []).forEach((row) => {
