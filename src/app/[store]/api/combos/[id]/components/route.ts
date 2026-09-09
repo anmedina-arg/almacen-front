@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
+import { revalidateTag } from 'next/cache';
 import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateComboComponentsSchema } from '@/features/products/schemas/comboSchemas';
 import { getComboComponents, updateComboComponents } from '@/features/products/services/comboService';
+import { productMetadataTag } from '@/lib/cache/tags';
 
 /**
  * GET /api/combos/[id]/components
@@ -41,6 +43,10 @@ export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
     }
 
     await updateComboComponents(ctx.supabase, ctx.storeId, id, parsed.data);
+    // combo_items (los nombres formateados de los componentes) es parte de
+    // la metadata cacheada del combo — invalida igual que product/route.ts
+    // (#145, spec #139).
+    revalidateTag(productMetadataTag(ctx.storeId));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return handleServiceError(error, 'PUT /api/combos/[id]/components');
