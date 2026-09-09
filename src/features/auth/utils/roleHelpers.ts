@@ -3,6 +3,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import { getStoreIdBySlug } from '@/lib/store/getStoreIdBySlug';
 import { isAdminRole } from './isAdminRole';
+import { logPerf } from '@/lib/observability/logPerf';
 
 // Usado por verifyStoreAdminAuth — necesita un client de Supabase atado a
 // las cookies del request actual.
@@ -96,17 +97,26 @@ export async function verifyStoreAdminAuth(storeSlug: string): Promise<{
   userId: string | null;
   error: string | null;
 }> {
+  const startedAt = Date.now();
   const supabase = await createCookieBasedSupabaseClient();
+  let resolvedStoreId: number | null = null;
 
-  const {
-    data: { user },
-    error: userError,
-  } = await supabase.auth.getUser();
+  try {
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-  if (userError || !user) {
-    return { isStoreAdmin: false, storeId: null, userId: null, error: 'No authenticated' };
+    if (userError || !user) {
+      return { isStoreAdmin: false, storeId: null, userId: null, error: 'No authenticated' };
+    }
+
+    const status = await resolveStoreAdminStatus(supabase, user.id, storeSlug);
+    resolvedStoreId = status.storeId;
+    return { ...status, userId: user.id };
+  } finally {
+    // Instrumentación temporal (#141, spec #139) — mide el guard que
+    // gatea la entrada a /admin, ver docs/diagnostics/2026-09-perf.md.
+    logPerf(supabase, 'admin_layout_guard', Date.now() - startedAt, resolvedStoreId);
   }
-
-  const status = await resolveStoreAdminStatus(supabase, user.id, storeSlug);
-  return { ...status, userId: user.id };
 }
