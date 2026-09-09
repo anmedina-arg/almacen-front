@@ -1,34 +1,22 @@
 import 'server-only';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import type { Product } from '@/types';
-
-function formatComboItem(rawName: string, qty: number, saleType: string): string {
-  const name = rawName
-    .replace(/\b100\s*gr\b/gi, '')
-    .replace(/\bkilos?\b/gi, '')
-    .replace(/\bkg\b/gi, '')
-    .replace(/\bx\b/gi, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-
-  let qtyLabel: string;
-  if (saleType === 'kg' || saleType === '100gr') {
-    if (qty < 1) {
-      qtyLabel = `${Math.round(qty * 1000)} gr`;
-    } else {
-      qtyLabel = `${parseFloat(qty.toFixed(3))} kg`;
-    }
-  } else {
-    const n = parseFloat(qty.toFixed(10));
-    qtyLabel = Number.isInteger(n) ? String(n) : String(parseFloat(n.toPrecision(6)));
-  }
-
-  return `${qtyLabel} ${name}`;
-}
+import { fetchProductMetadata } from './fetchProductMetadata';
+import { fetchProductStock } from './fetchProductStock';
+import { fetchTopSellerIds } from './fetchTopSellerIds';
 
 /**
  * Fetches products with stock and combo items, scoped to a single Store.
  * Server-only — do not import from client components.
+ *
+ * Orquesta las 3 piezas independientes (metadata / stock / top-seller,
+ * #140, spec #139) y arma el mismo Product[] que antes traía todo junto —
+ * sin cambio de comportamiento observable. Cada pieza recibe el
+ * SupabaseClient por parámetro; este orquestador es el único punto que
+ * sigue creando el cliente cookie-based (por eso queda sin test de
+ * integración automatizado, igual que verifyStoreAdminAuth — no se puede
+ * invocar fuera de un request real de Next.js; se verifica con smoke test
+ * manual).
  *
  * @param storeId - Store a la que se filtra el catálogo. Requerido: sin esto,
  *   el catálogo de una Store mostraría productos de todas las demás (#15).
@@ -47,99 +35,23 @@ export async function fetchPublicProducts(
 ): Promise<Product[]> {
   const supabase = await createSupabaseServerClient();
 
-  let query = supabase
-    .from('products')
-    .select(
-      `
-      id,
-      name,
-      price,
-      cost,
-      image,
-      active,
-      categories,
-      mainCategory:main_category,
-      sale_type,
-      is_combo,
-      max_stock,
-      category_id,
-      subcategory_id,
-      is_producto_surtido,
-      familia_id,
-      min_variedades,
-      max_variedades,
-      cat:categories!products_category_id_fkey(id, name),
-      sub:subcategories!products_subcategory_id_fkey(id, name)
-    `
-    )
-    .eq('store_id', storeId)
-    .order('name', { ascending: true });
+  const metadata = await fetchProductMetadata(supabase, storeId, options);
 
-  if (!options?.includeInactive) {
-    query = query.eq('active', true);
-  }
+  // Corta antes de tocar stock/top-seller si la Store no tiene productos
+  // (o la query principal falló — fetchProductMetadata devuelve [] en
+  // ambos casos) — mismo criterio que la versión pre-split, que evitaba
+  // los dos roundtrips extra (incluida la RPC de top-seller, que cruza
+  // todas las Stores) cuando no hay nada que enriquecer.
+  if (metadata.length === 0) return [];
 
-  if (options?.categoryId != null) {
-    query = query.eq('category_id', options.categoryId);
-  }
-
-  if (options?.search) {
-    query = query.ilike('name', `%${options.search}%`);
-  }
-
-  const { data, error } = await query;
-
-  if (error || !data) return [];
-
-  const comboIds = data.filter((p) => p.is_combo).map((p) => p.id);
-
-  const [
-    { data: stockData },
-    { data: topSellersData },
-    { data: comboData },
-  ] = await Promise.all([
-    supabase.from('product_stock').select('product_id, quantity').eq('store_id', storeId),
-    // get_top_seller_ids no filtra por Store todavía — depende de orders,
-    // que #16 (Pedidos y WhatsApp) todavía no scopea. Fuera de alcance acá.
-    supabase.rpc('get_top_seller_ids', { p_days: 30 }),
-    comboIds.length > 0
-      ? supabase
-          .from('combo_components')
-          .select(`combo_product_id, quantity, products!combo_components_component_product_id_fkey(name, sale_type)`)
-          .in('combo_product_id', comboIds)
-          .order('id', { ascending: true })
-      : Promise.resolve({ data: [] as { combo_product_id: number; quantity: number; products: unknown }[] }),
+  const [stockMap, topSellerIds] = await Promise.all([
+    fetchProductStock(supabase, storeId),
+    fetchTopSellerIds(supabase),
   ]);
 
-  const stockMap = new Map<number, number>(
-    (stockData ?? []).map((s) => [s.product_id, s.quantity])
-  );
-
-  const topSellerIds = new Set<number>((topSellersData ?? []).map((r: { product_id: number }) => r.product_id));
-
-  const comboItemsMap = new Map<number, string[]>();
-  (comboData ?? []).forEach((row) => {
-    const prod = row.products as unknown as { name: string; sale_type: string } | null;
-    if (!comboItemsMap.has(row.combo_product_id)) comboItemsMap.set(row.combo_product_id, []);
-    if (prod) {
-      comboItemsMap
-        .get(row.combo_product_id)!
-        .push(formatComboItem(prod.name, parseFloat(String(row.quantity)), prod.sale_type));
-    }
-  });
-
-  return data.map((p) => {
-    const { cat, sub, ...rest } = p as typeof p & {
-      cat?: { id: number; name: string } | null;
-      sub?: { id: number; name: string } | null;
-    };
-    return {
-      ...rest,
-      category_name: cat?.name ?? null,
-      subcategory_name: sub?.name ?? null,
-      stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
-      ...(p.is_combo ? { combo_items: comboItemsMap.get(p.id) ?? [] } : {}),
-      is_top_seller: topSellerIds.has(p.id),
-    } as Product;
-  });
+  return metadata.map((p) => ({
+    ...p,
+    stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
+    is_top_seller: topSellerIds.has(p.id),
+  }));
 }
