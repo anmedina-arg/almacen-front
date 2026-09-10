@@ -8,12 +8,19 @@ import { TOP_SELLER_CACHE_SECONDS } from '@/lib/cache/ttl';
 import { mapWithConcurrencyLimit } from '@/lib/concurrency';
 import type { Product } from '@/types';
 import { fetchProductMetadata, type FetchProductMetadataOptions } from './fetchProductMetadata';
-import { fetchProductStockForProduct } from './fetchProductStock';
+import { fetchProductStockBulk, fetchProductStockForProduct } from './fetchProductStock';
 import { fetchTopSellerIds } from './fetchTopSellerIds';
 
-// Tope de queries de stock simultáneas por request (#146) — arbitrario
-// pero conservador; ajustar si el timing post-deploy (perf_logs) muestra
-// que es cuello de botella en cold cache.
+// Tope de queries de stock simultáneas por request (#146) — solo aplica a
+// la rama filtrada de getStockForProducts (búsqueda/paginación por
+// categoría, resultado chico). El timing post-deploy en perf_logs
+// terminó confirmando que era cuello de botella, pero no en cold cache
+// como se esperaba acá: para el catálogo completo (sin filtros, ~550
+// productos) el overhead era de las llamadas a unstable_cache en sí,
+// cache-hit o no — resuelto en #148 sacando esa rama del cache per-producto
+// (ver getStockForProducts). Este límite se mantiene para cuando el
+// resultado SÍ es chico, donde el riesgo real de #146 (cold cache, muchos
+// productos a la vez) sigue vigente si la Store tiene una categoría grande.
 const STOCK_FETCH_CONCURRENCY = 25;
 
 /**
@@ -99,6 +106,76 @@ function getCachedProductStock(
     { tags: [productStockTag(storeId, productId)] }
   );
   return degradeOnError(cached(), 'getCachedProductStock', undefined);
+}
+
+/**
+ * `true` cuando `metadata` es el catálogo completo de la Store, sin
+ * recortar por búsqueda ni por categoría (#148) — el caso que en
+ * producción resultó ~550 productos, y donde el cache per-producto de
+ * getCachedProductStock resultaba más lento que no cachear. `includeInactive`
+ * no entra en la cuenta: catalog_admin_fetch también trae todo sin filtro,
+ * mismo tamaño de problema que catalog_ssr.
+ */
+function isFullCatalogFetch(options?: FetchProductMetadataOptions): boolean {
+  return !options?.search && options?.categoryId == null;
+}
+
+/**
+ * Un solo reintento inmediato para el query bulk (#148, code review) — a
+ * diferencia del cache per-producto, acá UN query fallido degradaría el
+ * stock de los ~550 productos del catálogo a "disponible" de una sola vez
+ * en vez de solo el de un producto puntual. Un blip transitorio de
+ * Supabase no debería pagar ese costo cuando un reintento simple ya lo
+ * resuelve la mayoría de las veces. Para una falla persistente (no
+ * transitoria) el degradado sigue siendo a "disponible" para todos —
+ * aceptado porque create_order() es la fuente de verdad real al
+ * confirmar (rechaza si el stock real no alcanza, ver CONTEXT.md): esto
+ * no arriesga overselling, solo una mala UX puntual (checkouts
+ * rechazados) durante una caída real y sostenida.
+ */
+async function fetchStockBulkWithRetry(supabase: SupabaseClient, storeId: number): Promise<Map<number, number>> {
+  try {
+    return await fetchProductStockBulk(supabase, storeId);
+  } catch {
+    return fetchProductStockBulk(supabase, storeId);
+  }
+}
+
+/**
+ * Resuelve el stock de `metadata` con una de dos estrategias (#148, spec
+ * #139, ADR-0014):
+ *
+ * - Catálogo completo (isFullCatalogFetch): un único query bulk
+ *   (fetchProductStockBulk), sin unstable_cache — ver ese archivo para el
+ *   razonamiento completo. Perf_logs en producción mostró que cachear acá
+ *   por producto (#146) dejaba catalog_ssr más lento que antes de esa
+ *   cache, no más rápido.
+ * - Resultado filtrado (búsqueda o paginación por categoría): mantiene el
+ *   cache per-producto de #146 sin cambios — el resultado es chico, ahí
+ *   sí gana invalidación granular sin pagar overhead de cientos de
+ *   lecturas de cache.
+ */
+function getStockForProducts(
+  supabase: SupabaseClient,
+  storeId: number,
+  metadata: Product[],
+  options?: FetchProductMetadataOptions
+): Promise<Map<number, number | undefined>> {
+  if (isFullCatalogFetch(options)) {
+    return degradeOnError(fetchStockBulkWithRetry(supabase, storeId), 'getStockForProducts:bulk', new Map<number, number>()).then(
+      (bulk) => new Map(metadata.map((p) => [p.id, bulk.get(p.id)]))
+    );
+  }
+
+  // Con límite de concurrencia (no un Promise.all sin tope, hallazgo de
+  // code review de #146): una categoría o búsqueda con muchos resultados
+  // en cold cache podría disparar muchas queries simultáneas a Supabase
+  // en un solo page load si no se acota.
+  return mapWithConcurrencyLimit(
+    metadata,
+    STOCK_FETCH_CONCURRENCY,
+    async (p) => [p.id, await getCachedProductStock(supabase, storeId, p.id)] as const
+  ).then((entries) => new Map(entries));
 }
 
 /**
@@ -193,22 +270,12 @@ export async function fetchPublicProducts(
     // top-seller): degradar en vez de romper la página.
     if (metadata.length === 0) return [];
 
-    // Un fetch cacheado por producto en vez de un solo fetch bulk (#146)
-    // — cada uno resuelve de cache o de la base según corresponda de
-    // forma independiente. Con límite de concurrencia (no un Promise.all
-    // sin tope, hallazgo de code review): un catálogo de ~550 productos
-    // con cache frío (deploy reciente, primera visita tras invalidar)
-    // podría disparar 550 queries simultáneas a Supabase en un solo page
-    // load si no se acota.
-    const [stockEntries, topSellerIds] = await Promise.all([
-      mapWithConcurrencyLimit(
-        metadata,
-        STOCK_FETCH_CONCURRENCY,
-        async (p) => [p.id, await getCachedProductStock(supabase, storeId, p.id)] as const
-      ),
+    // getStockForProducts elige bulk vs. cache per-producto según el
+    // tamaño del resultado (#148 — ver esa función para el razonamiento).
+    const [stockMap, topSellerIds] = await Promise.all([
+      getStockForProducts(supabase, storeId, metadata, options),
       getCachedTopSellerIds(supabase, storeId),
     ]);
-    const stockMap = new Map(stockEntries);
 
     return metadata.map((p) => ({
       ...p,
