@@ -11,3 +11,12 @@
 export function productMetadataTag(storeId: number): string {
   return `products:${storeId}`;
 }
+
+/**
+ * Stock de UN producto puntual (#146, spec #139) — a propósito por
+ * producto, no por Store: invalidar el stock de un producto no debe
+ * forzar el recálculo del stock de los otros 549 productos del catálogo.
+ */
+export function productStockTag(storeId: number, productId: number): string {
+  return `stock:${storeId}:${productId}`;
+}

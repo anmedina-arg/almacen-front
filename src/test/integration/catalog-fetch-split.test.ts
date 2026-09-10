@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { fetchProductMetadata } from '@/features/catalog/services/fetchProductMetadata';
-import { fetchProductStock } from '@/features/catalog/services/fetchProductStock';
+import { fetchProductStockForProduct } from '@/features/catalog/services/fetchProductStock';
 import { fetchTopSellerIds } from '@/features/catalog/services/fetchTopSellerIds';
 
 // Caracteriza el comportamiento de las 3 piezas en las que se partió
@@ -167,10 +167,16 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
     expect(withInactive.some((p) => p.id === componentId)).toBe(true);
   });
 
-  it.skipIf(!hasCredentials)('fetchProductStock: devuelve un Map product_id -> quantity scopeado por Store', async () => {
-    const stock = await fetchProductStock(admin, storeId);
-    expect(stock.get(productId)).toBe(15);
-    expect(stock.get(componentId)).toBe(40);
+  it.skipIf(!hasCredentials)('fetchProductStockForProduct: devuelve la cantidad de un producto puntual (#146)', async () => {
+    expect(await fetchProductStockForProduct(admin, storeId, productId)).toBe(15);
+    expect(await fetchProductStockForProduct(admin, storeId, componentId)).toBe(40);
+  });
+
+  it.skipIf(!hasCredentials)('fetchProductStockForProduct: undefined si el producto no tiene fila en product_stock', async () => {
+    // El combo del fixture no tiene fila propia en product_stock (su stock
+    // es virtual, derivado de los componentes) — mismo comportamiento que
+    // antes de #146, ahora por producto en vez de en el Map bulk.
+    expect(await fetchProductStockForProduct(admin, storeId, comboId)).toBeUndefined();
   });
 
   it.skipIf(!hasCredentials)('fetchTopSellerIds: devuelve un Set, sin el producto recien creado (sin ventas)', async () => {

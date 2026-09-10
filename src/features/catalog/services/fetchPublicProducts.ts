@@ -3,11 +3,17 @@ import { unstable_cache } from 'next/cache';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { logPerf } from '@/lib/observability/logPerf';
-import { productMetadataTag } from '@/lib/cache/tags';
+import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
+import { mapWithConcurrencyLimit } from '@/lib/concurrency';
 import type { Product } from '@/types';
 import { fetchProductMetadata, type FetchProductMetadataOptions } from './fetchProductMetadata';
-import { fetchProductStock } from './fetchProductStock';
+import { fetchProductStockForProduct } from './fetchProductStock';
 import { fetchTopSellerIds } from './fetchTopSellerIds';
+
+// Tope de queries de stock simultáneas por request (#146) — arbitrario
+// pero conservador; ajustar si el timing post-deploy (perf_logs) muestra
+// que es cuello de botella en cold cache.
+const STOCK_FETCH_CONCURRENCY = 25;
 
 /**
  * Cache de metadata de producto (#145, spec #139, ADR-0014) — vida larga
@@ -55,6 +61,33 @@ function getCachedProductMetadata(
   return metadataPromise.catch((err) => {
     console.error('[getCachedProductMetadata] error:', err instanceof Error ? err.message : err);
     return [];
+  });
+}
+
+/**
+ * Cache de stock por producto (#146, spec #139, ADR-0014) — a propósito
+ * una entrada de cache por producto, no una sola para toda la Store: un
+ * pedido o ajuste de stock de un producto invalida solo su propio tag
+ * (productStockTag), el resto de los ~550 productos del catálogo sigue
+ * sirviéndose de cache sin recalcularse. Mismo criterio de degradado que
+ * getCachedProductMetadata: fetchProductStockForProduct tira en error (no
+ * cachea un resultado malo), se ataja acá para no romper la página —
+ * degradar a undefined es seguro porque el catálogo ya trata "sin
+ * registro de stock" como "disponible" (ver Product.stock_quantity).
+ */
+function getCachedProductStock(
+  supabase: SupabaseClient,
+  storeId: number,
+  productId: number
+): Promise<number | undefined> {
+  const cached = unstable_cache(
+    () => fetchProductStockForProduct(supabase, storeId, productId),
+    ['product-stock', String(storeId), String(productId)],
+    { tags: [productStockTag(storeId, productId)] }
+  );
+  return cached().catch((err) => {
+    console.error('[getCachedProductStock] error:', err instanceof Error ? err.message : err);
+    return undefined;
   });
 }
 
@@ -116,14 +149,30 @@ export async function fetchPublicProducts(
     // top-seller): degradar en vez de romper la página.
     if (metadata.length === 0) return [];
 
-    const [stockMap, topSellerIds] = await Promise.all([
-      fetchProductStock(supabase, storeId),
+    // Un fetch cacheado por producto en vez de un solo fetch bulk (#146)
+    // — cada uno resuelve de cache o de la base según corresponda de
+    // forma independiente. Con límite de concurrencia (no un Promise.all
+    // sin tope, hallazgo de code review): un catálogo de ~550 productos
+    // con cache frío (deploy reciente, primera visita tras invalidar)
+    // podría disparar 550 queries simultáneas a Supabase en un solo page
+    // load si no se acota.
+    const [stockEntries, topSellerIds] = await Promise.all([
+      mapWithConcurrencyLimit(
+        metadata,
+        STOCK_FETCH_CONCURRENCY,
+        async (p) => [p.id, await getCachedProductStock(supabase, storeId, p.id)] as const
+      ),
       fetchTopSellerIds(supabase, storeId),
     ]);
+    const stockMap = new Map(stockEntries);
 
     return metadata.map((p) => ({
       ...p,
-      stock_quantity: stockMap.has(p.id) ? stockMap.get(p.id) : undefined,
+      // stockMap tiene una entrada para cada producto de metadata siempre
+      // (#146 — antes stockMap.has() podía ser false para un producto sin
+      // fila en product_stock; ahora esa entrada existe igual, con
+      // valor undefined).
+      stock_quantity: stockMap.get(p.id),
       is_top_seller: topSellerIds.has(p.id),
     }));
   } finally {

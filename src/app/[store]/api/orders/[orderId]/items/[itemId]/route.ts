@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateOrderItemSchema } from '@/features/orders/schemas/orderSchemas';
 import { updateOrderItem, removeOrderItem } from '@/features/orders/services/orderService';
+import { invalidateOrderStockTags } from '@/features/orders/services/invalidateOrderStock';
 
 /**
  * DELETE /api/orders/[orderId]/items/[itemId]
@@ -19,7 +20,12 @@ export const DELETE = createApiRoute<{ orderId: string; itemId: string }>(requir
       return NextResponse.json({ error: 'ID invalido' }, { status: 400 });
     }
 
-    await removeOrderItem(ctx.supabase, ctx.storeId, orderId, itemId);
+    const removed = await removeOrderItem(ctx.supabase, ctx.storeId, orderId, itemId);
+    // return_stock_on_item_delete devuelve stock real (#146, spec #139,
+    // hallazgo de code review) — invalida igual que crear/editar un item.
+    if (removed?.product_id != null) {
+      await invalidateOrderStockTags(ctx.supabase, ctx.storeId, [{ product_id: removed.product_id }]);
+    }
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return handleServiceError(error, 'DELETE /api/orders/[orderId]/items/[itemId]');
@@ -49,6 +55,13 @@ export const PUT = createApiRoute<{ orderId: string; itemId: string }>(requireAd
     }
 
     const item = await updateOrderItem(ctx.supabase, ctx.storeId, orderId, itemId, parsed.data);
+    // trg_adjust_stock_on_item_update dispara "BEFORE UPDATE OF quantity"
+    // (order_items.sql) — un cambio de unit_price solo nunca toca stock.
+    // Invalidar igual sería una query + eviction de cache desperdiciada en
+    // una edición común (2da pasada de code review de #146).
+    if (parsed.data.quantity !== undefined && item.product_id != null) {
+      await invalidateOrderStockTags(ctx.supabase, ctx.storeId, [{ product_id: item.product_id }]);
+    }
     return NextResponse.json(item);
   } catch (error) {
     return handleServiceError(error, 'PUT /api/orders/[orderId]/items/[itemId]');
