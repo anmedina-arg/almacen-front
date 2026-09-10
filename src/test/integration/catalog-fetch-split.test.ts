@@ -2,7 +2,7 @@ import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { fetchProductMetadata } from '@/features/catalog/services/fetchProductMetadata';
-import { fetchProductStockForProduct } from '@/features/catalog/services/fetchProductStock';
+import { fetchProductStockBulk, fetchProductStockForProduct } from '@/features/catalog/services/fetchProductStock';
 import { fetchTopSellerIds } from '@/features/catalog/services/fetchTopSellerIds';
 
 // Caracteriza el comportamiento de las 3 piezas en las que se partió
@@ -34,6 +34,12 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
   let componentId: number;
   let componentName: string;
   let slug: string;
+  // Store aparte, solo para el test de aislamiento de fetchProductStockBulk
+  // (#148) — product_stock no tiene RLS por Store en SELECT (ver
+  // store-scoping-stock.test.ts), el aislamiento de esta lectura es a
+  // nivel aplicación, que es justo lo que ese test verifica.
+  let otherStoreId: number;
+  let otherProductId: number;
 
   beforeAll(async () => {
     if (!hasCredentials) return;
@@ -130,20 +136,46 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
     ]);
     expect(stockError).toBeNull();
     await admin.from('stock_movement_log').delete().in('product_id', [productId, componentId]);
+
+    const otherSlug = `${slug}-other-store`;
+    const { data: otherStore, error: otherStoreError } = await admin
+      .from('stores')
+      .insert({ slug: otherSlug, name: otherSlug })
+      .select('id')
+      .single();
+    expect(otherStoreError).toBeNull();
+    otherStoreId = otherStore!.id;
+
+    const { data: otherProduct, error: otherProductError } = await admin
+      .from('products')
+      .insert({ name: `${otherSlug}-producto`, price: 100, image: '', categories: '', store_id: otherStoreId, active: true })
+      .select('id')
+      .single();
+    expect(otherProductError).toBeNull();
+    otherProductId = otherProduct!.id;
+    await admin.from('product_price_history').delete().eq('product_id', otherProductId);
+
+    const { error: otherStockError } = await admin
+      .from('product_stock')
+      .insert({ product_id: otherProductId, quantity: 999, store_id: otherStoreId, updated_by: userId });
+    expect(otherStockError).toBeNull();
+    await admin.from('stock_movement_log').delete().eq('product_id', otherProductId);
   });
 
   afterAll(async () => {
     if (!hasCredentials) return;
-    await admin.from('stock_movement_log').delete().in('product_id', [productId, comboId, componentId]);
-    await admin.from('product_stock').delete().in('product_id', [productId, componentId]);
+    await admin.from('stock_movement_log').delete().in('product_id', [productId, comboId, componentId, otherProductId]);
+    await admin.from('product_stock').delete().in('product_id', [productId, componentId, otherProductId]);
     await admin.from('combo_components').delete().eq('combo_product_id', comboId);
-    await admin.from('product_price_history').delete().in('product_id', [productId, comboId, componentId]);
+    await admin.from('product_price_history').delete().in('product_id', [productId, comboId, componentId, otherProductId]);
     await admin.from('products').delete().eq('store_id', storeId);
+    await admin.from('products').delete().eq('store_id', otherStoreId);
     await admin.from('subcategories').delete().eq('store_id', storeId);
     await admin.from('categories').delete().eq('store_id', storeId);
     await admin.from('profiles').delete().eq('id', userId);
     await admin.auth.admin.deleteUser(userId);
     await admin.from('stores').delete().eq('id', storeId);
+    await admin.from('stores').delete().eq('id', otherStoreId);
   });
 
   it.skipIf(!hasCredentials)('fetchProductMetadata: mapea categoria/subcategoria y arma combo_items solo para el combo', async () => {
@@ -177,6 +209,26 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
     // es virtual, derivado de los componentes) — mismo comportamiento que
     // antes de #146, ahora por producto en vez de en el Map bulk.
     expect(await fetchProductStockForProduct(admin, storeId, comboId)).toBeUndefined();
+  });
+
+  it.skipIf(!hasCredentials)('fetchProductStockBulk: devuelve un Map con la cantidad de cada producto con fila en product_stock (#148)', async () => {
+    const stock = await fetchProductStockBulk(admin, storeId);
+    expect(stock.get(productId)).toBe(15);
+    expect(stock.get(componentId)).toBe(40);
+  });
+
+  it.skipIf(!hasCredentials)('fetchProductStockBulk: no incluye el combo (sin fila propia, stock virtual)', async () => {
+    const stock = await fetchProductStockBulk(admin, storeId);
+    expect(stock.has(comboId)).toBe(false);
+  });
+
+  it.skipIf(!hasCredentials)('fetchProductStockBulk: no incluye stock de otra Store (#148)', async () => {
+    const stock = await fetchProductStockBulk(admin, storeId);
+    expect(stock.has(otherProductId)).toBe(false);
+
+    const otherStoreStock = await fetchProductStockBulk(admin, otherStoreId);
+    expect(otherStoreStock.get(otherProductId)).toBe(999);
+    expect(otherStoreStock.has(productId)).toBe(false);
   });
 
   it.skipIf(!hasCredentials)('fetchTopSellerIds: devuelve un Set, sin el producto recien creado (sin ventas)', async () => {
