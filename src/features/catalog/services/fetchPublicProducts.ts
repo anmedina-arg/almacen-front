@@ -4,6 +4,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { logPerf } from '@/lib/observability/logPerf';
 import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
+import { TOP_SELLER_CACHE_SECONDS } from '@/lib/cache/ttl';
 import { mapWithConcurrencyLimit } from '@/lib/concurrency';
 import type { Product } from '@/types';
 import { fetchProductMetadata, type FetchProductMetadataOptions } from './fetchProductMetadata';
@@ -14,6 +15,21 @@ import { fetchTopSellerIds } from './fetchTopSellerIds';
 // pero conservador; ajustar si el timing post-deploy (perf_logs) muestra
 // que es cuello de botella en cold cache.
 const STOCK_FETCH_CONCURRENCY = 25;
+
+/**
+ * Loguea y degrada a `fallback` si `promise` rechaza — patrón compartido
+ * por las 3 piezas cacheadas de este archivo (metadata #145, stock #146,
+ * top-seller #147): cada una tira en error para que unstable_cache no
+ * persista un resultado malo, y esto es lo que evita que ese throw rompa
+ * la página completa en vez de degradar. Extraído como helper en la 2da
+ * pasada de code review de #147, tras repetirse igual 3 veces.
+ */
+function degradeOnError<T>(promise: Promise<T>, label: string, fallback: T): Promise<T> {
+  return promise.catch((err) => {
+    console.error(`[${label}] error:`, err instanceof Error ? err.message : err);
+    return fallback;
+  });
+}
 
 /**
  * Cache de metadata de producto (#145, spec #139, ADR-0014) — vida larga
@@ -58,10 +74,7 @@ function getCachedProductMetadata(
         { tags: [productMetadataTag(storeId)] }
       )();
 
-  return metadataPromise.catch((err) => {
-    console.error('[getCachedProductMetadata] error:', err instanceof Error ? err.message : err);
-    return [];
-  });
+  return degradeOnError(metadataPromise, 'getCachedProductMetadata', [] as Product[]);
 }
 
 /**
@@ -85,10 +98,41 @@ function getCachedProductStock(
     ['product-stock', String(storeId), String(productId)],
     { tags: [productStockTag(storeId, productId)] }
   );
-  return cached().catch((err) => {
-    console.error('[getCachedProductStock] error:', err instanceof Error ? err.message : err);
-    return undefined;
-  });
+  return degradeOnError(cached(), 'getCachedProductStock', undefined);
+}
+
+/**
+ * Cache diario del badge "más vendido" (#147, spec #139, ADR-0014) — a
+ * diferencia de metadata/stock, sin invalidación por evento: solo
+ * `revalidate` por tiempo (TOP_SELLER_CACHE_SECONDS), ningún pedido lo
+ * toca. Se acepta hasta 24hs de desfasaje a propósito — es un dato
+ * informativo sobre una ventana de 30 días, no necesita estar al minuto
+ * (ver fetchTopSellerIds.ts).
+ *
+ * unstable_cache serializa el resultado (JSON) — un Set no sobrevive esa
+ * vuelta, por eso se cachea el array (fetchTopSellerIds ya lo devuelve
+ * como Set, sin cambios: se convierte acá en la frontera del cache, no en
+ * fetchTopSellerIds.ts, para no tocar su contrato ni el test existente).
+ *
+ * fetchTopSellerIds tira en error (#147, code review — antes degradaba
+ * ahí mismo a un Set vacío) para que unstable_cache no persista ese
+ * resultado malo: si degradara adentro, un error transitorio quedaría
+ * cacheado como "sin más vendidos" hasta por 24hs — un apagón total del
+ * badge en toda la Store, no el desfasaje de datos (dato viejo pero
+ * presente) que el ticket acepta. Se degrada acá, en el caller, para que
+ * el catálogo no se rompa por esto — mismo criterio que metadata/stock.
+ */
+function getCachedTopSellerIds(supabase: SupabaseClient, storeId: number): Promise<Set<number>> {
+  const cached = unstable_cache(
+    async () => Array.from(await fetchTopSellerIds(supabase, storeId)),
+    ['top-seller-ids', String(storeId)],
+    { revalidate: TOP_SELLER_CACHE_SECONDS }
+  );
+  return degradeOnError(
+    cached().then((ids) => new Set(ids)),
+    'getCachedTopSellerIds',
+    new Set<number>()
+  );
 }
 
 /**
@@ -162,7 +206,7 @@ export async function fetchPublicProducts(
         STOCK_FETCH_CONCURRENCY,
         async (p) => [p.id, await getCachedProductStock(supabase, storeId, p.id)] as const
       ),
-      fetchTopSellerIds(supabase, storeId),
+      getCachedTopSellerIds(supabase, storeId),
     ]);
     const stockMap = new Map(stockEntries);
 
