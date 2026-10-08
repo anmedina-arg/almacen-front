@@ -32,4 +32,10 @@ describe('provisionStore — validación de slug', () => {
       provisionStore(supabaseStub, { slug: 'api', name: 'x', ownerEmail: 'a@b.com', operatorEmail: 'op@b.com' })
     ).rejects.toThrow(/Slug reservado/);
   });
+
+  it.each(['stores', 'admin'])('rechaza el slug reservado de plataforma (%s)', async (slug) => {
+    await expect(
+      provisionStore(supabaseStub, { slug, name: 'x', ownerEmail: 'a@b.com', operatorEmail: 'op@b.com' })
+    ).rejects.toThrow(/Slug reservado/);
+  });
 });

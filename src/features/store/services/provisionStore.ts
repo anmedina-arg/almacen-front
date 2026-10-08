@@ -28,7 +28,7 @@ export type ProvisionStoreResult = {
 };
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const RESERVED_SLUGS = new Set(['api', 'robots.txt', 'sitemap.xml']);
+const RESERVED_SLUGS = new Set(['api', 'robots.txt', 'sitemap.xml', 'stores', 'admin']);
 
 function assertValidSlug(slug: string): void {
   if (!SLUG_PATTERN.test(slug)) {

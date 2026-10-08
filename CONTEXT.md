@@ -22,10 +22,10 @@ Página de admin (`/admin/informes`) que agrupa dos capacidades bajo una sola fe
 _Avoid_: Reportes (término usado en algunos issues pero no en el código ni la UI shippeada — canonizar como "Informes").
 
 **Store slug**:
-Identificador único de una Store en la URL (ej. `market-del-cevil`). Es el primer segmento del path (`/market-del-cevil/...`) — hoy no hay subdominios propios, así que el slug reemplaza esa función.
+Identificador único de una Store en la URL (ej. `market-del-cevil`). Es el primer segmento del path (`/market-del-cevil/...`) — hoy no hay subdominios propios, así que el slug reemplaza esa función. No puede ser un nombre reservado del sitio (`api`, `stores`, `admin`, etc.).
 
 **Platform**:
-El producto en sí (aún sin nombre definitivo), distinto de cualquier Store individual. Vive en la raíz `/` como landing de marketing.
+El producto en sí, llamado **chaskyapp** (chasky, del quechua *chaski*, el mensajero por relevos; más *app*), distinto de cualquier Store individual. Vive en la raíz `/` como landing de marketing; `/stores` lista las Stores y `/admin` queda reservada para el Platform admin (ver [ADR-0015](docs/adr/0015-site-level-routes-reserved.md)).
 
 **Store admin**:
 Un usuario con permiso para administrar una Store puntual (pedidos, stock, catálogo, etc. de esa Store solamente). Membresía explícita por Store, no un rol global.

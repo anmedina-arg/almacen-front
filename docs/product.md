@@ -1,4 +1,42 @@
-# Market Cevil — Resumen del Producto
+# Product
+
+<!-- impeccable:product-schema 1 -->
+
+## Platform
+
+web
+
+## Users
+
+- **Vecinos del barrio (catálogo público):** compran desde el celular y mandan el pedido por WhatsApp. Hoy los barrios son AC1 / AC2 / otros.
+- **Dueño/a del almacén (panel `/admin`):** confirma pedidos, controla stock, ventas, saldos y reportes.
+- **Dueños de otros negocios (clientes de la plataforma):** contratan el sistema y activan los módulos que necesitan.
+
+## Product Purpose
+
+Plataforma multi-tienda de ventas para almacenes/rotiserías de barrio que operan por WhatsApp. Market Cevil es el primer Store y el origen del producto. Éxito: el cliente pide sin fricción y el dueño gestiona todo el negocio desde un solo lugar.
+
+## Positioning
+
+Gestión completa del negocio de un almacén de barrio (pedidos, pagos y saldos, stock, márgenes, reportes) integrada a un catálogo que cierra la venta por WhatsApp. Un catálogo genérico + WhatsApp no cubre la parte de gestión.
+
+## Capabilities and Constraints
+
+- Cada Store tiene `feature_flags` por módulo, que sirven para vender suscripciones por módulo. Apagar una flag nunca puede romper otra ni las capacidades siempre-encendidas (catálogo, productos, pedidos/WhatsApp, ventas). Ver `docs/adr/0012-feature-flags-mutual-independence.md`.
+- El manifest PWA es dinámico y por Store (ver `docs/agents/pwa.md`).
+- El catálogo se usa sobre todo desde el celular; el panel admin también se usa en el día a día.
+
+## Product Principles
+
+*(Pendiente de confirmar con el equipo; no se infirieron.)*
+
+## Open decisions
+
+- Evidencia disponible (testimonios, casos, métricas), voz de marca y requisitos de accesibilidad: no se relevaron en esta ronda.
+
+---
+
+# Market Cevil — Resumen del Producto (detalle funcional)
 
 ## ¿Qué hace la app?
 
