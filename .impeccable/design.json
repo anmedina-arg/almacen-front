@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T16:22:10.852426+00:00",
+  "title": "Design System: chaskyapp",
+  "extensions": {
+    "colorMeta": {
+      "wall-cobalt": {
+        "role": "primary",
+        "displayName": "Pared cobalto",
+        "canonical": "#1f4e9e",
+        "tonalRamp": [
+          "#0d2347",
+          "#122f5f",
+          "#173b78",
+          "#1c4791",
+          "#3a63a9",
+          "#708ec1",
+          "#a7b9d8",
+          "#dde4f0"
+        ]
+      },
+      "signal-red": {
+        "role": "primary",
+        "displayName": "Rojo señal",
+        "canonical": "#c8321f",
+        "tonalRamp": [
+          "#59160d",
+          "#791e12",
+          "#982617",
+          "#b82e1c",
+          "#ce4a3a",
+          "#dc7c70",
+          "#e9aea7",
+          "#f6e0dd"
+        ]
+      },
+      "sign-mustard": {
+        "role": "secondary",
+        "displayName": "Mostaza de cartel",
+        "canonical": "#f2b705",
+        "tonalRamp": [
+          "#6c5202",
+          "#926f03",
+          "#b88b03",
+          "#dea804",
+          "#f3bf23",
+          "#f6d160",
+          "#f9e29c",
+          "#fdf4d9"
+        ]
+      },
+      "enamel-bone": {
+        "role": "neutral",
+        "displayName": "Hueso esmaltado",
+        "canonical": "#f3eedd",
+        "tonalRamp": [
+          "#6d6b63",
+          "#939086",
+          "#b9b5a8",
+          "#dfdbcb",
+          "#f4f0e1",
+          "#f7f4e9",
+          "#faf8f1",
+          "#fdfcf9"
+        ]
+      },
+      "night-navy": {
+        "role": "neutral",
+        "displayName": "Azul noche",
+        "canonical": "#0e2247",
+        "tonalRamp": [
+          "#060f1f",
+          "#08142b",
+          "#0a1936",
+          "#0c1f41",
+          "#2b3c5d",
+          "#65728a",
+          "#a0a8b6",
+          "#dadde3"
+        ]
+      },
+      "bare-steel": {
+        "role": "neutral",
+        "displayName": "Acero al descubierto",
+        "canonical": "#3a3f47",
+        "tonalRamp": [
+          "#1a1c1f",
+          "#23262b",
+          "#2c3036",
+          "#353a41",
+          "#51565d",
+          "#81848a",
+          "#b1b3b6",
+          "#e1e2e3"
+        ]
+      },
+      "ticket-paper": {
+        "role": "neutral",
+        "displayName": "Papel de ticket",
+        "canonical": "#fbf8ee",
+        "tonalRamp": [
+          "#706f6b",
+          "#989690",
+          "#bfbdb5",
+          "#e7e4db",
+          "#fbf8f0",
+          "#fcfaf4",
+          "#fdfcf8",
+          "#fefdfc"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Titular del hero, directo sobre la pared."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Títulos de sección."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Nombre de módulo en su chapa."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Párrafos y listas."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Botones."
+      }
+    },
+    "shadows": [
+      {
+        "name": "chapa",
+        "value": "0 20px 30px -14px rgba(5,16,40,.65), 0 2px 0 rgba(0,0,0,.12)",
+        "purpose": "Toda chapa."
+      },
+      {
+        "name": "button",
+        "value": "0 5px 0 -1px #0e2247, 0 12px 14px -8px rgba(5,16,40,.6)",
+        "purpose": "Botón en reposo."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out-expo",
+        "value": "cubic-bezier(0.16, 1, 0.3, 1)",
+        "purpose": "Colgado de chapas, giro y botones."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "wall",
+        "value": "900px"
+      },
+      {
+        "name": "hero",
+        "value": "960px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón de WhatsApp (rojo)",
+      "kind": "button",
+      "refersTo": "button-red",
+      "description": "Acción principal sobre chapas claras.",
+      "html": "<button class=\"ds-btn\" style=\"background:#c8321f;color:#fff\">Escribinos por WhatsApp</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:10px 20px;border-radius:12px;border:2px solid #0e2247;font-family:Archivo,Barlow,sans-serif;font-variation-settings:\"wdth\" 80;font-weight:800;font-size:1.05rem;letter-spacing:.02em;text-transform:uppercase;cursor:pointer;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1);box-shadow:0 5px 0 -1px #0e2247,0 12px 14px -8px rgba(5,16,40,.6)}.ds-btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 -1px #0e2247,0 16px 16px -8px rgba(5,16,40,.6)}.ds-btn:active{transform:translateY(3px);box-shadow:0 1px 0 -1px #0e2247}.ds-btn:focus-visible{outline:3px solid #f2b705;outline-offset:3px}"
+    },
+    {
+      "name": "Botón de WhatsApp (mostaza)",
+      "kind": "button",
+      "refersTo": "button-mustard",
+      "description": "Acción principal sobre chapas rojas o la pared.",
+      "html": "<button class=\"ds-btn\" style=\"background:#f2b705;color:#0e2247\">Escribinos por WhatsApp</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:10px;min-height:48px;padding:10px 20px;border-radius:12px;border:2px solid #0e2247;font-family:Archivo,Barlow,sans-serif;font-variation-settings:\"wdth\" 80;font-weight:800;font-size:1.05rem;letter-spacing:.02em;text-transform:uppercase;cursor:pointer;transition:transform .25s cubic-bezier(.16,1,.3,1),box-shadow .25s cubic-bezier(.16,1,.3,1);box-shadow:0 5px 0 -1px #0e2247,0 12px 14px -8px rgba(5,16,40,.6)}.ds-btn:hover{transform:translateY(-2px);box-shadow:0 7px 0 -1px #0e2247,0 16px 16px -8px rgba(5,16,40,.6)}.ds-btn:active{transform:translateY(3px);box-shadow:0 1px 0 -1px #0e2247}.ds-btn:focus-visible{outline:3px solid #f2b705;outline-offset:3px}"
+    },
+    {
+      "name": "Chapa de módulo",
+      "kind": "card",
+      "refersTo": "chapa-mustard",
+      "description": "Cara frontal de un módulo; se da vuelta al tocarla.",
+      "html": "<div class=\"ds-chapa\" style=\"background:#f2b705;color:#0e2247;--stripe:#0e2247\"><span class=\"ds-code\">101</span><h3>Precios y costos</h3><p>Cada producto con su precio de venta y su costo.</p></div>",
+      "css": ".ds-chapa{position:relative;border-radius:22px;padding:28px;font-family:Barlow,sans-serif;box-shadow:0 20px 30px -14px rgba(5,16,40,.65),0 2px 0 rgba(0,0,0,.12);max-width:320px}.ds-chapa::before{content:\"\";position:absolute;inset:10px;border:2px solid var(--stripe);border-radius:14px;pointer-events:none}.ds-chapa h3{margin:10px 0 8px;font-family:Archivo,Barlow,sans-serif;font-variation-settings:\"wdth\" 66;font-weight:900;font-size:2rem;line-height:.92;text-transform:uppercase}.ds-chapa p{margin:0;font-weight:500}.ds-code{display:inline-block;padding:2px 10px 3px;border:2px solid currentColor;border-radius:8px;font-family:Archivo,sans-serif;font-weight:900;font-size:1.05rem;line-height:1}"
+    },
+    {
+      "name": "Chapa principal",
+      "kind": "card",
+      "refersTo": "chapa-bone",
+      "description": "La chapa del plan base, en hueso con filete rojo.",
+      "html": "<div class=\"ds-chapa\" style=\"background:#f3eedd;color:#0e2247;--stripe:#c8321f\"><span class=\"ds-code\">Plan base</span><h3>Pedidos por WhatsApp</h3><p>Catálogo online y pedidos por WhatsApp.</p></div>",
+      "css": ".ds-chapa{position:relative;border-radius:22px;padding:28px;font-family:Barlow,sans-serif;box-shadow:0 20px 30px -14px rgba(5,16,40,.65),0 2px 0 rgba(0,0,0,.12);max-width:320px}.ds-chapa::before{content:\"\";position:absolute;inset:10px;border:2px solid var(--stripe);border-radius:14px;pointer-events:none}.ds-chapa h3{margin:10px 0 8px;font-family:Archivo,Barlow,sans-serif;font-variation-settings:\"wdth\" 66;font-weight:900;font-size:2rem;line-height:.92;text-transform:uppercase}.ds-chapa p{margin:0;font-weight:500}.ds-code{display:inline-block;padding:2px 10px 3px;border:2px solid currentColor;border-radius:8px;font-family:Archivo,sans-serif;font-weight:900;font-size:1.05rem;line-height:1}"
+    },
+    {
+      "name": "Logotipo",
+      "kind": "nav",
+      "refersTo": "chapa-mustard",
+      "description": "Dos chapas contiguas: chasky y app.",
+      "html": "<span class=\"ds-wm\"><span>chasky</span><span>app</span></span>",
+      "css": ".ds-wm{display:inline-flex;font-family:Archivo,sans-serif;font-variation-settings:\"wdth\" 66;font-weight:900;text-transform:uppercase;font-size:1.7rem}.ds-wm span{padding:7px 12px 8px;border:2px solid #0e2247}.ds-wm span:first-child{background:#f2b705;color:#0e2247;border-radius:10px 0 0 10px}.ds-wm span:last-child{background:#c8321f;color:#fff;border-left:0;border-radius:0 10px 10px 0}"
+    }
+  ],
+  "narrative": {
+    "northStar": "La pared de chapas",
+    "overview": "chaskyapp se ve como el frente de un almacén de barrio: una pared pintada de azul cobalto de la que cuelgan chapas esmaltadas. Cada módulo es una chapa; el plan base es la grande. La identidad nace del nombre chasky (chasqui), el mensajero que corre por relevos.",
+    "keyCharacteristics": [
+      "Pared cobalto drenched; las chapas son los únicos objetos de color.",
+      "Lettering condensado pesado en mayúsculas, a gran escala.",
+      "Rellenos planos, sin degradados de decoración ni vidrio.",
+      "Remaches y descascarados pequeños como único detalle de material.",
+      "Un solo momento de movimiento: colgado al cargar y giro al tocar."
+    ],
+    "rules": [
+      {
+        "name": "The Enamel Only Rule",
+        "body": "El color vive en chapas y botones, nunca como degradado ni como texto de color sin contraste de 4.5:1.",
+        "section": "colors"
+      },
+      {
+        "name": "The Sign Lettering Rule",
+        "body": "Todo texto de display va en mayúsculas, peso 900 y ancho condensado.",
+        "section": "typography"
+      },
+      {
+        "name": "The Hung Plate Rule",
+        "body": "La sombra siempre tiene desplazamiento vertical y desenfoque.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do sostener el contraste de 4.5:1 en texto de cuerpo y 3:1 en texto grande.",
+      "Do usar un solo momento de movimiento.",
+      "Do etiquetar como ejemplo cualquier dato de demostración.",
+      "Do respetar prefers-reduced-motion."
+    ],
+    "donts": [
+      "Don't usar plumas, máscaras ni estética inca de souvenir.",
+      "Don't usar degradados decorativos, vidrio ni texto degradado.",
+      "Don't repetir tarjetas iguales de ícono, título y texto como estructura de página.",
+      "Don't inventar precios, clientes ni métricas."
+    ]
+  }
+}
