@@ -35,6 +35,10 @@ export function LandingShell({ children }: { children: ReactNode }) {
       <main>{children}</main>
       <footer className="ck-wrap ck-footer">
         <Wordmark />
+        {/* Acceso discreto al panel de plataforma (#151): para quien no es super_admin da 404. */}
+        <Link href="/admin" className="ck-footer-admin" prefetch={false} aria-label="Panel de plataforma">
+          Panel
+        </Link>
       </footer>
     </div>
   );
