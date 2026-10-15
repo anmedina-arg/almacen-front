@@ -16,6 +16,7 @@ sistema). Consolidado en #87 (spec #81, mapa #74).
 | Archivo | Qué hace |
 |---|---|
 | `provision_store.sql` | Alta de una Store nueva (#26, ADR-0006): INSERT en `stores` + `store_admins` en una sola transacción. Sin `SECURITY DEFINER` ni `GRANT` — pensada para llamarse solo con el `service_role` key (bypassea RLS por rol de Postgres), nunca desde una ruta pública. Ver `src/features/store/services/provisionStore.ts` y `scripts/provision-store.ts`. |
+| `get_orders_count_by_store.sql` | Pedidos de cada Store en una tabla (#151): total y desglose por estado, incluye Stores sin pedidos. **Solo `super_admin`** (chequeo directo sobre `profiles.role`, no `is_store_admin()`, porque cruza todas las Stores y un Store admin no debe verlas). `SECURITY DEFINER` + `GRANT` solo a `authenticated`. La llama la página `/admin` del Platform admin vía `src/features/store/services/getOrdersCountByStore.ts`. |
 
 ## Funciones trigger (no se llaman directo)
 
