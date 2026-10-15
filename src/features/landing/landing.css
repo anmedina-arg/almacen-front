@@ -530,6 +530,21 @@
   color: color-mix(in oklab, var(--bone), var(--wall) 20%);
 }
 
+.ck-footer-admin {
+  font-size: 0.95rem;
+  padding-block: 10px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.ck-footer-admin:hover {
+  color: var(--bone);
+}
+.ck-footer-admin:focus-visible {
+  color: var(--bone);
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
 /* ---------- Stores ---------- */
 
 .ck-stores {
