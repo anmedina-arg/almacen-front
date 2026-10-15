@@ -12,7 +12,7 @@ Son rutas de nivel de sitio, y sus nombres están reservados como slug de Store:
 
 - `/`: landing de marketing de chaskyapp.
 - `/stores`: listado público de las Stores que usan la plataforma.
-- `/admin`: panel del Platform admin (activar y desactivar feature flags por Store y ver métricas). **Reservada, todavía sin página**: hoy `/admin` da 404 hasta que se construya.
+- `/admin`: panel del Platform admin (activar y desactivar feature flags por Store y ver métricas). **Primera pantalla desde #151**: una tabla de solo lectura con los pedidos de cada Store (total y desglose por estado), sin flags ni otras métricas todavía. Quien no sea `super_admin` (o no tenga sesión) recibe un 404, igual que si la ruta no existiera.
 - Además de las que ya estaban: `api`, `robots.txt`, `sitemap.xml`.
 
 La reserva vive en dos lugares que hay que mantener en sync:
@@ -27,5 +27,5 @@ La reserva vive en dos lugares que hay que mantener en sync:
 ## Consequences
 
 - Ningún negocio puede llamarse `stores` ni `admin` en su URL. Si hay una Store existente con alguno de esos slugs, hay que renombrarla antes de desplegar la reserva (verificar en la tabla `stores`).
-- El panel de plataforma debe autenticar al Platform admin (rol `super_admin`) sin pasar por el login por Store. Cómo entra esa persona queda **por decidir** al construir la página.
+- El panel de plataforma debe autenticar al Platform admin (rol `super_admin`). Decidido en #151: **no hay login propio de plataforma por ahora**. `/admin` lee la sesión de Supabase (las cookies valen para todo el host), así que el Platform admin entra iniciando sesión en el login de cualquier Store y yendo a `/admin`. La página comprueba `profiles.role = 'super_admin'` y responde 404 si no. El dato sale de la RPC `get_orders_count_by_store` (`supabase/schema/store/`), que revalida el rol por su cuenta. Un login propio de plataforma queda como mejora si esto resulta incómodo.
 - Cada ruta nueva de nivel de sitio exige agregar su nombre a las dos listas de arriba.

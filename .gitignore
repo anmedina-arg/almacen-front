@@ -55,3 +55,7 @@ scripts/migrate-images.sql
 # Production DB backups — never commit real dumps
 backups/
 market-cevil-backups/
+
+# Impeccable (estado local de sesiones de diseno en vivo)
+.impeccable/live/
+.impeccable/questions/
