@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useProductStock } from '../../hooks/useProductStock';
 import { useLowStock } from '../../hooks/useLowStock';
 import { LowStockBadge } from './LowStockBadge';
@@ -216,9 +217,11 @@ export function StockManagement() {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         {product.product_image ? (
-                          <img
+                          <Image
                             src={product.product_image}
                             alt={product.product_name}
+                            width={40}
+                            height={40}
                             className="w-10 h-10 rounded-md object-cover flex-shrink-0"
                           />
                         ) : (
@@ -296,9 +299,11 @@ export function StockManagement() {
                 {/* Product info */}
                 <div className="flex items-center gap-3">
                   {product.product_image ? (
-                    <img
+                    <Image
                       src={product.product_image}
                       alt={product.product_name}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-md object-cover flex-shrink-0"
                     />
                   ) : (

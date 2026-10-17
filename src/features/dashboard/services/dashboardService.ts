@@ -67,13 +67,13 @@ export async function getPendingPayments(supabase: SupabaseClient, storeId: numb
   if (error) throw new Error(error.message);
 
   const orders: Order[] = (data ?? []).map((order) => {
-    const items = (order.order_items as { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
+    const { order_items, clients: client, order_payments, ...orderFields } = order;
+    const items = (order_items as { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
     const total_cost = items.reduce((acc, item) => {
       const unitPrice = Number(item.unit_price);
       return acc + (unitPrice > 0 ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice) : 0);
     }, 0);
     const product_names = items.map((i) => i.product_name).filter(Boolean);
-    const { order_items: _items, clients: client, order_payments, ...orderFields } = order;
     const orderTotal = Number(orderFields.total);
     const margin = orderTotal - total_cost;
     const margin_pct = orderTotal > 0 ? (margin / orderTotal) * 100 : 0;

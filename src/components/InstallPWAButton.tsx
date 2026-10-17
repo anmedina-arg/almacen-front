@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import {
-  trackPWAInstall,
   trackPWAPromptShown,
   trackPWAInstallAccepted,
   trackPWAInstallDismissed,

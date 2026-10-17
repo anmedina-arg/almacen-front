@@ -60,7 +60,7 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll();
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value));
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
           response = NextResponse.next({
             request,
           });
@@ -80,10 +80,6 @@ export async function middleware(request: NextRequest) {
   // La validación de que `slug` sea una Store real la hace
   // src/app/[store]/layout.tsx (notFound() si no existe).
   const restPath = '/' + segments.slice(1).join('/');
-
-  // Rutas públicas que no requieren auth
-  const publicRoutes = ['/', '/login', '/register', '/auth/callback'];
-  const isPublicRoute = publicRoutes.some(route => restPath === route || restPath.startsWith(route));
 
   // Rutas protegidas que requieren auth
   const protectedRoutes = ['/admin', '/profile'];
