@@ -39,7 +39,7 @@ export async function getRecommendations(
     .from('products')
     .select(
       `id, name, price, cost, image, active, categories,
-       mainCategory:main_category, sale_type, is_combo, max_stock,
+       sale_type, is_combo, max_stock,
        category_id, subcategory_id, is_producto_surtido,
        cat:categories!products_category_id_fkey(id, name),
        sub:subcategories!products_subcategory_id_fkey(id, name)`

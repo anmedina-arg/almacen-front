@@ -44,7 +44,6 @@ stock/log_initial_stock.sql
 stock/log_stock_change.sql
 stock/product_stock.sql
 stock/stock_movement_log.sql
-stock/v_product_stock.sql
 
 # ── Combos ───────────────────────────────────────────────────────────────
 combos/sync_combo_cost.sql

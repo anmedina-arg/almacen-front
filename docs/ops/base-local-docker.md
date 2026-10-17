@@ -42,6 +42,8 @@ Es el mismo de [`docs/agents/schema-changes.md`](../agents/schema-changes.md), c
 
 ## Verificación de fidelidad contra producción (2026-10-17)
 
+> Foto del momento en que se armó la base local, **antes** de #133. Desde #133 los canónicos (y por lo tanto la base local) van un paso adelante de producción hasta que se aplique allá el SQL de ese issue: `get_all_products_with_stock` y `get_low_stock_products` devuelven `category_name` en vez de `main_category`, y la vista `v_product_stock` ya no existe. Eso es lo esperado del flujo (local primero, prod después); si hace falta re-verificar fidelidad, repetir las consultas por categoría de catálogo en ambos lados.
+
 Al armarlo se comparó la base local contra producción con las mismas consultas de catálogo en los dos lados (hash md5 por categoría). Resultado:
 
 | Categoría | Resultado |
@@ -51,7 +53,7 @@ Al armarlo se comparó la base local contra producción con las mismas consultas
 | Policies RLS | idéntico (55) |
 | Triggers (incluye `on_auth_user_created` sobre `auth.users`) | idéntico (19) tras la migración canónica; `local-only/` después quita `on_auth_user_created` (ver arriba) |
 | RLS habilitada por tabla | idéntico |
-| Vista `v_product_stock` | idéntico |
+| Vista `v_product_stock` | idéntico (retirada después en #133: nada la leía) |
 | Enum `order_status` | idéntico |
 | Propiedades de funciones (SECURITY DEFINER, volatilidad, `search_path`) | idéntico (38) |
 | Cuerpo de las 38 funciones | idéntico ignorando comentarios y espacios (los canónicos tienen más comentarios que lo que se pegó históricamente en el SQL Editor) |

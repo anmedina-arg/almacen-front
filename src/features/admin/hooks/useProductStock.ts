@@ -4,7 +4,7 @@ import { stockApiClient } from '../services/stockApiClient';
 
 /**
  * Fetches all products with their stock levels.
- * Uses the v_product_stock view via the API route.
+ * Uses the get_all_products_with_stock RPC via the API route (#133: the legacy v_product_stock view was dropped).
  */
 export function useProductStock() {
   return useQuery({

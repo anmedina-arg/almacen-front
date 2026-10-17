@@ -19,6 +19,14 @@
 --     definición de abajo tiene ambas cosas (store scoping + combos).
 -- Filtra por products.store_id, no product_stock.store_id — evita ocultar
 -- stock existente cuyo store_id todavía no se haya backfilleado.
+--
+-- #133 (2026-10-17): devuelve `category_name` (LEFT JOIN categories, null si
+-- el producto no tiene category_id) en lugar de la columna legacy
+-- `main_category`. Verificado antes contra producción: la definición viva
+-- coincidía con este archivo (hash normalizado idéntico). Como cambia el
+-- RETURNS TABLE, `CREATE OR REPLACE` falla con "cannot change return type":
+-- paso operativo, una vez por base, antes de aplicar este archivo:
+--   DROP FUNCTION public.get_all_products_with_stock(integer);
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_all_products_with_stock(p_store_id INTEGER)
@@ -27,7 +35,7 @@ RETURNS TABLE (
   product_id INTEGER,
   product_name TEXT,
   product_price NUMERIC,
-  main_category TEXT,
+  category_name TEXT,
   product_active BOOLEAN,
   product_image TEXT,
   quantity NUMERIC(12, 3),
@@ -52,7 +60,7 @@ BEGIN
     p.id AS product_id,
     p.name AS product_name,
     p.price AS product_price,
-    p.main_category,
+    c.name AS category_name,
     p.active AS product_active,
     p.image AS product_image,
     CASE
@@ -78,6 +86,7 @@ BEGIN
   FROM public.products p
   LEFT JOIN public.product_stock ps ON ps.product_id = p.id
   LEFT JOIN public.profiles pr ON pr.id = ps.updated_by
+  LEFT JOIN public.categories c ON c.id = p.category_id
   WHERE p.store_id = p_store_id
   ORDER BY p.name ASC;
 END;

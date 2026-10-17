@@ -339,7 +339,7 @@ Antes de considerar el refactor completo, verificar:
 |--------|-----------|
 | SSR más lento por cargar 550 productos | Aceptable: ~100-200ms extra en servidor, 0ms en cliente |
 | `scroll-behavior: smooth` no soportado en algún browser viejo | Fallback: scroll sin animación (funcional igual) |
-| Productos sin `category_id` asignado no aparecen en ninguna sección | Ya existe esta lógica en `ProductList.tsx` (`category_name ?? mainCategory`) |
+| Productos sin `category_id` asignado no aparecen en ninguna sección | En su momento: fallback `category_name ?? mainCategory` en `ProductList.tsx`. Retirado en #133 (2026-10-17): `category_id` es requerido al crear (#66) y en producción hay 0 productos activos sin categoría, así que la mitigación vigente es el dato, no el fallback. |
 | El `displayCategories` en search mode se calculaba a partir de `data?.pages.flat()` | Cambia a calcularse desde `initialProducts` en browse mode (mismo resultado) |
 
 ---

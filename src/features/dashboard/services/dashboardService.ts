@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { formatCategoryName } from '@/utils/formatCategoryName';
 import type {
   PendingPaymentsResponse,
   RotationItem,
@@ -134,7 +135,7 @@ export async function getRotation(supabase: SupabaseClient, storeId: number, day
     result.push({
       id: product.id,
       name: product.name,
-      category_name: cat?.name ?? 'Sin categoría',
+      category_name: formatCategoryName(cat?.name),
       sale_type: product.sale_type,
       units_sold,
       avg_stock,
@@ -210,7 +211,7 @@ export async function getStockByCategory(supabase: SupabaseClient, storeId: numb
 
   for (const product of products) {
     const cat = product.cat as unknown as { name: string } | null;
-    const categoryName = cat?.name ?? 'Sin categoría';
+    const categoryName = formatCategoryName(cat?.name);
     const stockGrams = stockMap.get(product.id) ?? 0;
     const cost = product.cost ?? 0;
     const value = calculateLineTotal(stockGrams, product.sale_type, cost);
@@ -240,7 +241,7 @@ export async function getStockProducts(supabase: SupabaseClient, storeId: number
   return products
     .filter((p) => {
       const cat = p.cat as unknown as { name: string } | null;
-      return (cat?.name ?? 'Sin categoría') === category;
+      return formatCategoryName(cat?.name) === category;
     })
     .map((p) => {
       const stock_raw = stockMap.get(p.id) ?? 0;

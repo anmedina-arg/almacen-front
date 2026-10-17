@@ -7,6 +7,7 @@ import { useToggleProductActive } from '../hooks/useToggleProductActive';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils/formatPrice';
+import { formatCategoryName } from '@/utils/formatCategoryName';
 
 interface AdminProductCardProps {
   product: Product;
@@ -63,7 +64,7 @@ export function AdminProductCard({ product, onEdit }: AdminProductCardProps) {
               {product.name}
             </h3>
             <p className="text-lg font-bold text-green-600">{formatPrice(product.price)}</p>
-            <p className="text-xs text-gray-500 mt-1">{product.mainCategory}</p>
+            <p className="text-xs text-gray-500 mt-1">{formatCategoryName(product.category_name)}</p>
           </div>
 
           {/* Botones de acción */}

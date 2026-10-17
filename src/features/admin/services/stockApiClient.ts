@@ -19,7 +19,7 @@ import { apiFetch } from '@/lib/api/apiFetch';
 export const stockApiClient = {
   /**
    * Fetch all products with their stock levels.
-   * Uses the v_product_stock view via the API route.
+   * Uses the get_all_products_with_stock RPC via the API route (#133).
    */
   async getAllStock(): Promise<ProductStockView[]> {
     const res = await apiFetch('/stock', {
