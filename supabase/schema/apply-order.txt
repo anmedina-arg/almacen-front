@@ -1,0 +1,101 @@
+# Orden de aplicación de los archivos canónicos para levantar el schema
+# desde cero (base local en Docker, ver docs/ops/base-local-docker.md).
+#
+# Lo consume scripts/build-local-schema.mjs, que concatena estos archivos en
+# una migración generada (supabase/migrations/, gitignoreada). Los archivos
+# canónicos siguen siendo la única fuente de verdad del repo (ADR-0011);
+# este manifiesto solo fija el orden, que importa por tres motivos:
+#   - una tabla con FK necesita la tabla referenciada creada antes;
+#   - una policy o un trigger necesita su función creada antes;
+#   - una función LANGUAGE sql (is_store_admin, is_stock_tracked,
+#     get_combo_effective_stock, get_top_seller_ids, get_recommendations)
+#     se valida al crearse, así que necesita sus tablas antes. Las plpgsql
+#     no (solo se validan al ejecutarse), pero `RETURNS product_stock`
+#     exige que la tabla exista.
+#
+# Regla del build: TODO archivo .sql bajo supabase/schema/ tiene que estar
+# listado acá — si falta uno, el build falla, para que un objeto nuevo no
+# quede afuera de la base local en silencio.
+
+# ── Funciones trigger genéricas (plpgsql, sin dependencias) ──────────────
+products/update_updated_at_column.sql
+store/handle_updated_at.sql
+orders/update_orders_updated_at.sql
+
+# ── Store: stores, profiles, membership, is_store_admin ──────────────────
+store/stores.sql
+store/profiles.sql
+store/store_admins.sql
+products/is_store_admin.sql
+store/handle_new_user.sql
+stock/is_stock_tracked.sql
+
+# ── Products / Categories / Familias ─────────────────────────────────────
+products/categories.sql
+products/subcategories.sql
+producto-surtido/familias.sql
+orders/log_price_change.sql
+orders/sync_order_items_unit_cost.sql
+products/products.sql
+producto-surtido/variedades.sql
+
+# ── Stock (tablas + triggers) ────────────────────────────────────────────
+stock/log_initial_stock.sql
+stock/log_stock_change.sql
+stock/product_stock.sql
+stock/stock_movement_log.sql
+stock/v_product_stock.sql
+
+# ── Combos ───────────────────────────────────────────────────────────────
+combos/sync_combo_cost.sql
+combos/combo_components.sql
+combos/get_combo_effective_stock.sql
+
+# ── Clients ──────────────────────────────────────────────────────────────
+clients/clients.sql
+
+# ── Orders ───────────────────────────────────────────────────────────────
+orders/orders.sql
+orders/recalculate_order_total.sql
+orders/reserve_order_stock.sql
+orders/return_order_stock.sql
+orders/adjust_stock_on_item_update.sql
+orders/return_stock_on_item_delete.sql
+orders/validate_order_item_store.sql
+orders/order_items.sql
+orders/order_payments.sql
+orders/product_price_history.sql
+orders/order_item_variedades.sql
+orders/add_order_item_variedades.sql
+orders/create_order.sql
+orders/confirm_order.sql
+orders/cancel_order.sql
+
+# ── Stock (RPCs) ─────────────────────────────────────────────────────────
+stock/upsert_product_stock.sql
+stock/increment_product_stock.sql
+stock/increment_product_stock_batch.sql
+stock/get_all_products_with_stock.sql
+stock/get_low_stock_products.sql
+stock/get_avg_stock_per_product.sql
+stock/get_stock_value_per_day.sql
+
+# ── Ranking ──────────────────────────────────────────────────────────────
+ranking/get_top_seller_ids.sql
+ranking/get_top_products.sql
+ranking/get_top_categories.sql
+
+# ── Recomendaciones ──────────────────────────────────────────────────────
+recomendaciones/category_affinity_rules.sql
+recomendaciones/product_affinity.sql
+recomendaciones/refresh_product_affinity.sql
+recomendaciones/get_recommendations.sql
+recomendaciones/export_productos.sql
+recomendaciones/export_ventas.sql
+
+# ── Store (RPCs de plataforma) ───────────────────────────────────────────
+store/provision_store.sql
+store/get_orders_count_by_store.sql
+
+# ── Observability ────────────────────────────────────────────────────────
+observability/perf_logs.sql

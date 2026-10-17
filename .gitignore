@@ -62,3 +62,5 @@ market-cevil-backups/
 
 # Estado local de la CLI de Supabase
 supabase/.temp/
+# generado por scripts/build-local-schema.mjs a partir de supabase/schema/
+supabase/migrations/

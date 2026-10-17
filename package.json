@@ -7,7 +7,14 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:unit": "vitest run --exclude \"src/test/integration/**\"",
+    "test:integration": "vitest run src/test/integration",
+    "db:build": "node scripts/build-local-schema.mjs",
+    "db:start": "npm run db:build && supabase start -x realtime,storage-api,imgproxy,edge-runtime,logflare,vector,supavisor,mailpit",
+    "db:reset": "npm run db:build && supabase db reset",
+    "db:stop": "supabase stop",
+    "db:status": "supabase status"
   },
   "dependencies": {
     "@supabase/auth-helpers-nextjs": "^0.15.0",
@@ -34,6 +41,7 @@
     "dotenv": "^17.4.2",
     "eslint": "^9",
     "eslint-config-next": "15.4.5",
+    "supabase": "^2.121.0",
     "tailwindcss": "^4",
     "typescript": "5.9.3",
     "vitest": "^4.1.10"

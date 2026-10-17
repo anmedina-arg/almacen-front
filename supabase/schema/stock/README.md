@@ -9,6 +9,7 @@ alertas de stock bajo. Consolidado en #83 (spec #81, mapa #74).
 |---|---|
 | `product_stock.sql` | Stock actual de cada producto (1:1 con `products`). Incluye policies RLS: lectura pública sin restricción (sostiene el catálogo público), escritura scoped por Store vía `is_store_admin()`. |
 | `stock_movement_log.sql` | Historial inmutable (solo INSERT) de cada cambio de stock, para auditoría. Alimentado por los dos triggers de abajo, no por escritura directa desde la app. |
+| `v_product_stock.sql` | Vista legacy (del primer control de stock) que lee `GET /api/stock`: `product_stock` + `products` + nombre de quien actualizó. Documentada en 2026-10-17 al armar la base local en Docker — ya existía en producción, no estaba en el repo. Expone `main_category` (a retirar en #133) y corre como su dueño (sin `security_invoker`), ver el header del archivo. |
 
 ## Funciones RPC (llamadas desde la API)
 
