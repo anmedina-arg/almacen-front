@@ -15,7 +15,12 @@
  *  npx tsx scripts/provision-store.ts \
  *    --slug=nueva-store --name="Nueva Store" --owner-email=cliente@example.com \
  *    --operator-email=vos@example.com \
- *    [--whatsapp=5493810000000] [--flags=stock,pos,pagos]
+ *    [--whatsapp=5493810000000] [--flags=stock,pos,pagos] [--demo]
+ *
+ *  --demo marca la Store como Demo Store (#153, ver CONTEXT.md): queda afuera
+ *  de /stores, del sitemap y de las métricas de /admin, y su catálogo muestra
+ *  la franja de demostración. Su contenido se carga después con
+ *  supabase/seed/demo-store.sql (ver docs/ops/demo-store.md).
  *
  * Requisitos:
  *  - tsx instalado (ver package-lock.json)
@@ -77,9 +82,16 @@ function parseFlags(raw: string | undefined): Partial<Record<FeatureFlagKey, boo
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const { slug, name, 'owner-email': ownerEmail, 'operator-email': operatorEmail, whatsapp, flags } = args;
+  // Flag sin valor (o --demo=true). Un valor distinto se rechaza en vez de
+  // interpretarlo: --demo=false marcaría igual la Store como demo.
+  const isDemo = 'demo' in args;
+  if (isDemo && args.demo !== '' && args.demo !== 'true') {
+    console.error(`--demo no lleva valor (recibido "--demo=${args.demo}"). Usá --demo a secas, u omitilo.`);
+    process.exit(1);
+  }
 
   if (!slug || !name || !ownerEmail || !operatorEmail) {
-    console.error('Uso: npx tsx scripts/provision-store.ts --slug=... --name=... --owner-email=... --operator-email=... [--whatsapp=...] [--flags=stock,pos]');
+    console.error('Uso: npx tsx scripts/provision-store.ts --slug=... --name=... --owner-email=... --operator-email=... [--whatsapp=...] [--flags=stock,pos] [--demo]');
     process.exit(1);
   }
 
@@ -99,12 +111,14 @@ async function main() {
     operatorEmail,
     whatsappNumber: whatsapp ?? null,
     featureFlags: parseFlags(flags),
+    isDemo,
   });
 
   console.log(`Store creada: ${result.slug} (id ${result.storeId})`);
   console.log(`Dueño: ${ownerEmail} (${result.ownerInvited ? 'invitado ahora, le llegó un mail' : 'ya tenía cuenta'})`);
   console.log('feature_flags:', result.featureFlags);
   console.log('whatsapp_number:', result.whatsappNumber ?? '(null — usa el fallback de NEXT_PUBLIC_WHATSAPP_NUMBER)');
+  if (result.isDemo) console.log('is_demo: true — Demo Store. Siguiente paso: cargar supabase/seed/demo-store.sql');
 }
 
 main().catch((error) => {

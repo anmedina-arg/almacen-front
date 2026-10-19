@@ -9,6 +9,7 @@ import { ProductCatalogSkeleton } from '@/features/catalog/components/ProductCat
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 import { resolveWhatsappNumber } from '@/features/catalog/utils/resolveWhatsappNumber';
+import { DemoStoreBanner } from '@/features/catalog/components/DemoStoreBanner';
 
 export default async function Home({ params }: { params: Promise<{ store: string }> }) {
   const { store } = await params;
@@ -27,6 +28,7 @@ export default async function Home({ params }: { params: Promise<{ store: string
   return (
     <div className="font-barlow flex flex-col min-h-screen px-2">
       <div className="sticky top-0 z-50">
+        {storeData.is_demo && <DemoStoreBanner />}
         <Header storeName={storeData.name} logoUrl={storeData.logo_url} />
         <ProductSearchBar />
         <CategoryNav storeId={storeId} />

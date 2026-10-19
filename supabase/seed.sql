@@ -11,6 +11,16 @@
 --     usuario en auth.users — posible porque la FK profiles.id → auth.users
 --     no está enforced en local (supabase/local-only/01_drop_auth_users_fks.sql).
 --
+--   - la Demo Store `demo-store` (#153) con membership del mismo admin. Acá
+--     se inserta directo con un número de WhatsApp de ejemplo; en producción
+--     se da de alta con scripts/provision-store.ts --demo y el número real de
+--     la demo. Su contenido (categorías, productos, Combo) lo carga
+--     supabase/seed/demo-store.sql, que config.toml aplica después de este.
+--     El flag `stock` va APAGADO a propósito: is_stock_tracked() es por Store
+--     (feature_flags->>'stock'), y con el flag prendido y sin filas en
+--     product_stock reserve_order_stock() rechaza todo pedido con
+--     insufficient_stock. Apagado, el stock nunca bloquea un pedido de demo.
+--
 -- Todo lo demás (productos, órdenes, stock, usuarios de auth) lo crea cada
 -- test como fixture descartable con su propio cleanup.
 --
@@ -40,4 +50,20 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO public.store_admins (profile_id, store_id, role)
 VALUES ('00000000-0000-4000-8000-000000000001', 1, 'admin')
+ON CONFLICT (profile_id, store_id) DO NOTHING;
+
+-- ── Demo Store (#153) ──────────────────────────────────────────────────────
+INSERT INTO public.stores (slug, name, whatsapp_number, is_demo, feature_flags)
+VALUES (
+  'demo-store',
+  'Demo Store',
+  '5491100000000',
+  true,
+  '{"pos": true, "pagos": true, "stock": false, "ranking": true, "clientes": true, "informes": true, "dashboard": true}'::jsonb
+)
+ON CONFLICT (slug) DO NOTHING;
+
+INSERT INTO public.store_admins (profile_id, store_id, role)
+SELECT '00000000-0000-4000-8000-000000000001', id, 'admin'
+FROM public.stores WHERE slug = 'demo-store'
 ON CONFLICT (profile_id, store_id) DO NOTHING;

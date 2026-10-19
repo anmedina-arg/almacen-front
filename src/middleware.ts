@@ -22,7 +22,7 @@ export async function middleware(request: NextRequest) {
   // bajo ninguna Store) y las rutas especiales de metadata a nivel de sitio
   // no tienen slug de Store: no necesitan el header ni el auth-gating de
   // abajo, que asume rutas bajo /[store]/...
-  const SITE_LEVEL_ROUTES = new Set(['api', 'robots.txt', 'sitemap.xml', 'stores', 'admin']);
+  const SITE_LEVEL_ROUTES = new Set(['api', 'robots.txt', 'sitemap.xml', 'stores', 'admin', 'demo']);
 
   // Request al host legacy sin el slug de su Store ya al frente (link viejo,
   // bookmark, o PWA instalada arrancando en start_url "/"): reinyectamos el

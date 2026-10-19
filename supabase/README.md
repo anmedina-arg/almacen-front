@@ -11,7 +11,8 @@ Los integration tests corren contra un stack de Supabase local (Supabase CLI + D
 - `supabase/schema/apply-order.txt` — orden de aplicación de los canónicos (dependencias entre tablas, funciones y policies). Todo canónico nuevo tiene que estar listado; el build falla si falta uno.
 - `scripts/build-local-schema.mjs` (`npm run db:build`) — concatena los canónicos en `supabase/migrations/` (gitignoreada, artefacto derivado) para que `supabase start` / `supabase db reset` los apliquen.
 - `supabase/local-only/` — ajustes que **solo** aplican en local, nunca en producción (hoy: drop de las 3 FKs a `auth.users` y del trigger `on_auth_user_created`, las dos diferencias deliberadas que ya tenía el proyecto de test hosteado).
-- `supabase/seed.sql` — mínimo que los tests dan por sentado (Store `market-del-cevil` + perfil super_admin con membership).
+- `supabase/seed.sql` — mínimo que los tests dan por sentado (Store `market-del-cevil` + perfil super_admin con membership + la Demo Store `demo-store`, #153).
+- `supabase/seed/demo-store.sql` — contenido de la Demo Store (categorías, productos, Combo). Datos, no schema: se aplica tanto en la base local (vía `config.toml`) como una vez en producción, ver `docs/ops/demo-store.md`.
 - `supabase/config.toml` — servicios y puertos del stack local (`5433x`, para convivir con el stack de `contability`).
 
 Detalle, comandos y verificación de fidelidad contra producción: [`docs/ops/base-local-docker.md`](../docs/ops/base-local-docker.md). Esto no cambia ADR-0011: los canónicos siguen siendo la fuente de verdad del repo y la base viva la del schema; la base local es la forma de probar un canónico desde cero antes de tocar producción (paso 5 de `docs/agents/schema-changes.md`).

@@ -20,6 +20,14 @@
 -- p_owner_profile_id ya viene resuelto (profile existente o recién invitado
 -- vía Supabase Auth Admin API) — esta función no crea perfiles ni usuarios,
 -- solo las dos filas de negocio.
+--
+-- #153: p_is_demo marca la Store como Demo Store desde el alta (default
+-- false). Agrega un parámetro con default al final, así una llamada sin él
+-- sigue resolviendo — pero si la firma de 5 parámetros quedara viva al
+-- lado, PostgREST no podría elegir entre las dos sobrecargas. Paso
+-- operativo, una vez por base existente, antes de aplicar este archivo
+-- (convención de docs/agents/schema-changes.md: el DROP no va en el canónico):
+--   DROP FUNCTION public.provision_store(text, text, uuid, text, jsonb);
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.provision_store(
@@ -27,7 +35,8 @@ CREATE OR REPLACE FUNCTION public.provision_store(
   p_name TEXT,
   p_owner_profile_id UUID,
   p_whatsapp_number TEXT DEFAULT NULL,
-  p_feature_flags JSONB DEFAULT '{}'::jsonb
+  p_feature_flags JSONB DEFAULT '{}'::jsonb,
+  p_is_demo BOOLEAN DEFAULT false
 )
 RETURNS JSONB
 LANGUAGE plpgsql
@@ -35,8 +44,8 @@ AS $$
 DECLARE
   v_store_id INTEGER;
 BEGIN
-  INSERT INTO public.stores (slug, name, whatsapp_number, feature_flags)
-  VALUES (p_slug, p_name, p_whatsapp_number, p_feature_flags)
+  INSERT INTO public.stores (slug, name, whatsapp_number, feature_flags, is_demo)
+  VALUES (p_slug, p_name, p_whatsapp_number, p_feature_flags, COALESCE(p_is_demo, false))
   RETURNING id INTO v_store_id;
 
   INSERT INTO public.store_admins (profile_id, store_id, role)

@@ -7,7 +7,7 @@ sistema). Consolidado en #87 (spec #81, mapa #74).
 
 | Archivo | Qué es |
 |---|---|
-| `stores.sql` | El tenant. `supabase_multitenant_schema_expand.sql` es su fuente original (#10) — no se descarta hasta que las otras 13 tablas de ese archivo confirmen su parte. Policies: lectura pública sin restricción; sin escritura vía RLS (alta/edición manual, ver ADR-0006). `feature_flags JSONB NOT NULL DEFAULT '{}'` desde #23 — catálogo de 7 flags por Store (`combos` se retiró en #117, ADR-0013), ver el comentario de columna en el archivo y `src/lib/store/featureFlags.ts`. |
+| `stores.sql` | El tenant. `supabase_multitenant_schema_expand.sql` es su fuente original (#10) — no se descarta hasta que las otras 13 tablas de ese archivo confirmen su parte. Policies: lectura pública sin restricción; sin escritura vía RLS (alta/edición manual, ver ADR-0006). `feature_flags JSONB NOT NULL DEFAULT '{}'` desde #23 — catálogo de 7 flags por Store (`combos` se retiró en #117, ADR-0013), ver el comentario de columna en el archivo y `src/lib/store/featureFlags.ts`. `is_demo BOOLEAN NOT NULL DEFAULT false` desde #153: marca de Demo Store (ver `CONTEXT.md`), la única que la saca de `/stores`, del sitemap y de `get_orders_count_by_store`; la lee `src/features/store/services/listPublicStores.ts`. |
 | `store_admins.sql` | Membresía explícita de un profile como admin de una Store (ADR-0005). Sin policies de escritura — mismo motivo que `stores`. |
 | `profiles.sql` | Extiende `auth.users` con nombre/rol/avatar. Sin `store_id` — no es tabla de negocio por-Store. |
 
@@ -15,8 +15,8 @@ sistema). Consolidado en #87 (spec #81, mapa #74).
 
 | Archivo | Qué hace |
 |---|---|
-| `provision_store.sql` | Alta de una Store nueva (#26, ADR-0006): INSERT en `stores` + `store_admins` en una sola transacción. Sin `SECURITY DEFINER` ni `GRANT` — pensada para llamarse solo con el `service_role` key (bypassea RLS por rol de Postgres), nunca desde una ruta pública. Ver `src/features/store/services/provisionStore.ts` y `scripts/provision-store.ts`. |
-| `get_orders_count_by_store.sql` | Pedidos de cada Store en una tabla (#151): total y desglose por estado, incluye Stores sin pedidos. **Solo `super_admin`** (chequeo directo sobre `profiles.role`, no `is_store_admin()`, porque cruza todas las Stores y un Store admin no debe verlas). `SECURITY DEFINER` + `GRANT` solo a `authenticated`. La llama la página `/admin` del Platform admin vía `src/features/store/services/getOrdersCountByStore.ts`. |
+| `provision_store.sql` | Alta de una Store nueva (#26, ADR-0006): INSERT en `stores` + `store_admins` en una sola transacción. Sin `SECURITY DEFINER` ni `GRANT` — pensada para llamarse solo con el `service_role` key (bypassea RLS por rol de Postgres), nunca desde una ruta pública. Ver `src/features/store/services/provisionStore.ts` y `scripts/provision-store.ts`. Desde #153 acepta `p_is_demo` (default false) para marcar la Demo Store en el alta — al cambiar la firma, en una base existente hay que `DROP` la versión anterior antes del `CREATE` (ver header). |
+| `get_orders_count_by_store.sql` | Pedidos de cada Store en una tabla (#151): total y desglose por estado, incluye Stores sin pedidos. **Solo `super_admin`** (chequeo directo sobre `profiles.role`, no `is_store_admin()`, porque cruza todas las Stores y un Store admin no debe verlas). `SECURITY DEFINER` + `GRANT` solo a `authenticated`. La llama la página `/admin` del Platform admin vía `src/features/store/services/getOrdersCountByStore.ts`. Excluye la Demo Store (`is_demo`, #153): sus pedidos son pruebas de prospectos, no métrica. |
 
 ## Funciones trigger (no se llaman directo)
 

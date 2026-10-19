@@ -1,4 +1,5 @@
 import { formatQuantity } from '@/utils/formatQuantity';
+import { MOBILE_MAX_WIDTH } from '@/utils/viewport';
 import { CartItem } from '../types';
 import { calculateItemPrice, truncateProductName } from './productUtils';
 
@@ -11,7 +12,7 @@ export const generateWhatsAppMessage = (cartItems: CartItem[]): string => {
   }
 
   // Detectar ancho de pantalla para ajustar el formato
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= MOBILE_MAX_WIDTH;
 
   // Definir anchos de columnas según el dispositivo
   const quantityWidth = 8; // Columna de cantidad

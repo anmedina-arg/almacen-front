@@ -4,22 +4,23 @@ import { WhatsAppButton } from './WhatsAppButton';
 
 export function ProofSection() {
   return (
-    <section className="ck-wrap ck-section" aria-labelledby="prueba-title" style={{ paddingTop: 0 }}>
+    <section className="ck-wrap ck-section" aria-labelledby="demo-title" style={{ paddingTop: 0 }}>
       <div className="ck-proof">
+        {/* Demo Store (#153): el CTA va a la demo, nunca al catálogo de un cliente real. */}
         <Chapa tone="mustard" chips={2}>
-          <h2 id="prueba-title" className="ck-h2 ck-display">
-            Ya funciona en un almacén de verdad.
+          <h2 id="demo-title" className="ck-h2 ck-display">
+            Probalo como lo haría un vecino.
           </h2>
           <p style={{ marginTop: 18, maxWidth: '46ch', fontSize: '1.15rem' }}>
-            Market Cevil es el primer almacén que usa chaskyapp: catálogo público, pedidos
-            por WhatsApp y panel de gestión. Entrá y pedí como lo haría un vecino.
+            Armá un pedido en la Demo Store y mandalo por WhatsApp. Productos reales, precios
+            de ejemplo.
           </p>
           <div className="ck-proof-actions">
-            <Link href="/market-del-cevil" className="ck-btn ck-btn-bone">
-              Ver el catálogo de Market Cevil
+            <Link href="/demo" className="ck-btn ck-btn-bone">
+              Ver demo
             </Link>
             <Link href="/stores" className="ck-link">
-              Ver todos los Stores
+              Ver quiénes ya lo usan
             </Link>
           </div>
         </Chapa>
