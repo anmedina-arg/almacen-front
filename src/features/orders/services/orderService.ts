@@ -198,9 +198,10 @@ export async function confirmOrder(
   orderId: number,
   confirmedBy: string | null
 ): Promise<{ order_id: number; status: string; confirmed_at: string; confirmed_by: string | null }> {
-  // confirm_order es SECURITY DEFINER y bypassea RLS — la verificación de
-  // que la orden pertenece a esta Store tiene que hacerse acá, antes de
-  // invocar el RPC.
+  // confirm_order es SECURITY DEFINER y bypassea RLS. La función exige ser
+  // admin de la Store de la orden, pero no de *esta* Store (la de la URL):
+  // un admin de varias Stores pasaría el chequeo del RPC con una orden
+  // ajena a la ruta — por eso se verifica acá, antes de invocarlo.
   await assertOrderInStore(supabase, storeId, orderId);
 
   const { data, error } = await supabase.rpc('confirm_order', {

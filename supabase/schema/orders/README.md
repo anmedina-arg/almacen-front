@@ -43,7 +43,7 @@ aplicados a otros ítems del mismo pedido):
 | `cancel_order.sql` | Cancela una orden, devuelve stock (combo-aware) vía `return_order_stock()` (#73). Desde #97: no devuelve stock si `stock:false` para esa Store — mismo criterio que `create_order`. |
 | `add_order_item_variedades.sql` | Paso posterior a `create_order()` (#95) — guarda las Variedades elegidas por línea de Producto Surtido. A propósito NO modifica `create_order()`: correlaciona los `order_items` recién creados por orden de inserción (`ORDER BY id`), ya que `create_order()` no devuelve sus ids. Best-effort: si falla, la orden ya quedó creada igual. |
 
-`confirm_order`/`cancel_order` son `SECURITY DEFINER` sin `p_store_id` — la verificación de que la orden pertenece a la Store del caller se hace en la ruta de API, antes de invocar el RPC.
+`confirm_order`/`cancel_order` son `SECURITY DEFINER` sin `p_store_id` — desde el fix de seguridad del 2026-10-20 la propia función exige `is_store_admin()` de la Store de la orden (salvo `service_role`) y `anon` no tiene EXECUTE; la ruta de API además verifica, antes de invocar el RPC, que la orden pertenezca a la Store de la URL.
 
 ## Funciones auxiliares (no son RPC ni trigger)
 
