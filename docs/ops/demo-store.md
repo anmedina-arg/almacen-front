@@ -24,6 +24,7 @@ No hay nada que hacer: `npm run db:reset` la deja lista. `supabase/seed.sql` ins
    ```
    El número es distinto al de Market del Cevil y no se escribe en el repo. El flag `stock` va **apagado** a propósito: el control de stock es por Store (`is_stock_tracked()` lee `feature_flags->>'stock'`) y la demo no tiene filas en `product_stock`; con el flag prendido, `reserve_order_stock()` rechazaría todos los pedidos con `insufficient_stock`. Si algún día se quiere mostrar el módulo de stock en la demo, hay que cargar stock para cada producto antes de prender el flag.
 4. **Contenido**: pegar `supabase/seed/demo-store.sql` entero en el SQL Editor (un solo bloque `DO`, un solo Run). Es idempotente: correrlo dos veces no duplica nada. No crea filas en `product_stock` (ver el punto anterior).
+   **Ojo con el cache del catálogo**: la metadata de productos se cachea por Store sin vencimiento y solo se invalida al editar productos o categorías desde el admin (ADR-0014). Si alguien visitó `/demo-store` entre el paso 3 y este, quedó cacheado el catálogo vacío. Se arregla editando y guardando cualquier producto en `/demo-store/admin/products` (sin cambiar nada). Lo mismo aplica cada vez que se vuelva a correr el seed.
 5. **Verificar**: `/demo` muestra el marco con el catálogo y la franja de demo; `/stores` y `/sitemap.xml` no listan `demo-store`; `/admin` no la cuenta.
 
 ## Mantenimiento
