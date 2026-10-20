@@ -43,6 +43,9 @@ export function Hero() {
           </p>
           <div className="ck-hero-actions">
             <WhatsAppButton tone="red" />
+            <Link href="/demo" className="ck-btn ck-btn-mustard">
+              Ver demo
+            </Link>
             <Link href="/stores" className="ck-link">
               Ver quiénes ya lo usan
             </Link>

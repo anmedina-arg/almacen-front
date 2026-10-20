@@ -41,9 +41,17 @@ BEGIN
   END IF;
 
   -- ── Categorías ─────────────────────────────────────────────────────────
-  INSERT INTO public.categories (name, sort_order, store_id)
-  VALUES ('Gaseosas', 1, v_store), ('Snacks', 2, v_store), ('Hamburguesas', 3, v_store)
-  ON CONFLICT (store_id, name) DO NOTHING;
+  -- Imágenes de las categorías equivalentes de Market del Cevil (Bebidas,
+  -- snacks, Congelados), mismo criterio que las fotos de productos. Si la
+  -- categoría ya existe y no tiene imagen, se la completa; si el admin ya
+  -- le puso una, se respeta.
+  INSERT INTO public.categories (name, sort_order, store_id, image_url)
+  VALUES
+    ('Gaseosas',     1, v_store, 'https://ihmrrregqddtiyospypm.supabase.co/storage/v1/object/public/categories/uov3iu3xgwuslevufokh.png'),
+    ('Snacks',       2, v_store, 'https://ihmrrregqddtiyospypm.supabase.co/storage/v1/object/public/categories/trl1syjkhq17slviwpve.png'),
+    ('Hamburguesas', 3, v_store, 'https://ihmrrregqddtiyospypm.supabase.co/storage/v1/object/public/categories/qf8zufhg9lz23rk6q9xi.png')
+  ON CONFLICT (store_id, name) DO UPDATE
+    SET image_url = COALESCE(public.categories.image_url, EXCLUDED.image_url);
 
   SELECT id INTO v_gaseosas FROM public.categories WHERE store_id = v_store AND name = 'Gaseosas';
   SELECT id INTO v_snacks   FROM public.categories WHERE store_id = v_store AND name = 'Snacks';
