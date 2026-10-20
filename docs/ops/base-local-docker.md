@@ -59,7 +59,7 @@ Al armarlo se comparó la base local contra producción con las mismas consultas
 | Cuerpo de las 38 funciones | idéntico ignorando comentarios y espacios (los canónicos tienen más comentarios que lo que se pegó históricamente en el SQL Editor) |
 | Constraints | idéntico tras la migración canónica (91); `local-only/` después quita las 3 FKs a `auth.users` |
 
-Fuera del alcance de la base local, a propósito: las 3 tablas legacy sin RLS de producción (`inventory`, `products_backup`, `categories_backup`), que ningún código ni test usa y cuya eliminación está pendiente de decisión (advisors de Supabase, auditoría 2026-10-17).
+Fuera del alcance de la base local, a propósito: las 3 tablas legacy de producción (`inventory`, `products_backup`, `categories_backup`), que ningún código, RPC, vista ni test usa. Desde 2026-10-20 tienen RLS activo sin policies (cerradas para `anon`/`authenticated`; solo `postgres`/`service_role` las leen) — conservan los grants de `anon`/`authenticated`, a propósito, como único cambio mínimo. Su eliminación sigue pendiente de decisión; `products_backup` es una foto del catálogo de Cevil al 2026-04-10 con costos, exportarla antes de un eventual `DROP`.
 
 ## Problemas conocidos
 
