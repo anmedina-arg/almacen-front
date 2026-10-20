@@ -26,10 +26,17 @@ export function LandingShell({ children }: { children: ReactNode }) {
       <header className="ck-wrap ck-nav">
         <Wordmark />
         <nav className="ck-nav-links" aria-label="Principal">
+          <Link href="/demo" className="ck-link">
+            Demo
+          </Link>
           <Link href="/stores" className="ck-link">
             Stores
           </Link>
-          <WhatsAppButton tone="mustard">WhatsApp</WhatsAppButton>
+          {/* En celulares angostos el texto se oculta visualmente (queda el ícono)
+              para que entren Demo, Stores y el botón — sigue siendo el nombre accesible. */}
+          <WhatsAppButton tone="mustard">
+            <span className="ck-nav-btn-label">WhatsApp</span>
+          </WhatsAppButton>
         </nav>
       </header>
       <main>{children}</main>

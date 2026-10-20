@@ -649,7 +649,16 @@
 }
 
 @media (max-width: 430px) {
-  .ck-nav-links { gap: 12px; }
+  .ck-nav { gap: 10px; }
+  .ck-nav-links { gap: 10px; }
+  .ck-nav-btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
   .ck-nav-links .ck-btn { padding: 8px 12px; font-size: 0.85rem; gap: 6px; }
   .ck-wordmark span { padding: 6px 9px 7px; }
   .ck-btn { width: 100%; justify-content: center; }
