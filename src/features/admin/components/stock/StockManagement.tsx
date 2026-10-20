@@ -2,15 +2,16 @@
 
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useProductStock } from '../../hooks/useProductStock';
 import { useLowStock } from '../../hooks/useLowStock';
 import { LowStockBadge } from './LowStockBadge';
 import { StockUpdateModal } from './StockUpdateModal';
 import { StockHistoryModal } from './StockHistoryModal';
-import { CATEGORY_LABELS } from '../../constants';
 import { Spinner } from '@/components/ui/Spinner';
 import type { ProductStockView, StockFilters } from '../../types/stock.types';
 import { formatPrice } from '@/utils/formatPrice';
+import { formatCategoryName, SIN_CATEGORIA_LABEL } from '@/utils/formatCategoryName';
 import { useStoreSlug } from '@/hooks/useStoreSlug';
 
 /**
@@ -18,6 +19,10 @@ import { useStoreSlug } from '@/hooks/useStoreSlug';
  * Muestra una tabla/listado de todos los productos con su stock,
  * filtros de busqueda, y modales para editar y ver historial.
  */
+// Valor del <select> para "sin categoría": no puede chocar con el nombre de
+// una categoría real (categories.name).
+const SIN_CATEGORIA_FILTER = '__sin_categoria__';
+
 export function StockManagement() {
   const slug = useStoreSlug();
   const { data: stockData, isLoading, error } = useProductStock();
@@ -32,11 +37,16 @@ export function StockManagement() {
   const [editingProduct, setEditingProduct] = useState<ProductStockView | null>(null);
   const [historyProduct, setHistoryProduct] = useState<{ id: number; name: string } | null>(null);
 
-  // Extraer categorias unicas de los datos
+  // Extraer categorias unicas de los datos. Los productos sin category_id
+  // (category_name null) se agrupan bajo SIN_CATEGORIA_FILTER para que el
+  // filtro pueda alcanzarlos igual (#133).
   const categories = useMemo(() => {
     if (!stockData) return [];
-    const unique = [...new Set(stockData.map((p) => p.main_category))].sort();
-    return unique;
+    const unique = [
+      ...new Set(stockData.map((p) => p.category_name).filter((c): c is string => c != null)),
+    ].sort((a, b) => a.localeCompare(b, 'es'));
+    const hasUncategorized = stockData.some((p) => p.category_name == null);
+    return hasUncategorized ? [...unique, SIN_CATEGORIA_FILTER] : unique;
   }, [stockData]);
 
   // Filtrar datos
@@ -53,7 +63,8 @@ export function StockManagement() {
 
       // Filtro de categoria
       if (filters.categoryFilter) {
-        if (product.main_category !== filters.categoryFilter) return false;
+        const productFilterValue = product.category_name ?? SIN_CATEGORIA_FILTER;
+        if (productFilterValue !== filters.categoryFilter) return false;
       }
 
       // Filtro de stock
@@ -162,7 +173,7 @@ export function StockManagement() {
           <option value="">Todas las categorias</option>
           {categories.map((cat) => (
             <option key={cat} value={cat}>
-              {CATEGORY_LABELS[cat] || cat}
+              {cat === SIN_CATEGORIA_FILTER ? SIN_CATEGORIA_LABEL : cat}
             </option>
           ))}
         </select>
@@ -216,9 +227,11 @@ export function StockManagement() {
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-3">
                         {product.product_image ? (
-                          <img
+                          <Image
                             src={product.product_image}
                             alt={product.product_name}
+                            width={40}
+                            height={40}
                             className="w-10 h-10 rounded-md object-cover flex-shrink-0"
                           />
                         ) : (
@@ -235,7 +248,7 @@ export function StockManagement() {
                       </div>
                     </td>
                     <td className="py-3 px-4 text-gray-600">
-                      {CATEGORY_LABELS[product.main_category] || product.main_category}
+                      {formatCategoryName(product.category_name)}
                     </td>
                     <td className="py-3 px-4 text-right font-mono text-gray-700">
                       {formatPrice(product.product_price)}
@@ -296,9 +309,11 @@ export function StockManagement() {
                 {/* Product info */}
                 <div className="flex items-center gap-3">
                   {product.product_image ? (
-                    <img
+                    <Image
                       src={product.product_image}
                       alt={product.product_name}
+                      width={48}
+                      height={48}
                       className="w-12 h-12 rounded-md object-cover flex-shrink-0"
                     />
                   ) : (
@@ -310,7 +325,7 @@ export function StockManagement() {
                     <p className="font-semibold text-gray-800 truncate">{product.product_name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-gray-500">
-                        {CATEGORY_LABELS[product.main_category] || product.main_category}
+                        {formatCategoryName(product.category_name)}
                       </span>
                       <span className="text-xs text-gray-400">|</span>
                       <span className="text-xs font-medium text-green-600">

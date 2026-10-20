@@ -17,6 +17,14 @@
 -- NOTA: `docs/agents/schema-changes.md` la marca junto a upsert_product_stock
 -- como objeto de "cobertura indirecta" únicamente (sin tests que ejerciten
 -- casos borde de cantidad) — ver spec #81, sección Testing Decisions.
+--
+-- #133 (2026-10-17): devuelve `category_name` (LEFT JOIN categories, null si
+-- el producto no tiene category_id) en lugar de la columna legacy
+-- `main_category`. Verificado antes contra producción: la definición viva
+-- coincidía con este archivo (hash normalizado idéntico). Como cambia el
+-- RETURNS TABLE, `CREATE OR REPLACE` falla con "cannot change return type":
+-- paso operativo, una vez por base, antes de aplicar este archivo:
+--   DROP FUNCTION public.get_low_stock_products(integer);
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_low_stock_products(p_store_id INTEGER)
@@ -25,7 +33,7 @@ RETURNS TABLE (
   product_name TEXT,
   quantity NUMERIC(12, 3),
   min_stock NUMERIC(12, 3),
-  main_category TEXT
+  category_name TEXT
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -41,9 +49,10 @@ BEGIN
     p.name::TEXT AS product_name,
     ps.quantity,
     ps.min_stock,
-    p.main_category::TEXT
+    c.name::TEXT AS category_name
   FROM public.product_stock ps
   JOIN public.products p ON p.id = ps.product_id
+  LEFT JOIN public.categories c ON c.id = p.category_id
   WHERE p.store_id = p_store_id
     AND ps.min_stock IS NOT NULL
     AND ps.quantity <= ps.min_stock

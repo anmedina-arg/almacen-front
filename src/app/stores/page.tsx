@@ -4,6 +4,7 @@ import { HeaderLogo } from '@/components/HeaderLogo';
 import { Chapa } from '@/features/landing/components/Chapa';
 import { LandingShell } from '@/features/landing/components/LandingShell';
 import { supabaseServer } from '@/lib/supabase/server';
+import { listPublicStores, type PublicStore } from '@/features/store/services/listPublicStores';
 
 export const metadata: Metadata = {
   title: 'Stores en chaskyapp',
@@ -11,9 +12,14 @@ export const metadata: Metadata = {
 };
 
 export default async function StoresPage() {
-  const { data: stores } = await supabaseServer
-    .from('stores')
-    .select('slug, name, logo_url');
+  // Solo negocios reales: la Demo Store queda afuera (#153). Si la consulta
+  // falla, la página muestra el estado vacío en vez de romperse.
+  let stores: PublicStore[] = [];
+  try {
+    stores = await listPublicStores(supabaseServer);
+  } catch (error) {
+    console.error('[stores] no se pudo listar las Stores:', error);
+  }
 
   return (
     <LandingShell>
@@ -22,7 +28,7 @@ export default async function StoresPage() {
           <h1 className="ck-h2 ck-display">Los negocios que ya usan chaskyapp.</h1>
           <p>Entrá al catálogo de cualquiera y mirá cómo se pide.</p>
         </div>
-        {stores && stores.length > 0 ? (
+        {stores.length > 0 ? (
           <div className="ck-stores">
             {stores.map((store, i) => (
               <Link key={store.slug} href={`/${store.slug}`} className="ck-store">

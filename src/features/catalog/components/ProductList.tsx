@@ -22,10 +22,11 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 
 		return mainCategories
 			.map((displayCat) => {
-				// Agrupar por categoría: nuevo sistema (category_name) con fallback a mainCategory legacy
-				const catProducts = products.filter(
-					(p) => (p.category_name ?? String(p.mainCategory)) === displayCat
-				);
+				// Agrupar por category_name (FK a categories). Un producto sin
+				// category_id no cae en ninguna sección — por eso #66 la hizo
+				// requerida al crear. El fallback a main_category legacy se retiró
+				// en #133.
+				const catProducts = products.filter((p) => p.category_name === displayCat);
 
 				const subMap = new Map<string, Product[]>();
 				catProducts.forEach((p) => {

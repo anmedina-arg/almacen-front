@@ -7,6 +7,7 @@ import { getQuantityPerClick } from '@/features/catalog/utils/productUtils';
 import { QuantityButton } from '@/components/ui/QuantityButton';
 import type { ProductStockView } from '../../types/stock.types';
 import { formatQuantity } from '@/utils/formatQuantity';
+import { formatCategoryName } from '@/utils/formatCategoryName';
 export interface StockEntryCardProduct extends ProductStockView {
   sale_type: WeightType;
 }
@@ -59,7 +60,7 @@ function StockEntryCardBase({
             {product.product_name}
           </h3>
           <p className="text-xs text-gray-500">
-            {product.main_category} · ${product.product_price}
+            {formatCategoryName(product.category_name)} · ${product.product_price}
           </p>
           <p className="text-xs text-gray-400">Stock actual: {currentStockLabel}</p>
         </div>

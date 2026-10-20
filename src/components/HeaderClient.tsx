@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
 import HelpButton from './HelpButton';
 import { useIsAuthenticated, useUser } from '@/features/auth/stores/authStore';
 import { useQuery } from '@tanstack/react-query';

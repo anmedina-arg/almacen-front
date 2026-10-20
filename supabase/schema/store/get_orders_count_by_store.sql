@@ -73,6 +73,8 @@ BEGIN
     COUNT(o.id) FILTER (WHERE o.status = 'cancelled') AS cancelled_orders
   FROM public.stores s
   LEFT JOIN public.orders o ON o.store_id = s.id
+  -- Demo Store (#153): sus pedidos son pruebas de prospectos, no métrica.
+  WHERE s.is_demo = false
   GROUP BY s.id, s.slug, s.name
   ORDER BY COUNT(o.id) DESC, s.name ASC;
 END;

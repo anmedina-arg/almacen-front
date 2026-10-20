@@ -27,6 +27,10 @@ Identificador único de una Store en la URL (ej. `market-del-cevil`). Es el prim
 **Platform**:
 El producto en sí, llamado **chaskyapp** (chasky, del quechua *chaski*, el mensajero por relevos; más *app*), distinto de cualquier Store individual. Vive en la raíz `/` como landing de marketing; `/stores` lista las Stores y `/admin` queda reservada para el Platform admin (ver [ADR-0015](docs/adr/0015-site-level-routes-reserved.md)).
 
+**Demo Store**:
+Una Store de muestra, propiedad de la Platform y no de un cliente, con productos reales y precios de ejemplo, que la landing de chaskyapp ofrece para que un prospecto pruebe el flujo completo de pedido (armar el carrito y mandar el mensaje de WhatsApp) sin tocar el catálogo de ningún negocio real. Es una Store común en todo lo demás (mismo catálogo, mismos pedidos), pero no cuenta como negocio que usa la plataforma: no aparece entre las Stores reales ni sus pedidos valen como métrica de la Platform.
+_Avoid_: Tienda demo, store de prueba, Store de ejemplo (canonizar como Demo Store). No confundir con la base de test (la base local en Docker donde corren los tests — eso es infraestructura, no una Store).
+
 **Store admin**:
 Un usuario con permiso para administrar una Store puntual (pedidos, stock, catálogo, etc. de esa Store solamente). Membresía explícita por Store, no un rol global.
 _Avoid_: Admin a secas (ambiguo entre Store admin y Platform admin).

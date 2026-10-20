@@ -17,7 +17,6 @@ const PRODUCT_COLUMNS = `
   image,
   active,
   categories,
-  mainCategory:main_category,
   sale_type,
   is_combo,
   max_stock,
@@ -117,7 +116,8 @@ export async function createProduct(
       price: input.price,
       cost: input.cost,
       image: input.image,
-      main_category: input.mainCategory ?? 'otros',
+      // main_category (legacy) ya no se escribe desde #133: queda el DEFAULT
+      // 'otros' de la columna hasta que se dropee (paso separado, post-deploy).
       categories: input.categories,
       active: input.active,
       sale_type: input.sale_type,
@@ -158,7 +158,6 @@ export async function updateProduct(
   if (input.price !== undefined) updates.price = input.price;
   if (input.cost !== undefined) updates.cost = input.cost;
   if (input.image !== undefined) updates.image = input.image;
-  if (input.mainCategory !== undefined) updates.main_category = input.mainCategory;
   if (input.categories !== undefined) updates.categories = input.categories;
   if (input.active !== undefined) updates.active = input.active;
   if (input.sale_type !== undefined) updates.sale_type = input.sale_type;

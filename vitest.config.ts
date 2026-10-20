@@ -7,8 +7,9 @@ export default defineConfig({
   test: {
     environment: 'node',
     setupFiles: ['./vitest.setup.ts'],
-    // Los integration tests pegan contra el mismo proyecto Supabase de test
-    // compartido — sin esto, un archivo puede ver de forma transitoria
+    // Los integration tests pegan contra la misma base Supabase de test
+    // (local en Docker, ver docs/ops/base-local-docker.md) — sin esto, un
+    // archivo puede ver de forma transitoria
     // filas mutadas por otro archivo corriendo en paralelo (confirmado
     // empíricamente en #16: con paralelismo, la suite falla ~3 de cada 5
     // corridas; sin él, estable en 5/5). Triggers pre-existentes como

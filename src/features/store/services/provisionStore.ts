@@ -16,6 +16,13 @@ export type ProvisionStoreParams = {
   operatorEmail: string;
   whatsappNumber?: string | null;
   featureFlags?: Partial<FeatureFlags>;
+  /**
+   * Demo Store (#153): Store de muestra de la Platform, no un cliente. Se
+   * marca en el alta porque es lo único que la saca de /stores, del sitemap
+   * y de las métricas de /admin — una Store creada sin la marca aparecería
+   * como cliente real hasta que alguien la corrija a mano.
+   */
+  isDemo?: boolean;
 };
 
 export type ProvisionStoreResult = {
@@ -25,10 +32,11 @@ export type ProvisionStoreResult = {
   ownerInvited: boolean;
   featureFlags: FeatureFlags;
   whatsappNumber: string | null;
+  isDemo: boolean;
 };
 
 const SLUG_PATTERN = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-const RESERVED_SLUGS = new Set(['api', 'robots.txt', 'sitemap.xml', 'stores', 'admin']);
+const RESERVED_SLUGS = new Set(['api', 'robots.txt', 'sitemap.xml', 'stores', 'admin', 'demo']);
 
 function assertValidSlug(slug: string): void {
   if (!SLUG_PATTERN.test(slug)) {
@@ -90,7 +98,7 @@ export async function provisionStore(
   supabaseAdmin: SupabaseClient,
   params: ProvisionStoreParams
 ): Promise<ProvisionStoreResult> {
-  const { slug, name, ownerEmail, operatorEmail, whatsappNumber = null } = params;
+  const { slug, name, ownerEmail, operatorEmail, whatsappNumber = null, isDemo = false } = params;
   assertValidSlug(slug);
   await assertOperatorIsSuperAdmin(supabaseAdmin, operatorEmail);
   const featureFlags = resolveFeatureFlags(params.featureFlags ?? {});
@@ -116,6 +124,7 @@ export async function provisionStore(
     p_owner_profile_id: ownerProfileId,
     p_whatsapp_number: whatsappNumber,
     p_feature_flags: featureFlags,
+    p_is_demo: isDemo,
   });
   if (error || !data) {
     throw new Error(`provision_store RPC falló: ${error?.message ?? 'sin resultado'}`);
@@ -128,5 +137,6 @@ export async function provisionStore(
     ownerInvited,
     featureFlags,
     whatsappNumber,
+    isDemo,
   };
 }

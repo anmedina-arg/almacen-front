@@ -23,6 +23,13 @@
 -- normalizado de category_id/subcategory_id. No se toca ni se elimina acá
 -- — solo se documenta por primera vez.
 --
+-- COLUMNA LEGACY `main_category` (+ CHECK `main_category_check`): categoría
+-- fija pre-sistema de categorías. Desde #133 la app no la lee ni la escribe
+-- (los INSERT dejan el DEFAULT 'otros'); las RPCs de Stock exponen
+-- `category_name` vía categories. El DROP de la columna y su CHECK queda
+-- como cambio de schema separado (8 pasos), a correr después de desplegar
+-- el código que ya no la usa.
+--
 -- is_producto_surtido/familia_id/min_variedades/max_variedades (#92, spec
 -- #91): marcan un producto como Producto Surtido (se arma eligiendo
 -- Variedades de su Familia en vez de venderse tal cual, ver

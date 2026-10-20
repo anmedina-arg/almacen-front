@@ -95,6 +95,43 @@ describe('provisionStore (#26)', () => {
     }
   );
 
+  it.skipIf(!hasServiceRoleCredentials)('marca la Store como Demo Store cuando se pide isDemo (#153)', async () => {
+    const owner = await createDisposableProfile();
+    const operator = await createDisposableProfile('super_admin');
+    const slug = `test-provision-demo-${randomUUID().slice(0, 8)}`;
+
+    const result = await provisionStore(supabase, {
+      slug,
+      name: 'Demo de prueba',
+      ownerEmail: owner.email,
+      operatorEmail: operator.email,
+      isDemo: true,
+    });
+    storeCleanupId = result.storeId;
+
+    expect(result.isDemo).toBe(true);
+    const { data: store } = await supabase.from('stores').select('is_demo').eq('id', result.storeId).single();
+    expect(store?.is_demo).toBe(true);
+  });
+
+  it.skipIf(!hasServiceRoleCredentials)('una Store común no queda marcada como demo por defecto (#153)', async () => {
+    const owner = await createDisposableProfile();
+    const operator = await createDisposableProfile('super_admin');
+    const slug = `test-provision-nodemo-${randomUUID().slice(0, 8)}`;
+
+    const result = await provisionStore(supabase, {
+      slug,
+      name: 'Store común',
+      ownerEmail: owner.email,
+      operatorEmail: operator.email,
+    });
+    storeCleanupId = result.storeId;
+
+    expect(result.isDemo).toBe(false);
+    const { data: store } = await supabase.from('stores').select('is_demo').eq('id', result.storeId).single();
+    expect(store?.is_demo).toBe(false);
+  });
+
   it.skipIf(!hasServiceRoleCredentials)('rechaza un slug ya existente', async () => {
     const owner = await createDisposableProfile();
     const operator = await createDisposableProfile('super_admin');

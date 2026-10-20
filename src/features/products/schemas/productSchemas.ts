@@ -11,31 +11,7 @@ import { z } from 'zod';
  * un cambio de diseño aparte, no scope de este ticket — mantenerlos
  * sincronizados a mano es el costo de esa decisión mientras tanto.
  */
-const MAIN_CATEGORIES = [
-  'panaderia',
-  'congelados',
-  'combos',
-  'snaks',
-  'otros',
-  'bebidas',
-  'lacteos',
-  'almacen',
-  'fiambres',
-  'pizzas',
-] as const;
-
 const SALE_TYPES = ['unit', '100gr', 'kg'] as const;
-
-/**
- * mainCategory se normaliza a minúsculas antes de validar contra el enum —
- * los handlers viejos hacían `body.mainCategory.toLowerCase()` antes de
- * guardar (constraint de la base es case-sensitive); se replica acá vía
- * preprocess para no perder callers que mandan casing distinto (ej. "Almacen").
- */
-const mainCategorySchema = z.preprocess(
-  (val) => (typeof val === 'string' ? val.toLowerCase() : val),
-  z.enum(MAIN_CATEGORIES, { errorMap: () => ({ message: 'Categoría inválida' }) })
-);
 
 /**
  * Schema de creación — todo el objeto siempre está presente, así que las
@@ -52,7 +28,6 @@ export const createProductSchema = z
     price: z.number().positive('El precio debe ser positivo'),
     cost: z.number().min(0, 'El costo no puede ser negativo').optional().default(0),
     image: z.string().nullable().optional().transform((v) => v || ''),
-    mainCategory: mainCategorySchema.optional(),
     categories: z.string().optional().default(''),
     active: z.boolean().optional().default(true),
     sale_type: z.enum(SALE_TYPES, { errorMap: () => ({ message: 'Tipo de venta inválido' }) }).optional().default('unit'),
@@ -109,7 +84,6 @@ export const updateProductSchema = z.object({
   price: z.number().positive('El precio debe ser positivo').optional(),
   cost: z.number().min(0, 'El costo no puede ser negativo').optional(),
   image: z.string().nullable().optional().transform((v) => v ?? undefined),
-  mainCategory: mainCategorySchema.optional(),
   categories: z.string().optional(),
   active: z.boolean().optional(),
   sale_type: z.enum(SALE_TYPES, { errorMap: () => ({ message: 'Tipo de venta inválido' }) }).optional(),

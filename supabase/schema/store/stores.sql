@@ -11,7 +11,12 @@
 -- supabase_store_whatsapp.sql (#24, whatsapp_number) +
 -- #23 (feature_flags — reabre ADR-0002, ver ADR-0007: columna DB en vez de
 -- archivo estático versionado, porque el deployment es compartido por
--- todas las Stores, ver ADR-0001).
+-- todas las Stores, ver ADR-0001) +
+-- #153 (is_demo — marca de Demo Store, ver CONTEXT.md).
+--
+-- Paso operativo para una base que ya existe (#153, una sola vez):
+--   ALTER TABLE public.stores ADD COLUMN IF NOT EXISTS is_demo BOOLEAN NOT NULL DEFAULT false;
+--   COMMENT ON COLUMN public.stores.is_demo IS '...'; (texto abajo)
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.stores (
@@ -22,13 +27,16 @@ CREATE TABLE IF NOT EXISTS public.stores (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   logo_url   TEXT,
   whatsapp_number TEXT,
-  feature_flags JSONB NOT NULL DEFAULT '{}'
+  feature_flags JSONB NOT NULL DEFAULT '{}',
+  is_demo    BOOLEAN NOT NULL DEFAULT false
 );
 
 COMMENT ON COLUMN public.stores.logo_url IS
   'URL absoluta del logo de la Store. NULL = usa el asset genérico compartido (ver DEFAULT_LOGO_URL en el código).';
 COMMENT ON COLUMN public.stores.whatsapp_number IS
   'Número de WhatsApp (con código de país, sin +) para recibir pedidos de esta Store. NULL = usa NEXT_PUBLIC_WHATSAPP_NUMBER como fallback.';
+COMMENT ON COLUMN public.stores.is_demo IS
+  'Demo Store (#153): Store de muestra de la Platform, no un cliente. Su catálogo funciona igual que el de cualquier Store, pero no cuenta como negocio que usa la plataforma: queda afuera del listado público /stores, del sitemap y de get_orders_count_by_store, y su catálogo muestra la franja de demostración. No es una feature flag (eje comercial) — es una propiedad de la Store.';
 COMMENT ON COLUMN public.stores.feature_flags IS
   'Catálogo de 7 keys booleanas por Store (#23): stock, clientes, pagos, ranking, pos, dashboard, informes. Todas requeridas al escribir — omitir una es un estado inválido — pero src/lib/store/featureFlags.ts resuelve cualquier key faltante a false (apagado) para no romper si una fila queda parcialmente seteada. Catálogo/productos/pedidos-WhatsApp/ventas siempre están encendidos, no son flags — combos tampoco lo es desde #117 (ADR-0013), pasó a ser siempre-encendida junto con Producto Surtido. Escritura manual vía SQL Editor (ADR-0006) — sin UI de super-admin todavía.';
 

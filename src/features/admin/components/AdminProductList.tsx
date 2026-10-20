@@ -5,13 +5,13 @@ import Image from 'next/image';
 import { useProducts } from '../hooks/useProducts';
 import { useToggleProductActive } from '../hooks/useToggleProductActive';
 import { useDeleteProduct } from '../hooks/useDeleteProduct';
-import { CATEGORY_LABELS } from '../constants';
 import { ProductFormModal } from './ProductFormModal';
 import { ComboFormModal } from './ComboFormModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
 import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils/formatPrice';
+import { formatCategoryName } from '@/utils/formatCategoryName';
 
 export function AdminProductList() {
   const { data: products, isLoading, error } = useProducts({ includeInactive: true });
@@ -187,7 +187,7 @@ export function AdminProductList() {
 
                     {/* Categoría */}
                     <td className="py-3 px-4 text-gray-600">
-                      {product.category_name ?? CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
+                      {formatCategoryName(product.category_name)}
                     </td>
 
                     {/* Costo */}
@@ -270,7 +270,7 @@ export function AdminProductList() {
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-xs text-gray-500">
-                        {product.category_name ?? CATEGORY_LABELS[product.mainCategory ?? ''] ?? product.mainCategory ?? '-'}
+                        {formatCategoryName(product.category_name)}
                       </span>
                       <span className="text-xs text-gray-400">|</span>
                       <span className="text-xs font-medium text-green-600">

@@ -1,5 +1,7 @@
 # Poblar el proyecto Supabase de test
 
+> **Superseded (2026-10-17).** El proyecto hosteado `market-test` quedó pausado (límite de 2 proyectos activos del plan) y los integration tests pasaron a correr contra una base local en Docker levantada desde los archivos canónicos: ver [`docs/ops/base-local-docker.md`](base-local-docker.md). Este documento y `scripts/restore-test-db.sh` quedan como historial de cómo se poblaba el proyecto hosteado; la "diferencia deliberada" de las FKs a `auth.users` descripta abajo se mantiene en la base local (`supabase/local-only/`).
+
 Restaura el dump de producción (ver `docs/ops/backup-produccion.md`) en el proyecto Supabase de test, para que los tests de integración de la migración multi-tenant corran contra datos representativos sin tocar producción nunca.
 
 **El script borra y recrea el schema `public` completo del proyecto de test en cada corrida** (necesario para que la restauración sea idempotente) — pide confirmación explícita antes de hacerlo. Nunca apuntes `TEST_DB_URL` a producción.

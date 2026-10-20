@@ -517,6 +517,81 @@
 .ck-close { text-align: left; display: grid; gap: 22px; }
 .ck-close .ck-h2 { max-width: 14ch; }
 
+/* ---------- Demo: marco de celular (#153) ---------- */
+
+.ck-demo {
+  display: grid;
+  gap: clamp(20px, 3vw, 40px);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .ck-demo { grid-template-columns: 6fr 5fr; }
+}
+
+.ck-demo-guide { display: grid; gap: 18px; }
+.ck-demo-lede { max-width: 46ch; font-size: 1.15rem; }
+
+.ck-demo-steps {
+  display: grid;
+  gap: 16px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ck-demo-steps li {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 14px;
+  align-items: start;
+}
+
+.ck-demo-step-n {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--mustard);
+  font-size: 1.4rem;
+}
+
+.ck-demo-step-title { font-size: 1.1rem; margin-bottom: 2px; }
+
+.ck-demo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 26px;
+  margin-top: 6px;
+}
+
+.ck-phone {
+  position: relative;
+  justify-self: center;
+  /* La altura manda (viewports bajos, ej. 1366x768) y el ancho sale de la
+     proporción; max-width solo protege la columna en pantallas angostas. */
+  height: min(844px, calc(100vh - 140px));
+  aspect-ratio: 390 / 844;
+  max-width: 100%;
+  padding: 14px;
+  border-radius: 48px;
+  background: var(--navy);
+  box-shadow:
+    inset 0 0 0 2px color-mix(in oklab, var(--bone), transparent 70%),
+    0 30px 40px -24px rgb(var(--shadow) / 0.9);
+}
+
+.ck-phone-screen {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 36px;
+  background: #fff;
+}
+
 /* ---------- Pie ---------- */
 
 .ck-footer {

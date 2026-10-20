@@ -1,16 +1,3 @@
-//Main categories:
-export type MainCategory =
-  | 'panaderia'
-  | 'congelados'
-  | 'combos'
-  | 'snaks'
-  | 'otros'
-  | 'bebidas'
-  | 'lacteos'
-  | 'almacen'
-  | 'fiambres'
-  | 'pizzas';
-
 // Tipos base
 export interface Product {
   id: number;
@@ -19,7 +6,6 @@ export interface Product {
   image: string;
   active: boolean;
   categories: string;
-  mainCategory: MainCategory;
   sale_type: WeightType;
   stock_quantity?: number; // undefined = no stock record (treat as available)
   cost?: number | null;

@@ -18,15 +18,17 @@ export type StockMovementType =
   | 'return';
 
 /**
- * Represents a row from the `v_product_stock` view.
- * This is the primary type used in the stock management UI.
+ * Fila de la RPC `get_all_products_with_stock()` — la forma original era la
+ * de la vista legacy `v_product_stock`, retirada en #133 (nada la leía).
+ * `category_name` sale del JOIN con `categories`; null si el producto no
+ * tiene `category_id`. Es el tipo principal de la UI de stock.
  */
 export interface ProductStockView {
   stock_id: number | null;
   product_id: number;
   product_name: string;
   product_price: number;
-  main_category: string;
+  category_name: string | null;
   product_active: boolean;
   product_image: string;
   quantity: number | null;
@@ -62,7 +64,7 @@ export interface LowStockProduct {
   product_name: string;
   quantity: number;
   min_stock: number;
-  main_category: string;
+  category_name: string | null;
 }
 
 /**

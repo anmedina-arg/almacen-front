@@ -2,7 +2,6 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { supabaseServer } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
-import { DEFAULT_LOGO_URL } from '@/lib/store/defaultLogo';
 
 type StoreLayoutProps = {
   children: React.ReactNode;
