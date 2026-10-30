@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { cancelOrderSchema } from '@/features/orders/schemas/orderSchemas';
 import { cancelOrder } from '@/features/orders/services/orderService';
-import { invalidateOrderStockTags } from '@/features/orders/services/invalidateOrderStock';
+import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
  * PUT /api/orders/[orderId]/cancel
@@ -41,10 +41,10 @@ export const PUT = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx,
     if (orderItemsError) {
       console.error('[cancel order] order_items lookup error:', orderItemsError.message);
     }
-    const itemsWithProductId = (orderItems ?? []).filter(
-      (item): item is { product_id: number } => item.product_id != null
-    );
-    await invalidateOrderStockTags(ctx.supabase, ctx.storeId, itemsWithProductId);
+    const productIds = (orderItems ?? [])
+      .map((item) => item.product_id)
+      .filter((productId): productId is number => productId != null);
+    await invalidateProductStockTags(ctx.supabase, ctx.storeId, productIds);
     return NextResponse.json(result);
   } catch (error) {
     return handleServiceError(error, 'PUT /api/orders/[orderId]/cancel');

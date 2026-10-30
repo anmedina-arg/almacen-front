@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
 import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { requireFlag } from '@/lib/store/requireFlag';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { stockEntryBatchSchema } from '@/features/stock/schemas/stockEntrySchema';
 import { batchIncrementStock } from '@/features/stock/services/stockService';
-import { productStockTag } from '@/lib/cache/tags';
+import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
  * POST /api/stock/entry
@@ -32,10 +31,14 @@ export const POST = createApiRoute(requireAdmin, requireFlag('stock'))(async (ct
     const results = await batchIncrementStock(ctx.supabase, ctx.storeId, parsed.data);
     // Invalida solo los productos que efectivamente se ajustaron (#146,
     // spec #139) — respeta el "best-effort por fila" del batch: una
-    // entrada fallida no invalida nada, porque no cambió nada.
-    for (const result of results) {
-      if (result.success) revalidateTag(productStockTag(ctx.storeId, result.product_id));
-    }
+    // entrada fallida no invalida nada, porque no cambió nada. Incluye los
+    // combos que contienen cada producto ajustado (#158): su Disponible se
+    // deriva del stock de sus componentes.
+    await invalidateProductStockTags(
+      ctx.supabase,
+      ctx.storeId,
+      results.filter((result) => result.success).map((result) => result.product_id)
+    );
     return NextResponse.json({ results });
   } catch (error) {
     return handleServiceError(error, 'POST /api/stock/entry');

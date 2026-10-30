@@ -1,12 +1,11 @@
 import { NextResponse } from 'next/server';
-import { revalidateTag } from 'next/cache';
 import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { requireFlag } from '@/lib/store/requireFlag';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { stockUpdateSchema } from '@/features/stock/schemas/stockUpdateSchema';
 import { upsertProductStock } from '@/features/stock/services/stockService';
-import { productStockTag } from '@/lib/cache/tags';
+import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
  * PUT /api/stock/[productId]
@@ -40,9 +39,10 @@ export const PUT = createApiRoute<{ productId: string }>(requireAdmin, requireFl
     }
 
     const result = await upsertProductStock(ctx.supabase, ctx.storeId, productId, parsed.data);
-    // Invalida solo el producto ajustado (#146, spec #139) — el resto
-    // del catálogo sigue sirviéndose de cache.
-    revalidateTag(productStockTag(ctx.storeId, productId));
+    // Invalida solo el producto ajustado y los combos que lo contienen
+    // (#146, spec #139; #158) — el resto del catálogo sigue sirviéndose
+    // de cache.
+    await invalidateProductStockTags(ctx.supabase, ctx.storeId, [productId]);
     return NextResponse.json(result);
   } catch (error) {
     return handleServiceError(error, 'PUT /api/stock/[productId]');

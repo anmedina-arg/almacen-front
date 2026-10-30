@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { createOrderSchema } from '@/features/orders/schemas/orderSchemas';
 import { getOrders, createOrder, InsufficientStockError } from '@/features/orders/services/orderService';
-import { invalidateOrderStockTags } from '@/features/orders/services/invalidateOrderStock';
+import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
  * GET /api/orders
@@ -46,7 +46,7 @@ export const POST = createApiRoute()(async (ctx) => {
     // Invalida solo el stock de los productos de esta orden, combos
     // incluidos (#146, spec #139) — el resto del catálogo sigue
     // sirviéndose de cache.
-    await invalidateOrderStockTags(ctx.supabase, ctx.storeId, parsed.data.items);
+    await invalidateProductStockTags(ctx.supabase, ctx.storeId, parsed.data.items.map((item) => item.product_id));
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     if (error instanceof InsufficientStockError) {
