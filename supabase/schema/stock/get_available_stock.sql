@@ -2,6 +2,9 @@
 -- Función RPC: get_available_stock
 -- Dominio: Stock (#159, spec #157, ver ADR-0016)
 -- ============================================================================
+-- Lee products (Products) y combo_components (Combos) además de
+-- product_stock — la relación combo↔componentes es del dominio Combos.
+--
 -- Devuelve el Disponible (ver CONTEXT.md) de los productos de una Store: la
 -- única definición que usa el catálogo público, y que #160 va a reusar al
 -- registrar el pedido para calcular el Faltante.
@@ -75,3 +78,5 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_available_stock(INTEGER, INTEGER[]) TO anon, authenticated, service_role;
 
 COMMENT ON FUNCTION public.get_available_stock IS 'Disponible de los productos de una Store (#159, ver CONTEXT.md): stock propio, o combos completos que alcanzan con sus componentes; 0 sin fila; nunca negativo. Sin Control de stock no devuelve filas.';
+
+NOTIFY pgrst, 'reload schema';

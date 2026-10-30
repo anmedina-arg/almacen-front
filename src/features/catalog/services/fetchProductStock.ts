@@ -23,14 +23,14 @@ async function fetchAvailableStock(
   supabase: SupabaseClient,
   storeId: number,
   productIds: number[] | null,
-  label: string
+  errorPrefix: string
 ): Promise<Map<number, number>> {
   const { data, error } = await supabase.rpc('get_available_stock', {
     p_store_id: storeId,
     p_product_ids: productIds,
   });
 
-  if (error) throw new Error(`${label}: ${error.message}`);
+  if (error) throw new Error(`${errorPrefix}: ${error.message}`);
 
   return new Map(((data ?? []) as AvailableStockRow[]).map((row) => [row.product_id, Number(row.available)]));
 }
