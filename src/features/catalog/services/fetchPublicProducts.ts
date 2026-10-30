@@ -92,8 +92,8 @@ function getCachedProductMetadata(
  * sirviéndose de cache sin recalcularse. Mismo criterio de degradado que
  * getCachedProductMetadata: fetchProductStockForProduct tira en error (no
  * cachea un resultado malo), se ataja acá para no romper la página —
- * degradar a undefined es seguro porque el catálogo ya trata "sin
- * registro de stock" como "disponible" (ver Product.stock_quantity).
+ * degrada a undefined, que el catálogo trata como "sin límite" (ver
+ * Product.stock_quantity, #159).
  */
 function getCachedProductStock(
   supabase: SupabaseClient,
@@ -280,9 +280,8 @@ export async function fetchPublicProducts(
     return metadata.map((p) => ({
       ...p,
       // stockMap tiene una entrada para cada producto de metadata siempre
-      // (#146 — antes stockMap.has() podía ser false para un producto sin
-      // fila en product_stock; ahora esa entrada existe igual, con
-      // valor undefined).
+      // (#146): el Disponible con Control de stock (#159), undefined sin
+      // Control de stock o si el fetch degradó.
       stock_quantity: stockMap.get(p.id),
       is_top_seller: topSellerIds.has(p.id),
     }));

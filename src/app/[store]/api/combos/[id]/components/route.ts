@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateComboComponentsSchema } from '@/features/products/schemas/comboSchemas';
 import { getComboComponents, updateComboComponents } from '@/features/products/services/comboService';
-import { productMetadataTag } from '@/lib/cache/tags';
+import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
 
 /**
  * GET /api/combos/[id]/components
@@ -47,6 +47,9 @@ export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
     // la metadata cacheada del combo — invalida igual que product/route.ts
     // (#145, spec #139).
     revalidateTag(productMetadataTag(ctx.storeId));
+    // El Disponible del combo se deriva de sus componentes (#159): cambiar
+    // la composición cambia su stock aunque ningún stock real se movió.
+    revalidateTag(productStockTag(ctx.storeId, id));
     return new NextResponse(null, { status: 204 });
   } catch (error) {
     return handleServiceError(error, 'PUT /api/combos/[id]/components');
