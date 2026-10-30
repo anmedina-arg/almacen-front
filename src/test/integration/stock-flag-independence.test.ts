@@ -139,23 +139,39 @@ describe('stock flag independence — create_order/adjust/cancel/delete (#97)', 
     });
   });
 
-  describe('stock: true — sigue chequeando (no regresionó)', () => {
+  // #160 (ADR-0016): con stock:true ya no rechaza — registra el pedido y
+  // crea la fila de stock en negativo. Hace falta un Store admin: es quien
+  // queda como updated_by de esa fila (stock_movement_log.performed_by).
+  describe('stock: true — descuenta aunque no haya product_stock', () => {
     let storeId: number;
     let productId: number;
+    let orderId: number;
+    let userId: string;
 
     beforeAll(async () => {
       if (!hasCredentials) return;
       const fixture = await createStoreWithProduct(`test-stock-on-${randomUUID().slice(0, 8)}`, true);
       storeId = fixture.storeId;
       productId = fixture.productId;
+
+      const email = `__test_stock_on_${randomUUID()}@example.invalid`;
+      const { data: authData, error: authError } = await admin.auth.admin.createUser({ email, password: randomUUID(), email_confirm: true });
+      expect(authError).toBeNull();
+      userId = authData!.user!.id;
+      expect((await admin.from('profiles').insert({ id: userId, email, role: 'user' })).error).toBeNull();
+      expect((await admin.from('store_admins').insert({ profile_id: userId, store_id: storeId })).error).toBeNull();
     });
 
     afterAll(async () => {
       if (!hasCredentials) return;
-      await deleteFixture(productId, storeId);
+      await admin.from('stock_movement_log').delete().eq('product_id', productId);
+      await deleteFixture(productId, storeId, orderId);
+      await admin.from('store_admins').delete().eq('profile_id', userId);
+      await admin.from('profiles').delete().eq('id', userId);
+      await admin.auth.admin.deleteUser(userId);
     });
 
-    it.skipIf(!hasCredentials)('create_order() rechaza con insufficient_stock si no hay product_stock', async () => {
+    it.skipIf(!hasCredentials)('create_order() registra el pedido y deja la fila de product_stock en negativo', async () => {
       const { data, error } = await admin.rpc('create_order', {
         p_user_id: null,
         p_notes: 'pedido de prueba stock:true',
@@ -166,10 +182,11 @@ describe('stock flag independence — create_order/adjust/cancel/delete (#97)', 
         p_store_id: storeId,
       });
 
-      expect(data).toBeNull();
-      expect(error).not.toBeNull();
-      const parsed = JSON.parse(error!.message);
-      expect(parsed.error).toBe('insufficient_stock');
+      expect(error).toBeNull();
+      orderId = data.order_id;
+
+      const { data: stockRow } = await admin.from('product_stock').select('quantity').eq('product_id', productId).single();
+      expect(Number(stockRow!.quantity)).toBe(-5);
     });
   });
 });

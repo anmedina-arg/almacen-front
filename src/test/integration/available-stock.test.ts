@@ -6,11 +6,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 // Disponible (ver CONTEXT.md) que consume el catálogo público, y que después
 // va a usar también el registro del pedido (#160). Sin Control de stock no
 // devuelve filas; con Control de stock, una fila por producto y nunca
-// negativa.
-//
-// El caso "stock negativo da 0" no se puede armar acá todavía:
-// product_stock tiene CHECK (quantity >= 0) hasta que #160 lo retire. La
-// función ya lo acota igual (GREATEST), y el test entra con #160.
+// negativa (desde #160 el stock puede quedar negativo: Disponible 0).
 const url = process.env.TEST_SUPABASE_URL;
 const anonKey = process.env.TEST_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
@@ -30,6 +26,8 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
   let comboId: number;
   let comboMissingRowId: number;
   let cappedComboId: number;
+  let negativeId: number;
+  let comboNegativeComponentId: number;
   let untrackedProductId: number;
   // stock_movement_log exige performed_by: el trigger lo toma de updated_by.
   let userId: string;
@@ -99,10 +97,13 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
     comboId = await createProduct(trackedStoreId, { is_combo: true });
     comboMissingRowId = await createProduct(trackedStoreId, { is_combo: true });
     cappedComboId = await createProduct(trackedStoreId, { is_combo: true, max_stock: 2 });
+    negativeId = await createProduct(trackedStoreId);
+    comboNegativeComponentId = await createProduct(trackedStoreId, { is_combo: true });
 
     await setStock(trackedStoreId, plainId, 15);
     await setStock(trackedStoreId, componentAId, 10);
     await setStock(trackedStoreId, componentBId, 9);
+    await setStock(trackedStoreId, negativeId, -4);
 
     // combo: A alcanza para 5 (10/2), B para 3 (9/3) → 3.
     await addComponent(trackedStoreId, comboId, componentAId, 2);
@@ -112,6 +113,9 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
     await addComponent(trackedStoreId, comboMissingRowId, noRowId, 1);
     // Alcanza para 3; el stock máximo (2) no entra en la regla (#159).
     await addComponent(trackedStoreId, cappedComboId, componentBId, 3);
+    // Un componente con stock negativo deja al combo en 0.
+    await addComponent(trackedStoreId, comboNegativeComponentId, componentAId, 1);
+    await addComponent(trackedStoreId, comboNegativeComponentId, negativeId, 1);
 
     // Store sin Control de stock, con una fila vieja en product_stock.
     untrackedStoreId = await createStore(false);
@@ -146,12 +150,20 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
     expect((await available(admin, trackedStoreId)).get(noRowId)).toBe(0);
   });
 
+  it.skipIf(!hasCredentials)('producto con stock negativo: 0', async () => {
+    expect((await available(admin, trackedStoreId)).get(negativeId)).toBe(0);
+  });
+
   it.skipIf(!hasCredentials)('combo: limitado por su componente más escaso', async () => {
     expect((await available(admin, trackedStoreId)).get(comboId)).toBe(3);
   });
 
   it.skipIf(!hasCredentials)('combo con un componente sin fila de stock: 0', async () => {
     expect((await available(admin, trackedStoreId)).get(comboMissingRowId)).toBe(0);
+  });
+
+  it.skipIf(!hasCredentials)('combo con un componente con stock negativo: 0', async () => {
+    expect((await available(admin, trackedStoreId)).get(comboNegativeComponentId)).toBe(0);
   });
 
   it.skipIf(!hasCredentials)('combo con stock máximo cargado: el tope no limita el Disponible', async () => {
@@ -161,7 +173,7 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
   it.skipIf(!hasCredentials)('devuelve una fila por cada producto de la Store, y solo de esa Store', async () => {
     const rows = await available(admin, trackedStoreId);
     expect(new Set(rows.keys())).toEqual(
-      new Set([plainId, noRowId, componentAId, componentBId, comboId, comboMissingRowId, cappedComboId])
+      new Set([plainId, noRowId, componentAId, componentBId, comboId, comboMissingRowId, cappedComboId, negativeId, comboNegativeComponentId])
     );
   });
 

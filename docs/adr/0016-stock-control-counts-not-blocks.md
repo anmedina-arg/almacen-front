@@ -1,5 +1,5 @@
 ---
-status: accepted (2026-10-30, implementación pendiente en #96)
+status: accepted (2026-10-30; implementación en #157 — el pedido ya no se rechaza desde #160, falta la edición en #161)
 ---
 
 # El Control de stock lleva la cuenta, no impide ventas

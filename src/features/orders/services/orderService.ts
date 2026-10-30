@@ -14,13 +14,6 @@ import { NotFoundError, ValidationError } from '@/lib/api/errors';
  * cuenta, sin pasar por acá todavía.
  */
 
-/** Un producto de la orden se quedó sin stock — create_order() ya devuelve la lista completa de faltantes, no solo el primero (ver reserve_order_stock.sql, #73). */
-export class InsufficientStockError extends Error {
-  constructor(public readonly products: Array<{ id: number; name: string; requested: number; available: number }>) {
-    super('insufficient_stock');
-  }
-}
-
 type OrderWithMargin = Order & { total_cost: number; margin: number; margin_pct: number };
 
 export async function getOrders(supabase: SupabaseClient, storeId: number): Promise<OrderWithMargin[]> {
@@ -121,18 +114,9 @@ export async function createOrder(
     p_store_id: storeId,
   });
 
+  // create_order() ya no rechaza por stock (#160, ADR-0016): un ítem que
+  // pide de más se registra con su Faltante. Un error acá no es de stock.
   if (error) {
-    // JSON.parse en su propio try/catch, sin throw adentro — un throw
-    // dentro de un try lo intercepta su propio catch, no se propaga solo.
-    let parsed: { error?: string; products?: InsufficientStockError['products'] } | null = null;
-    try {
-      parsed = JSON.parse(error.message);
-    } catch {
-      parsed = null;
-    }
-    if (parsed?.error === 'insufficient_stock') {
-      throw new InsufficientStockError(parsed.products ?? []);
-    }
     throw new Error(error.message);
   }
 

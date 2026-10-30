@@ -3,7 +3,7 @@ import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { posOrderSchema } from '@/features/orders/schemas/orderSchemas';
-import { createOrder, InsufficientStockError } from '@/features/orders/services/orderService';
+import { createOrder } from '@/features/orders/services/orderService';
 import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
@@ -48,9 +48,6 @@ export const POST = createApiRoute(requireAdmin)(async (ctx) => {
     await invalidateProductStockTags(ctx.supabase, ctx.storeId, items.map((item) => item.product_id));
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    if (error instanceof InsufficientStockError) {
-      return NextResponse.json({ error: 'insufficient_stock', products: error.products }, { status: 409 });
-    }
     return handleServiceError(error, 'POST /api/pos/orders');
   }
 });

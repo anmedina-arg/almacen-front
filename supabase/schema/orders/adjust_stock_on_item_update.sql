@@ -26,6 +26,12 @@
 -- ningún caller parsea este texto (confirmado: PUT /api/orders/[id]/items/[id]
 -- solo reenvía error.message tal cual), así que no es un cambio observable
 -- para nadie que dependa de su forma exacta.
+--
+-- #160: reserve_order_stock() ya no rechaza — descuenta siempre y devuelve
+-- el Faltante. Esta función sigue rechazando una suba que no alcanza (mismo
+-- mensaje, Disponible = diferencia - Faltante): el RAISE revierte también
+-- el descuento y una fila de stock creada en el camino. Retirar ese
+-- rechazo es #161. No escribe order_items.shortfall.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION adjust_stock_on_item_update()
@@ -36,8 +42,7 @@ AS $$
 DECLARE
   v_order_status order_status;
   v_diff         NUMERIC(12, 3);
-  v_reserved     BOOLEAN;
-  v_available    NUMERIC(12, 3);
+  v_shortfall    NUMERIC(12, 3);
 BEGIN
   SELECT status INTO v_order_status FROM orders WHERE id = NEW.order_id;
 
@@ -58,12 +63,12 @@ BEGIN
   IF v_diff > 0 THEN
     PERFORM set_config('app.movement_type', 'sale', true);
 
-    SELECT success, available INTO v_reserved, v_available
+    SELECT shortfall INTO v_shortfall
     FROM reserve_order_stock(NEW.product_id, v_diff, NEW.store_id);
 
-    IF NOT v_reserved THEN
+    IF v_shortfall > 0 THEN
       RAISE EXCEPTION 'Stock insuficiente. Disponible: %, Requerido: %',
-        v_available, v_diff;
+        v_diff - v_shortfall, v_diff;
     END IF;
   ELSE
     PERFORM set_config('app.movement_type', 'return', true);

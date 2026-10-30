@@ -146,6 +146,7 @@ describe('combo stock — descuento/devolución combo-aware (#73)', () => {
 
   describe('create_order() — combo con stock insuficiente en un componente', () => {
     let fixture: Fixture;
+    let orderId: number;
 
     beforeAll(async () => {
       if (!hasCredentials) return;
@@ -154,20 +155,19 @@ describe('combo stock — descuento/devolución combo-aware (#73)', () => {
 
     afterAll(async () => {
       if (!hasCredentials) return;
-      await deleteFixture(fixture);
+      await deleteFixture(fixture, orderId);
     });
 
-    it.skipIf(!hasCredentials)('rechaza el pedido entero y no descuenta ningún componente (rollback)', async () => {
+    // #160 (ADR-0016): antes rechazaba el pedido entero sin descontar nada.
+    it.skipIf(!hasCredentials)('registra el pedido igual y descuenta cada componente aunque quede negativo', async () => {
       // 15 combos: necesita 30 de A y 15 de B — ninguno alcanza (10 c/u).
       const { data, error } = await createComboOrder(fixture, 15);
 
-      expect(data).toBeNull();
-      expect(error).not.toBeNull();
-      const parsed = JSON.parse(error!.message);
-      expect(parsed.error).toBe('insufficient_stock');
+      expect(error).toBeNull();
+      orderId = data.order_id;
 
-      expect(await stockOf(fixture.componentAId)).toBe(10);
-      expect(await stockOf(fixture.componentBId)).toBe(10);
+      expect(await stockOf(fixture.componentAId)).toBe(-20);
+      expect(await stockOf(fixture.componentBId)).toBe(-5);
     });
   });
 

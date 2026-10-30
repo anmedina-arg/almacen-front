@@ -56,13 +56,8 @@ export function POSView() {
       });
 
       if (!res.ok) {
-        const data = await res.json() as { error: string; products?: { name: string }[] };
-        if (data.error === 'insufficient_stock' && data.products) {
-          const names = data.products.map((p) => p.name).join(', ');
-          setErrorMsg(`Stock insuficiente: ${names}`);
-        } else {
-          setErrorMsg(data.error || 'Error al crear la orden');
-        }
+        const data = await res.json() as { error: string };
+        setErrorMsg(data.error || 'Error al crear la orden');
         return;
       }
 

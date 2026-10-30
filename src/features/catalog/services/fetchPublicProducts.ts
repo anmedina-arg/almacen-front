@@ -128,10 +128,10 @@ function isFullCatalogFetch(options?: FetchProductMetadataOptions): boolean {
  * Supabase no debería pagar ese costo cuando un reintento simple ya lo
  * resuelve la mayoría de las veces. Para una falla persistente (no
  * transitoria) el degradado sigue siendo a "disponible" para todos —
- * aceptado porque create_order() es la fuente de verdad real al
- * confirmar (rechaza si el stock real no alcanza, ver CONTEXT.md): esto
- * no arriesga overselling, solo una mala UX puntual (checkouts
- * rechazados) durante una caída real y sostenida.
+ * aceptado porque create_order() nunca pierde el pedido (#160, ADR-0016):
+ * un ítem que pide de más se registra con su Faltante y el Store admin lo
+ * resuelve por WhatsApp. El peor caso durante una caída real y sostenida
+ * son pedidos con Faltante, no pedidos perdidos.
  */
 async function fetchStockBulkWithRetry(supabase: SupabaseClient, storeId: number): Promise<Map<number, number>> {
   try {

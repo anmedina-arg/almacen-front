@@ -12,6 +12,13 @@
 -- #103: trg_validate_order_item_store agregado — hasta entonces nada
 -- impedía que product_id apuntara a un producto de otra Store distinta de
 -- store_id en esta misma fila. Ver validate_order_item_store.sql.
+--
+-- #160 (spec #157): shortfall guarda el Faltante (ver CONTEXT.md) del ítem
+-- al crear el pedido, en las mismas unidades que quantity (gramos para
+-- productos por peso, combos para un combo). NULL = la Store no lleva
+-- Control de stock; 0 = sin Faltante. Lo escribe solo create_order(): las
+-- ediciones del Store admin no lo tocan. Paso operativo, una vez por base:
+--   ALTER TABLE public.order_items ADD COLUMN shortfall NUMERIC(10, 3) CHECK (shortfall >= 0);
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.order_items (
@@ -26,8 +33,11 @@ CREATE TABLE IF NOT EXISTS public.order_items (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   unit_cost       NUMERIC(12, 2) NOT NULL DEFAULT 0,
   from_suggestion BOOLEAN NOT NULL DEFAULT FALSE,
-  store_id        INTEGER NOT NULL REFERENCES public.stores(id)
+  store_id        INTEGER NOT NULL REFERENCES public.stores(id),
+  shortfall       NUMERIC(10, 3) CHECK (shortfall >= 0)
 );
+
+COMMENT ON COLUMN public.order_items.shortfall IS 'Faltante al crear el pedido (#160): cuanto faltaba respecto de lo Disponible, mismas unidades que quantity. NULL = sin Control de stock, 0 = sin Faltante.';
 
 -- ── Índices ──────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON public.order_items(order_id);

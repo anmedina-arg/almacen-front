@@ -24,7 +24,7 @@ Mecánicamente en Next.js: tags de cache granulares (`revalidateTag`) por pieza 
 
 - `fetchPublicProducts()` deja de ser una función monolítica que trae todo junto — se parte en piezas independientemente cacheables (metadata / stock / top-seller), cada una con su propio trigger de invalidación.
 - Requiere invalidación por evento (`revalidateTag`) en `create_order()` (o el service que lo envuelve) y en los endpoints de administración de productos/stock — no alcanza con un TTL pasivo.
-- El stock mostrado en el catálogo público puede quedar desactualizado por el tiempo que tarde la invalidación en propagarse tras un pedido — aceptable porque el Descuento de stock (ver `CONTEXT.md`) ya es la fuente de verdad al momento de confirmar un pedido nuevo: `create_order()` rechaza si el stock real no alcanza, independientemente de lo que mostraba el catálogo cacheado.
+- El stock mostrado en el catálogo público puede quedar desactualizado por el tiempo que tarde la invalidación en propagarse tras un pedido — aceptable porque el Descuento de stock (ver `CONTEXT.md`) ya es la fuente de verdad al momento de confirmar un pedido nuevo, independientemente de lo que mostraba el catálogo cacheado. Desde #160 ([ADR-0016](./0016-stock-control-counts-not-blocks.md)) `create_order()` ya no rechaza si el stock real no alcanza: registra el pedido y el ítem queda con Faltante, así que un catálogo desactualizado da a lo sumo un Faltante, nunca un pedido perdido.
 
 ## Actualización 2026-09-10 (#148) — el cache por producto de stock no escala al catálogo completo
 

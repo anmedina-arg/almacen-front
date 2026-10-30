@@ -6,8 +6,8 @@
 -- product_stock — la relación combo↔componentes es del dominio Combos.
 --
 -- Devuelve el Disponible (ver CONTEXT.md) de los productos de una Store: la
--- única definición que usa el catálogo público, y que #160 va a reusar al
--- registrar el pedido para calcular el Faltante.
+-- única definición que usa el catálogo público, y que reserve_order_stock()
+-- reusa al registrar el pedido para calcular el Faltante (#160).
 --
 --   - Sin Control de stock (is_stock_tracked = false): ninguna fila. El
 --     catálogo lo lee como "esta Store no lleva la cuenta", aunque queden
@@ -19,9 +19,9 @@
 --     da 0. products.max_stock NO entra en la regla, a propósito (decisión
 --     de Andrés en #159): hoy solo lo muestra /admin/stock y el CSV de
 --     informes, y no tiene efecto en la venta.
---   - Nunca negativo. Hoy product_stock tiene CHECK (quantity >= 0), pero
---     #160 lo retira (el Descuento de stock puede dejarlo negativo) y un
---     stock negativo tiene que leerse como Disponible 0.
+--   - Nunca negativo. Desde #160 product_stock admite negativos (el
+--     Descuento de stock puede dejarlo por debajo de 0), y un stock negativo
+--     se lee como Disponible 0.
 --
 -- p_product_ids NULL = todos los productos de la Store (catálogo completo,
 -- un solo roundtrip, #148); con lista = solo esos (búsqueda/paginación, cache

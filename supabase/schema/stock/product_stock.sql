@@ -9,6 +9,14 @@
 -- supabase_store_scoping_stock.sql (#17, policies scoped por Store) +
 -- supabase_fix_stock_scoping_gaps.sql (#17 code review — sin cambios sobre
 -- esta tabla en particular, solo sobre las RPCs).
+--
+-- #160 (ADR-0016): quantity puede ser negativa. El Descuento de stock nunca
+-- rechaza un pedido, así que una venta de más deja el stock por debajo de 0
+-- (la señal de que la cuenta no coincide con el estante, ver #156). Se
+-- retiró CHECK (quantity >= 0) — paso operativo, una vez por base:
+--   ALTER TABLE public.product_stock DROP CONSTRAINT chk_product_stock_quantity;
+-- Una carga manual negativa desde /admin/stock la sigue frenando la API
+-- (stockUpdateSchema, >= 0), ya no la base.
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.product_stock (
@@ -23,12 +31,11 @@ CREATE TABLE IF NOT EXISTS public.product_stock (
   store_id      INTEGER NOT NULL REFERENCES public.stores(id),
 
   CONSTRAINT uq_product_stock_product_id UNIQUE (product_id),
-  CONSTRAINT chk_product_stock_quantity CHECK (quantity >= 0),
   CONSTRAINT chk_product_stock_min_stock CHECK (min_stock IS NULL OR min_stock >= 0)
 );
 
 COMMENT ON TABLE public.product_stock IS 'Stock actual de cada producto. Control manual de inventario.';
-COMMENT ON COLUMN public.product_stock.quantity IS 'Cantidad actual en stock. NUMERIC(12,3) para soportar unidades y pesos.';
+COMMENT ON COLUMN public.product_stock.quantity IS 'Cantidad actual en stock. NUMERIC(12,3) para soportar unidades y pesos. Puede ser negativa: un pedido nunca se rechaza por stock (#160, ADR-0016).';
 COMMENT ON COLUMN public.product_stock.min_stock IS 'Umbral minimo para alertas de stock bajo. NULL = sin alerta.';
 COMMENT ON COLUMN public.product_stock.updated_by IS 'UUID del admin que realizo la ultima actualizacion.';
 COMMENT ON COLUMN public.product_stock.notes IS 'Nota opcional sobre la ultima actualizacion (ej: motivo del ajuste).';
