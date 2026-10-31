@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createOrder, updateOrderItem } from '@/features/orders/services/orderService';
+import { confirmOrder, createOrder, getOrderById, getOrders, updateOrderItem } from '@/features/orders/services/orderService';
 
 // #160 (spec #157, ADR-0016): con Control de stock, un Faltante nunca impide
 // registrar el pedido. El Descuento de stock descuenta igual (el stock puede
@@ -11,6 +11,10 @@ import { createOrder, updateOrderItem } from '@/features/orders/services/orderSe
 //
 // #161: la edición de un pedido tampoco rechaza. Descuenta igual y no toca
 // el Faltante guardado, que es la foto del momento en que se creó el pedido.
+//
+// #162: el Store admin ve el Faltante en Pedidos. El ítem guarda también lo
+// que se pidió al crear el pedido, para poder mostrar "pidió 3, había 1"
+// aunque después se edite la cantidad.
 const url = process.env.TEST_SUPABASE_URL;
 const anonKey = process.env.TEST_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
@@ -334,5 +338,54 @@ describe('Faltante — el pedido se registra aunque no alcance el stock (#160)',
     await editQuantity(order_id, itemId, 2);
     expect(await stockOf(productId)).toBe(-1);
     expect((await shortfallsOf(order_id)).get(productId)).toBe(2);
+  });
+
+  it.skipIf(!hasCredentials)('el ítem guarda lo que se pidió al crear y una edición no lo cambia (#162)', async () => {
+    const productId = await createProduct();
+    await setStock(productId, 1);
+    const { order_id } = await order([{ productId, quantity: 3 }]);
+    const itemId = await itemOf(order_id, productId);
+
+    await editQuantity(order_id, itemId, 5);
+
+    const { data, error } = await admin.from('order_items').select('quantity, ordered_quantity, shortfall').eq('id', itemId).single();
+    expect(error).toBeNull();
+    expect(Number(data!.quantity)).toBe(5);
+    expect(Number(data!.ordered_quantity)).toBe(3);
+    expect(Number(data!.shortfall)).toBe(2);
+  });
+
+  it.skipIf(!hasCredentials)('la lista de Pedidos marca con faltante solo los pendientes con algún ítem con Faltante (#162)', async () => {
+    const productId = await createProduct();
+    await setStock(productId, 1);
+    const sinFaltante = await order([{ productId, quantity: 1 }]);
+    const conFaltante = await order([{ productId, quantity: 2 }]);
+    const confirmado = await order([{ productId, quantity: 2 }]);
+    const cancelado = await order([{ productId, quantity: 2 }]);
+
+    // Confirmar un pedido con Faltante funciona igual que uno sin Faltante.
+    const confirmed = await confirmOrder(admin, storeId, confirmado.order_id, userId);
+    expect(confirmed.status).toBe('confirmed');
+    expect((await admin.rpc('cancel_order', { p_order_id: cancelado.order_id })).error).toBeNull();
+
+    const marks = new Map((await getOrders(admin, storeId)).map((o) => [o.id, o.has_pending_shortfall]));
+    expect(marks.get(sinFaltante.order_id)).toBe(false);
+    expect(marks.get(conFaltante.order_id)).toBe(true);
+    expect(marks.get(confirmado.order_id)).toBe(false);
+    expect(marks.get(cancelado.order_id)).toBe(false);
+  });
+
+  it.skipIf(!hasCredentials)('el detalle de un pedido confirmado sigue trayendo su Faltante y lo pedido (#162)', async () => {
+    const productId = await createProduct();
+    await setStock(productId, 1);
+    const { order_id } = await order([{ productId, quantity: 3 }]);
+    await confirmOrder(admin, storeId, order_id, userId);
+
+    const detail = await getOrderById(admin, storeId, order_id);
+
+    expect(detail!.status).toBe('confirmed');
+    expect(detail!.order_items).toHaveLength(1);
+    expect(Number(detail!.order_items[0].shortfall)).toBe(2);
+    expect(Number(detail!.order_items[0].ordered_quantity)).toBe(3);
   });
 });

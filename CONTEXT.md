@@ -67,7 +67,7 @@ La cantidad de un producto que el sistema considera vendible en este momento, co
 _Avoid_: Stock virtual (forma de calcular el Disponible de un Combo, no un concepto aparte), stock a secas cuando se habla de lo que el comprador puede pedir.
 
 **Faltante**:
-La diferencia entre lo que un ítem de un pedido pide y lo Disponible en el momento en que se registra (ej. "pidió 3, había 1"). Queda guardado en el ítem como foto de ese momento y el Store admin lo ve en Pedidos, nunca el comprador. No bloquea nada: el Store admin lo resuelve por WhatsApp y confirma, edita o saca el ítem. Solo existe con Control de stock.
+La diferencia entre lo que un ítem de un pedido pide y lo Disponible en el momento en que se registra (ej. "pidió 3, había 1"). Queda guardado en el ítem como foto de ese momento, junto con lo que se pidió entonces, y el Store admin lo ve en Pedidos, nunca el comprador. No bloquea nada: el Store admin lo resuelve por WhatsApp y confirma, edita o saca el ítem. Solo existe con Control de stock.
 _Avoid_: Error de stock, pedido rechazado (un Faltante nunca rechaza el pedido).
 
 ## Deployment model

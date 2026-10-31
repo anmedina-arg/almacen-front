@@ -9,7 +9,7 @@ precio/costo. Consolidado en #84 (spec #81, mapa #74).
 | Archivo | Qué es |
 |---|---|
 | `orders.sql` | La orden en sí (incluye el tipo `order_status`). `client_id` (FK a `clients`) y `store_id` los agregaron migraciones de otros dominios — ver "Archivos compartidos" abajo. |
-| `order_items.sql` | Ítems de una orden. `unit_cost`/`from_suggestion` los agregaron migraciones de otros dominios — ídem. `shortfall` (#160): Faltante al crear el pedido, NULL sin Control de stock. |
+| `order_items.sql` | Ítems de una orden. `unit_cost`/`from_suggestion` los agregaron migraciones de otros dominios — ídem. `shortfall` (#160): Faltante al crear el pedido, NULL sin Control de stock. `ordered_quantity` (#162): cantidad pedida al crear el pedido, para mostrar "pidió 3, había 1" aunque después se edite. Las ediciones no tocan ninguna de las dos. |
 | `order_payments.sql` | Método(s) de pago de una orden (efectivo/transferencia). |
 | `product_price_history.sql` | Historial append-only de precio/costo — alimentado por `log_price_change` (ver abajo), no por escritura directa. Su policy de lectura no está scoped por Store — ver Gaps conocidos. |
 | `order_item_variedades.sql` | Variedades elegidas por línea de Producto Surtido (#95). Depende del dominio Familias/Variedades (#92) — `variedad_id` es FK nullable a `variedades`, `variedad_name` es un snapshot congelado que sobrevive a que la Variedad se deshabilite o se borre. |
@@ -27,7 +27,8 @@ aplicados a otros ítems del mismo pedido):
    ADR-0016): si no alcanza descuenta igual, el stock puede quedar
    negativo, y devuelve el Faltante del ítem.
 3. Inserta el `order_item` (producto, cantidad, precio/costo snapshot, si
-   vino de una recomendación, Faltante en `shortfall`) y acumula el total.
+   vino de una recomendación, Faltante en `shortfall`, cantidad pedida en
+   `ordered_quantity`) y acumula el total.
 4. Graba el total real y devuelve el id del pedido.
 
 ## Funciones RPC (llamadas desde la API)

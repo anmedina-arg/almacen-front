@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { getOrders } from '@/features/orders/services/orderService';
 
 // Verifica el fix de #97 (ver ADR-0012): una Store con la flag `stock`
 // apagada tiene que poder crear, editar y cancelar pedidos sin que
@@ -91,6 +92,12 @@ describe('stock flag independence — create_order/adjust/cancel/delete (#97)', 
 
       const { data: stockRow } = await admin.from('product_stock').select('id').eq('product_id', productId).maybeSingle();
       expect(stockRow).toBeNull();
+    });
+
+    it.skipIf(!hasCredentials)('la lista de Pedidos no marca el pedido con faltante (#162)', async () => {
+      const orders = await getOrders(admin, storeId);
+
+      expect(orders.find((o) => o.id === orderId)?.has_pending_shortfall).toBe(false);
     });
 
     it.skipIf(!hasCredentials)('editar la cantidad de un ítem no falla ni crea una fila de product_stock', async () => {

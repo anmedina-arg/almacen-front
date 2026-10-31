@@ -19,6 +19,14 @@
 -- Control de stock; 0 = sin Faltante. Lo escribe solo create_order(): las
 -- ediciones del Store admin no lo tocan. Paso operativo, una vez por base:
 --   ALTER TABLE public.order_items ADD COLUMN shortfall NUMERIC(10, 3) CHECK (shortfall >= 0);
+--
+-- #162 (spec #157): ordered_quantity guarda la cantidad pedida al crear el
+-- pedido, mismas unidades que quantity. Junto con shortfall permite mostrar
+-- "pidió 3, había 1" aunque el Store admin edite la cantidad después (#161).
+-- Lo escribe solo create_order(), con o sin Control de stock; las ediciones
+-- no lo tocan. NULL = ítem anterior a #162 o agregado por el Store admin
+-- desde el detalle del pedido. Paso operativo, una vez por base:
+--   ALTER TABLE public.order_items ADD COLUMN ordered_quantity NUMERIC(10, 3) CHECK (ordered_quantity > 0);
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.order_items (
@@ -34,10 +42,12 @@ CREATE TABLE IF NOT EXISTS public.order_items (
   unit_cost       NUMERIC(12, 2) NOT NULL DEFAULT 0,
   from_suggestion BOOLEAN NOT NULL DEFAULT FALSE,
   store_id        INTEGER NOT NULL REFERENCES public.stores(id),
-  shortfall       NUMERIC(10, 3) CHECK (shortfall >= 0)
+  shortfall       NUMERIC(10, 3) CHECK (shortfall >= 0),
+  ordered_quantity NUMERIC(10, 3) CHECK (ordered_quantity > 0)
 );
 
 COMMENT ON COLUMN public.order_items.shortfall IS 'Faltante al crear el pedido (#160): cuanto faltaba respecto de lo Disponible, mismas unidades que quantity. NULL = sin Control de stock, 0 = sin Faltante.';
+COMMENT ON COLUMN public.order_items.ordered_quantity IS 'Cantidad pedida al crear el pedido (#162), mismas unidades que quantity. Las ediciones no la tocan. NULL = item anterior a #162 o agregado desde el admin.';
 
 -- ── Índices ──────────────────────────────────────────────────────────────
 CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON public.order_items(order_id);
