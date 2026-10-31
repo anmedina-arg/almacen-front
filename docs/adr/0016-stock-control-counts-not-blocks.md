@@ -1,5 +1,5 @@
 ---
-status: accepted (2026-10-30; implementación en #157 — el pedido ya no se rechaza desde #160, falta la edición en #161)
+status: accepted (2026-10-30; implementación en #157 — el pedido ya no se rechaza desde #160, la edición desde #161)
 ---
 
 # El Control de stock lleva la cuenta, no impide ventas
@@ -20,7 +20,7 @@ En producción los rechazos casi nunca fueron carreras entre dos compradores; la
 ## Consequences
 
 - La regla vale para todo el ciclo del pedido: pedidos del catálogo, ventas por POS y ediciones del Store admin. Ninguna rechaza por stock.
-- El ítem que pide más de lo Disponible queda con **Faltante** (ver CONTEXT.md), visible solo en el admin: marca en la lista de Pedidos y detalle por ítem. El mensaje de WhatsApp no cambia. Un pedido con Faltante se confirma normal.
+- El ítem que pide más de lo Disponible al crear el pedido queda con **Faltante** (ver CONTEXT.md), la foto de ese momento: una edición posterior del Store admin no lo cambia. Visible solo en el admin: marca en la lista de Pedidos y detalle por ítem. El mensaje de WhatsApp no cambia. Un pedido con Faltante se confirma normal.
 - Un producto sin stock cargado tiene Disponible 0 y el catálogo lo muestra "Sin Stock". Un olvido de carga queda visible en vez de vender sin descontar. Esto absorbe #130.
 - Los fallos de `create_order()` que no son de stock (red, servidor, datos inválidos) no tienen UI para el comprador, que no vuelve a la app. El Store admin los detecta al no encontrar el pedido del WhatsApp en Pedidos y lo carga por POS.
 - El catálogo y la confirmación usan una sola definición de **Disponible** (ver CONTEXT.md), que incluye el stock calculado de los combos. Un stock negativo da Disponible 0, así que el catálogo muestra "Sin Stock" después de esa venta.

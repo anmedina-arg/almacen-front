@@ -1,13 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { createOrder } from '@/features/orders/services/orderService';
+import { createOrder, updateOrderItem } from '@/features/orders/services/orderService';
 
 // #160 (spec #157, ADR-0016): con Control de stock, un Faltante nunca impide
 // registrar el pedido. El Descuento de stock descuenta igual (el stock puede
 // quedar negativo) y el ítem guarda su Faltante: cuánto faltaba respecto de
 // lo Disponible en ese momento, en las mismas unidades que la cantidad
 // (combos para un combo).
+//
+// #161: la edición de un pedido tampoco rechaza. Descuenta igual y no toca
+// el Faltante guardado, que es la foto del momento en que se creó el pedido.
 const url = process.env.TEST_SUPABASE_URL;
 const anonKey = process.env.TEST_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
@@ -73,6 +76,17 @@ describe('Faltante — el pedido se registra aunque no alcance el stock (#160)',
     const { data, error } = await admin.from('order_items').select('product_id, shortfall').eq('order_id', orderId);
     expect(error).toBeNull();
     return new Map((data ?? []).map((row) => [row.product_id as number, row.shortfall == null ? null : Number(row.shortfall)]));
+  }
+
+  async function itemOf(orderId: number, productId: number): Promise<number> {
+    const { data, error } = await admin.from('order_items').select('id').eq('order_id', orderId).eq('product_id', productId).single();
+    expect(error).toBeNull();
+    return data!.id;
+  }
+
+  // Tal como lo llama PUT orders/[orderId]/items/[itemId]/route.ts.
+  function editQuantity(orderId: number, itemId: number, quantity: number) {
+    return updateOrderItem(admin, storeId, orderId, itemId, { quantity });
   }
 
   beforeAll(async () => {
@@ -293,5 +307,32 @@ describe('Faltante — el pedido se registra aunque no alcance el stock (#160)',
     expect(result.status).toBe('pending');
     expect(await stockOf(productId)).toBe(-3);
     expect((await shortfallsOf(result.order_id)).get(productId)).toBe(3);
+  });
+
+  it.skipIf(!hasCredentials)('editar un ítem por encima de lo Disponible descuenta igual y no le pone Faltante', async () => {
+    const productId = await createProduct();
+    await setStock(productId, 2);
+    const { order_id } = await order([{ productId, quantity: 1 }]);
+
+    await editQuantity(order_id, await itemOf(order_id, productId), 5);
+
+    expect(await stockOf(productId)).toBe(-3);
+    expect((await shortfallsOf(order_id)).get(productId)).toBe(0);
+  });
+
+  it.skipIf(!hasCredentials)('editar un ítem que ya tenía Faltante no lo cambia', async () => {
+    const productId = await createProduct();
+    await setStock(productId, 1);
+    const { order_id } = await order([{ productId, quantity: 3 }]);
+    const itemId = await itemOf(order_id, productId);
+
+    await editQuantity(order_id, itemId, 5);
+    expect(await stockOf(productId)).toBe(-4);
+    expect((await shortfallsOf(order_id)).get(productId)).toBe(2);
+
+    // Bajar la cantidad devuelve stock como siempre, y tampoco toca el Faltante.
+    await editQuantity(order_id, itemId, 2);
+    expect(await stockOf(productId)).toBe(-1);
+    expect((await shortfallsOf(order_id)).get(productId)).toBe(2);
   });
 });

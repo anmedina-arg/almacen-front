@@ -19,19 +19,17 @@
 -- #73: el chequeo+descuento (rama de suba) y la devolución (rama de baja)
 -- se extrajeron a reserve_order_stock()/return_order_stock() — vivían
 -- duplicados acá, en create_order() y (la devolución) en
--- cancel_order()/return_stock_on_item_delete(). El mensaje de error de
--- stock insuficiente para combo cambia de forma (antes nombraba el
--- componente puntual con cantidades crudas; ahora es el mismo mensaje
--- genérico que un producto simple, con la cantidad de combos disponibles) —
--- ningún caller parsea este texto (confirmado: PUT /api/orders/[id]/items/[id]
--- solo reenvía error.message tal cual), así que no es un cambio observable
--- para nadie que dependa de su forma exacta.
+-- cancel_order()/return_stock_on_item_delete(). (Hasta #161 la rama de
+-- suba rechazaba con "Stock insuficiente"; ese mensaje ya no existe.)
 --
 -- #160: reserve_order_stock() ya no rechaza — descuenta siempre y devuelve
--- el Faltante. Esta función sigue rechazando una suba que no alcanza (mismo
--- mensaje, Disponible = diferencia - Faltante): el RAISE revierte también
--- el descuento y una fila de stock creada en el camino. Retirar ese
--- rechazo es #161. No escribe order_items.shortfall.
+-- el Faltante.
+--
+-- #161 (spec #157, ADR-0016): la edición tampoco rechaza. Una suba que no
+-- alcanza descuenta igual y el stock puede quedar negativo (por componente
+-- en un combo). Ignora el Faltante que devuelve reserve_order_stock() y no
+-- escribe order_items.shortfall: el Faltante es la foto del momento en que
+-- se creó el pedido, una edición no lo cambia.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION adjust_stock_on_item_update()
@@ -42,7 +40,6 @@ AS $$
 DECLARE
   v_order_status order_status;
   v_diff         NUMERIC(12, 3);
-  v_shortfall    NUMERIC(12, 3);
 BEGIN
   SELECT status INTO v_order_status FROM orders WHERE id = NEW.order_id;
 
@@ -63,13 +60,7 @@ BEGIN
   IF v_diff > 0 THEN
     PERFORM set_config('app.movement_type', 'sale', true);
 
-    SELECT shortfall INTO v_shortfall
-    FROM reserve_order_stock(NEW.product_id, v_diff, NEW.store_id);
-
-    IF v_shortfall > 0 THEN
-      RAISE EXCEPTION 'Stock insuficiente. Disponible: %, Requerido: %',
-        v_diff - v_shortfall, v_diff;
-    END IF;
+    PERFORM reserve_order_stock(NEW.product_id, v_diff, NEW.store_id);
   ELSE
     PERFORM set_config('app.movement_type', 'return', true);
     PERFORM return_order_stock(NEW.product_id, ABS(v_diff), NEW.store_id);

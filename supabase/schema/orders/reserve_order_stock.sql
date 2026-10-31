@@ -16,7 +16,8 @@
 -- Disponible sale de get_available_stock() (Stock, #159) — la misma regla
 -- que muestra el catálogo, no una copia. Qué hacer con un Faltante lo
 -- decide el caller: create_order() lo guarda en el ítem;
--- adjust_stock_on_item_update() todavía rechaza la edición (lo retira #161).
+-- adjust_stock_on_item_update() lo ignora (#161: una edición no cambia el
+-- Faltante).
 --
 -- Firma anterior a #160, con otro tipo de retorno (CREATE OR REPLACE no
 -- puede cambiarlo — DROP operativo antes de crear esta, ver paso 4 de
@@ -38,8 +39,8 @@
 --
 -- Combo sin componentes: no descuenta nada y su Faltante es la cantidad
 -- entera — su Disponible es 0 (get_available_stock), igual que en el
--- catálogo. Antes de #160 una suba de cantidad de ese combo en la edición
--- se aceptaba; hasta #161 se rechaza, como cualquier otro Faltante.
+-- catálogo. Una suba de cantidad de ese combo en la edición se acepta
+-- (#161), como cualquier otra.
 --
 -- Los componentes de un combo se lockean en orden de product_id. Eso evita
 -- trabas solo dentro de una línea: create_order() sigue lockeando ítem por
