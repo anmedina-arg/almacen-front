@@ -9,7 +9,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 // RLS de combo_components (store-scoping-combos.test.ts). Escrito como red
 // de seguridad antes de unificar las 4 en reserve_order_stock/
 // return_order_stock (#73): confirma que el refactor no cambia el
-// comportamiento observable.
+// comportamiento observable. Desde #160/#161 ni crear ni editar un pedido
+// rechaza por stock (ADR-0016): esos casos afirman el comportamiento nuevo.
 const url = process.env.TEST_SUPABASE_URL;
 const serviceRoleKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
 const hasCredentials = Boolean(url && serviceRoleKey);
@@ -234,14 +235,17 @@ describe('combo stock — descuento/devolución combo-aware (#73)', () => {
       expect(await stockOf(fixture.componentBId)).toBe(9);
     });
 
-    it.skipIf(!hasCredentials)('rechaza subir la cantidad si no alcanza el stock de un componente, sin tocar stock', async () => {
+    it.skipIf(!hasCredentials)('subir la cantidad aunque no alcance el stock de un componente descuenta igual (#161)', async () => {
       // Tras el test anterior: 1 combo activo, A=8, B=9.
-      // Subir a 20 combos necesita 40 de A y 20 de B — ninguno alcanza.
+      // Subir a 20 combos necesita 38 más de A y 19 más de B — ninguno alcanza.
       const { error } = await admin.from('order_items').update({ quantity: 20 }).eq('id', itemId);
-      expect(error).not.toBeNull();
+      expect(error).toBeNull();
 
-      expect(await stockOf(fixture.componentAId)).toBe(8);
-      expect(await stockOf(fixture.componentBId)).toBe(9);
+      expect(await stockOf(fixture.componentAId)).toBe(-30);
+      expect(await stockOf(fixture.componentBId)).toBe(-10);
+      // El Faltante es la foto de la creación del pedido: la edición no lo toca.
+      const { data: item } = await admin.from('order_items').select('shortfall').eq('id', itemId).single();
+      expect(Number(item!.shortfall)).toBe(0);
     });
   });
 

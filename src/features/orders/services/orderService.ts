@@ -303,9 +303,8 @@ export async function updateOrderItem(
   }
 
   // Si esto sube la cantidad, adjust_stock_on_item_update() (trigger, #73)
-  // puede rechazar por stock insuficiente — ese error sigue cayendo acá
-  // como Error genérico (500), sin caso especial: mismo comportamiento que
-  // antes de esta migración, no es parte del alcance de #120.
+  // descuenta la diferencia aunque no alcance: desde #161 la edición no
+  // rechaza por stock (ADR-0016).
   const { data, error } = await supabase
     .from('order_items')
     .update({ ...input, ...(unit_cost !== undefined && { unit_cost }) })
