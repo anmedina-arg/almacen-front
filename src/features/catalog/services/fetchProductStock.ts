@@ -1,42 +1,66 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+interface AvailableStockRow {
+  product_id: number;
+  available: number;
+}
+
 /**
- * Fetches the current stock quantity for a single product (#146, spec
- * #139) — reemplaza el fetch bulk de toda la Store (#140) para poder
- * cachear/invalidar por producto en vez de forzar el recálculo de los
- * ~550 productos del catálogo por cada pedido/ajuste de uno solo (ver
- * getCachedProductStock en fetchPublicProducts.ts).
+ * Trae el Disponible (ver CONTEXT.md) vía get_available_stock() (#159,
+ * spec #157) — la misma regla para los dos caminos de abajo, y la que #160
+ * va a usar al registrar el pedido. Sin Control de stock la función no
+ * devuelve filas, así que el Map queda vacío y el catálogo ve `undefined`
+ * para todo producto (sin límite, ver Product.stock_quantity).
  *
- * undefined = sin fila en product_stock — puede ser un producto sin
- * tracking de stock (is_stock_tracked = false, ADR-0012) o un combo (su
- * stock es virtual, derivado de los componentes, no tiene fila propia).
- * Ambos casos ya se trataban como "sin registro, tratar como disponible"
- * antes de #146 (ver Product.stock_quantity).
+ * Tira en vez de devolver vacío en error (#146, mismo criterio que
+ * fetchProductMetadata.ts #145): con cache indefinido, un vacío cacheado por
+ * un error transitorio se leería como "sin Control de stock" hasta el
+ * próximo cambio de stock de ese producto — se degrada un nivel arriba
+ * (getCachedProductStock/getStockForProducts en fetchPublicProducts.ts),
+ * no acá.
+ */
+async function fetchAvailableStock(
+  supabase: SupabaseClient,
+  storeId: number,
+  productIds: number[] | null,
+  errorPrefix: string
+): Promise<Map<number, number>> {
+  const { data, error } = await supabase.rpc('get_available_stock', {
+    p_store_id: storeId,
+    p_product_ids: productIds,
+  });
+
+  if (error) throw new Error(`${errorPrefix}: ${error.message}`);
+
+  return new Map(((data ?? []) as AvailableStockRow[]).map((row) => [row.product_id, Number(row.available)]));
+}
+
+/**
+ * Disponible de un solo producto (#146, spec #139) — para cachear/invalidar
+ * por producto en vez de forzar el recálculo de los ~550 productos del
+ * catálogo por cada pedido/ajuste de uno solo (ver getCachedProductStock en
+ * fetchPublicProducts.ts). Un combo depende del stock de sus componentes:
+ * su tag se invalida cuando cambia el de cualquiera de ellos (#158, ver
+ * invalidateProductStock.ts).
+ *
+ * undefined = la Store no lleva Control de stock (#159). Antes significaba
+ * "sin fila en product_stock" (producto sin cargar o combo); con Control de
+ * stock eso ahora es un número: 0 sin fila, combos completos para un combo.
+ * También da undefined un producto inactivo pedido por un visitante
+ * anónimo (la RLS de products no se lo deja ver) — el catálogo público no
+ * muestra inactivos, y el fetch de admin corre con sesión de Store admin.
  */
 export async function fetchProductStockForProduct(
   supabase: SupabaseClient,
   storeId: number,
   productId: number
 ): Promise<number | undefined> {
-  const { data, error } = await supabase
-    .from('product_stock')
-    .select('quantity')
-    .eq('store_id', storeId)
-    .eq('product_id', productId)
-    .maybeSingle();
-
-  // Tira en vez de devolver undefined en error (#146, mismo criterio que
-  // fetchProductMetadata.ts #145): con cache indefinido, undefined
-  // cacheado por un error transitorio se leería como "disponible" hasta
-  // la próxima venta/ajuste de ESE producto puntual — se degrada un nivel
-  // arriba (getCachedProductStock), no acá.
-  if (error) throw new Error(`fetchProductStockForProduct: ${error.message}`);
-
-  return data?.quantity ?? undefined;
+  const stock = await fetchAvailableStock(supabase, storeId, [productId], 'fetchProductStockForProduct');
+  return stock.get(productId);
 }
 
 /**
- * Trae el stock de TODOS los productos de una Store en una sola query
+ * Disponible de TODOS los productos de una Store en un solo roundtrip
  * (#148) — usado por fetchPublicProducts.ts únicamente para catalog_ssr/
  * catalog_admin_fetch (sin categoryId ni search, ver getStockForProducts),
  * es decir, cuando el resultado de metadata es el catálogo completo (del
@@ -62,13 +86,5 @@ export async function fetchProductStockBulk(
   supabase: SupabaseClient,
   storeId: number
 ): Promise<Map<number, number>> {
-  const { data, error } = await supabase.from('product_stock').select('product_id, quantity').eq('store_id', storeId);
-
-  // Mismo criterio que fetchProductStockForProduct: tira en vez de degradar
-  // acá, para no persistir un resultado malo en ningún cache — este helper
-  // no cachea, pero el caller (getStockForProducts en fetchPublicProducts.ts)
-  // sí degrada a un Map vacío, mismo patrón que las piezas hermanas.
-  if (error) throw new Error(`fetchProductStockBulk: ${error.message}`);
-
-  return new Map((data ?? []).map((row) => [row.product_id as number, row.quantity as number]));
+  return fetchAvailableStock(supabase, storeId, null, 'fetchProductStockBulk');
 }

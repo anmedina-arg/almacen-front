@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateProductSchema } from '@/features/products/schemas/productSchemas';
 import { getProductById, updateProduct, deleteProduct } from '@/features/products/services/productService';
-import { productMetadataTag } from '@/lib/cache/tags';
+import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
 
 /**
  * GET /api/products/[id]
@@ -71,6 +71,11 @@ export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
     // pegue directo a esa URL puede seguir viendo la versión vieja hasta
     // que ese TTL expire, 3ra pasada de code review de #145).
     revalidateTag(productMetadataTag(ctx.storeId));
+    // Pasar de producto común a combo (o al revés) cambia de dónde sale su
+    // Disponible (#159): fila propia vs. componentes.
+    if (parsed.data.is_combo !== undefined) {
+      revalidateTag(productStockTag(ctx.storeId, id));
+    }
     return NextResponse.json(product);
   } catch (error) {
     return handleServiceError(error, 'PUT /api/products/[id]');

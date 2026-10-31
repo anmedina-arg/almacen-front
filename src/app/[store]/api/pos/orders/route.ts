@@ -3,8 +3,8 @@ import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { posOrderSchema } from '@/features/orders/schemas/orderSchemas';
-import { createOrder, InsufficientStockError } from '@/features/orders/services/orderService';
-import { invalidateOrderStockTags } from '@/features/orders/services/invalidateOrderStock';
+import { createOrder } from '@/features/orders/services/orderService';
+import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
  * POST /api/pos/orders
@@ -45,12 +45,9 @@ export const POST = createApiRoute(requireAdmin)(async (ctx) => {
     // arriba) — invalida stock igual que POST /api/orders (#146, spec
     // #139), hallazgo de code review: se había cubierto el checkout
     // público pero no este.
-    await invalidateOrderStockTags(ctx.supabase, ctx.storeId, items);
+    await invalidateProductStockTags(ctx.supabase, ctx.storeId, items.map((item) => item.product_id));
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    if (error instanceof InsufficientStockError) {
-      return NextResponse.json({ error: 'insufficient_stock', products: error.products }, { status: 409 });
-    }
     return handleServiceError(error, 'POST /api/pos/orders');
   }
 });

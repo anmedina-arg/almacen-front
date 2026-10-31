@@ -78,6 +78,7 @@ stock/get_all_products_with_stock.sql
 stock/get_low_stock_products.sql
 stock/get_avg_stock_per_product.sql
 stock/get_stock_value_per_day.sql
+stock/get_available_stock.sql
 
 # ── Ranking ──────────────────────────────────────────────────────────────
 ranking/get_top_seller_ids.sql

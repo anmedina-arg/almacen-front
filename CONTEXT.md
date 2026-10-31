@@ -56,6 +56,19 @@ Estado del pedido mientras el comprador todavía lo está armando, previo a conf
 **Descuento de stock**:
 La resta real y permanente de `product_stock`, con lock, que ocurre en el momento en que el comprador confirma el pedido (`reserve_order_stock()`, llamado desde `create_order()`) — simultáneo a que se abra WhatsApp con el mensaje. No es un hold temporal ni tiene expiración automática: solo se revierte con una acción explícita y posterior — cancelar el pedido (`cancel_order()`, devuelve stock vía `return_order_stock()`) — nunca por el simple paso del tiempo. Hasta el momento de la confirmación, mientras el producto está en el Carrito, el stock sigue disponible para cualquier otro comprador.
 _Avoid_: "Reserva"/"reservar" (el nombre de la función SQL `reserve_order_stock` usa ese verbo, pero no es el concepto correcto de dominio — "reserva" implica un hold temporal que puede caducar solo, y acá no existe eso: es un descuento real, permanente hasta cancelación explícita).
+Solo ocurre si la Store tiene Control de stock. Decidido en #96 (2026-10-30): el Descuento de stock nunca rechaza, ni al crear el pedido (catálogo o POS) ni cuando el Store admin lo edita; si no alcanza, descuenta igual, el stock queda negativo y el ítem queda con Faltante. Al crear el pedido rige desde #160; la edición del Store admin todavía rechaza hasta #161.
+
+**Control de stock**:
+La capacidad que una Store contrata con la feature flag `stock`. Sirve para **llevar la cuenta** de lo que el negocio tiene, no para impedir ventas: un pedido se registra siempre, aunque la cuenta diga que no alcanza. Un stock negativo es la señal de que la cuenta no coincide con el estante, y la resuelve el Store admin (ver #156). Sin Control de stock, el stock no existe para ninguna parte del flujo de venta: ni el catálogo ni la confirmación lo miran.
+_Avoid_: Control de stock como "bloqueo de ventas" o "validación de stock" — esa fue la semántica anterior a #96 y es justamente la que dejaba pedidos reales sin registrar.
+
+**Disponible**:
+La cantidad de un producto que el sistema considera vendible en este momento, con una sola definición compartida por el catálogo y la confirmación del pedido. Para un producto común es su stock; para un Combo es cuántos Combos completos alcanzan con el stock de sus componentes. Un producto sin stock cargado o con stock negativo tiene Disponible 0. Solo existe si la Store tiene Control de stock.
+_Avoid_: Stock virtual (forma de calcular el Disponible de un Combo, no un concepto aparte), stock a secas cuando se habla de lo que el comprador puede pedir.
+
+**Faltante**:
+La diferencia entre lo que un ítem de un pedido pide y lo Disponible en el momento en que se registra (ej. "pidió 3, había 1"). Queda guardado en el ítem como foto de ese momento y el Store admin lo ve en Pedidos, nunca el comprador. No bloquea nada: el Store admin lo resuelve por WhatsApp y confirma, edita o saca el ítem. Solo existe con Control de stock.
+_Avoid_: Error de stock, pedido rechazado (un Faltante nunca rechaza el pedido).
 
 ## Deployment model
 

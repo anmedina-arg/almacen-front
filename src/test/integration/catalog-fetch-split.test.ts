@@ -40,6 +40,12 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
   // nivel aplicación, que es justo lo que ese test verifica.
   let otherStoreId: number;
   let otherProductId: number;
+  // Desde #159 el servicio de stock devuelve el Disponible (ver CONTEXT.md),
+  // que solo existe con Control de stock: las dos Stores de arriba tienen la
+  // flag prendida, y esta la tiene apagada, con una fila vieja de stock.
+  let untrackedStoreId: number;
+  let untrackedProductId: number;
+  let noRowProductId: number;
 
   beforeAll(async () => {
     if (!hasCredentials) return;
@@ -49,7 +55,7 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
     componentName = `${slug}-componente`;
     const { data: store, error: storeError } = await admin
       .from('stores')
-      .insert({ slug, name: slug })
+      .insert({ slug, name: slug, feature_flags: { stock: true } })
       .select('id')
       .single();
     expect(storeError).toBeNull();
@@ -140,7 +146,7 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
     const otherSlug = `${slug}-other-store`;
     const { data: otherStore, error: otherStoreError } = await admin
       .from('stores')
-      .insert({ slug: otherSlug, name: otherSlug })
+      .insert({ slug: otherSlug, name: otherSlug, feature_flags: { stock: true } })
       .select('id')
       .single();
     expect(otherStoreError).toBeNull();
@@ -160,22 +166,58 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
       .insert({ product_id: otherProductId, quantity: 999, store_id: otherStoreId, updated_by: userId });
     expect(otherStockError).toBeNull();
     await admin.from('stock_movement_log').delete().eq('product_id', otherProductId);
+
+    const { data: noRowProduct, error: noRowProductError } = await admin
+      .from('products')
+      .insert({ name: `${slug}-sin-fila`, price: 100, image: '', categories: '', store_id: storeId, active: true })
+      .select('id')
+      .single();
+    expect(noRowProductError).toBeNull();
+    noRowProductId = noRowProduct!.id;
+    await admin.from('product_price_history').delete().eq('product_id', noRowProductId);
+
+    const untrackedSlug = `${slug}-untracked`;
+    const { data: untrackedStore, error: untrackedStoreError } = await admin
+      .from('stores')
+      .insert({ slug: untrackedSlug, name: untrackedSlug, feature_flags: { stock: false } })
+      .select('id')
+      .single();
+    expect(untrackedStoreError).toBeNull();
+    untrackedStoreId = untrackedStore!.id;
+
+    const { data: untrackedProduct, error: untrackedProductError } = await admin
+      .from('products')
+      .insert({ name: `${untrackedSlug}-producto`, price: 100, image: '', categories: '', store_id: untrackedStoreId, active: true })
+      .select('id')
+      .single();
+    expect(untrackedProductError).toBeNull();
+    untrackedProductId = untrackedProduct!.id;
+    await admin.from('product_price_history').delete().eq('product_id', untrackedProductId);
+
+    const { error: untrackedStockError } = await admin
+      .from('product_stock')
+      .insert({ product_id: untrackedProductId, quantity: 7, store_id: untrackedStoreId, updated_by: userId });
+    expect(untrackedStockError).toBeNull();
+    await admin.from('stock_movement_log').delete().eq('product_id', untrackedProductId);
   });
 
   afterAll(async () => {
     if (!hasCredentials) return;
-    await admin.from('stock_movement_log').delete().in('product_id', [productId, comboId, componentId, otherProductId]);
-    await admin.from('product_stock').delete().in('product_id', [productId, componentId, otherProductId]);
+    const allProductIds = [productId, comboId, componentId, otherProductId, noRowProductId, untrackedProductId];
+    await admin.from('stock_movement_log').delete().in('product_id', allProductIds);
+    await admin.from('product_stock').delete().in('product_id', allProductIds);
     await admin.from('combo_components').delete().eq('combo_product_id', comboId);
-    await admin.from('product_price_history').delete().in('product_id', [productId, comboId, componentId, otherProductId]);
+    await admin.from('product_price_history').delete().in('product_id', allProductIds);
     await admin.from('products').delete().eq('store_id', storeId);
     await admin.from('products').delete().eq('store_id', otherStoreId);
+    await admin.from('products').delete().eq('store_id', untrackedStoreId);
     await admin.from('subcategories').delete().eq('store_id', storeId);
     await admin.from('categories').delete().eq('store_id', storeId);
     await admin.from('profiles').delete().eq('id', userId);
     await admin.auth.admin.deleteUser(userId);
     await admin.from('stores').delete().eq('id', storeId);
     await admin.from('stores').delete().eq('id', otherStoreId);
+    await admin.from('stores').delete().eq('id', untrackedStoreId);
   });
 
   it.skipIf(!hasCredentials)('fetchProductMetadata: mapea categoria/subcategoria y arma combo_items solo para el combo', async () => {
@@ -199,27 +241,30 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
     expect(withInactive.some((p) => p.id === componentId)).toBe(true);
   });
 
-  it.skipIf(!hasCredentials)('fetchProductStockForProduct: devuelve la cantidad de un producto puntual (#146)', async () => {
+  it.skipIf(!hasCredentials)('fetchProductStockForProduct: devuelve el Disponible de un producto puntual (#146, #159)', async () => {
     expect(await fetchProductStockForProduct(admin, storeId, productId)).toBe(15);
     expect(await fetchProductStockForProduct(admin, storeId, componentId)).toBe(40);
   });
 
-  it.skipIf(!hasCredentials)('fetchProductStockForProduct: undefined si el producto no tiene fila en product_stock', async () => {
-    // El combo del fixture no tiene fila propia en product_stock (su stock
-    // es virtual, derivado de los componentes) — mismo comportamiento que
-    // antes de #146, ahora por producto en vez de en el Map bulk.
-    expect(await fetchProductStockForProduct(admin, storeId, comboId)).toBeUndefined();
+  it.skipIf(!hasCredentials)('fetchProductStockForProduct: un combo devuelve cuántos combos completos alcanzan (#159)', async () => {
+    // 40 del componente / 2 por combo.
+    expect(await fetchProductStockForProduct(admin, storeId, comboId)).toBe(20);
   });
 
-  it.skipIf(!hasCredentials)('fetchProductStockBulk: devuelve un Map con la cantidad de cada producto con fila en product_stock (#148)', async () => {
+  it.skipIf(!hasCredentials)('fetchProductStockForProduct: 0 si el producto no tiene fila en product_stock (#159)', async () => {
+    expect(await fetchProductStockForProduct(admin, storeId, noRowProductId)).toBe(0);
+  });
+
+  it.skipIf(!hasCredentials)('fetchProductStockForProduct: undefined si la Store no lleva Control de stock (#159)', async () => {
+    expect(await fetchProductStockForProduct(admin, untrackedStoreId, untrackedProductId)).toBeUndefined();
+  });
+
+  it.skipIf(!hasCredentials)('fetchProductStockBulk: devuelve el Disponible de cada producto de la Store, combos incluidos (#148, #159)', async () => {
     const stock = await fetchProductStockBulk(admin, storeId);
     expect(stock.get(productId)).toBe(15);
     expect(stock.get(componentId)).toBe(40);
-  });
-
-  it.skipIf(!hasCredentials)('fetchProductStockBulk: no incluye el combo (sin fila propia, stock virtual)', async () => {
-    const stock = await fetchProductStockBulk(admin, storeId);
-    expect(stock.has(comboId)).toBe(false);
+    expect(stock.get(comboId)).toBe(20);
+    expect(stock.get(noRowProductId)).toBe(0);
   });
 
   it.skipIf(!hasCredentials)('fetchProductStockBulk: no incluye stock de otra Store (#148)', async () => {
@@ -229,6 +274,11 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
     const otherStoreStock = await fetchProductStockBulk(admin, otherStoreId);
     expect(otherStoreStock.get(otherProductId)).toBe(999);
     expect(otherStoreStock.has(productId)).toBe(false);
+  });
+
+  it.skipIf(!hasCredentials)('fetchProductStockBulk: vacío si la Store no lleva Control de stock, aunque tenga filas viejas (#159)', async () => {
+    const stock = await fetchProductStockBulk(admin, untrackedStoreId);
+    expect(stock.size).toBe(0);
   });
 
   it.skipIf(!hasCredentials)('fetchTopSellerIds: devuelve un Set, sin el producto recien creado (sin ventas)', async () => {

@@ -4,7 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateOrderItemSchema } from '@/features/orders/schemas/orderSchemas';
 import { updateOrderItem, removeOrderItem } from '@/features/orders/services/orderService';
-import { invalidateOrderStockTags } from '@/features/orders/services/invalidateOrderStock';
+import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
  * DELETE /api/orders/[orderId]/items/[itemId]
@@ -24,7 +24,7 @@ export const DELETE = createApiRoute<{ orderId: string; itemId: string }>(requir
     // return_stock_on_item_delete devuelve stock real (#146, spec #139,
     // hallazgo de code review) — invalida igual que crear/editar un item.
     if (removed?.product_id != null) {
-      await invalidateOrderStockTags(ctx.supabase, ctx.storeId, [{ product_id: removed.product_id }]);
+      await invalidateProductStockTags(ctx.supabase, ctx.storeId, [removed.product_id]);
     }
     return new NextResponse(null, { status: 204 });
   } catch (error) {
@@ -60,7 +60,7 @@ export const PUT = createApiRoute<{ orderId: string; itemId: string }>(requireAd
     // Invalidar igual sería una query + eviction de cache desperdiciada en
     // una edición común (2da pasada de code review de #146).
     if (parsed.data.quantity !== undefined && item.product_id != null) {
-      await invalidateOrderStockTags(ctx.supabase, ctx.storeId, [{ product_id: item.product_id }]);
+      await invalidateProductStockTags(ctx.supabase, ctx.storeId, [item.product_id]);
     }
     return NextResponse.json(item);
   } catch (error) {

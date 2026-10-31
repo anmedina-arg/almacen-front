@@ -81,6 +81,6 @@ CREATE POLICY "Admins can delete orders"
 -- NOT NULL en esta tabla. Ver ADR-0008 (marcado cerrado).
 
 -- confirm_order/cancel_order son SECURITY DEFINER (bypassean RLS) — la
--- verificación de que la orden pertenece a la Store del caller se hace en
--- la ruta de API, antes de invocar el RPC, no acá. Ver confirm_order.sql /
--- cancel_order.sql.
+-- propia función exige admin de la Store de la orden (fix 2026-10-20), y la
+-- ruta de API además verifica que la orden sea de la Store de la URL. Ver
+-- confirm_order.sql / cancel_order.sql.

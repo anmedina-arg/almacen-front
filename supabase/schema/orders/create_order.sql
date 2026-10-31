@@ -47,6 +47,13 @@
 -- acumulando todos los ítems sin stock suficiente y recién al final hace
 -- RAISE EXCEPTION (revierte toda la transacción, incluidos los descuentos
 -- ya aplicados a otros ítems). Ver reserve_order_stock.sql.
+--
+-- #160 (spec #157, ADR-0016): ya no rechaza por stock — el RAISE de
+-- insufficient_stock y su acumulación de faltantes se retiraron. Registra
+-- el pedido completo siempre; reserve_order_stock() descuenta igual (el
+-- stock puede quedar negativo) y devuelve el Faltante de cada ítem, que se
+-- guarda en order_items.shortfall. El retorno no cambia de forma. Firma
+-- sin cambios: CREATE OR REPLACE alcanza (los GRANTs se conservan).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.create_order(
@@ -66,10 +73,7 @@ DECLARE
   v_total            NUMERIC(12, 2) := 0;
   v_needed           NUMERIC(12, 3);
   v_product_id       INTEGER;
-  v_reserved         BOOLEAN;
-  v_available        NUMERIC(12, 3);
-  v_failed_products  JSONB    := '[]'::JSONB;
-  v_has_insufficient BOOLEAN  := FALSE;
+  v_shortfall        NUMERIC(12, 3);
 BEGIN
   INSERT INTO orders (user_id, status, total, notes, whatsapp_message, store_id)
   VALUES (p_user_id, 'pending', 0, p_notes, p_whatsapp_message, p_store_id)
@@ -82,23 +86,13 @@ BEGIN
     v_product_id := (v_item->>'product_id')::INTEGER;
     v_needed     := (v_item->>'quantity')::NUMERIC;
 
-    SELECT success, available INTO v_reserved, v_available
+    SELECT shortfall INTO v_shortfall
     FROM reserve_order_stock(v_product_id, v_needed, p_store_id);
-
-    IF NOT v_reserved THEN
-      v_has_insufficient := TRUE;
-      v_failed_products  := v_failed_products || jsonb_build_object(
-        'id',        v_product_id,
-        'name',      v_item->>'product_name',
-        'requested', v_needed,
-        'available', v_available
-      );
-      CONTINUE;
-    END IF;
 
     INSERT INTO order_items (
       order_id, product_id, product_name, quantity,
-      unit_price, unit_cost, is_by_weight, from_suggestion, store_id
+      unit_price, unit_cost, is_by_weight, from_suggestion, store_id,
+      shortfall
     )
     VALUES (
       v_order_id,
@@ -109,18 +103,12 @@ BEGIN
       COALESCE((v_item->>'unit_cost')::NUMERIC, 0),
       COALESCE((v_item->>'is_by_weight')::BOOLEAN, FALSE),
       COALESCE((v_item->>'from_suggestion')::BOOLEAN, FALSE),
-      p_store_id
+      p_store_id,
+      v_shortfall
     );
 
     v_total := v_total + v_needed * (v_item->>'unit_price')::NUMERIC;
   END LOOP;
-
-  IF v_has_insufficient THEN
-    RAISE EXCEPTION '%', jsonb_build_object(
-      'error',    'insufficient_stock',
-      'products', v_failed_products
-    )::TEXT;
-  END IF;
 
   UPDATE orders SET total = v_total WHERE id = v_order_id;
 

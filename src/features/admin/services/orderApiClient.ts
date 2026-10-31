@@ -32,10 +32,6 @@ export const orderApiClient = {
     });
     if (!res.ok) {
       const body = await res.json();
-      // Preserve structured errors (e.g. insufficient_stock) as JSON in the message
-      if (body.error === 'insufficient_stock') {
-        throw new Error(JSON.stringify(body));
-      }
       throw new Error(body.error || 'Error al crear el pedido');
     }
     return res.json();

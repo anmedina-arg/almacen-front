@@ -7,7 +7,7 @@ export interface Product {
   active: boolean;
   categories: string;
   sale_type: WeightType;
-  stock_quantity?: number; // undefined = no stock record (treat as available)
+  stock_quantity?: number; // Disponible (#159, ver CONTEXT.md); undefined = la Store no lleva Control de stock o falló el fetch (sin límite)
   cost?: number | null;
   is_combo?: boolean;
   max_stock?: number | null;
