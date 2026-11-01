@@ -39,6 +39,8 @@ export interface Order {
   order_payments?: OrderPayment[];
   // Product names from items (for client-side search)
   product_names?: string[];
+  // Pendiente con al menos un ítem con Faltante (#162). Computado en la lista.
+  has_pending_shortfall?: boolean;
 }
 
 /**
@@ -67,6 +69,12 @@ export interface OrderItem {
   subtotal: number;
   is_by_weight: boolean;
   created_at: string;
+  // Faltante al crear el pedido (#160), mismas unidades que quantity.
+  // null = sin Control de stock; 0 = sin Faltante.
+  shortfall: number | null;
+  // Cantidad pedida al crear el pedido (#162); las ediciones no la cambian.
+  // null = ítem anterior a #162 o agregado desde el admin.
+  ordered_quantity: number | null;
   // Solo presente en líneas de Producto Surtido (#95).
   order_item_variedades?: OrderItemVariedad[];
 }

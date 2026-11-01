@@ -54,6 +54,9 @@
 -- stock puede quedar negativo) y devuelve el Faltante de cada ítem, que se
 -- guarda en order_items.shortfall. El retorno no cambia de forma. Firma
 -- sin cambios: CREATE OR REPLACE alcanza (los GRANTs se conservan).
+--
+-- #162: también guarda la cantidad pedida en order_items.ordered_quantity
+-- (foto de la creación, como shortfall). Firma sin cambios.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.create_order(
@@ -92,7 +95,7 @@ BEGIN
     INSERT INTO order_items (
       order_id, product_id, product_name, quantity,
       unit_price, unit_cost, is_by_weight, from_suggestion, store_id,
-      shortfall
+      shortfall, ordered_quantity
     )
     VALUES (
       v_order_id,
@@ -104,7 +107,8 @@ BEGIN
       COALESCE((v_item->>'is_by_weight')::BOOLEAN, FALSE),
       COALESCE((v_item->>'from_suggestion')::BOOLEAN, FALSE),
       p_store_id,
-      v_shortfall
+      v_shortfall,
+      v_needed
     );
 
     v_total := v_total + v_needed * (v_item->>'unit_price')::NUMERIC;

@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useOrders } from '../../hooks/useOrders';
 import { useSalesFilters } from '../../hooks/useSalesFilters';
 import { OrderStatusBadge } from './OrderStatusBadge';
+import { ShortfallBadge } from './ShortfallBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import { MarginDisplay } from './MarginDisplay';
 import { ClientAssignCell } from './ClientAssignCell';
@@ -21,7 +22,7 @@ import { useFeatureFlags } from '../../context/FeatureFlagsContext';
  */
 export function OrdersTable() {
   const { data: orders, isLoading, error } = useOrders();
-  const { clientes: clientesEnabled, pagos: pagosEnabled } = useFeatureFlags();
+  const { clientes: clientesEnabled, pagos: pagosEnabled, stock: stockEnabled } = useFeatureFlags();
 
   const { quickFilter, dateFrom, dateTo, setQuickFilter, setDateFrom, setDateTo, filteredOrders: dateFilteredOrders } =
     useSalesFilters(orders);
@@ -337,7 +338,10 @@ export function OrdersTable() {
                       </td>
                     )}
                     <td className="py-3 px-4 text-center">
-                      <OrderStatusBadge status={order.status} />
+                      <div className="flex flex-col items-center gap-1">
+                        <OrderStatusBadge status={order.status} />
+                        {stockEnabled && order.has_pending_shortfall && <ShortfallBadge />}
+                      </div>
                     </td>
                     <td className="py-3 px-4 text-center">
                       <button
@@ -373,7 +377,10 @@ export function OrdersTable() {
                       </span>
                     )}
                   </div>
-                  <OrderStatusBadge status={order.status} />
+                  <div className="flex items-center gap-1.5">
+                    {stockEnabled && order.has_pending_shortfall && <ShortfallBadge />}
+                    <OrderStatusBadge status={order.status} />
+                  </div>
                 </div>
                 {clientesEnabled && (
                   <div onClick={(e) => e.stopPropagation()}>

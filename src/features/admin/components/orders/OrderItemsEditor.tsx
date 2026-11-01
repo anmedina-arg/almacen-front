@@ -8,6 +8,8 @@ import { useUpdateOrderItem } from '../../hooks/useUpdateOrderItem';
 import { useAddOrderItem } from '../../hooks/useAddOrderItem';
 import { useProducts } from '../../hooks/useProducts';
 import { formatPrice } from '@/utils/formatPrice';
+import { describeShortfall } from '../../utils/orderUtils';
+import { useFeatureFlags } from '../../context/FeatureFlagsContext';
 
 interface OrderItemsEditorProps {
   orderId: number;
@@ -24,6 +26,7 @@ export function OrderItemsEditor({
   const updateItem = useUpdateOrderItem();
   const addItem = useAddOrderItem();
   const { data: products } = useProducts({ includeInactive: true });
+  const { stock: stockEnabled } = useFeatureFlags();
 
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [editQuantity, setEditQuantity] = useState<string>('');
@@ -220,6 +223,14 @@ export function OrderItemsEditor({
                   <p className="text-xs text-gray-500">
                     {item.quantity} x {formatPrice(item.unit_price)}
                   </p>
+                  {(() => {
+                    // Faltante (#162): foto de la creación del pedido, se
+                    // muestra en cualquier estado como historial.
+                    const shortfallText = stockEnabled ? describeShortfall(item) : null;
+                    return shortfallText ? (
+                      <p className="text-xs font-medium text-orange-700">⚠ {shortfallText}</p>
+                    ) : null;
+                  })()}
                   {(() => {
                     const { margin, marginPct } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.subtotal));
                     return (

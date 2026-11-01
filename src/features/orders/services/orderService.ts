@@ -14,14 +14,15 @@ import { NotFoundError, ValidationError } from '@/lib/api/errors';
  * cuenta, sin pasar por acá todavía.
  */
 
-type OrderWithMargin = Order & { total_cost: number; margin: number; margin_pct: number };
+type OrderWithMargin = Order & { total_cost: number; margin: number; margin_pct: number; has_pending_shortfall: boolean };
+type ListedOrderItem = { unit_cost: number; unit_price: number; subtotal: number; product_name: string; shortfall: number | null };
 
 export async function getOrders(supabase: SupabaseClient, storeId: number): Promise<OrderWithMargin[]> {
   const { data, error } = await supabase
     .from('orders')
     // Trae los ítems en la misma query (evita un segundo round-trip que
     // pueda fallar/devolver vacío de forma independiente del principal).
-    .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code, created_at), order_payments(id, method, amount)')
+    .select('*, order_items(unit_cost, unit_price, subtotal, product_name, shortfall), clients(id, barrio, manzana_lote, display_code, created_at), order_payments(id, method, amount)')
     .eq('store_id', storeId)
     .order('created_at', { ascending: false });
 
@@ -33,8 +34,7 @@ export async function getOrders(supabase: SupabaseClient, storeId: number): Prom
   // unit_price/unit_cost son por 100gr.
   return (data ?? []).map((order) => {
     const { order_items, clients: client, order_payments, ...orderFields } = order;
-    const items: { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[] =
-      (order_items as unknown as { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
+    const items = (order_items as unknown as ListedOrderItem[]) ?? [];
     const total_cost = items.reduce((acc, item) => {
       const unitPrice = Number(item.unit_price);
       const itemCost = unitPrice > 0 ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice) : 0;
@@ -44,7 +44,11 @@ export async function getOrders(supabase: SupabaseClient, storeId: number): Prom
     const total = Number(orderFields.total);
     const margin = total - total_cost;
     const margin_pct = total > 0 ? (margin / total) * 100 : 0;
-    return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names } as OrderWithMargin;
+    // Marca "con faltante" (#162): solo pendientes, que es cuando el Store
+    // admin todavía tiene que resolverlo. El Faltante en sí queda en el
+    // detalle en cualquier estado. Sin Control de stock shortfall es NULL.
+    const has_pending_shortfall = orderFields.status === 'pending' && items.some((i) => Number(i.shortfall) > 0);
+    return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names, has_pending_shortfall } as OrderWithMargin;
   });
 }
 
