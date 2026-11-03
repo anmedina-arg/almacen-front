@@ -3,7 +3,7 @@ export function Footer() {
 	const encodedMessageAM = `Hola Andrés me interesa el sistema de ventas por Whatsapp, me contas un poco más?`;
 
 	return (
-		<footer className="bg-gray-100 border-t border-gray-200 mt-12 pb-20">
+		<footer className="bg-gray-100 border-t border-gray-200 mt-12 pb-32">
 			<div className="max-w-4xl mx-auto px-4 py-8">
 				<div className="text-center">
 					<p className="text-gray-600 text-sm mb-2">

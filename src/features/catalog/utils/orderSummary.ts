@@ -1,4 +1,5 @@
 import type { CartItem } from '../types';
+import { calculateLineTotal } from './productUtils';
 
 export type OrderSummaryItem = Pick<CartItem, 'id' | 'quantity' | 'isByWeight'>;
 
@@ -38,4 +39,19 @@ const pluralize = (count: number, singular: string, plural: string): string =>
 /** Texto para mostrar el resumen: "2 productos · 3 unidades". */
 export function formatOrderSummary({ products, units }: OrderSummary): string {
   return `${pluralize(products, 'producto', 'productos')} · ${pluralize(units, 'unidad', 'unidades')}`;
+}
+
+export type OrderTotalItem = Pick<CartItem, 'quantity' | 'saleType' | 'unitPrice'>;
+
+/** Total del pedido en pesos, con el mismo cálculo por peso que arma el mensaje de WhatsApp. */
+export function getOrderTotal(items: OrderTotalItem[]): number {
+  return items.reduce(
+    (sum, item) => sum + calculateLineTotal(item.quantity, item.saleType, item.unitPrice),
+    0
+  );
+}
+
+/** Total para mostrar, escrito como los precios del catálogo ("$6000"), sin ruido de coma flotante. */
+export function formatOrderTotal(total: number): string {
+  return `$${Number(total.toFixed(2))}`;
 }

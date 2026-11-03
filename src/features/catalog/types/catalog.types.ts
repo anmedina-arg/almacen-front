@@ -113,11 +113,6 @@ export interface ProductListProps {
   categories?: string[];
 }
 
-export interface WhatsAppButtonProps {
-  cartItems: CartItem[];
-  onSendMessage: () => void;
-}
-
 export interface ConfirmationModalProps {
   isOpen: boolean;
   message: string;

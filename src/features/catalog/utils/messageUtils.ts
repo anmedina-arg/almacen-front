@@ -1,6 +1,7 @@
 import { formatQuantity } from '@/utils/formatQuantity';
 import { MOBILE_MAX_WIDTH } from '@/utils/viewport';
 import { CartItem } from '../types';
+import { formatOrderTotal, getOrderTotal } from './orderSummary';
 import { calculateItemPrice, truncateProductName } from './productUtils';
 
 /**
@@ -20,11 +21,9 @@ export const generateWhatsAppMessage = (cartItems: CartItem[]): string => {
   const priceWidth = 10; // Columna de precio
 
   let message = 'Hola! Quiero hacerte un pedido de:\n\n';
-  let total = 0;
 
   cartItems.forEach((item) => {
     const itemTotal = calculateItemPrice(item);
-    total += itemTotal;
 
     let quantityText = '';
 
@@ -47,7 +46,8 @@ export const generateWhatsAppMessage = (cartItems: CartItem[]): string => {
     }
   });
 
-  message += `\nTotal = $${total}`;
+  // Mismo total que muestra la barra de pedido (#175): una sola fuente.
+  message += `\nTotal = ${formatOrderTotal(getOrderTotal(cartItems))}`;
   return message;
 };
 

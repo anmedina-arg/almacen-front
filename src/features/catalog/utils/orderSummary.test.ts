@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   formatOrderSummary,
+  formatOrderTotal,
   getOrderSummary,
+  getOrderTotal,
   type OrderSummaryItem,
 } from './orderSummary';
 import { useCartStore } from '../stores/cartStore';
@@ -114,5 +116,46 @@ describe('formatOrderSummary', () => {
 
   it('mezcla singular y plural cuando corresponde', () => {
     expect(formatOrderSummary({ products: 1, units: 2 })).toBe('1 producto · 2 unidades');
+  });
+});
+
+describe('getOrderTotal', () => {
+  it('un pedido vacío suma 0', () => {
+    expect(getOrderTotal([])).toBe(0);
+  });
+
+  it('suma unidades por su precio: 2 gaseosas de 3000 son 6000', () => {
+    expect(getOrderTotal([{ quantity: 2, saleType: 'unit', unitPrice: 3000 }])).toBe(6000);
+  });
+
+  it('cobra los productos por peso según los gramos: 500 g a 800 cada 100 g son 4000', () => {
+    expect(getOrderTotal([{ quantity: 500, saleType: '100gr', unitPrice: 800 }])).toBe(4000);
+  });
+
+  it('cobra por kilo: 1500 g a 9000 el kilo son 13500', () => {
+    expect(getOrderTotal([{ quantity: 1500, saleType: 'kg', unitPrice: 9000 }])).toBe(13500);
+  });
+
+  it('suma todas las líneas del pedido', () => {
+    const lines = [
+      { quantity: 2, saleType: 'unit' as const, unitPrice: 3000 },
+      { quantity: 500, saleType: 'kg' as const, unitPrice: 9000 },
+    ];
+
+    expect(getOrderTotal(lines)).toBe(10500);
+  });
+});
+
+describe('formatOrderTotal', () => {
+  it('escribe el total como los precios del catálogo: signo de pesos y número', () => {
+    expect(formatOrderTotal(6000)).toBe('$6000');
+  });
+
+  it('conserva los centavos cuando hay', () => {
+    expect(formatOrderTotal(4500.5)).toBe('$4500.5');
+  });
+
+  it('no muestra ruido de coma flotante', () => {
+    expect(formatOrderTotal(0.1 + 0.2)).toBe('$0.3');
   });
 });
