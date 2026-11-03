@@ -2,6 +2,8 @@
 
 No hay `public/manifest.json` — cada Store sirve el suyo dinámicamente desde `src/app/[store]/manifest/route.ts` (nombre e ícono leídos de `stores.name`/`stores.logo_url`, con `STATIC_ICONS` como fallback si la Store no cargó logo propio). Es un Route Handler común, no el file convention `manifest.ts` de Next.js — ese convention solo soporta la raíz (`app/manifest.ts`), no segmentos dinámicos anidados como `[store]/manifest.ts` (a diferencia de `sitemap.ts`/`opengraph-image.tsx`, que sí). El link al manifest se arma en `generateMetadata()` de `src/app/[store]/layout.tsx` (`/${store}/manifest`), no en el `layout.tsx` raíz — la raíz `/` es el landing multi-store, no es instalable como PWA.
 
+**Botón de instalar**: desde #173 es la acción "Instalar" del encabezado del catálogo (`InstallPWAButton`, montado en `HeaderClient`), no un botón flotante del layout raíz. Aparece solo en el catálogo de cada Store, no en la landing ni en el admin. El evento `appinstalled` se sigue registrando globalmente con `PWAInstallTracker`, que sí está en el layout raíz.
+
 **Nota**: el header rule para `source: '/manifest.json'` en `next.config.ts` no matchea ninguna request real hoy (la ruta real es `/[store]/manifest`) — pendiente de limpieza, no se tocó al escribir esto.
 
 ## Service Worker (`public/sw.js`)
