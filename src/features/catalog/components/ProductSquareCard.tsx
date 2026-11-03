@@ -5,7 +5,7 @@ import Image from 'next/image';
 import type { ProductCardProps } from '@/components/ProductCard';
 import { getWeightType } from '../utils/productUtils';
 import { isSinStock } from '../utils/sinStock';
-import { QuantityButton } from '@/components/ui/QuantityButton';
+import { QuantityStepper } from './QuantityStepper';
 import { PrecioOculto } from '@/components/ui/PrecioOculto';
 import { formatQuantity } from '@/utils/formatQuantity';
 import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
@@ -24,7 +24,11 @@ function ProductSquareCardBase({
 		quantity >= product.stock_quantity;
 
 	return (
-		<div className="flex flex-col items-center w-full border border-gray-200 rounded-lg min-h-64 shadow-sm hover:shadow-md transition-shadow">
+		<div
+			className={`flex flex-col items-center w-full border rounded-lg min-h-64 shadow-sm hover:shadow-md transition-shadow ${
+				quantity > 0 && !isOutOfStock ? 'border-selected-green bg-selected-wash' : 'border-gray-200'
+			}`}
+		>
 			<div className="relative w-full h-32 rounded-t-lg overflow-hidden flex-shrink-0">
 				<Image
 					src={getCloudinaryUrl(product.image, 400)}
@@ -66,28 +70,19 @@ function ProductSquareCardBase({
 						</span>
 					</div>
 				) : (
-					<div className="flex items-center gap-2 flex-shrink-0 flex-col">
-						{quantity > 0 && (
-							<span className="text-sm font-bold text-green-700 min-w-[50px] text-center bg-green-50 px-2 py-0.5 rounded-md">
-								{formatQuantity(quantity, weightType)}
-							</span>
-						)}
+					<div className="flex items-center gap-2 flex-shrink-0 flex-col pb-2">
+						<p className="text-xl font-semibold text-green-600">
+							${product.price}
+						</p>
 
-						<div className="flex items-center gap-2">
-							<p className="text-xl font-semibold text-green-600">
-								${product.price}
-							</p>
-
-							<QuantityButton variant="decrement" onClick={() => onRemove(product.id)} disabled={quantity === 0} aria-label={`Quitar ${product.name}`} />
-
-							<QuantityButton variant="increment" onClick={() => onAdd(product.id)} disabled={isAtStockLimit} aria-label={`Agregar ${product.name}`} />
-						</div>
-
-						{isAtStockLimit && (
-							<span className="text-xs text-orange-500 font-medium text-center leading-tight">
-								Máx. disponible
-							</span>
-						)}
+						<QuantityStepper
+							productName={product.name}
+							quantity={quantity}
+							quantityLabel={formatQuantity(quantity, weightType)}
+							isAtStockLimit={isAtStockLimit}
+							onAdd={() => onAdd(product.id)}
+							onRemove={() => onRemove(product.id)}
+						/>
 					</div>
 				)}
 			</div>

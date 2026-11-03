@@ -3,7 +3,7 @@ import Image from 'next/image';
 import type { ProductWithOptionalDescription } from '@/types';
 import { getWeightType } from '@/utils/productUtils';
 import { isSinStock } from '@/features/catalog/utils/sinStock';
-import { QuantityButton } from '@/components/ui/QuantityButton';
+import { QuantityStepper } from '@/features/catalog/components/QuantityStepper';
 import { PrecioOculto } from '@/components/ui/PrecioOculto';
 import { ComboDisclosure } from '@/components/ui/ComboDisclosure';
 import { formatQuantity } from '@/utils/formatQuantity';
@@ -33,7 +33,11 @@ function ProductCardBase({
   const hasComboItems = product.is_combo && product.combo_items && product.combo_items.length > 0;
 
   return (
-    <div className="flex w-full items-center justify-between border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+    <div
+      className={`flex w-full items-center justify-between border rounded-lg shadow-sm hover:shadow-md transition-shadow ${
+        quantity > 0 && !isOutOfStock ? 'border-selected-green bg-selected-wash' : 'border-gray-200'
+      }`}
+    >
       <div className={`flex ${'description' in product ? 'flex-col' : 'flex-row'} items-center gap-3`}>
         {product.price !== 0 && (
           <div className="flex-shrink-0 relative">
@@ -91,42 +95,22 @@ function ProductCardBase({
         </div>
       </div>
 
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 flex-shrink-0 pr-2">
         {isOutOfStock ? (
           <span className="text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-md">
             Sin Stock
           </span>
         ) : (
-          <>
-            {quantity > 0 && (
-              <span className="text-sm font-bold text-green-700 min-w-[50px] text-center bg-green-50 px-2 py-1 rounded-md">
-                {formatQuantity(quantity, weightType)}
-              </span>
-            )}
-            {product.price !== 0 && (
-              <div className="flex flex-col gap-1 items-center">
-                {quantity > 0 && (
-                  <QuantityButton
-                    variant="decrement"
-                    onClick={() => onRemove(product.id)}
-                    disabled={quantity === 0}
-                    aria-label={`Quitar ${product.name}`}
-                  />
-                )}
-                <QuantityButton
-                  variant="increment"
-                  onClick={() => onAdd(product.id)}
-                  disabled={isAtStockLimit}
-                  aria-label={`Agregar ${product.name}`}
-                />
-                {isAtStockLimit && (
-                  <span className="text-xs text-orange-500 font-medium text-center leading-tight">
-                    Máx. disponible
-                  </span>
-                )}
-              </div>
-            )}
-          </>
+          product.price !== 0 && (
+            <QuantityStepper
+              productName={product.name}
+              quantity={quantity}
+              quantityLabel={formatQuantity(quantity, weightType)}
+              isAtStockLimit={isAtStockLimit}
+              onAdd={() => onAdd(product.id)}
+              onRemove={() => onRemove(product.id)}
+            />
+          )
         )}
       </div>
     </div>

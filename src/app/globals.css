@@ -11,6 +11,16 @@
   --font-barlow: var(--font-barlow)
 }
 
+/* Verdes del catálogo del comprador (docs/design/catalogo.md). Tailwind 4 trae
+   una paleta distinta de la que se diseñó, así que se fijan acá y se usan como
+   bg-action-green, text-action-green-deep, border-selected-green, etc. */
+@theme {
+  --color-action-green: #15803d;
+  --color-action-green-deep: #166534;
+  --color-selected-green: #16a34a;
+  --color-selected-wash: #f0fdf4;
+}
+
 /* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
