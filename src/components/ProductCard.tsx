@@ -68,7 +68,7 @@ function ProductCardBase({
             isOutOfStock ? (
               <PrecioOculto className="h-6" />
             ) : (
-              <p className="text-base font-semibold text-green-600">
+              <p className="text-base font-semibold text-action-green">
                 ${product.price}
               </p>
             )

@@ -43,7 +43,7 @@ export function ProductSearchBar() {
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Buscar producto por nombre..."
-        className="h-11 w-full max-w-lg bg-white border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-1 focus:ring-green-500"
+        className="h-11 w-full max-w-lg bg-white border border-gray-300 rounded-lg px-3 text-sm focus:outline-none focus:ring-1 focus:ring-action-green"
         aria-label="Buscar productos"
       />
       <button

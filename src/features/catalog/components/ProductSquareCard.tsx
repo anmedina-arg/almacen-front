@@ -71,7 +71,7 @@ function ProductSquareCardBase({
 					</div>
 				) : (
 					<div className="flex items-center gap-2 flex-shrink-0 flex-col pb-2">
-						<p className="text-xl font-semibold text-green-600">
+						<p className="text-xl font-semibold text-action-green">
 							${product.price}
 						</p>
 

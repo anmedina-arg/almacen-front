@@ -99,7 +99,7 @@ export function SurtidoVariedadesModal({ isOpen, product, onClose }: SurtidoVari
                   <div className="flex items-center gap-2">
                     <span
                       className={`text-xs font-medium ${
-                        isUnitValid(unit) ? 'text-green-600' : 'text-red-500'
+                        isUnitValid(unit) ? 'text-action-green' : 'text-red-500'
                       }`}
                     >
                       {unit.length}/{min === max ? min : `${min}-${max}`}
@@ -122,7 +122,7 @@ export function SurtidoVariedadesModal({ isOpen, product, onClose }: SurtidoVari
                         key={variedad.id}
                         className={`flex items-center gap-1.5 text-sm px-2 py-1 rounded border cursor-pointer ${
                           checked
-                            ? 'bg-green-50 border-green-400 text-green-800'
+                            ? 'bg-selected-wash border-selected-green text-action-green-deep'
                             : 'border-gray-200 text-gray-700'
                         }`}
                       >
@@ -155,7 +155,7 @@ export function SurtidoVariedadesModal({ isOpen, product, onClose }: SurtidoVari
           <button
             onClick={handleConfirm}
             disabled={!allUnitsValid || isLoading}
-            className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 bg-action-green hover:bg-action-green-deep text-white py-2 px-4 rounded transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Confirmar
           </button>

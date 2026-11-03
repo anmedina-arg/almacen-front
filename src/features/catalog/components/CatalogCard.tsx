@@ -80,7 +80,7 @@ export function CatalogCard({ product, view, priority = false }: CatalogCardProp
         // líneas ya confirmadas — si no, reabrir para "revisarlas o
         // cambiarlas" (AC de #94) sería inalcanzable apenas se confirma.
         disabled={pendingCount === 0 && quantity === 0}
-        className="mt-1 flex min-h-11 w-full items-center justify-center text-sm font-medium text-center rounded border border-green-500 text-green-700 bg-green-50 hover:bg-green-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-green-50"
+        className="mt-1 flex min-h-11 w-full items-center justify-center text-sm font-medium text-center rounded border border-action-green text-action-green-deep bg-white hover:bg-selected-wash disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
       >
         Elegir sabores{pendingCount > 0 ? ` (${pendingCount})` : ''}
       </button>

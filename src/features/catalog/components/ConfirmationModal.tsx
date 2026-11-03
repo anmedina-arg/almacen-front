@@ -24,7 +24,7 @@ export function ConfirmationModal({
 					<h3 className="text-xl font-bold mb-4 text-gray-800">
 						Vas a enviar el siguiente mensaje con tu pedido:
 					</h3>
-					<div className="bg-gray-50 p-4 rounded text-sm border-l-4 border-green-500">
+					<div className="bg-gray-50 p-4 rounded text-sm border-l-4 border-action-green">
 						<div className="whitespace-pre-line text-gray-800">
 							{message}
 						</div>
@@ -48,7 +48,7 @@ export function ConfirmationModal({
 						<button
 							onClick={onConfirm}
 							disabled={isLoading}
-							className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+							className="flex-1 bg-action-green hover:bg-action-green-deep text-white py-2 px-4 rounded transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
 						>
 							{isLoading ? 'Enviando...' : 'Confirmar'}
 						</button>

@@ -117,7 +117,7 @@ function UserMenu() {
 						<Image src={avatarUrl} alt={displayName} width={36} height={36} className="rounded-full object-cover" />
 					</div>
 				) : (
-					<div className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
+					<div className="w-9 h-9 rounded-full bg-action-green text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
 						{initials}
 					</div>
 				)}
