@@ -70,6 +70,14 @@ _Avoid_: Stock virtual (forma de calcular el Disponible de un Combo, no un conce
 La diferencia entre lo que un ítem de un pedido pide y lo Disponible en el momento en que se registra (ej. "pidió 3, había 1"). Queda guardado en el ítem como foto de ese momento, junto con lo que se pidió entonces, y el Store admin lo ve en Pedidos, nunca el comprador. No bloquea nada: el Store admin lo resuelve por WhatsApp y confirma, edita o saca el ítem. Solo existe con Control de stock.
 _Avoid_: Error de stock, pedido rechazado (un Faltante nunca rechaza el pedido).
 
+**Sin stock**:
+Estado de un producto cuyo Disponible es 0. Es lo que el comprador ve como cartel "Sin Stock" en el catálogo, y la misma condición hace que el producto no muestre precio y quede al final de su subcategoría. Solo existe si la Store tiene Control de stock: sin esa flag ningún producto está Sin stock.
+_Avoid_: Agotado, sin existencias (un solo término para el comprador y para el código).
+
+**Más vendido**:
+Marca que reciben los productos que están entre los más vendidos de la Store en los últimos 30 días. Dentro de una subcategoría, los Más vendidos se muestran antes que el resto (siempre después de los que no están Sin stock). Es una marca de sí o no, no un puntaje: no hay ranking fino entre productos.
+_Avoid_: Scoring, puntaje, popularidad (no existe un puntaje por producto; el `affinity_score` de Recomendaciones mide qué se compra junto y no ordena el catálogo).
+
 ## Deployment model
 
 Un único deployment comparte todas las Stores — no hay una instancia/infraestructura separada por cliente. El middleware resuelve la Store activa según el primer segmento del path de la URL (no hay dominio propio todavía, ver [ADR-0003](./docs/adr/0003-path-based-tenant-resolution.md)) e inyecta el slug como header para que los endpoints de API filtren por Store.

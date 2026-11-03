@@ -9,6 +9,7 @@ import {
   getUnitPrice,
   calculateItemPrice,
 } from '../utils/productUtils';
+import { isSinStock } from '../utils/sinStock';
 
 let lineIdCounter = 0;
 function nextLineId(): string {
@@ -22,7 +23,7 @@ function nextLineId(): string {
 function isAtStockLimit(product: Product, currentQty: number): boolean {
   return (
     product.stock_quantity !== undefined &&
-    (product.stock_quantity === 0 || currentQty >= product.stock_quantity)
+    (isSinStock(product) || currentQty >= product.stock_quantity)
   );
 }
 
