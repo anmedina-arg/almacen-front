@@ -186,7 +186,7 @@ Un verde de acción oscuro sobre blanco, grises de estructura y unos pocos color
 
 Una columna a todo el ancho con 8px de margen lateral. De arriba hacia abajo: franja demo si corresponde, encabezado con logo, nombre y tres acciones de texto, y la zona fija. Solo la zona fija, es decir el buscador y las categorías con imagen, se queda arriba al bajar; está separada de la lista con una línea de 1px y fondo blanco sólido. Las acciones del encabezado son "Instalar", "Ayuda" e "Ingresar", cada una de 44px de alto como mínimo.
 
-La lista conserva sus dos modos, filas de a uno con 16px de separación o grilla de dos columnas con 8px, que se conmutan con el botón junto al buscador. Cada sección lleva un solo título. Al final de la lista se reserva espacio suficiente para que la barra de pedido nunca tape el último producto ni el pie.
+La lista conserva sus dos modos, filas de a uno con 16px de separación o grilla de dos columnas con 8px, que se conmutan con el botón junto al buscador. Cada sección lleva un solo título. Al tocar una categoría, el título de su sección queda 12px debajo de la zona fija: el margen de desplazamiento es la altura real de esa zona, que la zona publica en una variable de CSS, más 12px; no es un número fijo. Sin subcategorías la fila de subcategorías no se dibuja y la zona fija mide unos 149px; con subcategorías suma unos 35px. Al final de la lista se reserva espacio suficiente para que la barra de pedido nunca tape el último producto ni el pie.
 
 ## Elevation & Depth
 
@@ -273,7 +273,7 @@ El prototipo A no modela estos elementos. Se documentan como funcionan hoy y hay
 - **Productos por kg o 100 g y su formato de cantidad.**
 - **Producto surtido y su ventana de variedades, y etiquetas de combos.**
 - **Estados de stock** ("Sin Stock", "Máx. disponible") en el nuevo control de cantidad.
-- **Margen de desplazamiento de las secciones:** hoy 224px para librar la zona fija; hay que recalcularlo con la zona fija más baja.
+- **Búsqueda con la página scrolleada:** `ProductList` agrega un margen superior de 192px (`fixHeight`) cuando se busca con la página más abajo de 50px. Se pensó para la zona fija anterior y no se revisó en #176. Con pocos resultados el primero puede quedar tapado por la zona fija. Hay que revisarlo, probablemente llevando la vista al inicio de los resultados al buscar.
 - **Logo y avatar** del encabezado con imagen real de cada Store.
 
 ## Estado anterior
