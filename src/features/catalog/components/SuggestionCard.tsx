@@ -23,10 +23,10 @@ export function SuggestionCard({ product, onAdd }: SuggestionCardProps) {
       <p className="text-xs font-semibold text-gray-800 text-center leading-tight line-clamp-2">
         {product.name}
       </p>
-      <p className="text-xs font-bold text-green-600">${product.price}</p>
+      <p className="text-xs font-bold text-action-green">${product.price}</p>
       <button
         onClick={() => onAdd(product)}
-        className="text-xs bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded-md font-medium transition-colors w-full"
+        className="text-xs bg-action-green hover:bg-action-green-deep text-white px-2 py-1 rounded-md font-medium transition-colors w-full"
       >
         + Agregar
       </button>

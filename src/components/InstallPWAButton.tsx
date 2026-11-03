@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { headerActionClass } from './headerAction';
 import {
   trackPWAPromptShown,
   trackPWAInstallAccepted,
@@ -12,10 +13,17 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
 }
 
+/**
+ * Acción "Instalar" del encabezado del catálogo (#173). Antes era un botón
+ * flotante azul con globo de texto montado en el layout raíz; ahora vive solo
+ * en el encabezado del catálogo. Las condiciones para mostrarse son las mismas
+ * (no instalada y no descartada antes). Ya no hay botón para descartarla desde
+ * la pantalla, así que el evento 'button_dismissed' dejó de generarse; el
+ * rechazo del aviso del navegador ('user_rejected') se sigue registrando.
+ */
 export function InstallPWAButton() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showButton, setShowButton] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
 
   useEffect(() => {
     console.log('[PWA Button] InstallPWAButton component mounted');
@@ -39,11 +47,6 @@ export function InstallPWAButton() {
     // Mostrar el botón siempre (no depender del evento)
     console.log('[PWA Button] Showing install button');
     setShowButton(true);
-
-    // Mostrar tooltip después de 2 segundos
-    setTimeout(() => {
-      setShowTooltip(true);
-    }, 2000);
 
     // Escuchar el evento beforeinstallprompt para capturar el prompt
     const beforeInstallHandler = (e: Event) => {
@@ -102,62 +105,13 @@ export function InstallPWAButton() {
     // Limpiar el prompt
     setDeferredPrompt(null);
     setShowButton(false);
-    setShowTooltip(false);
-  };
-
-  const handleDismiss = () => {
-    localStorage.setItem('pwa-install-dismissed', 'true');
-    setShowButton(false);
-    setShowTooltip(false);
-    // Track que el usuario descartó el botón
-    trackPWAInstallDismissed('button_dismissed');
   };
 
   if (!showButton) return null;
 
   return (
-    <div className="fixed bottom-6 left-6 z-50">
-      <div className="relative group">
-        <button
-          onClick={handleInstallClick}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-xl transition-all duration-300"
-          aria-label="Instalar aplicación"
-        >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-            />
-          </svg>
-        </button>
-
-        {/* Botón de cerrar pequeño - fuera del botón principal */}
-        <button
-          onClick={handleDismiss}
-          className="absolute -top-1 -right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs transition-opacity opacity-0 group-hover:opacity-100"
-          aria-label="Descartar instalación"
-        >
-          ✕
-        </button>
-
-        {/* Tooltip informativo */}
-        {showTooltip && (
-          <div className="absolute bottom-full left-0 mb-2 bg-gray-800 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap opacity-90 animate-fade-in">
-            <div className="flex items-center gap-2">
-              <span>📱 Instalar aplicación</span>
-            </div>
-            <div className="absolute top-full left-4 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
-          </div>
-        )}
-      </div>
-    </div>
+    <button type="button" onClick={handleInstallClick} className={headerActionClass}>
+      Instalar
+    </button>
   );
 }

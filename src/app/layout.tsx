@@ -3,7 +3,6 @@ import { Barlow } from 'next/font/google';
 import './globals.css';
 import { Analytics } from '@vercel/analytics/react';
 import { ServiceWorkerRegistration } from '@/components/ServiceWorkerRegistration';
-import { InstallPWAButton } from '@/components/InstallPWAButton';
 import { GoogleAnalytics } from '@/components/GoogleAnalytics';
 import { PWAInstallTracker } from '@/components/PWAInstallTracker';
 import { Providers } from '@/components/Providers';
@@ -59,13 +58,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head />
       <body className={`${barlow.variable} antialiased`}>
         <Providers>
           {children}
         </Providers>
-        <InstallPWAButton />
         <PWAInstallTracker />
         <ServiceWorkerRegistration />
         <GoogleAnalytics />

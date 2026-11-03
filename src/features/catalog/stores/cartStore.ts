@@ -10,6 +10,7 @@ import {
   calculateItemPrice,
 } from '../utils/productUtils';
 import { isSinStock } from '../utils/sinStock';
+import { getOrderSummary } from '../utils/orderSummary';
 
 let lineIdCounter = 0;
 function nextLineId(): string {
@@ -331,6 +332,13 @@ export const useCartStore = create<CartStore>()((set) => ({
 
 // Granular selectors
 export const useCartItems = () => useCartStore((s) => s.items);
+
+// Resumen del pedido (#171): productos distintos y unidades, con la regla del
+// peso. useShallow (no un selector pelado): getOrderSummary devuelve un objeto
+// nuevo en cada llamada, y sin comparación superficial Zustand lo vería
+// siempre distinto y re-renderizaría en bucle (ver incidente #104).
+export const useOrderSummary = () =>
+  useCartStore(useShallow((s: CartStore) => getOrderSummary(s.items)));
 
 export function useCartItemQuantity(productId: number) {
   const selector = useCallback(

@@ -4,6 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import HelpButton from './HelpButton';
+import { InstallPWAButton } from './InstallPWAButton';
+import { headerActionClass } from './headerAction';
 import { useIsAuthenticated, useUser } from '@/features/auth/stores/authStore';
 import { useQuery } from '@tanstack/react-query';
 import { supabaseBrowser } from '@/lib/supabase/client';
@@ -115,7 +117,7 @@ function UserMenu() {
 						<Image src={avatarUrl} alt={displayName} width={36} height={36} className="rounded-full object-cover" />
 					</div>
 				) : (
-					<div className="w-9 h-9 rounded-full bg-green-600 text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
+					<div className="w-9 h-9 rounded-full bg-action-green text-white flex items-center justify-center text-sm font-semibold flex-shrink-0">
 						{initials}
 					</div>
 				)}
@@ -163,26 +165,24 @@ export function HeaderClient({ logo, storeName }: HeaderClientProps) {
 	const slug = useStoreSlug();
 
 	return (
-		<div className="relative z-10 flex items-center justify-between gap-3 px-3 py-2 bg-white/80 backdrop-blur-md">
+		<div className="relative z-50 flex flex-wrap items-center justify-between gap-x-3 px-3 py-2 bg-white">
 			{/* Izquierda: logo + título */}
-			<div className="flex items-center gap-2 flex-1 min-w-0">
+			<div className="flex min-w-0 flex-1 basis-48 items-center gap-2">
 				{logo}
-				<h1 className="text-xl font-bold leading-tight">{storeName}</h1>
+				<h1 className="text-xl font-bold leading-tight break-words">{storeName}</h1>
 			</div>
 
-			{/* Derecha: perfil + ayuda en una sola línea */}
-			<div className="flex items-center gap-2 flex-shrink-0">
+			{/* Derecha: instalar, ayuda e ingresar. Si no entran junto al nombre, bajan a una segunda línea. */}
+			<div className="ml-auto flex flex-shrink-0 items-center">
+				<InstallPWAButton />
+				<HelpButton />
 				{isAuthenticated ? (
 					<UserMenu />
 				) : (
-					<Link
-						href={`/${slug}/login`}
-						className="text-sm text-green-600 hover:text-green-700 font-medium transition-colors"
-					>
-						Iniciar sesión
+					<Link href={`/${slug}/login`} className={headerActionClass}>
+						Ingresar
 					</Link>
 				)}
-				<HelpButton />
 			</div>
 		</div>
 	);

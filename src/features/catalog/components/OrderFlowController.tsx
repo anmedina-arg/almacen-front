@@ -2,7 +2,7 @@
 
 import { useCartItems, useCartStore, useUnconfirmedSurtidoProducts } from '../stores/cartStore';
 import { useOrderSubmit } from '../hooks/useOrderSubmit';
-import { WhatsAppButton } from './WhatsAppButton';
+import { OrderBar } from './OrderBar';
 import { ConfirmationModal } from './ConfirmationModal';
 
 export function OrderFlowController({ whatsappNumber }: { whatsappNumber: string }) {
@@ -15,7 +15,7 @@ export function OrderFlowController({ whatsappNumber }: { whatsappNumber: string
 
   return (
     <>
-      <WhatsAppButton cartItems={items} onSendMessage={handleSendMessage} />
+      <OrderBar onSendMessage={handleSendMessage} />
       <ConfirmationModal
         isOpen={showConfirmation}
         message={whatsAppMessage}
