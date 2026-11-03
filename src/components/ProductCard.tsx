@@ -4,6 +4,7 @@ import type { ProductWithOptionalDescription } from '@/types';
 import { getWeightType } from '@/utils/productUtils';
 import { isSinStock } from '@/features/catalog/utils/sinStock';
 import { QuantityButton } from '@/components/ui/QuantityButton';
+import { PrecioOculto } from '@/components/ui/PrecioOculto';
 import { ComboDisclosure } from '@/components/ui/ComboDisclosure';
 import { formatQuantity } from '@/utils/formatQuantity';
 import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
@@ -60,9 +61,13 @@ function ProductCardBase({
           )}
           <h2 className="text-sm font-bold">{product.name}</h2>
           {product.price !== 0 && (
-            <p className="text-base font-semibold text-green-600">
-              ${product.price}
-            </p>
+            isOutOfStock ? (
+              <PrecioOculto className="h-6" />
+            ) : (
+              <p className="text-base font-semibold text-green-600">
+                ${product.price}
+              </p>
+            )
           )}
           {hasComboItems && (
             <ComboDisclosure items={product.combo_items!} />

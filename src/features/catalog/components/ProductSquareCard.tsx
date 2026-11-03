@@ -6,6 +6,7 @@ import type { ProductCardProps } from '@/components/ProductCard';
 import { getWeightType } from '../utils/productUtils';
 import { isSinStock } from '../utils/sinStock';
 import { QuantityButton } from '@/components/ui/QuantityButton';
+import { PrecioOculto } from '@/components/ui/PrecioOculto';
 import { formatQuantity } from '@/utils/formatQuantity';
 import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
 
@@ -59,9 +60,7 @@ function ProductSquareCardBase({
 
 				{isOutOfStock ? (
 					<div className="flex items-center gap-2 flex-shrink-0 flex-col">
-						<p className="text-xl font-semibold text-green-600">
-							${product.price}
-						</p>
+						<PrecioOculto className="h-7" />
 						<span className="text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-md">
 							Sin Stock
 						</span>
