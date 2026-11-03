@@ -159,7 +159,7 @@ Un verde de acción oscuro sobre blanco, grises de estructura y unos pocos color
 - **Lavado de pie** (#f9fafb): fondo del pie.
 
 ### Named Rules
-**The One Action Green Rule.** Un solo verde, #15803d, para todo lo que se toca y para el precio. El verde de selección y su fondo suave solo marcan qué producto ya está en el pedido. Los demás colores solo informan estados.
+**The One Action Green Rule.** Un solo verde, #15803d, para todo lo que se toca y para el precio. El verde de selección (#16a34a) se usa solo como borde, y su fondo suave (#f0fdf4) marca lo que ya está elegido: el producto que ya está en el pedido y la variedad elegida en la ventana del Producto Surtido. Ese fondo suave también es el fondo al pasar el cursor sobre los botones con borde verde, como "Agregar" y "Elegir sabores". Los demás colores solo informan estados.
 
 ## Typography
 
