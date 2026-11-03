@@ -269,7 +269,7 @@ El prototipo A no modela estos elementos. Se documentan como funcionan hoy y hay
 
 - **Botón de lista y grilla:** se mantiene junto al buscador como está. Hoy mide 36px, por debajo del mínimo de 44px.
 - **Vista de grilla:** controles y precio a adaptar al estándar de 44px.
-- **Subcategorías:** encabezados y marcadores de salto. Hoy cada subcategoría repite el título de la categoría con su propio contador, y en el prototipo se quitó esa repetición.
+- **Subcategorías:** encabezados y marcadores de salto. Desde #174, una categoría con una sola subcategoría del mismo nombre muestra un solo título con "N productos". Con varias subcategorías se mantienen el título de la categoría ("N categorías") y el subtítulo de cada una ("N productos" en una chapa gris); ese caso no se vio en pantalla con datos reales y su estilo de contador no sigue el de "Section". Los marcadores de salto no se revisaron.
 - **Productos por kg o 100 g y su formato de cantidad.**
 - **Producto surtido y su ventana de variedades, y etiquetas de combos.**
 - **Estados de stock** ("Sin Stock", "Máx. disponible") en el nuevo control de cantidad.
@@ -294,5 +294,4 @@ Lo que existía en el código el 2026-11-03, antes de adoptar el prototipo A. Si
 
 **Sigue abierto:**
 - **Casi sin tokens propios.** Desde #172 hay variables de color para el verde de acción, su versión profunda, el verde de selección y su fondo suave en el CSS global. El resto sigue siendo clases de Tailwind por componente.
-- **El documento HTML declara `lang="en"`** pero el contenido está en español.
-- **Faltan tildes** en textos como "Categorias".
+- **Texto de la ayuda desactualizado.** La ventana "¿Cómo hacer tu pedido?" todavía dice "Agrega productos con los botones + y -" y "Haz clic en el botón verde de WhatsApp", y ahora el envío se hace con "Enviar pedido" en la barra inferior.
