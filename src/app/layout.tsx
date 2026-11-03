@@ -58,7 +58,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head />
       <body className={`${barlow.variable} antialiased`}>
         <Providers>

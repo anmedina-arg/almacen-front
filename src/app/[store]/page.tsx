@@ -37,7 +37,7 @@ export default async function Home({ params }: { params: Promise<{ store: string
       <Suspense fallback={<ProductCatalogSkeleton />}>
         <ProductCatalogLoader storeId={storeId} whatsappNumber={whatsappNumber} />
       </Suspense>
-      <Footer />
+      <Footer isDemo={storeData.is_demo} storeName={storeData.name} />
     </div>
   );
 }

@@ -5,6 +5,11 @@ import type { Product } from '../types';
 import { CatalogCard } from './CatalogCard';
 import { useCatalogViewStore } from '../stores/catalogViewStore';
 import { sortCatalogProducts } from '../utils/sortCatalogProducts';
+import {
+	formatCategoryCount,
+	formatProductCount,
+	hasSingleSameNameSubcategory,
+} from '../utils/sectionTitles';
 
 interface ProductListProps {
 	products: Product[];
@@ -79,51 +84,64 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 					// Only the first 2 rendered products get priority={true} to fix LCP.
 					// This removes loading="lazy" and adds fetchpriority="high" on above-the-fold images.
 					let priorityRemaining = 2;
-					return grouped.map(({ main, subcategories }) => (
-						<div
-							key={String(main)}
-							id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
-							data-category={String(main)}
-							className="w-full scroll-mt-[calc(var(--catalog-sticky-h,12rem)_+_0.75rem)]"
-						>
-							<div className='flex gap-2 items-baseline'>
-								<span className="text-lg font-bold mb-2 capitalize">{String(main)}</span>
-								<span className=" font-light text-xs px-1 py-0.5 rounded-md flex items-center justify-center h-auto">({subcategories.length} Categorias)</span>
+					return grouped.map(({ main, subcategories }) => {
+						// Categoría con una sola subcategoría del mismo nombre: un solo título (#174).
+						const hasSingleTitle = hasSingleSameNameSubcategory(
+							String(main),
+							subcategories.map((sub) => sub.label)
+						);
+						return (
+							<div
+								key={String(main)}
+								id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
+								data-category={String(main)}
+								className="w-full scroll-mt-[calc(var(--catalog-sticky-h,12rem)_+_0.75rem)]"
+							>
+								<div className="flex items-baseline justify-between gap-2 mb-2">
+									<span className="text-lg font-bold capitalize">{String(main)}</span>
+									<span className="text-sm text-gray-500">
+										{hasSingleTitle
+											? formatProductCount(subcategories[0].products.length)
+											: formatCategoryCount(subcategories.length)}
+									</span>
+								</div>
+
+								{subcategories.map((sub) => {
+									return (
+										<section
+										key={`${String(main)}-${sub.key}`}
+										id={`${String(main).charAt(0).toUpperCase() + String(main).slice(1)}-${sub.key}`}
+										data-category={String(main)}
+										data-subcategory={sub.label}
+										className="mb-4 scroll-mt-[calc(var(--catalog-sticky-h,12rem)_+_0.75rem)]"
+									>
+											{!hasSingleTitle && (
+												<div className="flex items-center gap-2 w-full text-md font-semibold mb-2 border-b-1 border-gray-700">
+													<span>{sub.label}</span>
+													<span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{formatProductCount(sub.products.length)}</span>
+												</div>
+											)}
+
+											<div className={`${showList === 'list' ? 'flex flex-wrap gap-4' : 'grid grid-cols-2 gap-2'}`}>
+												{sub.products.map((product) => {
+													const isPriority = priorityRemaining > 0;
+													if (isPriority) priorityRemaining--;
+													return (
+														<CatalogCard
+															key={`${product.id}-${product.name}`}
+															product={product}
+															view={showList === 'list' ? 'list' : 'grid'}
+															priority={isPriority}
+														/>
+													);
+												})}
+											</div>
+										</section>
+									);
+								})}
 							</div>
-
-							{subcategories.map((sub) => {
-								return (
-									<section
-									key={`${String(main)}-${sub.key}`}
-									id={`${String(main).charAt(0).toUpperCase() + String(main).slice(1)}-${sub.key}`}
-									data-category={String(main)}
-									data-subcategory={sub.label}
-									className="mb-4 scroll-mt-[calc(var(--catalog-sticky-h,12rem)_+_0.75rem)]"
-								>
-										<div className="flex items-center gap-2 w-full text-md font-semibold mb-2 border-b-1 border-gray-700">
-											<span>{sub.label}</span>
-											<span className="bg-gray-600 font-light text-xs text-white px-1 py-0.5 rounded-md flex items-center justify-center">{sub.products.length} Productos</span>
-										</div>
-
-										<div className={`${showList === 'list' ? 'flex flex-wrap gap-4' : 'grid grid-cols-2 gap-2'}`}>
-											{sub.products.map((product) => {
-												const isPriority = priorityRemaining > 0;
-												if (isPriority) priorityRemaining--;
-												return (
-													<CatalogCard
-														key={`${product.id}-${product.name}`}
-														product={product}
-														view={showList === 'list' ? 'list' : 'grid'}
-														priority={isPriority}
-													/>
-												);
-											})}
-										</div>
-									</section>
-								);
-							})}
-						</div>
-					));
+						);
+					});
 				})()}
 			</div>
 		</div>

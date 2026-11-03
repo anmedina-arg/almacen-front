@@ -1,4 +1,5 @@
 import type { CartItem } from '../types';
+import { pluralize } from './pluralize';
 import { calculateLineTotal } from './productUtils';
 
 export type OrderSummaryItem = Pick<CartItem, 'id' | 'quantity' | 'isByWeight'>;
@@ -32,9 +33,6 @@ export function getOrderSummary(items: OrderSummaryItem[]): OrderSummary {
 
   return { products: productIds.size, units: unitLineQuantity + weightProductIds.size };
 }
-
-const pluralize = (count: number, singular: string, plural: string): string =>
-  `${count} ${count === 1 ? singular : plural}`;
 
 /** Texto para mostrar el resumen: "2 productos · 3 unidades". */
 export function formatOrderSummary({ products, units }: OrderSummary): string {
