@@ -287,12 +287,12 @@ Lo que existía en el código el 2026-11-03, antes de adoptar el prototipo A. Si
 - Globo con "1 productos": plural incorrecto y sin mostrar unidades.
 - Zona fija de casi una cuarta parte de la pantalla (cerca de 190px sobre 844px), con franja demo, encabezado, buscador y categorías.
 - "Iniciar sesión" de 20px y "Ayuda" de 28px de alto.
-- Tres verdes sin regla (#22c55e, #16a34a y #15803d), con el precio en #16a34a, cerca de 3,3 a 1 de contraste, bajo AA.
+- Tres verdes de la paleta de Tailwind 4 sin regla (green-500, green-600 y green-700), con el precio en green-600, cerca de 3,2 a 1 de contraste, bajo AA. Los hex de la paleta de Tailwind 3 (#22c55e, #16a34a y #15803d) que figuraban en una versión anterior de este documento no eran los que usa el código: el proyecto usa Tailwind 4, que trae otros valores. El verde de acción de este documento (#15803d) se fija como variable de color propia.
 - Título de sección repetido: "Gaseosas (1 Categorias)" seguido de otro "Gaseosas".
 - Barras fijas con translucidez y desenfoque.
 - Pie con nombre, email y publicidad del desarrollador en todas las tiendas.
 
 **Sigue abierto:**
-- **Sin tokens propios.** Todo son clases de Tailwind por componente; cambiar el verde implica editar muchos archivos. No hay variables de color en el CSS.
+- **Casi sin tokens propios.** Desde #172 hay variables de color para el verde de acción, su versión profunda, el verde de selección y su fondo suave en el CSS global. El resto sigue siendo clases de Tailwind por componente.
 - **El documento HTML declara `lang="en"`** pero el contenido está en español.
 - **Faltan tildes** en textos como "Categorias".
