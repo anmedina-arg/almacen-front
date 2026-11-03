@@ -165,7 +165,7 @@ export function HeaderClient({ logo, storeName }: HeaderClientProps) {
 	const slug = useStoreSlug();
 
 	return (
-		<div className="relative z-10 flex flex-wrap items-center justify-between gap-x-3 px-3 py-2 bg-white/80 backdrop-blur-md">
+		<div className="relative z-50 flex flex-wrap items-center justify-between gap-x-3 px-3 py-2 bg-white">
 			{/* Izquierda: logo + título */}
 			<div className="flex min-w-0 flex-1 basis-48 items-center gap-2">
 				{logo}

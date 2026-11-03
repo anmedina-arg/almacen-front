@@ -69,6 +69,9 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 		return () => { setFixHeight(false); };
 	}, [searchQuery]);
 
+	// El margen de desplazamiento de cada sección es la altura real de la zona
+	// fija (la publica StickyCatalogZone en --catalog-sticky-h) más 12 px. El 12rem
+	// es solo el valor de respaldo hasta que la zona publique su altura.
 	return (
 		<div className="flex flex-col items-center justify-center gap-4 sm:p-2">
 			<div className={`flex flex-col gap-4 ${fixHeight ? 'mt-48' : ''}`}>
@@ -81,7 +84,7 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 							key={String(main)}
 							id={String(main).charAt(0).toUpperCase() + String(main).slice(1)}
 							data-category={String(main)}
-							className="w-full scroll-mt-56"
+							className="w-full scroll-mt-[calc(var(--catalog-sticky-h,12rem)_+_0.75rem)]"
 						>
 							<div className='flex gap-2 items-baseline'>
 								<span className="text-lg font-bold mb-2 capitalize">{String(main)}</span>
@@ -95,7 +98,7 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 									id={`${String(main).charAt(0).toUpperCase() + String(main).slice(1)}-${sub.key}`}
 									data-category={String(main)}
 									data-subcategory={sub.label}
-									className="mb-4 scroll-mt-56"
+									className="mb-4 scroll-mt-[calc(var(--catalog-sticky-h,12rem)_+_0.75rem)]"
 								>
 										<div className="flex items-center gap-2 w-full text-md font-semibold mb-2 border-b-1 border-gray-700">
 											<span>{sub.label}</span>

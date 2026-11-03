@@ -84,26 +84,29 @@ export function FilterButtons({ categories }: FilterButtonsProps) {
         )}
       </div>
 
-      {/* Fila 2: badges de subcategoría */}
-      <div
-        ref={subRowRef}
-        className="flex gap-1.5 py-1.5 overflow-x-auto"
-        onScroll={handleSubRowScroll}
-      >
-        {allSubs.map((sub) => (
-          <SubcategoryBadge
-            key={sub.id}
-            ref={(el) => {
-              if (el) badgeRefs.current.set(sub.name.toLowerCase(), el);
-              else badgeRefs.current.delete(sub.name.toLowerCase());
-            }}
-            href={sub.anchor}
-            label={sub.name}
-            categoryName={sub.categoryName}
-            active={activeSubName === sub.name.toLowerCase()}
-          />
-        ))}
-      </div>
+      {/* Fila 2: badges de subcategoría. Sin subcategorías no se dibuja, para no
+          dejar un hueco vacío en la zona fija (#176). */}
+      {allSubs.length > 0 && (
+        <div
+          ref={subRowRef}
+          className="flex gap-1.5 py-1.5 overflow-x-auto"
+          onScroll={handleSubRowScroll}
+        >
+          {allSubs.map((sub) => (
+            <SubcategoryBadge
+              key={sub.id}
+              ref={(el) => {
+                if (el) badgeRefs.current.set(sub.name.toLowerCase(), el);
+                else badgeRefs.current.delete(sub.name.toLowerCase());
+              }}
+              href={sub.anchor}
+              label={sub.name}
+              categoryName={sub.categoryName}
+              active={activeSubName === sub.name.toLowerCase()}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
