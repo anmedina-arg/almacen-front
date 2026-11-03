@@ -4,7 +4,9 @@ import { memo } from 'react';
 import Image from 'next/image';
 import type { ProductCardProps } from '@/components/ProductCard';
 import { getWeightType } from '../utils/productUtils';
+import { isSinStock } from '../utils/sinStock';
 import { QuantityButton } from '@/components/ui/QuantityButton';
+import { PrecioOculto } from '@/components/ui/PrecioOculto';
 import { formatQuantity } from '@/utils/formatQuantity';
 import { getCloudinaryUrl } from '@/utils/cloudinaryUrl';
 
@@ -16,7 +18,7 @@ function ProductSquareCardBase({
 	priority = false,
 }: ProductCardProps) {
 	const weightType = getWeightType(product);
-	const isOutOfStock = product.stock_quantity === 0;
+	const isOutOfStock = isSinStock(product);
 	const isAtStockLimit = product.stock_quantity !== undefined &&
 		product.stock_quantity > 0 &&
 		quantity >= product.stock_quantity;
@@ -58,9 +60,7 @@ function ProductSquareCardBase({
 
 				{isOutOfStock ? (
 					<div className="flex items-center gap-2 flex-shrink-0 flex-col">
-						<p className="text-xl font-semibold text-green-600">
-							${product.price}
-						</p>
+						<PrecioOculto className="h-7" />
 						<span className="text-xs font-semibold text-white bg-red-500 px-2 py-1 rounded-md">
 							Sin Stock
 						</span>
