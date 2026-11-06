@@ -28,6 +28,17 @@
 -- usan los integration tests). Además se revoca EXECUTE a anon/PUBLIC y se
 -- fija search_path (hardening de SECURITY DEFINER, mismo criterio que
 -- log_price_change.sql).
+--
+-- #155: confirmed_by es el campo de auditoría de "quién confirmó", y antes se
+-- guardaba el UUID que mandaba quien llamaba: un admin de la Store podía
+-- dejar el pedido registrado como confirmado por otra persona llamando
+-- /rest/v1/rpc directo. Ahora, para quien no es service_role, es siempre
+-- auth.uid(): p_confirmed_by NULL o igual a su usuario se resuelve a su
+-- usuario, y cualquier otro UUID es Forbidden (el pedido no se confirma).
+-- service_role sigue pudiendo mandarlo explícito (integration tests y
+-- scripts server-side). La ruta PUT /api/orders/[id]/confirm ya manda el
+-- usuario de la sesión, así que el admin no cambia. Decisión de Andrés,
+-- 2026-11-06: rechazar y no ignorar en silencio.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION confirm_order(
@@ -40,7 +51,8 @@ SECURITY DEFINER
 SET search_path = public
 AS $$
 DECLARE
-  v_order orders%ROWTYPE;
+  v_order        orders%ROWTYPE;
+  v_confirmed_by UUID;
 BEGIN
   SELECT * INTO v_order FROM orders WHERE id = p_order_id;
 
@@ -48,9 +60,18 @@ BEGIN
     RAISE EXCEPTION 'Order not found: %', p_order_id;
   END IF;
 
-  IF auth.role() IS DISTINCT FROM 'service_role'
-     AND NOT public.is_store_admin(v_order.store_id) THEN
-    RAISE EXCEPTION 'Forbidden: Store admin access required';
+  IF auth.role() IS DISTINCT FROM 'service_role' THEN
+    IF NOT public.is_store_admin(v_order.store_id) THEN
+      RAISE EXCEPTION 'Forbidden: Store admin access required';
+    END IF;
+
+    IF p_confirmed_by IS NOT NULL AND p_confirmed_by IS DISTINCT FROM auth.uid() THEN
+      RAISE EXCEPTION 'Forbidden: confirmed_by must be the calling user';
+    END IF;
+
+    v_confirmed_by := auth.uid();
+  ELSE
+    v_confirmed_by := p_confirmed_by;
   END IF;
 
   IF v_order.status != 'pending' THEN
@@ -61,14 +82,14 @@ BEGIN
   UPDATE orders
   SET status       = 'confirmed',
       confirmed_at = NOW(),
-      confirmed_by = p_confirmed_by
+      confirmed_by = v_confirmed_by
   WHERE id = p_order_id;
 
   RETURN jsonb_build_object(
     'order_id',      p_order_id,
     'status',        'confirmed',
     'confirmed_at',  NOW(),
-    'confirmed_by',  p_confirmed_by
+    'confirmed_by',  v_confirmed_by
   );
 END;
 $$;

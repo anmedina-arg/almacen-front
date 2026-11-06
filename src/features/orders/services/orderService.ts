@@ -229,6 +229,10 @@ export async function confirmOrder(
   // ajena a la ruta — por eso se verifica acá, antes de invocarlo.
   await assertOrderInStore(supabase, storeId, orderId);
 
+  // #155: confirmedBy tiene que ser el usuario de la sesión (la ruta manda
+  // ctx.userId). Con un cliente de usuario, la función guarda auth.uid() si
+  // llega NULL y rechaza con Forbidden cualquier otro UUID; solo el
+  // service_role puede registrar a otra persona.
   const { data, error } = await supabase.rpc('confirm_order', {
     p_order_id: orderId,
     p_confirmed_by: confirmedBy,
