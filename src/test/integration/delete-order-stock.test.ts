@@ -234,4 +234,35 @@ describe('Eliminar un pedido y el stock (#164)', () => {
     expect(await orderExists(orderId)).toBe(false);
     expect(await stockOf(productId)).toBe(7);
   });
+
+  // #163: la ruta DELETE necesita saber qué productos tocó el borrado para
+  // invalidar su stock cacheado en el catálogo (invalidateProductStockTags,
+  // igual que cancelar o borrar un ítem). Después del DELETE los ítems ya no
+  // existen, así que el servicio los devuelve junto con el estado que tenía
+  // el pedido: solo un pendiente movió stock (#164).
+  it.skipIf(!hasCredentials)('deleteOrder devuelve el estado y los product_ids del pedido borrado (#163)', async () => {
+    const a = await createProduct();
+    const b = await createProduct();
+    await setStock(a, 5);
+    await setStock(b, 5);
+    const orderId = await order([{ productId: a, quantity: 1 }, { productId: b, quantity: 2 }]);
+
+    const deleted = await deleteOrder(admin, storeId, orderId);
+
+    expect(deleted.status).toBe('pending');
+    expect(deleted.productIds).toHaveLength(2);
+    expect(deleted.productIds).toEqual(expect.arrayContaining([a, b]));
+    expect(await orderExists(orderId)).toBe(false);
+  });
+
+  it.skipIf(!hasCredentials)('deleteOrder de un pedido de otra Store sigue dando Orden no encontrada sin borrar nada', async () => {
+    const productId = await createProduct();
+    await setStock(productId, 5);
+    const orderId = await order([{ productId, quantity: 1 }]);
+
+    await expect(deleteOrder(admin, untrackedStoreId, orderId)).rejects.toThrow('Orden no encontrada');
+
+    expect(await orderExists(orderId)).toBe(true);
+    expect(await stockOf(productId)).toBe(4);
+  });
 });

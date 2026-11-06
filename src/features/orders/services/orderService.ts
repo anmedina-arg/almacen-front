@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
-import type { Order, OrderWithItems, OrderItem } from '@/features/admin/types/order.types';
+import type { Order, OrderWithItems, OrderItem, OrderStatus } from '@/features/admin/types/order.types';
 import type { Client } from '@/features/admin/types/client.types';
 import type { OrderPayment } from '@/features/admin/types/payment.types';
 import type { CreateOrderSchemaInput, UpdateOrderSchemaInput, AddOrderItemSchemaInput, UpdateOrderItemSchemaInput } from '../schemas/orderSchemas';
@@ -169,17 +169,52 @@ export async function updateOrder(
   return data;
 }
 
-export async function deleteOrder(supabase: SupabaseClient, storeId: number, orderId: number): Promise<void> {
+/**
+ * Borra un pedido y devuelve lo que la ruta necesita para invalidar la
+ * caché de stock del catálogo (#163): el estado que tenía y los product_id
+ * de sus ítems.
+ *
+ * Los ítems se leen ANTES del DELETE porque order_items se elimina en
+ * cascada y después ya no hay nada que consultar — mismo motivo por el que
+ * cancel/route.ts hace su propio lookup (allí no tira si falla, porque la
+ * cancelación ya se aplicó; acá sí, porque todavía no se borró nada). Un
+ * ítem agregado o quitado entre esa lectura y el DELETE queda a lo sumo
+ * con su tag sin invalidar — tolerable según ADR-0014.
+ *
+ * El estado sale del RETURNING del propio DELETE, no de una lectura
+ * previa: es exactamente la fila que vio el trigger, así que no hay
+ * ventana para que un PUT cambie el status en el medio (code review de
+ * #163). Stock (#164, trigger return_stock_on_order_delete): solo un pedido
+ * *pendiente* devuelve el stock que descontó al crearse (equivale a
+ * cancelar y borrar). Confirmado y cancelado no mueven stock — el cancelado
+ * ya lo devolvió al cancelar. Por eso la ruta solo invalida si `status` era
+ * 'pending'.
+ */
+export async function deleteOrder(
+  supabase: SupabaseClient,
+  storeId: number,
+  orderId: number
+): Promise<{ status: OrderStatus; productIds: number[] }> {
+  const { data: items, error: itemsError } = await supabase.from('order_items').select('product_id').eq('order_id', orderId);
+  if (itemsError) throw new Error(itemsError.message);
+  const productIds = (items ?? [])
+    .map((item) => item.product_id)
+    .filter((productId): productId is number => productId != null);
+
   // Sin .select(), un id de otra Store hubiera devuelto éxito sin borrar
-  // nada (0 filas afectadas, sin error) — silencioso. order_items se
-  // eliminan solos vía ON DELETE CASCADE. Stock (#164, en la base, trigger
-  // return_stock_on_order_delete): solo un pedido *pendiente* devuelve el
-  // stock que descontó al crearse (equivale a cancelar y borrar). Confirmado
-  // y cancelado no mueven stock — el cancelado ya lo devolvió al cancelar.
-  const { data, error } = await supabase.from('orders').delete().eq('id', orderId).eq('store_id', storeId).select('id');
+  // nada (0 filas afectadas, sin error) — silencioso.
+  const { data, error } = await supabase
+    .from('orders')
+    .delete()
+    .eq('id', orderId)
+    .eq('store_id', storeId)
+    .select('id, status')
+    .overrideTypes<{ id: number; status: OrderStatus }[], { merge: false }>();
 
   if (error) throw new Error(error.message);
   if (!data || data.length === 0) throw new NotFoundError('Orden no encontrada');
+
+  return { status: data[0].status, productIds };
 }
 
 export async function confirmOrder(
