@@ -1,8 +1,8 @@
 # Dominio: Orders
 
 Ciclo de vida del pedido: creación (con descuento de stock), confirmación,
-cancelación (con devolución de stock), edición de ítems, historial de
-precio/costo. Consolidado en #84 (spec #81, mapa #74).
+cancelación (con devolución de stock), eliminación (devuelve stock solo si
+estaba pendiente, #164), edición de ítems, historial de precio/costo. Consolidado en #84 (spec #81, mapa #74).
 
 ## Tablas
 
@@ -59,7 +59,8 @@ Ambas son no-op (sin locks) si la Store no trackea stock (`is_stock_tracked()`) 
 | `recalculate_order_total.sql` | Al INSERT/UPDATE/DELETE en `order_items` — recalcula `orders.total`. |
 | `update_orders_updated_at.sql` | Al UPDATE en `orders`. |
 | `adjust_stock_on_item_update.sql` | Al UPDATE de `quantity` en `order_items` (orden `pending`) — ajusta stock por la diferencia, combo-aware, vía `reserve_order_stock()`/`return_order_stock()` (#73). Desde #97: no-op si `stock:false` para esa Store. Desde #161 nunca rechaza: una suba que no alcanza descuenta igual, y no toca el Faltante del ítem (es la foto de la creación del pedido). |
-| `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock vía `return_order_stock()` (#73), combo-aware. Desde #97: no-op si `stock:false` para esa Store. |
+| `return_stock_on_item_delete.sql` | Al DELETE en `order_items` (orden `pending`) — devuelve stock vía `return_order_stock()` (#73), combo-aware. Desde #97: no-op si `stock:false` para esa Store. Desde #164: si la orden ya no existe (cascade de un DELETE sobre `orders`) no devuelve nada — antes devolvía en cualquier estado y duplicaba el stock de un pedido cancelado. |
+| `return_stock_on_order_delete.sql` | Al DELETE en `orders` (BEFORE, con los ítems todavía vivos) — si la orden está `pending`, devuelve el stock de cada ítem vía `return_order_stock()`, combo-aware: eliminar un pendiente equivale a cancelarlo y borrarlo (#164). Confirmado y cancelado no mueven stock. No-op si `stock:false`. |
 | `sync_order_items_unit_cost.sql` | Al UPDATE de `products.cost` — sincroniza `order_items.unit_cost` en pedidos con `unit_cost = 0`. Dispara sobre `products`, tabla de Products (#85) — el `CREATE TRIGGER` que la ata vive en `supabase/schema/products/products.sql` (agregado por #85), no acá. |
 | `log_price_change.sql` | Al INSERT/UPDATE en `products` — registra en `product_price_history`. Mismo caso: el `CREATE TRIGGER` vive en `supabase/schema/products/products.sql`. Setea `store_id` desde `NEW.store_id` (#46) — antes no lo seteaba, dejando cada cambio de precio real con `store_id NULL`. |
 

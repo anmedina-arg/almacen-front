@@ -49,6 +49,15 @@ CREATE TRIGGER trg_orders_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_orders_updated_at();
 
+-- ── Trigger: devolver stock al eliminar un pedido pendiente (#164) ───────
+-- BEFORE DELETE, con los ítems todavía vivos (el CASCADE sobre order_items
+-- corre después). Su función vive en return_stock_on_order_delete.sql.
+DROP TRIGGER IF EXISTS trg_return_stock_on_order_delete ON public.orders;
+CREATE TRIGGER trg_return_stock_on_order_delete
+  BEFORE DELETE ON public.orders
+  FOR EACH ROW
+  EXECUTE FUNCTION return_stock_on_order_delete();
+
 -- ── RLS ──────────────────────────────────────────────────────────────────
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 
