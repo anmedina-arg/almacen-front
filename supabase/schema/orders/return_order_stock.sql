@@ -15,7 +15,7 @@
 -- No-op si la Store no trackea stock (is_stock_tracked, #97, ADR-0012) —
 -- mismo criterio que reserve_order_stock().
 --
--- Sin GRANT explícito ni SECURITY DEFINER — mismo criterio que
+-- Sin SECURITY DEFINER y sin EXECUTE para anon (#154) — mismo criterio que
 -- is_stock_tracked()/get_combo_effective_stock(): solo se llama desde
 -- adentro de otras funciones, nunca directo desde la API.
 -- ============================================================================
@@ -53,3 +53,7 @@ BEGIN
   END IF;
 END;
 $$;
+
+-- #154: sin EXECUTE para anon. En una base nueva ya nace cerrada; este REVOKE
+-- alinea las existentes (docs/agents/schema-changes.md, "Permisos de ejecución de funciones").
+REVOKE EXECUTE ON FUNCTION public.return_order_stock(INTEGER, NUMERIC, INTEGER) FROM PUBLIC, anon;

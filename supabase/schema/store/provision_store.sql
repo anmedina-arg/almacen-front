@@ -7,7 +7,7 @@
 -- segundo INSERT fallara (ej. profile_id inválido). Mismo patrón que
 -- create_order.sql para escrituras multi-tabla.
 --
--- Sin SECURITY DEFINER ni GRANT: stores/store_admins no tienen policies de
+-- Sin SECURITY DEFINER ni GRANT, y desde #154 con REVOKE de anon/PUBLIC: stores/store_admins no tienen policies de
 -- INSERT (default-deny, ver ADR-0006/ADR-0005) y esta función está pensada
 -- para llamarse únicamente con el service_role key (bypassea RLS por rol de
 -- Postgres, no por definer) — ver src/lib/store/provisionStore.ts y
@@ -54,3 +54,7 @@ BEGIN
   RETURN jsonb_build_object('store_id', v_store_id, 'slug', p_slug);
 END;
 $$;
+
+-- #154: sin EXECUTE para anon. En una base nueva ya nace cerrada; este REVOKE
+-- alinea las existentes (docs/agents/schema-changes.md, "Permisos de ejecución de funciones").
+REVOKE EXECUTE ON FUNCTION public.provision_store(TEXT, TEXT, UUID, TEXT, JSONB, BOOLEAN) FROM PUBLIC, anon;

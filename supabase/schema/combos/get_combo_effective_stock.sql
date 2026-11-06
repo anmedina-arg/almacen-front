@@ -21,3 +21,7 @@ RETURNS NUMERIC(12, 3) AS $$
   LEFT JOIN product_stock ps ON ps.product_id = cc.component_product_id
   WHERE cc.combo_product_id = p_product_id;
 $$ LANGUAGE sql STABLE;
+
+-- #154: sin EXECUTE para anon. En una base nueva ya nace cerrada; este REVOKE
+-- alinea las existentes (docs/agents/schema-changes.md, "Permisos de ejecución de funciones").
+REVOKE EXECUTE ON FUNCTION public.get_combo_effective_stock(INTEGER) FROM PUBLIC, anon;

@@ -49,7 +49,7 @@ aplicados a otros ítems del mismo pedido):
 | `reserve_order_stock.sql` | Descuenta (con lock) el stock de una línea de pedido, combo-aware, y devuelve su Faltante respecto de lo Disponible (`get_available_stock()`, dominio Stock). Desde #160 nunca rechaza: el stock puede quedar negativo, y un producto/componente sin fila se crea en negativo. Qué hacer con el Faltante lo decide el caller. Extraída en #73 — vivía duplicada, con variantes, en `create_order()` y `adjust_stock_on_item_update()`. |
 | `return_order_stock.sql` | Inverso de `reserve_order_stock()` — devuelve stock de una línea, combo-aware, siempre "exitoso". Extraída en #73 — vivía duplicada en `cancel_order()`, `adjust_stock_on_item_update()` (rama de baja) y `return_stock_on_item_delete()`. |
 
-Ambas son no-op (sin locks) si la Store no trackea stock (`is_stock_tracked()`) — encapsulan ahí el chequeo que antes repetían las 4 funciones por separado. Sin GRANT explícito ni `SECURITY DEFINER`: solo se llaman desde adentro de otras funciones de este dominio, nunca directo desde la API (mismo criterio que `is_stock_tracked()`/`get_combo_effective_stock()`, dominio Stock/Combos).
+Ambas son no-op (sin locks) si la Store no trackea stock (`is_stock_tracked()`) — encapsulan ahí el chequeo que antes repetían las 4 funciones por separado. Sin `SECURITY DEFINER`, y con `REVOKE EXECUTE ... FROM PUBLIC, anon` desde #154: solo se llaman desde adentro de otras funciones de este dominio, nunca directo desde la API (mismo criterio que `is_stock_tracked()`/`get_combo_effective_stock()`, dominio Stock/Combos).
 
 ## Funciones trigger (no se llaman directo)
 
