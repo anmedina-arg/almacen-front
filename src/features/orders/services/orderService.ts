@@ -172,8 +172,10 @@ export async function updateOrder(
 export async function deleteOrder(supabase: SupabaseClient, storeId: number, orderId: number): Promise<void> {
   // Sin .select(), un id de otra Store hubiera devuelto éxito sin borrar
   // nada (0 filas afectadas, sin error) — silencioso. order_items se
-  // eliminan solos vía ON DELETE CASCADE; el stock NO se devuelve (borrado
-  // permanente, no cancelación).
+  // eliminan solos vía ON DELETE CASCADE. Stock (#164, en la base, trigger
+  // return_stock_on_order_delete): solo un pedido *pendiente* devuelve el
+  // stock que descontó al crearse (equivale a cancelar y borrar). Confirmado
+  // y cancelado no mueven stock — el cancelado ya lo devolvió al cancelar.
   const { data, error } = await supabase.from('orders').delete().eq('id', orderId).eq('store_id', storeId).select('id');
 
   if (error) throw new Error(error.message);

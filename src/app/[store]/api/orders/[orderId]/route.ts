@@ -65,7 +65,8 @@ export const PUT = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx,
  * DELETE /api/orders/[orderId]
  * Permanently delete an order and all its items. Admin only.
  * order_items are removed automatically via ON DELETE CASCADE.
- * Note: stock is NOT restored — handle separately if needed.
+ * Stock (#164): a pending order returns its stock (DB trigger); confirmed
+ * and cancelled orders don't move stock.
  */
 export const DELETE = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx, { orderId: orderIdParam }) => {
   try {

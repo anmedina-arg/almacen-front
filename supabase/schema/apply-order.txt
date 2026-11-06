@@ -54,6 +54,10 @@ combos/get_combo_effective_stock.sql
 clients/clients.sql
 
 # ── Orders ───────────────────────────────────────────────────────────────
+# return_stock_on_order_delete va antes que orders.sql porque orders.sql ata
+# el trigger (#164). Al crearse no depende de nada posterior (usa RECORD, no
+# %ROWTYPE); order_items y return_order_stock() se resuelven en runtime.
+orders/return_stock_on_order_delete.sql
 orders/orders.sql
 orders/recalculate_order_total.sql
 orders/reserve_order_stock.sql

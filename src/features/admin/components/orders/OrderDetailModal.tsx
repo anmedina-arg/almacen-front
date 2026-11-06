@@ -6,6 +6,8 @@ import { useConfirmOrder } from '../../hooks/useConfirmOrder';
 import { useCancelOrder } from '../../hooks/useCancelOrder';
 import { useDeleteOrder } from '../../hooks/useDeleteOrder';
 import { useUpdateOrder } from '../../hooks/useUpdateOrder';
+import { useFeatureFlags } from '../../context/FeatureFlagsContext';
+import type { OrderStatus } from '../../types/order.types';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
 import { computeMargin, MarginDisplay } from './MarginDisplay';
@@ -18,22 +20,30 @@ interface OrderDetailModalProps {
   onClose: () => void;
 }
 
+// Qué pasa con el stock al eliminar lo decide la base (#164, trigger
+// return_stock_on_order_delete): solo un pendiente devuelve. El aviso tiene
+// que decir lo mismo, y solo se muestra con Control de stock (ADR-0012).
+const DELETE_STOCK_NOTE: Record<OrderStatus, string> = {
+  pending: ' Se devolverá el stock de sus productos.',
+  confirmed: ' El stock descontado NO se restaurará automáticamente.',
+  cancelled: ' El stock ya se devolvió al cancelar y no se mueve.',
+};
+
 export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   const { data: order, isLoading, error } = useOrderDetail(orderId);
   const confirmOrder = useConfirmOrder();
   const cancelOrder = useCancelOrder();
   const deleteOrder = useDeleteOrder();
   const updateOrder = useUpdateOrder();
+  const { stock: stockEnabled } = useFeatureFlags();
 
   const [showWhatsAppMessage, setShowWhatsAppMessage] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
   const [newDateStr, setNewDateStr] = useState('');
 
   const handleDelete = () => {
-    const isConfirmed = order?.status === 'confirmed';
-    const msg = isConfirmed
-      ? `Eliminar pedido #${orderId}? Esta acción es irreversible. El stock descontado al confirmar NO se restaurará automáticamente.`
-      : `Eliminar pedido #${orderId}? Esta acción es irreversible.`;
+    const stockNote = stockEnabled && order ? DELETE_STOCK_NOTE[order.status] : '';
+    const msg = `Eliminar pedido #${orderId}? Esta acción es irreversible.${stockNote}`;
     if (!confirm(msg)) return;
     deleteOrder.mutate(orderId, { onSuccess: onClose });
   };
