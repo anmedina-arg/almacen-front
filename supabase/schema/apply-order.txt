@@ -17,6 +17,10 @@
 # listado acá — si falta uno, el build falla, para que un objeto nuevo no
 # quede afuera de la base local en silencio.
 
+# ── Privilegios por defecto (#154): las funciones nacen sin EXECUTE para anon ──
+# Va primero para regir sobre todo lo que se crea después.
+store/default_privileges.sql
+
 # ── Funciones trigger genéricas (plpgsql, sin dependencias) ──────────────
 products/update_updated_at_column.sql
 store/handle_updated_at.sql

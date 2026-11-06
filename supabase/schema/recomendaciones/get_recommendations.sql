@@ -60,6 +60,7 @@ RETURNS TABLE (product_id INT, score NUMERIC)
 LANGUAGE sql
 STABLE
 SECURITY DEFINER
+SET search_path = public
 AS $$
   WITH cart_affinity AS (
     -- Sumar scores de afinidad para todos los productos del carrito
@@ -143,5 +144,6 @@ AS $$
   LIMIT p_limit;
 $$;
 
-GRANT EXECUTE ON FUNCTION get_recommendations TO anon;
-GRANT EXECUTE ON FUNCTION get_recommendations TO authenticated;
+-- RPC pública del catálogo (sugerencias en el carrito): anon a propósito. #154:
+-- firma explícita y service_role, misma forma que las demás públicas.
+GRANT EXECUTE ON FUNCTION public.get_recommendations(INTEGER[], INTEGER[], INTEGER, INTEGER) TO anon, authenticated, service_role;

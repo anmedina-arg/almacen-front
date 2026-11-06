@@ -20,13 +20,12 @@
 -- create_order() va en este archivo, con CREATE OR REPLACE FUNCTION sobre
 -- esta misma firma — no crear un archivo nuevo para tocar esta función.
 --
--- GRANTs (histórico, NO re-verificado en #84 — supabase_create_order.sql
--- tampoco los tenía, por eso no se re-escriben acá; ver supabase_orders.sql
--- en supabase/_archive/): esta función necesita EXECUTE para `anon` además
--- de `authenticated` — sostiene el checkout público por WhatsApp sin login.
--- Si se toca la firma de create_order() en el futuro, confirmar contra
--- pg_proc_acl / information_schema.routine_privileges que ambos roles
--- siguen con EXECUTE antes de dar el cambio por completo.
+-- GRANTs: esta función necesita EXECUTE para `anon` además de `authenticated`
+-- — sostiene el checkout público por WhatsApp sin login. Hasta #154 dependía
+-- del grant implícito de Supabase (histórico, no re-verificado en #84); desde
+-- #154 las funciones nacen sin anon (store/default_privileges.sql) y el GRANT
+-- es explícito al final de este archivo. Si se toca la firma en el futuro, el
+-- GRANT acompaña a la firma nueva.
 --
 -- #97 (ADR-0012): con is_stock_tracked(p_store_id) = false, ningún ítem
 -- (combo o no) chequea ni descuenta product_stock — se trata como siempre
@@ -69,6 +68,7 @@ CREATE OR REPLACE FUNCTION public.create_order(
  RETURNS jsonb
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET search_path = public
 AS $function$
 DECLARE
   v_order_id         BIGINT;
@@ -124,3 +124,7 @@ BEGIN
   );
 END;
 $function$;
+
+-- #154: checkout público — anon a propósito. Antes dependía del grant implícito
+-- de Supabase; desde default_privileges.sql tiene que ser explícito.
+GRANT EXECUTE ON FUNCTION public.create_order(UUID, TEXT, TEXT, JSONB, INTEGER) TO anon, authenticated, service_role;

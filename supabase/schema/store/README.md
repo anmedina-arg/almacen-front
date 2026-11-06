@@ -18,6 +18,12 @@ sistema). Consolidado en #87 (spec #81, mapa #74).
 | `provision_store.sql` | Alta de una Store nueva (#26, ADR-0006): INSERT en `stores` + `store_admins` en una sola transacción. Sin `SECURITY DEFINER` ni `GRANT` — pensada para llamarse solo con el `service_role` key (bypassea RLS por rol de Postgres), nunca desde una ruta pública. Ver `src/features/store/services/provisionStore.ts` y `scripts/provision-store.ts`. Desde #153 acepta `p_is_demo` (default false) para marcar la Demo Store en el alta — al cambiar la firma, en una base existente hay que `DROP` la versión anterior antes del `CREATE` (ver header). |
 | `get_orders_count_by_store.sql` | Pedidos de cada Store en una tabla (#151): total y desglose por estado, incluye Stores sin pedidos. **Solo `super_admin`** (chequeo directo sobre `profiles.role`, no `is_store_admin()`, porque cruza todas las Stores y un Store admin no debe verlas). `SECURITY DEFINER` + `GRANT` solo a `authenticated`. La llama la página `/admin` del Platform admin vía `src/features/store/services/getOrdersCountByStore.ts`. Excluye la Demo Store (`is_demo`, #153): sus pedidos son pruebas de prospectos, no métrica. |
 
+## Privilegios por defecto
+
+| Archivo | Qué hace |
+|---|---|
+| `default_privileges.sql` | `ALTER DEFAULT PRIVILEGES` del schema `public` (#154): las funciones nuevas nacen sin `EXECUTE` para `anon` ni `PUBLIC`. No es una función ni una tabla; va primero en `apply-order.txt` para regir sobre todo lo que se crea después. Reglas para los canónicos que definen funciones en `docs/agents/schema-changes.md`, "Permisos de ejecución de funciones". |
+
 ## Funciones trigger (no se llaman directo)
 
 | Archivo | Cuándo dispara |

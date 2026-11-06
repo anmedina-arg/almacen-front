@@ -31,7 +31,8 @@ Cada `supabase/schema/<dominio>/` lleva su propio `README.md` — un glosario de
 2. Tabla **Tablas**: archivo → qué es (incluye, si aplica, una nota corta sobre sus policies RLS más notables).
 3. Tabla **Funciones RPC** (las que llama la API): archivo → qué hace. Marcar ahí mismo los objetos de prioridad 1 (ver `docs/agents/schema-changes.md`) y cualquier regresión/fix real que haya tenido ese objeto puntual.
 4. Tabla **Funciones trigger** (no se llaman directo): archivo → cuándo dispara.
-5. Sección **Gaps conocidos, no corregidos acá** — todo lo que se identificó como pendiente/fuera de alcance durante la consolidación (ej. un objeto sin scoping por Store todavía), para que el próximo ticket que lo toque no tenga que re-descubrirlo.
+5. (Opcional) una tabla propia para objetos que no son tabla ni función, como **Privilegios por defecto** en `store/README.md` (`default_privileges.sql`, #154).
+6. Sección **Gaps conocidos, no corregidos acá** — todo lo que se identificó como pendiente/fuera de alcance durante la consolidación (ej. un objeto sin scoping por Store todavía), para que el próximo ticket que lo toque no tenga que re-descubrirlo.
 
 ## Regla de retención de archivos (decidida en #77)
 

@@ -36,6 +36,7 @@ CREATE OR REPLACE FUNCTION adjust_stock_on_item_update()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_order_status order_status;

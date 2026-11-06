@@ -61,6 +61,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   IF NOT public.is_store_admin(p_store_id) THEN
@@ -137,3 +138,8 @@ BEGIN
   ORDER BY o.created_at DESC, o.id, oi.id;
 END;
 $$;
+
+-- #154: RPC de admin, sin EXECUTE para anon. Por qué y por qué hay que nombrar
+-- `anon`: docs/agents/schema-changes.md, "Permisos de ejecución de funciones".
+REVOKE EXECUTE ON FUNCTION public.export_ventas(INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.export_ventas(INTEGER, TIMESTAMPTZ, TIMESTAMPTZ) TO authenticated, service_role;

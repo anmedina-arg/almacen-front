@@ -48,6 +48,7 @@ CREATE OR REPLACE FUNCTION get_top_seller_ids(
 )
 RETURNS TABLE (product_id INT)
 LANGUAGE sql STABLE SECURITY DEFINER
+SET search_path = public
 AS $$
   WITH ranked AS (
     SELECT
@@ -67,3 +68,7 @@ AS $$
   )
   SELECT product_id FROM ranked WHERE rnk <= 3;
 $$;
+
+-- #154: RPC pública del catálogo (badge "más vendido"), se invoca con la anon
+-- key desde el servidor. Solo lee ids de productos de la Store pedida.
+GRANT EXECUTE ON FUNCTION public.get_top_seller_ids(INTEGER, INTEGER) TO anon, authenticated, service_role;
