@@ -36,7 +36,7 @@ aplicados a otros ítems del mismo pedido):
 | Archivo | Qué hace |
 |---|---|
 | `create_order.sql` | Crea la orden + ítems, descuenta stock (combo-aware). Ya resuelta en #49 — reubicada sin re-verificar. Desde #97: si la Store tiene `stock:false` (`is_stock_tracked()`, dominio Stock), no chequea ni descuenta — todo producto se trata como siempre disponible. Desde #73: el chequeo+descuento por línea vive en `reserve_order_stock()`, no inline (ver "Flujo" arriba y "Funciones auxiliares" abajo). |
-| `confirm_order.sql` | Pasa una orden `pending` a `confirmed`. No estaba en el AC original de #84 — se agregó al notar que vivía en el mismo archivo fuente que `cancel_order`, para no dejarla huérfana. |
+| `confirm_order.sql` | Pasa una orden `pending` a `confirmed`. No estaba en el AC original de #84 — se agregó al notar que vivía en el mismo archivo fuente que `cancel_order`, para no dejarla huérfana. Desde #155 `confirmed_by` es siempre `auth.uid()` para quien no es `service_role`: `p_confirmed_by` NULL o igual al usuario se resuelve a su usuario y cualquier otro UUID es `Forbidden`. |
 | `cancel_order.sql` | Cancela una orden, devuelve stock (combo-aware) vía `return_order_stock()` (#73). Desde #97: no devuelve stock si `stock:false` para esa Store — mismo criterio que `create_order`. |
 | `add_order_item_variedades.sql` | Paso posterior a `create_order()` (#95) — guarda las Variedades elegidas por línea de Producto Surtido. A propósito NO modifica `create_order()`: correlaciona los `order_items` recién creados por orden de inserción (`ORDER BY id`), ya que `create_order()` no devuelve sus ids. Best-effort: si falla, la orden ya quedó creada igual. Desde #154 sigue abierta a `anon` (la llama el checkout) pero solo acepta un pedido `pending`, creado hace menos de 10 minutos y sin Variedades todavía: antes servía para sumar Variedades a cualquier pedido existente conociendo `order_id` + `store_id`. |
 
@@ -49,7 +49,7 @@ aplicados a otros ítems del mismo pedido):
 | `reserve_order_stock.sql` | Descuenta (con lock) el stock de una línea de pedido, combo-aware, y devuelve su Faltante respecto de lo Disponible (`get_available_stock()`, dominio Stock). Desde #160 nunca rechaza: el stock puede quedar negativo, y un producto/componente sin fila se crea en negativo. Qué hacer con el Faltante lo decide el caller. Extraída en #73 — vivía duplicada, con variantes, en `create_order()` y `adjust_stock_on_item_update()`. |
 | `return_order_stock.sql` | Inverso de `reserve_order_stock()` — devuelve stock de una línea, combo-aware, siempre "exitoso". Extraída en #73 — vivía duplicada en `cancel_order()`, `adjust_stock_on_item_update()` (rama de baja) y `return_stock_on_item_delete()`. |
 
-Ambas son no-op (sin locks) si la Store no trackea stock (`is_stock_tracked()`) — encapsulan ahí el chequeo que antes repetían las 4 funciones por separado. Sin GRANT explícito ni `SECURITY DEFINER`: solo se llaman desde adentro de otras funciones de este dominio, nunca directo desde la API (mismo criterio que `is_stock_tracked()`/`get_combo_effective_stock()`, dominio Stock/Combos).
+Ambas son no-op (sin locks) si la Store no trackea stock (`is_stock_tracked()`) — encapsulan ahí el chequeo que antes repetían las 4 funciones por separado. Sin `SECURITY DEFINER`, y con `REVOKE EXECUTE ... FROM PUBLIC, anon` desde #154: solo se llaman desde adentro de otras funciones de este dominio, nunca directo desde la API (mismo criterio que `is_stock_tracked()`/`get_combo_effective_stock()`, dominio Stock/Combos).
 
 ## Funciones trigger (no se llaman directo)
 

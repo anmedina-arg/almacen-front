@@ -134,4 +134,66 @@ describe('cancel_order / confirm_order exigen admin de la Store de la orden', ()
     expect(cancel.error).toBeNull();
     expect(await statusOf(cancelledId)).toBe('cancelled');
   });
+
+  // #155: confirmed_by es el campo de auditoría de "quién confirmó". Antes se
+  // guardaba el UUID que mandaba quien llamaba, así que un admin de la Store
+  // podía dejar el pedido registrado como confirmado por otra persona
+  // llamando /rest/v1/rpc directo. Ahora, para quien no es service_role,
+  // es siempre auth.uid(): NULL o su propio id se resuelven a su usuario y
+  // cualquier otro UUID es Forbidden. service_role (tests, scripts) sigue
+  // pudiendo mandarlo explícito.
+  describe('confirm_order: confirmed_by es el usuario de la sesión (#155)', () => {
+    async function confirmedByOf(orderId: number) {
+      const { data } = await admin.from('orders').select('confirmed_by').eq('id', orderId).single();
+      return data!.confirmed_by as string | null;
+    }
+
+    async function userIdOf(client: SupabaseClient) {
+      const { data, error } = await client.auth.getUser();
+      expect(error).toBeNull();
+      return data.user!.id;
+    }
+
+    it.skipIf(!hasCredentials)('un admin no puede registrar el pedido como confirmado por otra persona', async () => {
+      const orderId = await pendingOrderInStoreA();
+      const otherAdminId = await userIdOf(adminBClient);
+
+      const confirm = await adminAClient.rpc('confirm_order', { p_order_id: orderId, p_confirmed_by: otherAdminId });
+
+      expect(confirm.error?.message).toMatch(/Forbidden/);
+      expect(await statusOf(orderId)).toBe('pending');
+      expect(await confirmedByOf(orderId)).toBeNull();
+    });
+
+    it.skipIf(!hasCredentials)('un admin que manda NULL queda registrado como quien confirmó', async () => {
+      const orderId = await pendingOrderInStoreA();
+      const adminAId = await userIdOf(adminAClient);
+
+      const confirm = await adminAClient.rpc('confirm_order', { p_order_id: orderId, p_confirmed_by: null });
+
+      expect(confirm.error).toBeNull();
+      expect(confirm.data.confirmed_by).toBe(adminAId);
+      expect(await confirmedByOf(orderId)).toBe(adminAId);
+    });
+
+    it.skipIf(!hasCredentials)('un admin que manda su propio id queda registrado igual', async () => {
+      const orderId = await pendingOrderInStoreA();
+      const adminAId = await userIdOf(adminAClient);
+
+      const confirm = await adminAClient.rpc('confirm_order', { p_order_id: orderId, p_confirmed_by: adminAId });
+
+      expect(confirm.error).toBeNull();
+      expect(await confirmedByOf(orderId)).toBe(adminAId);
+    });
+
+    it.skipIf(!hasCredentials)('el service_role puede mandar confirmed_by explícito', async () => {
+      const orderId = await pendingOrderInStoreA();
+      const someUserId = await userIdOf(adminBClient);
+
+      const confirm = await admin.rpc('confirm_order', { p_order_id: orderId, p_confirmed_by: someUserId });
+
+      expect(confirm.error).toBeNull();
+      expect(await confirmedByOf(orderId)).toBe(someUserId);
+    });
+  });
 });

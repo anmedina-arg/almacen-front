@@ -23,10 +23,31 @@ Desde #154 rige `supabase/schema/store/default_privileges.sql`: **las funciones 
 
 - **RPC de admin** (la llama una ruta bajo `[store]/api/` con sesión): no necesita `GRANT`. Además, si es `SECURITY DEFINER`, valida al caller **adentro** con `is_store_admin(<store>)` y, cuando corresponda, tolera `service_role` (`auth.role() IS DISTINCT FROM 'service_role'`), como `cancel_order.sql`. Las que ya existían llevan `REVOKE EXECUTE ... FROM PUBLIC, anon` explícito porque los defaults no son retroactivos — y hay que nombrar `anon`: un `REVOKE ... FROM PUBLIC` solo no saca el grant explícito de Supabase.
 - **RPC pública** (catálogo o checkout, se invoca con la anon key): `GRANT EXECUTE ... TO anon, authenticated, service_role` explícito, con un comentario de por qué es pública. Hoy son `create_order`, `add_order_item_variedades`, `get_recommendations`, `get_top_seller_ids`, `get_available_stock`.
-- **Función auxiliar que evalúan las policies RLS o una función `SECURITY INVOKER` pública** (`is_store_admin`, `is_stock_tracked`): también `GRANT ... TO anon`, porque corre con los privilegios de quien consulta, incluido el visitante anónimo. Una auxiliar que solo se llama desde adentro de funciones `SECURITY DEFINER` (`reserve_order_stock`, `return_order_stock`, `get_combo_effective_stock`) no necesita nada.
+- **Función auxiliar que evalúan las policies RLS o una función `SECURITY INVOKER` pública** (`is_store_admin`, `is_stock_tracked`): también `GRANT ... TO anon`, porque corre con los privilegios de quien consulta, incluido el visitante anónimo. Una auxiliar que solo se llama desde adentro de funciones `SECURITY DEFINER` (`reserve_order_stock`, `return_order_stock`, `get_combo_effective_stock`), o con el `service_role` (`provision_store`), no lleva `GRANT`: en una base nueva nace cerrada. En las bases existentes se le agrega `REVOKE EXECUTE ... FROM PUBLIC, anon` en su canónico, porque conservaban el `EXECUTE` implícito de Supabase.
 - **Toda `SECURITY DEFINER`**, RPC o trigger, lleva `SET search_path = public` (advisor `function_search_path_mutable`). Si el cuerpo crea tablas temporales, `pg_temp` sigue resolviéndose implícito.
 - Las funciones trigger no necesitan `EXECUTE` para nadie: el privilegio se chequea al crear el trigger, no al dispararse.
 - El `REVOKE` global de `default_privileges.sql` alcanza a toda función que `postgres` cree después en cualquier schema. Si se instala una extensión nueva desde el Dashboard y se la usa desde consultas `anon`/`authenticated`, verificar su ACL con la consulta de abajo y dar `GRANT` explícito si hace falta.
+
+**Alinear una base existente (paso operativo único, #154, 2026-11-06).** Los defaults no son retroactivos: una base creada antes de `default_privileges.sql` conserva el `EXECUTE` implícito de Supabase para `PUBLIC` y `anon` en las funciones viejas, incluidas las de trigger. Producción se alineó con la local con un bloque que recorre las funciones de `public`, quita `PUBLIC` a todas y `anon` a todas menos las 7 públicas (`add_order_item_variedades`, `create_order`, `get_available_stock`, `get_recommendations`, `get_top_seller_ids`, `is_stock_tracked`, `is_store_admin`). En una base nueva ese bloque no hace nada. Se verifica con la consulta de abajo: solo esas 7 deben aparecer con `anon_exec`, y ninguna función con `EXECUTE` para `PUBLIC`.
+
+```sql
+DO $$
+DECLARE
+  r record;
+  public_rpcs text[] := ARRAY['add_order_item_variedades','create_order','get_available_stock','get_recommendations','get_top_seller_ids','is_stock_tracked','is_store_admin'];
+BEGIN
+  FOR r IN
+    SELECT p.oid::regprocedure AS sig, p.proname
+    FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public'
+  LOOP
+    EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM PUBLIC', r.sig);
+    IF NOT (r.proname = ANY (public_rpcs)) THEN
+      EXECUTE format('REVOKE EXECUTE ON FUNCTION %s FROM anon', r.sig);
+    END IF;
+  END LOOP;
+END $$;
+```
 
 Cómo verificar quién puede ejecutar qué, contra la base que corresponda:
 
@@ -38,7 +59,7 @@ WHERE n.nspname = 'public'
 ORDER BY p.prosecdef DESC, anon_exec DESC, p.proname;
 ```
 
-El test `src/test/integration/secdef-rpc-authorization.test.ts` recorre las RPC de admin con un cliente anónimo (espera `42501`), un admin de otra Store (espera `Forbidden`) y el admin de la Store (espera éxito): al agregar una RPC de admin nueva, sumarla a esa lista.
+El test `src/test/integration/secdef-rpc-authorization.test.ts` también cubre esas cuatro auxiliares (anon recibe `42501`) y recorre las RPC de admin con un cliente anónimo (espera `42501`), un admin de otra Store (espera `Forbidden`) y el admin de la Store (espera éxito): al agregar una RPC de admin nueva, sumarla a esa lista.
 
 ## Validar que una fila pertenece a la misma Store que su padre
 

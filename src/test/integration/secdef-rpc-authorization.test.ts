@@ -148,6 +148,8 @@ describe('RPC SECURITY DEFINER: quién puede llamar a qué (#154)', () => {
     await admin.from('profiles').delete().in('id', userIds);
     for (const id of userIds) await admin.auth.admin.deleteUser(id);
     await admin.from('stores').delete().in('id', storeIds);
+    // Por si provision_store llegara a ejecutarse como anon: esa Store no está en storeIds.
+    await admin.from('stores').delete().like('slug', 'test-secdef-denied-%');
   });
 
   describe('RPC de admin', () => {
@@ -178,6 +180,63 @@ describe('RPC SECURITY DEFINER: quién puede llamar a qué (#154)', () => {
       const { data: stock } = await admin.from('product_stock').select('quantity').eq('product_id', productAId).single();
       // upsert 5 + increment 1 + batch 1
       expect(Number(stock!.quantity)).toBe(7);
+    });
+  });
+
+  // Auxiliares que no son SECURITY DEFINER: corren con los privilegios del
+  // caller y las policies RLS frenan lo que escriben, pero ningún flujo
+  // público las llama. En producción conservaban el EXECUTE implícito de
+  // Supabase para anon hasta que #154 las cerró; en una base nueva nacen
+  // cerradas por default_privileges.sql. Este test falla si alguna vuelve a
+  // quedar abierta en cualquiera de las dos.
+  describe('funciones auxiliares sin EXECUTE para anon', () => {
+    // Slug propio de este test: el conteo de abajo no puede confundirse con la
+    // Store que crea el test del service_role (otro slug) ni con otra corrida.
+    const deniedSlug = `test-secdef-denied-${randomUUID().slice(0, 8)}`;
+    const helpers: Array<{ name: string; args: () => RpcArgs }> = [
+      { name: 'get_combo_effective_stock', args: () => ({ p_product_id: productAId }) },
+      { name: 'reserve_order_stock', args: () => ({ p_product_id: productAId, p_quantity: 1, p_store_id: storeAId }) },
+      { name: 'return_order_stock', args: () => ({ p_product_id: productAId, p_quantity: 1, p_store_id: storeAId }) },
+      {
+        name: 'provision_store',
+        args: () => ({
+          p_slug: deniedSlug,
+          p_name: 'no debería crearse',
+          p_owner_profile_id: userIds[0],
+          p_whatsapp_number: null,
+          p_feature_flags: {},
+          p_is_demo: false,
+        }),
+      },
+    ];
+
+    it.skipIf(!hasCredentials)('un visitante sin sesión no tiene EXECUTE sobre ninguna (42501)', async () => {
+      const stockOf = async () =>
+        (await admin.from('product_stock').select('quantity').eq('product_id', productAId).maybeSingle()).data?.quantity ?? null;
+      const stockBefore = await stockOf();
+
+      for (const helper of helpers) {
+        const { error } = await anon.rpc(helper.name, helper.args());
+        expect(error?.code, helper.name).toBe('42501');
+      }
+      // El rechazo fue por permisos, no por efectos: no se movió stock ni se creó Store.
+      expect(await stockOf()).toEqual(stockBefore);
+      const { count } = await admin.from('stores').select('id', { count: 'exact', head: true }).eq('slug', deniedSlug);
+      expect(count).toBe(0);
+    });
+
+    it.skipIf(!hasCredentials)('el service_role sigue pudiendo provisionar una Store', async () => {
+      const slug = `test-secdef-prov-${randomUUID().slice(0, 8)}`;
+      const { data, error } = await admin.rpc('provision_store', {
+        p_slug: slug,
+        p_name: slug,
+        p_owner_profile_id: userIds[0],
+        p_whatsapp_number: null,
+        p_feature_flags: {},
+        p_is_demo: false,
+      });
+      expect(error).toBeNull();
+      storeIds.push(data.store_id);
     });
   });
 

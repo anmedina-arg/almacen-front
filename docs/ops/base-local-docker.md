@@ -61,6 +61,10 @@ Al armarlo se comparó la base local contra producción con las mismas consultas
 
 Fuera del alcance de la base local, a propósito: las 3 tablas legacy de producción (`inventory`, `products_backup`, `categories_backup`), que ningún código, RPC, vista ni test usa. Desde 2026-10-20 tienen RLS activo sin policies (cerradas para `anon`/`authenticated`; solo `postgres`/`service_role` las leen) — conservan los grants de `anon`/`authenticated`, a propósito, como único cambio mínimo. Su eliminación sigue pendiente de decisión; `products_backup` es una foto del catálogo de Cevil al 2026-04-10 con costos, exportarla antes de un eventual `DROP`.
 
+## Paridad de permisos de funciones con producción (2026-11-06, #154)
+
+La base local nace con `store/default_privileges.sql` y los `GRANT`/`REVOKE` de cada canónico. Producción es anterior, así que se alineó una vez con el bloque descrito en `docs/agents/schema-changes.md` ("Alinear una base existente"). Resultado verificado: las dos tienen las mismas 40 funciones de `public`, solo 7 ejecutables por `anon`, ninguna ejecutable por `PUBLIC` y ninguna `SECURITY DEFINER` sin `search_path`. El proyecto hosteado `market-test` quedó pausado para siempre (se reemplazó por esta base): no cuenta para la paridad.
+
 ## Problemas conocidos
 
 - `supabase start` necesita Docker Desktop corriendo. Si otro proyecto ya usa los puertos `5433x`, cambiarlos en `supabase/config.toml` **y** en `.env.test`.
