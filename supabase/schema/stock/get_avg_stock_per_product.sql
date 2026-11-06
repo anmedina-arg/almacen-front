@@ -39,6 +39,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_day DATE;
@@ -100,3 +101,8 @@ $$;
 COMMENT ON FUNCTION public.get_avg_stock_per_product IS
   'Promedio de stock diario por producto en una ventana de fechas, scoped por Store (#21). '
   'Usa product_stock para el día actual y stock_movement_log para días anteriores.';
+
+-- #154: RPC de admin, sin EXECUTE para anon. Por qué y por qué hay que nombrar
+-- `anon`: docs/agents/schema-changes.md, "Permisos de ejecución de funciones".
+REVOKE EXECUTE ON FUNCTION public.get_avg_stock_per_product(INTEGER, DATE, DATE) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_avg_stock_per_product(INTEGER, DATE, DATE) TO authenticated, service_role;

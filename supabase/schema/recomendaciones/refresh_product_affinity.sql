@@ -53,6 +53,7 @@ CREATE OR REPLACE FUNCTION refresh_product_affinity(p_store_id INTEGER)
 RETURNS VOID
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_max NUMERIC;
@@ -121,4 +122,7 @@ BEGIN
 END;
 $$;
 
-GRANT EXECUTE ON FUNCTION refresh_product_affinity TO authenticated;
+-- #154: RPC de admin, sin EXECUTE para anon. Por qué y por qué hay que nombrar
+-- `anon`: docs/agents/schema-changes.md, "Permisos de ejecución de funciones".
+REVOKE EXECUTE ON FUNCTION public.refresh_product_affinity(INTEGER) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.refresh_product_affinity(INTEGER) TO authenticated, service_role;

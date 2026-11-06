@@ -28,6 +28,7 @@ CREATE OR REPLACE FUNCTION public.increment_product_stock(
 )
 RETURNS public.product_stock
 LANGUAGE plpgsql SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_user_id UUID;
@@ -66,5 +67,7 @@ BEGIN
 END;
 $$;
 
-REVOKE ALL ON FUNCTION public.increment_product_stock(INTEGER, NUMERIC, INTEGER, TEXT) FROM PUBLIC;
-GRANT EXECUTE ON FUNCTION public.increment_product_stock(INTEGER, NUMERIC, INTEGER, TEXT) TO authenticated;
+-- #154: el REVOKE anterior era solo FROM PUBLIC y no sacaba el grant explícito
+-- que Supabase le da a anon — había que nombrarlo.
+REVOKE ALL ON FUNCTION public.increment_product_stock(INTEGER, NUMERIC, INTEGER, TEXT) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.increment_product_stock(INTEGER, NUMERIC, INTEGER, TEXT) TO authenticated, service_role;

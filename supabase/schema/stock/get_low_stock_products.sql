@@ -37,6 +37,7 @@ RETURNS TABLE (
 )
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 BEGIN
   IF NOT public.is_store_admin(p_store_id) THEN
@@ -62,3 +63,8 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.get_low_stock_products IS 'Retorna productos activos de una Store con stock por debajo del mínimo. Filtra por products.store_id.';
+
+-- #154: RPC de admin, sin EXECUTE para anon. Por qué y por qué hay que nombrar
+-- `anon`: docs/agents/schema-changes.md, "Permisos de ejecución de funciones".
+REVOKE EXECUTE ON FUNCTION public.get_low_stock_products(INTEGER) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.get_low_stock_products(INTEGER) TO authenticated, service_role;

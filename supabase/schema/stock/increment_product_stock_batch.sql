@@ -34,12 +34,20 @@ CREATE OR REPLACE FUNCTION public.increment_product_stock_batch(
 RETURNS JSONB
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_entry      JSONB;
   v_product_id INTEGER;
   v_results    JSONB := '[]'::JSONB;
 BEGIN
+  -- #154: chequeo propio, no delegado. Antes quedaba protegida solo porque
+  -- increment_product_stock() valida adentro (y el error por fila se tragaba
+  -- como success:false): si alguien relajaba la interna, esta se abría.
+  IF NOT public.is_store_admin(p_store_id) THEN
+    RAISE EXCEPTION 'Forbidden: Store admin access required';
+  END IF;
+
   FOR v_entry IN SELECT * FROM jsonb_array_elements(p_entries)
   LOOP
     v_product_id := (v_entry->>'product_id')::INTEGER;
@@ -62,3 +70,8 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.increment_product_stock_batch IS 'Ingreso de stock por lote, un solo round-trip, best-effort por fila (savepoint implícito por entrada) — reemplaza el patrón de N llamadas a increment_product_stock() desde TypeScript (#122, audit #106).';
+
+-- #154: RPC de admin, sin EXECUTE para anon. Por qué y por qué hay que nombrar
+-- `anon`: docs/agents/schema-changes.md, "Permisos de ejecución de funciones".
+REVOKE EXECUTE ON FUNCTION public.increment_product_stock_batch(JSONB, INTEGER) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.increment_product_stock_batch(JSONB, INTEGER) TO authenticated, service_role;

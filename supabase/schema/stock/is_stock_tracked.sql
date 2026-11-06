@@ -32,3 +32,7 @@ AS $$
   FROM public.stores
   WHERE id = p_store_id;
 $$;
+
+-- #154: la llama get_available_stock() (SECURITY INVOKER) desde el catálogo
+-- público, o sea con los privilegios de anon.
+GRANT EXECUTE ON FUNCTION public.is_stock_tracked(INTEGER) TO anon, authenticated, service_role;

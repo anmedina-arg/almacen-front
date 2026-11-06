@@ -34,6 +34,7 @@ CREATE OR REPLACE FUNCTION public.upsert_product_stock(
 RETURNS public.product_stock
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_user_id UUID;
@@ -75,3 +76,8 @@ END;
 $$;
 
 COMMENT ON FUNCTION public.upsert_product_stock IS 'Crea o actualiza el stock de un producto, scoped por Store (p_store_id requerido). Verifica membership de store_admins (o super_admin) y que el producto pertenezca a esa Store.';
+
+-- #154: RPC de admin, sin EXECUTE para anon. Por qué y por qué hay que nombrar
+-- `anon`: docs/agents/schema-changes.md, "Permisos de ejecución de funciones".
+REVOKE EXECUTE ON FUNCTION public.upsert_product_stock(INTEGER, NUMERIC, INTEGER, NUMERIC, TEXT, TEXT) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.upsert_product_stock(INTEGER, NUMERIC, INTEGER, NUMERIC, TEXT, TEXT) TO authenticated, service_role;

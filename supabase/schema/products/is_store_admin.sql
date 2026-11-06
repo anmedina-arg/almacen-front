@@ -42,3 +42,9 @@ AS $$
       SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'super_admin'
     );
 $$;
+
+-- #154: desde default_privileges.sql las funciones nacen sin EXECUTE para anon.
+-- Esta la evalúan las policies RLS con los privilegios de quien consulta —
+-- un visitante anónimo leyendo el catálogo incluido — así que el grant a
+-- anon es obligatorio, no una concesión.
+GRANT EXECUTE ON FUNCTION public.is_store_admin(INTEGER) TO anon, authenticated, service_role;

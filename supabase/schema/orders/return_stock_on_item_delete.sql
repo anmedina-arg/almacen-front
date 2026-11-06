@@ -37,6 +37,7 @@ CREATE OR REPLACE FUNCTION return_stock_on_item_delete()
 RETURNS TRIGGER
 LANGUAGE plpgsql
 SECURITY DEFINER
+SET search_path = public
 AS $$
 DECLARE
   v_order_status order_status;
