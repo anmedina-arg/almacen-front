@@ -114,10 +114,17 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Se valida sobre lo que realmente se va a mandar (#167): un componente
+    // con cantidad 0 no cuenta, y si todos quedan afuera el PUT de
+    // componentes fallaría después de haber guardado el producto.
+    const componentPayload = components
+      .filter((c) => c.quantity > 0)
+      .map((c) => ({ component_product_id: c.component_product_id, quantity: c.quantity }));
+
     const newErrors: Record<string, string> = {};
     if (!formData.name.trim()) newErrors.name = 'Nombre requerido';
     if (formData.price <= 0) newErrors.price = 'El precio debe ser mayor a 0';
-    if (components.length === 0) newErrors.components = 'Debe agregar al menos un componente';
+    if (componentPayload.length === 0) newErrors.components = 'Debe agregar al menos un componente';
     if (!formData.image && !pendingFile) newErrors.image = 'Imagen requerida';
     // Categoría requerida solo al crear (#66/#116) — un combo es un producto
     // (is_combo=true) y pasa por el mismo POST /api/products, que ahora
@@ -139,10 +146,6 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
       }
     }
 
-    const componentPayload = components
-      .filter((c) => c.quantity > 0)
-      .map((c) => ({ component_product_id: c.component_product_id, quantity: c.quantity }));
-
     const productPayload = {
       name: formData.name.trim(),
       price: formData.price,
@@ -158,14 +161,12 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
     };
 
     if (mode === 'create') {
-      createMutation.mutate(productPayload as Parameters<typeof createMutation.mutate>[0], {
-        onSuccess: (newProduct) => {
-          updateComponentsMutation.mutate(
-            { productId: newProduct.id, components: componentPayload },
-            { onSuccess: () => onClose() }
-          );
-        },
-      });
+      // Un solo pedido (#167): el servidor crea el combo y sus componentes
+      // juntos, y si los componentes fallan no deja el combo huérfano.
+      createMutation.mutate(
+        { ...productPayload, components: componentPayload } as Parameters<typeof createMutation.mutate>[0],
+        { onSuccess: () => onClose() }
+      );
     } else if (product) {
       updateProductMutation.mutate(
         { id: product.id, updates: productPayload as Partial<Product> },

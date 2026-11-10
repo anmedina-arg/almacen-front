@@ -1,5 +1,6 @@
 import { Product } from '@/types';
 import { apiFetch, extractErrorMessage } from '@/lib/api/apiFetch';
+import type { ComboComponentInput } from '@/features/products/schemas/comboSchemas';
 
 export const adminProductService = {
   async getById(id: number): Promise<Product> {
@@ -13,7 +14,9 @@ export const adminProductService = {
     return res.json();
   },
 
-  async create(product: Omit<Product, 'id'>): Promise<Product> {
+  async create(
+    product: Omit<Product, 'id'> & { components?: ComboComponentInput[] }
+  ): Promise<Product> {
     const res = await apiFetch('/products', {
       method: 'POST',
       headers: {
