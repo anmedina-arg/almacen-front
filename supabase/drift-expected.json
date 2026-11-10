@@ -1,0 +1,59 @@
+[
+  {
+    "keyPrefix": "inventory.",
+    "kind": "solo_produccion",
+    "reason": "Tabla legacy inventory: está en producción y no en los canónicos. Ningún código, RPC ni test la usa; borrarla o archivarla es una decisión pendiente (ver docs/ops/base-local-docker.md)."
+  },
+  {
+    "category": "rls",
+    "key": "inventory",
+    "kind": "solo_produccion",
+    "reason": "Tabla legacy inventory: está en producción y no en los canónicos. Ningún código, RPC ni test la usa; borrarla o archivarla es una decisión pendiente (ver docs/ops/base-local-docker.md)."
+  },
+  {
+    "keyPrefix": "products_backup.",
+    "kind": "solo_produccion",
+    "reason": "Tabla legacy products_backup: copia vieja de products que está en producción y no en los canónicos. Borrarla o archivarla es una decisión pendiente."
+  },
+  {
+    "category": "rls",
+    "key": "products_backup",
+    "kind": "solo_produccion",
+    "reason": "Tabla legacy products_backup: copia vieja de products que está en producción y no en los canónicos. Borrarla o archivarla es una decisión pendiente."
+  },
+  {
+    "keyPrefix": "categories_backup.",
+    "kind": "solo_produccion",
+    "reason": "Tabla legacy categories_backup: copia vieja de categories que está en producción y no en los canónicos. Borrarla o archivarla es una decisión pendiente."
+  },
+  {
+    "category": "rls",
+    "key": "categories_backup",
+    "kind": "solo_produccion",
+    "reason": "Tabla legacy categories_backup: copia vieja de categories que está en producción y no en los canónicos. Borrarla o archivarla es una decisión pendiente."
+  },
+  {
+    "category": "constraint",
+    "key": "profiles.profiles_id_fkey",
+    "kind": "solo_produccion",
+    "reason": "La base local no enforcea las FKs a auth.users, a propósito: los tests siembran profiles sin pasar por auth (supabase/local-only/01_drop_auth_users_fks.sql)."
+  },
+  {
+    "category": "constraint",
+    "key": "orders.orders_user_id_fkey",
+    "kind": "solo_produccion",
+    "reason": "La base local no enforcea las FKs a auth.users, a propósito: los tests siembran profiles sin pasar por auth (supabase/local-only/01_drop_auth_users_fks.sql)."
+  },
+  {
+    "category": "constraint",
+    "key": "orders.orders_confirmed_by_fkey",
+    "kind": "solo_produccion",
+    "reason": "La base local no enforcea las FKs a auth.users, a propósito: los tests siembran profiles sin pasar por auth (supabase/local-only/01_drop_auth_users_fks.sql)."
+  },
+  {
+    "category": "trigger",
+    "key": "auth.users.on_auth_user_created",
+    "kind": "solo_produccion",
+    "reason": "La base local no tiene el trigger de alta de perfiles sobre auth.users, a propósito (#87): los fixtures hacen insert en profiles y con el trigger activo chocarían (supabase/local-only/02_drop_on_auth_user_created.sql)."
+  }
+]

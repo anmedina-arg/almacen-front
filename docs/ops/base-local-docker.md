@@ -23,6 +23,7 @@ Las keys `anon` y `service_role` son las demo keys fijas de la CLI (las imprime 
 npm run db:start      # build de migraciones + supabase start (primera vez baja imágenes)
 npm run db:reset      # build + supabase db reset: recrea desde cero, aplica migraciones y seed
 npm run db:status     # URLs y keys
+npm run db:drift      # compara producción con los canónicos (ver abajo)
 npm run db:stop       # apaga los contenedores (los datos quedan en el volumen)
 npm run test:integration
 npm run test:unit
@@ -64,6 +65,12 @@ Fuera del alcance de la base local, a propósito: las 3 tablas legacy de producc
 ## Paridad de permisos de funciones con producción (2026-11-06, #154)
 
 La base local nace con `store/default_privileges.sql` y los `GRANT`/`REVOKE` de cada canónico. Producción es anterior, así que se alineó una vez con el bloque descrito en `docs/agents/schema-changes.md` ("Alinear una base existente"). Resultado verificado: las dos tienen las mismas 40 funciones de `public`, solo 7 ejecutables por `anon`, ninguna ejecutable por `PUBLIC` y ninguna `SECURITY DEFINER` sin `search_path`. El proyecto hosteado `market-test` quedó pausado para siempre (se reemplazó por esta base): no cuenta para la paridad.
+
+## Chequeo de drift contra producción (#166)
+
+Lo que se hizo a mano el 2026-10-17 y el 2026-11-06 (hash por categoría de las mismas consultas de catálogo en las dos bases) lo automatiza `npm run db:drift`. Cómo se usa, qué compara y cómo leer el resultado: `docs/agents/schema-changes.md`, "Chequeo de drift". La base local es la fuente de comparación, así que tiene que estar reconstruida (`npm run db:reset`) antes de correrlo.
+
+Primera comparación (2026-11-10), hecha a mano: la misma consulta de catálogo corrida en producción por el MCP de Supabase, solo lectura, y comparada por hash por categoría. Producción coincide con los canónicos salvo por los 38 objetos que cubren las 10 entradas de `supabase/drift-expected.json`; funciones, policies y enums coinciden sin excepción. La conexión directa (`DRIFT_PROD_DB_URL`) todavía no se probó contra producción real.
 
 ## Problemas conocidos
 
