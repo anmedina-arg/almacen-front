@@ -39,6 +39,7 @@
 CREATE OR REPLACE FUNCTION public.validate_order_item_store()
 RETURNS TRIGGER
 LANGUAGE plpgsql
+SET search_path = public  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).
 AS $$
 BEGIN
   IF NEW.product_id IS NULL THEN

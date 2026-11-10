@@ -40,6 +40,7 @@ CREATE OR REPLACE FUNCTION public.provision_store(
 )
 RETURNS JSONB
 LANGUAGE plpgsql
+SET search_path = public  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).
 AS $$
 DECLARE
   v_store_id INTEGER;

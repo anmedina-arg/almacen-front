@@ -32,6 +32,7 @@ CREATE OR REPLACE FUNCTION public.is_store_admin(check_store_id INTEGER)
 RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
+SET search_path = public  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).
 AS $$
   SELECT
     EXISTS (

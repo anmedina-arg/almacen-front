@@ -17,4 +17,5 @@ BEGIN
   NEW.updated_at = NOW();
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = public;  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).

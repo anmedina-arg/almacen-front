@@ -27,6 +27,7 @@ CREATE OR REPLACE FUNCTION public.is_stock_tracked(p_store_id INTEGER)
 RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
+SET search_path = public  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).
 AS $$
   SELECT COALESCE((feature_flags->>'stock')::boolean, false)
   FROM public.stores

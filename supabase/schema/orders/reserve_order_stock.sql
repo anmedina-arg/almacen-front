@@ -79,6 +79,7 @@ CREATE OR REPLACE FUNCTION public.reserve_order_stock(
   OUT shortfall NUMERIC(12, 3)
 )
 LANGUAGE plpgsql
+SET search_path = public  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).
 AS $$
 DECLARE
   v_is_combo  BOOLEAN;
