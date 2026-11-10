@@ -13,7 +13,7 @@ Flujo obligatorio para cualquier cambio a una función, policy, trigger o tabla 
 5. **Correr primero en la base local de Docker** (`npm run db:reset` — recrea la base desde cero a partir de los canónicos, así también confirma que el archivo aplica limpio — y después `npm run test:integration`; ver `docs/ops/base-local-docker.md`). Desde 2026-10-17 la base local reemplaza al proyecto Supabase de test hosteado (pausado por el límite de 2 proyectos activos del plan). Confirmar explícitamente contra qué base apunta la sesión (`.env.test` → local vs `.env.local` → producción) antes de ejecutar nada.
 6. **Aplicar en producción** solo después de confirmar el resultado en test, re-confirmando explícitamente el proyecto destino antes de correr.
 7. **`NOTIFY pgrst, 'reload schema';` siempre** que se toque una función, policy, o tabla — no solo cuando "parece" necesario. El cache de schema de PostgREST no se invalida solo de forma confiable.
-8. **Verificar manualmente** el resultado (re-correr el template de verificación contra el objeto recién aplicado) y **commitear referenciando el número de issue** explícito en el mensaje — necesario para saber, más adelante, si un archivo de fix ya aplicado y confirmado puede descartarse (ver regla de retención de archivos, `supabase/README.md`).
+8. **Verificar manualmente** el resultado (re-correr el template de verificación contra el objeto recién aplicado) y **commitear referenciando el número de issue** explícito en el mensaje — necesario para saber, más adelante, si un archivo de fix ya aplicado y confirmado puede descartarse (ver regla de retención de archivos, `supabase/README.md`). Si hay acceso a la cadena de conexión de producción, además correr `npm run db:drift` (ver "Chequeo de drift" abajo): tiene que salir sin diferencias inesperadas.
 
 ## Permisos de ejecución de funciones (#154)
 
@@ -60,6 +60,27 @@ ORDER BY p.prosecdef DESC, anon_exec DESC, p.proname;
 ```
 
 El test `src/test/integration/secdef-rpc-authorization.test.ts` también cubre esas cuatro auxiliares (anon recibe `42501`) y recorre las RPC de admin con un cliente anónimo (espera `42501`), un admin de otra Store (espera `Forbidden`) y el admin de la Store (espera éxito): al agregar una RPC de admin nueva, sumarla a esa lista.
+
+## Chequeo de drift (#166)
+
+Producción y los canónicos de `supabase/schema/` se pueden desviar sin que nadie lo note: pasó con el fix de seguridad de `cancel_order` / `confirm_order` (#165) y con los permisos de las 12 RPC de admin (#154). `npm run db:drift` los compara y lista lo que difiere.
+
+Qué hace: saca la misma foto del catálogo (funciones con su cuerpo sin comentarios ni espacios, `SECURITY DEFINER`, `search_path` y `EXECUTE` por rol; columnas; constraints; índices; policies; triggers; RLS; enums; vistas) de la base local —la que `npm run db:reset` genera desde los canónicos— y de producción, y las compara. Sobre producción solo lee: la consulta corre en una transacción `READ ONLY` y no escribe nada.
+
+```bash
+npm run db:reset                                    # la base local tiene que estar al día con los canónicos
+DRIFT_PROD_DB_URL='postgresql://…' npm run db:drift # conexión directa a producción
+npm run db:drift -- --print-query                   # la consulta, para correrla a mano
+npm run db:drift -- --prod-snapshot foto.json       # foto de producción sacada a mano
+```
+
+- `DRIFT_PROD_DB_URL` es la cadena de conexión de Postgres del proyecto de producción (la que muestra el panel de Supabase). Puede ir en `.env.local`, que está ignorado por git; el script lee solo esa variable de ese archivo. Nunca imprime la cadena ni la contraseña, y la contraseña le llega a `psql` por el entorno y no por los argumentos. Si la conexión directa no resuelve en tu red (hasta donde sé, el host directo de Supabase puede ser solo IPv6, dato que no se puede verificar desde el repo), probar con el pooler de sesión que ofrece el mismo panel.
+- Sin conexión directa: `--print-query` imprime la consulta; se corre en producción (SQL Editor o el MCP de Supabase) y el resultado se guarda en un archivo que contenga solo el arreglo JSON de filas `{category, key, fingerprint}`, o las filas en TSV como las imprime `psql`, y se pasa con `--prod-snapshot`. Si se pasa `--prod-snapshot` o `--prod-url`, ganan sobre la variable de entorno.
+- Otras opciones: `--local-url` (por defecto `TEST_DB_URL` de `.env.test`, o la base de Docker), `--expected <archivo>` (otra lista de diferencias esperadas), `--json` (resultado como datos) y la variable `PSQL_PATH` si `psql` no está en el PATH. La base "local" tiene que ser local de verdad (`localhost`, `127.0.0.1` o `::1`, sin `?host=`): si no, el script se niega, para no comparar producción contra sí misma. Requiere Node 20.12 o más.
+- Sale con 0 si no hay diferencias inesperadas, 1 si las hay y 2 si no pudo comparar. Para una función o una columna que cambió, la salida dice qué campo cambió (cuerpo, `SECURITY DEFINER`, `search_path`, `EXECUTE` de cada rol, tipo, default…), y un overload de más aparece como una función nueva con otros tipos de argumentos.
+- Las diferencias que se esperan a propósito están en `supabase/drift-expected.json`, cada una con su motivo: las tres tablas legacy de producción, las FKs a `auth.users` y el trigger `on_auth_user_created` que la base local no tiene (`supabase/local-only/`). Cada entrada tiene `reason` (obligatorio) y al menos uno de `category`, `key`, `keyPrefix` y `kind` (`solo_local`, `solo_produccion` o `distinto`). Si una entrada deja de coincidir con algo, el script avisa para sacarla.
+- Qué hacer con una diferencia inesperada: si producción está atrasada, aplicar el SQL del canónico siguiendo los 8 pasos de arriba; si el canónico está atrasado, actualizarlo; si la diferencia es a propósito, declararla con motivo en `drift-expected.json`.
+- Fuera de esta versión: privilegios de tablas y secuencias, datos, storage y el resto del schema `auth`.
 
 ## Validar que una fila pertenece a la misma Store que su padre
 
