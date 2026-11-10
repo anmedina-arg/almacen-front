@@ -20,7 +20,8 @@ RETURNS NUMERIC(12, 3) AS $$
   FROM combo_components cc
   LEFT JOIN product_stock ps ON ps.product_id = cc.component_product_id
   WHERE cc.combo_product_id = p_product_id;
-$$ LANGUAGE sql STABLE;
+$$ LANGUAGE sql STABLE
+SET search_path = public;  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).
 
 -- #154: sin EXECUTE para anon. En una base nueva ya nace cerrada; este REVOKE
 -- alinea las existentes (docs/agents/schema-changes.md, "Permisos de ejecución de funciones").

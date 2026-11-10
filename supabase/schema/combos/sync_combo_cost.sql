@@ -31,4 +31,5 @@ BEGIN
 
   RETURN COALESCE(NEW, OLD);
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql
+SET search_path = public;  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).

@@ -27,6 +27,7 @@ CREATE OR REPLACE FUNCTION public.return_order_stock(
 )
 RETURNS VOID
 LANGUAGE plpgsql
+SET search_path = public  -- search_path fijo (advisor function_search_path_mutable, 2026-11-10).
 AS $$
 DECLARE
   v_is_combo  BOOLEAN;

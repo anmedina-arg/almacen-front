@@ -23,12 +23,15 @@
 -- normalizado de category_id/subcategory_id. No se toca ni se elimina acá
 -- — solo se documenta por primera vez.
 --
--- COLUMNA LEGACY `main_category` (+ CHECK `main_category_check`): categoría
--- fija pre-sistema de categorías. Desde #133 la app no la lee ni la escribe
--- (los INSERT dejan el DEFAULT 'otros'); las RPCs de Stock exponen
--- `category_name` vía categories. El DROP de la columna y su CHECK queda
--- como cambio de schema separado (8 pasos), a correr después de desplegar
--- el código que ya no la usa.
+-- COLUMNA LEGACY `main_category` (+ CHECK `main_category_check`): RETIRADA el
+-- 2026-11-10. Era la categoría fija pre-sistema de categorías. Desde #133 la
+-- app no la leía ni la escribía (los INSERT dejaban el DEFAULT 'otros') y las
+-- RPCs de Stock exponen `category_name` vía categories. Se hizo el DROP de la
+-- columna y su CHECK en producción como cambio separado, después de verificar
+-- que ninguna función, vista, policy, trigger ni índice la nombraba. Valores
+-- que tenía al borrarla: otros 356, almacen 168, bebidas 77, panaderia 58,
+-- combos 33, lacteos 23, congelados 11, fiambres 10, snaks 7, pizzas 5. La
+-- tabla legacy products_backup conserva una copia vieja de la columna.
 --
 -- is_producto_surtido/familia_id/min_variedades/max_variedades (#92, spec
 -- #91): marcan un producto como Producto Surtido (se arma eligiendo
@@ -46,7 +49,6 @@ CREATE TABLE IF NOT EXISTS public.products (
   image           TEXT NOT NULL,
   active          BOOLEAN NOT NULL DEFAULT true,
   categories      TEXT NOT NULL,
-  main_category   TEXT DEFAULT 'otros',
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW(),
   sale_type       TEXT NOT NULL DEFAULT 'unit'
@@ -61,11 +63,6 @@ CREATE TABLE IF NOT EXISTS public.products (
   familia_id      INTEGER,
   min_variedades  INTEGER,
   max_variedades  INTEGER,
-
-  CONSTRAINT main_category_check CHECK (main_category IN (
-    'panaderia', 'congelados', 'combos', 'snaks', 'otros',
-    'bebidas', 'lacteos', 'almacen', 'fiambres', 'pizzas'
-  )),
 
   -- Un Producto Surtido tiene que traer Familia + mínimo + máximo siempre
   -- juntos — no tiene sentido is_producto_surtido=true sin ellos (quedaría

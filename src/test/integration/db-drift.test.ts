@@ -29,6 +29,7 @@ CREATE OR REPLACE FUNCTION public.is_stock_tracked(p_store_id INTEGER)
 RETURNS BOOLEAN
 LANGUAGE sql
 STABLE
+SET search_path = public
 AS $$
   -- un comentario nuevo que no cambia nada
   SELECT   COALESCE((feature_flags->>'stock')::boolean, false)
@@ -48,6 +49,25 @@ describe('recolector del catálogo para el chequeo de drift (#166)', () => {
 
     expect([...categories]).toEqual(expect.arrayContaining(['column', 'constraint', 'enum', 'function', 'index', 'policy', 'rls', 'trigger']));
     expect(diffCatalogs(baseline, collectCatalog({ url: url as string }))).toEqual([]);
+  });
+
+  // Reglas del schema que el chequeo de drift deja verificar sobre la base local
+  // generada desde los canónicos. La base local es la fuente de verdad: si
+  // producción difiere, db:drift lo avisa.
+  it.skipIf(!canRun)('toda función de public fija search_path (advisor function_search_path_mutable)', () => {
+    const withoutSearchPath = [...baseline.values()]
+      .filter((row) => row.category === 'function')
+      .filter((row) => !row.fingerprint.split('|')[3]?.startsWith('search_path='))
+      .map((row) => row.key);
+
+    expect(withoutSearchPath).toEqual([]);
+  });
+
+  it.skipIf(!canRun)('el schema ya no tiene la columna legacy products.main_category', () => {
+    const keys = [...baseline.values()].map((row) => `${row.category} ${row.key}`);
+
+    expect(keys).not.toContain('column products.main_category');
+    expect(keys).not.toContain('constraint products.main_category_check');
   });
 
   it.skipIf(!canRun)('cambiar el cuerpo de una función es un drift', () => {
