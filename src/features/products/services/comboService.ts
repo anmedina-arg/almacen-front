@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
-import type { UpdateComboComponentsInput } from '../schemas/comboSchemas';
+import { COMBO_NEEDS_COMPONENTS, type UpdateComboComponentsInput } from '../schemas/comboSchemas';
 
 export interface ComboComponent {
   id: number;
@@ -81,6 +81,12 @@ export async function updateComboComponents(
   comboId: number,
   input: UpdateComboComponentsInput
 ): Promise<void> {
+  // #167: defensa en profundidad — la ruta ya lo rechaza con el esquema, pero
+  // esta función también la llama el alta de un combo (productService).
+  if (input.components.length === 0) {
+    throw new ValidationError(COMBO_NEEDS_COMPONENTS);
+  }
+
   if (!(await comboBelongsToStore(supabase, comboId, storeId))) {
     throw new NotFoundError('Combo not found in this store');
   }
@@ -88,39 +94,50 @@ export async function updateComboComponents(
   // Cada componente también tiene que pertenecer a la misma Store — evita
   // que un combo termine referenciando el producto de otra Store como
   // componente.
-  if (input.components.length > 0) {
-    const componentIds = input.components.map((c) => c.component_product_id);
-    const { data: ownComponents } = await supabase
-      .from('products')
-      .select('id')
-      .eq('store_id', storeId)
-      .in('id', componentIds);
+  const componentIds = input.components.map((c) => c.component_product_id);
+  const { data: ownComponents } = await supabase
+    .from('products')
+    .select('id')
+    .eq('store_id', storeId)
+    .in('id', componentIds);
 
-    const ownIds = new Set((ownComponents ?? []).map((p) => p.id));
-    const foreignId = componentIds.find((cid) => !ownIds.has(cid));
-    if (foreignId != null) {
-      throw new ValidationError(`Component product not found in this store: ${foreignId}`);
-    }
+  const ownIds = new Set((ownComponents ?? []).map((p) => p.id));
+  const foreignId = componentIds.find((cid) => !ownIds.has(cid));
+  if (foreignId != null) {
+    throw new ValidationError(`Component product not found in this store: ${foreignId}`);
   }
 
-  // Replace all existing components. Filtra por combo_product_id, no por
-  // combo_components.store_id — mismo motivo que en getComboComponents, ya
-  // validado arriba vía comboBelongsToStore().
-  const { error: deleteError } = await supabase
+  // Reemplaza la composición SIN pasar por un estado vacío (#167): primero
+  // inserta o actualiza los componentes nuevos y recién después borra los que
+  // ya no están. Antes borraba todo y reinsertaba, y un fallo entre los dos
+  // pasos dejaba el combo sin componentes. Filtra por combo_product_id, no
+  // por combo_components.store_id — mismo motivo que en getComboComponents,
+  // ya validado arriba vía comboBelongsToStore().
+  const rows = input.components.map((c) => ({
+    combo_product_id: comboId,
+    component_product_id: c.component_product_id,
+    quantity: c.quantity,
+    store_id: storeId,
+  }));
+  const { error: upsertError } = await supabase
     .from('combo_components')
-    .delete()
+    .upsert(rows, { onConflict: 'combo_product_id,component_product_id' });
+  if (upsertError) throw new Error(upsertError.message);
+
+  const { data: current, error: currentError } = await supabase
+    .from('combo_components')
+    .select('component_product_id')
     .eq('combo_product_id', comboId);
-  if (deleteError) throw new Error(deleteError.message);
+  if (currentError) throw new Error(currentError.message);
 
-  if (input.components.length > 0) {
-    const rows = input.components.map((c) => ({
-      combo_product_id: comboId,
-      component_product_id: c.component_product_id,
-      quantity: c.quantity,
-      store_id: storeId,
-    }));
-
-    const { error: insertError } = await supabase.from('combo_components').insert(rows);
-    if (insertError) throw new Error(insertError.message);
+  const keep = new Set(componentIds);
+  const toRemove = (current ?? []).map((row) => row.component_product_id as number).filter((id) => !keep.has(id));
+  if (toRemove.length > 0) {
+    const { error: deleteError } = await supabase
+      .from('combo_components')
+      .delete()
+      .eq('combo_product_id', comboId)
+      .in('component_product_id', toRemove);
+    if (deleteError) throw new Error(deleteError.message);
   }
 }

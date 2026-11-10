@@ -2,6 +2,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Product } from '@/types';
 import type { CreateProductInput, UpdateProductInput } from '../schemas/productSchemas';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
+import { COMBO_NEEDS_COMPONENTS } from '../schemas/comboSchemas';
+import { updateComboComponents } from './comboService';
 
 /**
  * Service del dominio Products — ver ADR-0013, mismo patrón que
@@ -107,6 +109,13 @@ export async function createProduct(
   storeId: number,
   input: CreateProductInput
 ): Promise<Product> {
+  // #167: createProductSchema ya lo exige; esto cubre a un caller que arme el
+  // input sin pasar por el esquema.
+  const components = input.components ?? [];
+  if (input.is_combo && components.length === 0) {
+    throw new ValidationError(COMBO_NEEDS_COMPONENTS);
+  }
+
   await assertOwnership(supabase, storeId, input);
 
   const { data, error } = await supabase
@@ -142,7 +151,33 @@ export async function createProduct(
     }
     throw new Error(error.message);
   }
-  return flatten(data as unknown as JoinedRow);
+
+  const product = flatten(data as unknown as JoinedRow);
+
+  // #167: el alta de un combo es atómica. Antes eran dos pedidos (producto y
+  // después componentes) y, si el segundo fallaba, quedaba un combo huérfano
+  // con Disponible 0. Si los componentes no se pueden guardar, se borra el
+  // producto recién creado y el error original sigue su camino.
+  if (input.is_combo) {
+    try {
+      await updateComboComponents(supabase, storeId, product.id, { components });
+    } catch (componentsError) {
+      const { error: rollbackError } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', product.id)
+        .eq('store_id', storeId);
+      if (rollbackError) {
+        console.error(
+          `[createProduct] no se pudo borrar el combo ${product.id} tras fallar sus componentes:`,
+          rollbackError.message
+        );
+      }
+      throw componentsError;
+    }
+  }
+
+  return product;
 }
 
 export async function updateProduct(
@@ -152,6 +187,30 @@ export async function updateProduct(
   input: UpdateProductInput
 ): Promise<Product> {
   await assertOwnership(supabase, storeId, input);
+
+  // #167: pasar un producto común a combo solo se permite si ya tiene
+  // componentes cargados — si no, quedaría un combo vacío. Un combo que ya
+  // lo es no vuelve a pasar por esta verificación.
+  if (input.is_combo === true) {
+    const { data: current } = await supabase
+      .from('products')
+      .select('is_combo')
+      .eq('id', id)
+      .eq('store_id', storeId)
+      .maybeSingle();
+    if (!current) throw new NotFoundError('Product not found');
+
+    if (!current.is_combo) {
+      const { count, error: countError } = await supabase
+        .from('combo_components')
+        .select('id', { count: 'exact', head: true })
+        .eq('combo_product_id', id);
+      if (countError) throw new Error(countError.message);
+      if ((count ?? 0) === 0) {
+        throw new ValidationError(COMBO_NEEDS_COMPONENTS);
+      }
+    }
+  }
 
   const updates: Record<string, unknown> = {};
   if (input.name !== undefined) updates.name = input.name;

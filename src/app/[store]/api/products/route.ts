@@ -6,7 +6,7 @@ import { handleServiceError } from '@/lib/api/handleServiceError';
 import { createProductSchema } from '@/features/products/schemas/productSchemas';
 import { createProduct } from '@/features/products/services/productService';
 import { fetchPublicProducts } from '@/features/catalog/services/fetchPublicProducts';
-import { productMetadataTag } from '@/lib/cache/tags';
+import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
 
 /**
  * GET /api/products
@@ -67,6 +67,9 @@ export const POST = createApiRoute(requireAdmin)(async (ctx) => {
     // catálogo público refleje el alta al instante, no recién cuando
     // expire un TTL (no hay TTL — solo se invalida por evento).
     revalidateTag(productMetadataTag(ctx.storeId));
+    // Un combo nace con su Disponible derivado de los componentes (#167): si el
+    // catálogo lo leyó entre el alta y los componentes, no queda un 0 cacheado.
+    if (product.is_combo) revalidateTag(productStockTag(ctx.storeId, product.id));
     return NextResponse.json(product, { status: 201 });
   } catch (error) {
     return handleServiceError(error, 'POST /api/products');

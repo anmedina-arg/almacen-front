@@ -16,8 +16,9 @@ export function useCreateProduct() {
         return [...old, newProduct];
       });
 
-      // Invalidar para refrescar desde servidor
-      queryClient.invalidateQueries({ queryKey: adminKeys.productsList() });
+      // Invalidar para refrescar desde servidor. Un combo nuevo también trae
+      // componentes (#167): se invalida todo el prefijo de productos.
+      queryClient.invalidateQueries({ queryKey: adminKeys.products() });
     },
   });
 }

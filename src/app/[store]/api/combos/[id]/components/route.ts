@@ -27,7 +27,8 @@ export const GET = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
 
 /**
  * PUT /api/combos/[id]/components
- * Reemplaza todos los componentes del combo. Admin only.
+ * Reemplaza todos los componentes del combo. Admin only. Exige al menos uno
+ * (#167): un combo no puede quedar vacío.
  */
 export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id: idParam }) => {
   try {

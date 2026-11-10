@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { COMBO_NEEDS_COMPONENTS, comboComponentsListSchema } from './comboSchemas';
 
 /**
  * Deliberadamente NO comparte definición con
@@ -39,6 +40,16 @@ export const createProductSchema = z
     familia_id: z.number().int().positive().nullable().optional(),
     min_variedades: z.number().int().min(1, 'Mínimo 1').nullable().optional(),
     max_variedades: z.number().int().min(1, 'Mínimo 1').nullable().optional(),
+    // #167: un combo se crea junto con sus componentes, en un solo pedido.
+    components: comboComponentsListSchema.optional(),
+  })
+  .refine((data) => !data.is_combo || data.components !== undefined, {
+    message: COMBO_NEEDS_COMPONENTS,
+    path: ['components'],
+  })
+  .refine((data) => data.is_combo || data.components === undefined, {
+    message: 'Solo un combo lleva componentes',
+    path: ['components'],
   })
   .refine(
     (data) =>
