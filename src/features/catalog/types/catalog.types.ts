@@ -5,7 +5,6 @@ export interface Product {
   price: number;
   image: string;
   active: boolean;
-  categories: string;
   sale_type: WeightType;
   stock_quantity?: number; // Disponible (#159, ver CONTEXT.md); undefined = la Store no lleva Control de stock o falló el fetch (sin límite)
   cost?: number | null;

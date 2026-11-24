@@ -152,7 +152,6 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
       cost: calculatedCost,
       image: finalImage,
       active: formData.active,
-      categories: 'combos',
       sale_type: 'unit' as const,
       is_combo: true,
       max_stock: formData.max_stock,

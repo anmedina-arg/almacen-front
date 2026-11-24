@@ -71,7 +71,6 @@ export async function fetchProductMetadata(
       cost,
       image,
       active,
-      categories,
       sale_type,
       is_combo,
       max_stock,

@@ -7,7 +7,6 @@ function product(overrides: Partial<Product> & Pick<Product, 'id' | 'name'>): Pr
     price: 1000,
     image: '',
     active: true,
-    categories: '',
     sale_type: 'kg',
     ...overrides,
   };

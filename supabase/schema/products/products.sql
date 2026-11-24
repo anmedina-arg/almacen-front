@@ -16,12 +16,17 @@
 -- (supabase_multitenant_schema_expand.sql), is_producto_surtido/familia_id/
 -- min_variedades/max_variedades (#92, dominio nuevo Producto Surtido).
 --
--- COLUMNA LEGACY SIN DOCUMENTAR: `categories` (texto libre, NOT NULL, sin
--- default) — distinta de la tabla `categories` y de `category_id`. Sigue en
--- uso activo (ProductFormModal, ProductList, /api/products) como campo de
--- texto libre complementario, no reemplazado todavía por el sistema
--- normalizado de category_id/subcategory_id. No se toca ni se elimina acá
--- — solo se documenta por primera vez.
+-- COLUMNA LEGACY `categories` (texto libre) — distinta de la tabla
+-- `categories` y de `category_id`. Desde #181 (spec #179) sale del flujo: ya
+-- no es obligatoria (nullable, DEFAULT ''), ningún formulario, ruta ni la
+-- Importación masiva la escribe, y el catálogo dejó de leerla (el grupo de un
+-- producto sin subcategoría usa el nombre de su categoría). Los valores
+-- existentes se conservan intactos. La columna se borra en el ticket de
+-- limpieza (#189), no acá.
+-- Paso operativo único en producción (la tabla ya existe, el CREATE de abajo
+-- no corre):
+--   ALTER TABLE public.products ALTER COLUMN categories DROP NOT NULL;
+--   ALTER TABLE public.products ALTER COLUMN categories SET DEFAULT '';
 --
 -- COLUMNA LEGACY `main_category` (+ CHECK `main_category_check`): RETIRADA el
 -- 2026-11-10. Era la categoría fija pre-sistema de categorías. Desde #133 la
@@ -48,7 +53,7 @@ CREATE TABLE IF NOT EXISTS public.products (
   price           NUMERIC NOT NULL,
   image           TEXT NOT NULL,
   active          BOOLEAN NOT NULL DEFAULT true,
-  categories      TEXT NOT NULL,
+  categories      TEXT DEFAULT '',
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW(),
   sale_type       TEXT NOT NULL DEFAULT 'unit'

@@ -38,4 +38,4 @@ Ninguna en este dominio — `is_store_admin()` no es RPC (no se llama vía `supa
 
 ## Gaps conocidos, no corregidos acá
 
-- Columna `products.categories` (texto libre) convive con el sistema normalizado `category_id`/`subcategory_id` sin que ninguno haya reemplazado al otro — deuda técnica preexistente, no introducida ni resuelta acá.
+- Columna `products.categories` (texto libre, legacy): desde #181 (spec #179) ya no es obligatoria (nullable, `DEFAULT ''`) y ninguna parte de la app la lee ni la escribe; el catálogo agrupa por categoría y subcategoría normalizadas. Los valores viejos se conservan. Se borra en el ticket de limpieza #189. Los datos de `supabase/seed/demo-store.sql` todavía la mencionan: es inocuo hasta ese borrado.

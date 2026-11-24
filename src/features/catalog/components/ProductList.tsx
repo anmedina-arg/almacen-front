@@ -8,6 +8,7 @@ import { sortCatalogProducts } from '../utils/sortCatalogProducts';
 import {
 	formatCategoryCount,
 	formatProductCount,
+	groupBySubcategory,
 	hasSingleSameNameSubcategory,
 } from '../utils/sectionTitles';
 
@@ -34,21 +35,15 @@ export function ProductList({ products, mainCategories, searchQuery }: ProductLi
 				// en #133.
 				const catProducts = products.filter((p) => p.category_name === displayCat);
 
-				const subMap = new Map<string, Product[]>();
-				catProducts.forEach((p) => {
-					// Sub-agrupación: subcategory_name → categories (texto) → 'General'
-					const subLabel = p.subcategory_name
-						?? (p.categories?.trim() || null)
-						?? 'General';
-					if (!subMap.has(subLabel)) subMap.set(subLabel, []);
-					subMap.get(subLabel)!.push(p);
-				});
-
-				const subcategories = Array.from(subMap.entries()).map(([label, items]) => ({
-					key: label.toLowerCase(),
-					label,
-					products: sortCatalogProducts(items),
-				}));
+				// Sub-agrupación: subcategory_name → nombre de la categoría (#181
+				// retiró el texto libre legacy y el 'General' de respaldo).
+				const subcategories = groupBySubcategory(catProducts, displayCat).map(
+					({ key, label, items }) => ({
+						key,
+						label,
+						products: sortCatalogProducts(items),
+					})
+				);
 
 				return { main: displayCat, subcategories };
 			})

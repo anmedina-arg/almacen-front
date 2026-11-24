@@ -58,7 +58,6 @@ function makeProduct(overrides: Partial<Product> = {}): Product {
     price: 1000,
     image: '',
     active: true,
-    categories: '',
     sale_type: 'unit',
     ...overrides,
   };

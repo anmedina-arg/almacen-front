@@ -12,6 +12,23 @@ const base = {
   image: 'https://example.com/img.jpg',
 };
 
+// #181: la columna legacy de texto libre `categories` salió del flujo. Un
+// producto se crea sin enviarla, y un cliente viejo que todavía la mande no
+// rompe nada pero tampoco la propaga.
+describe('productCreateSchema — sin la columna legacy categories (#181)', () => {
+  it('acepta un producto sin `categories` y no la agrega al resultado', () => {
+    const result = productCreateSchema.safeParse({ ...base });
+    expect(result.success).toBe(true);
+    expect(result.success && 'categories' in result.data).toBe(false);
+  });
+
+  it('si un cliente viejo todavía la manda, no falla y se descarta', () => {
+    const result = productCreateSchema.safeParse({ ...base, categories: 'Gaseosas' });
+    expect(result.success).toBe(true);
+    expect(result.success && 'categories' in result.data).toBe(false);
+  });
+});
+
 describe('productCreateSchema — validación de Producto Surtido', () => {
   it('acepta un producto normal (is_producto_surtido=false, todo lo demás null)', () => {
     const result = productCreateSchema.safeParse({ ...base });
