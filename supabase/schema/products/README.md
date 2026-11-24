@@ -23,10 +23,11 @@ Ninguna en este dominio — `is_store_admin()` no es RPC (no se llama vía `supa
 
 `products.sql` también declara `trg_log_price_change` y `trg_sync_order_items_cost` — sus funciones (`log_price_change()`, `sync_order_items_unit_cost()`) son de Orders (#84), viven en `supabase/schema/orders/`. Se declaran acá porque `products` es la tabla a la que están atadas (el trigger se declara junto a la tabla, la función junto a quien la posee semánticamente).
 
-## Funciones auxiliares (no son RPC ni trigger — usadas dentro de policies RLS)
+## Funciones auxiliares (no son RPC ni trigger — usadas dentro de policies RLS o como columna calculada)
 
 | Archivo | Qué hace |
 |---|---|
+| `effective_price.sql` | Punto único de lectura del Precio (#179, ticket 1): columna calculada de `products` que devuelve lo que se cobra. Hoy es `products.price`; más adelante puede calcularse por fórmula sin tocar a los consumidores. `SECURITY INVOKER` con `GRANT` a `anon` (la usa el catálogo público). El formulario de producto sigue leyendo y escribiendo `products.price` (precio manual de entrada). |
 | `is_store_admin.sql` | La función compartida por casi todas las policies RLS de todos los dominios. Vive acá por la regla de #78 (un archivo por función) y porque su primera definición fue en el ticket de scoping de Products (#15). |
 
 ## Archivos compartidos entre dominios

@@ -85,7 +85,7 @@ export async function createOrder(
   const productIds = items.map((i) => i.product_id);
   const { data: productsData } = await supabase
     .from('products')
-    .select('id, price, cost')
+    .select('id, price:effective_price, cost')
     .eq('store_id', storeId)
     .in('id', productIds);
   const productMap = new Map<number, { price: number; cost: number }>(
@@ -294,7 +294,7 @@ export async function addOrderItem(
   // code review de #120.
   const [, productResult] = await Promise.all([
     assertOrderIsPending(supabase, storeId, orderId),
-    supabase.from('products').select('price, cost').eq('id', input.product_id).eq('store_id', storeId).maybeSingle(),
+    supabase.from('products').select('price:effective_price, cost').eq('id', input.product_id).eq('store_id', storeId).maybeSingle(),
   ]);
   const product = productResult.data;
   if (!product) throw new ValidationError('Producto no encontrado en esta Store');
@@ -338,7 +338,7 @@ export async function updateOrderItem(
 
   let unit_cost: number | undefined;
   if (existingItem) {
-    const { data: product } = await supabase.from('products').select('price, cost').eq('id', existingItem.product_id).eq('store_id', storeId).maybeSingle();
+    const { data: product } = await supabase.from('products').select('price:effective_price, cost').eq('id', existingItem.product_id).eq('store_id', storeId).maybeSingle();
     if (product && Number(product.price) > 0) {
       const effectiveUnitPrice = input.unit_price ?? existingItem.unit_price;
       unit_cost = effectiveUnitPrice * (Number(product.cost ?? 0) / Number(product.price));

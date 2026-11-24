@@ -67,7 +67,7 @@ export async function fetchProductMetadata(
       `
       id,
       name,
-      price,
+      price:effective_price,
       cost,
       image,
       active,

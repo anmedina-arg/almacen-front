@@ -38,7 +38,7 @@ export async function getRecommendations(
   const { data: products, error: prodError } = await supabase
     .from('products')
     .select(
-      `id, name, price, cost, image, active, categories,
+      `id, name, price:effective_price, cost, image, active, categories,
        sale_type, is_combo, max_stock,
        category_id, subcategory_id, is_producto_surtido,
        cat:categories!products_category_id_fkey(id, name),

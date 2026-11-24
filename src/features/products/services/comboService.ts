@@ -53,7 +53,7 @@ export async function getComboComponents(
       combo_product_id,
       component_product_id,
       quantity,
-      products!combo_components_component_product_id_fkey(name, price, cost)
+      products!combo_components_component_product_id_fkey(name, price:effective_price, cost)
     `
     )
     .eq('combo_product_id', comboId)

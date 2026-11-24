@@ -63,15 +63,15 @@ BEGIN
     cat.name                                      AS category_name,
     SUM(oi.quantity)                              AS units_sold,
     SUM(oi.quantity * oi.unit_price)              AS revenue,
-    p.price                                       AS current_price,
+    public.effective_price(p)                     AS current_price,
     COALESCE(p.cost, 0)                           AS current_cost,
     CASE
-      WHEN COALESCE(p.cost, 0) = 0 THEN p.price
-      ELSE p.price - p.cost
+      WHEN COALESCE(p.cost, 0) = 0 THEN public.effective_price(p)
+      ELSE public.effective_price(p) - p.cost
     END                                           AS margin,
     CASE
       WHEN COALESCE(p.cost, 0) = 0 THEN NULL
-      ELSE ROUND(((p.price - p.cost) / p.cost * 100)::NUMERIC, 1)
+      ELSE ROUND(((public.effective_price(p) - p.cost) / p.cost * 100)::NUMERIC, 1)
     END                                           AS margin_pct
   FROM order_items oi
   JOIN orders    o   ON oi.order_id   = o.id
@@ -82,7 +82,7 @@ BEGIN
     AND (p_start_date  IS NULL OR o.created_at >= p_start_date)
     AND (p_end_date    IS NULL OR o.created_at <= p_end_date)
     AND (p_category_id IS NULL OR p.category_id = p_category_id)
-  GROUP BY p.id, p.name, p.image, p.sale_type, p.price, p.cost, cat.name
+  GROUP BY p.id, p.name, p.image, p.sale_type, public.effective_price(p), p.cost, cat.name
   ORDER BY
     CASE WHEN p_metric = 'revenue' THEN SUM(oi.quantity * oi.unit_price)
          ELSE SUM(oi.quantity)

@@ -59,16 +59,16 @@ BEGIN
     COALESCE(cat.name,  ''),
     COALESCE(sub.name,  ''),
 
-    COALESCE(p.price, 0),
+    COALESCE(public.effective_price(p), 0),
     COALESCE(p.cost,  0),
 
     -- Margen absoluto
-    COALESCE(p.price, 0) - COALESCE(p.cost, 0),
+    COALESCE(public.effective_price(p), 0) - COALESCE(p.cost, 0),
 
     -- Margen porcentual sobre costo (NULL si costo = 0)
     CASE
       WHEN COALESCE(p.cost, 0) > 0
-      THEN ROUND(((p.price - p.cost) / p.cost * 100)::NUMERIC, 1)
+      THEN ROUND(((public.effective_price(p) - p.cost) / p.cost * 100)::NUMERIC, 1)
       ELSE NULL
     END,
 

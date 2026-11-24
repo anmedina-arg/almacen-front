@@ -60,7 +60,7 @@ BEGIN
     ps.id AS stock_id,
     p.id AS product_id,
     p.name AS product_name,
-    p.price AS product_price,
+    public.effective_price(p) AS product_price,
     c.name AS category_name,
     p.active AS product_active,
     p.image AS product_image,
