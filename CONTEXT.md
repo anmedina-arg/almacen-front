@@ -38,6 +38,26 @@ _Avoid_: Admin a secas (ambiguo entre Store admin y Platform admin).
 **Platform admin**:
 El dueño de la plataforma (rol `super_admin`), con acceso a todas las Stores. No es un Store admin de ninguna Store en particular.
 
+**Producto**:
+Lo que el catálogo ofrece, definido estrictamente por su identidad: nombre, imagen, categoría, subcategoría, tipo de venta (unidad, 100gr o kg) y si está activo. Todo lo demás que hoy se carga junto con él no es parte del Producto sino un atributo de otra capacidad: el Precio (núcleo siempre encendido), el Costo (módulo `costos`), el stock (módulo `stock`) y la composición de Combos y Productos Surtidos. Una Store sin un módulo no ve ni carga los atributos de ese módulo al crear o importar productos.
+_Avoid_: Usar "producto" para referirse al conjunto de todos sus datos de gestión (precio + costo + stock); eso mezcla tres capacidades con dueños distintos.
+
+**Precio**:
+Lo que el comprador paga por una unidad de venta de un Producto, expresado según su tipo de venta. Es la base del catálogo (es lo que permite al comprador ver cuánto suma su carrito), por eso es núcleo siempre encendido y no se puede apagar. Hoy lo fija el Store admin a mano; todo el sistema lo lee por un único punto, de modo que más adelante pueda calcularse por fórmula (porcentaje sobre costo, utilidad deseada, ajustes por categoría) sin cambiar a quienes lo consumen.
+_Avoid_: Precio de venta (redundante: el Precio es siempre el de venta), precio de compra (eso es el Costo).
+
+**Costo**:
+Lo que le cuesta al negocio adquirir o producir una unidad de venta de un Producto. Pertenece al módulo `costos`: sin Costo no hay margen. Un Costo faltante significa "sin costo registrado", nunca "costo cero". Al encender el módulo en una Store con historia, el margen rige hacia adelante: los pedidos anteriores sin Costo registrado quedan como "sin costo", no como margen total.
+_Avoid_: Precio de compra (es lo mismo, pero "Costo" es el término canónico), valorizar un pedido viejo con el costo actual.
+
+**Importación masiva**:
+La carga de muchos Productos a la vez desde una planilla que sube el Store admin. Solo crea Productos nuevos; no actualiza los existentes. Valida la planilla antes de crear nada, muestra una vista previa con cada fila como válida, con advertencia o con error, y crea solo las filas válidas que el usuario confirma. Los nombres que ya existen en la Store se marcan como posible duplicado y se omiten por defecto; las categorías o subcategorías que no existen se listan para confirmar antes de crearse. Es parte del catálogo, por lo tanto siempre encendida.
+_Avoid_: Carga masiva, bulk upload, importación de Excel (el archivo puede venir de cualquier planilla).
+
+**Plantilla de importación**:
+La planilla vacía que el Store admin descarga para completar una Importación masiva. Sus columnas dependen de los módulos que la Store tiene encendidos: siempre trae las del Producto y el Precio, y suma el Costo o el stock inicial solo si la Store tiene esos módulos. Quedan fuera Combos, Productos Surtidos y el máximo de stock.
+_Avoid_: Formato de importación, plantilla de productos (ambiguo: no es una plantilla de producto sino de la carga).
+
 **Variedad**:
 Una opción elegible entre las que se puede componer un Producto Surtido (ej. sabor de helado "Chocolate", tipo de masa "Bombón de dulce de leche"). Es una etiqueta administrable, sin precio ni stock propio — no es una fila de `products`.
 _Avoid_: Sabor (válido solo como ejemplo dentro del dominio helados, no como término canónico — el modelo tiene que servir también para masas y futuros casos), variante, opción (a secas).
