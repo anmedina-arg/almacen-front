@@ -100,6 +100,16 @@ BEGIN
   ) AS v(name, price, cost, img)
   WHERE NOT EXISTS (SELECT 1 FROM public.products p WHERE p.store_id = v_store AND p.name = v.name);
 
+  -- ── Costos (#183) ───────────────────────────────────────────────────────
+  -- El Costo vive en product_costs; products.cost es solo su espejo. Los productos de
+  -- arriba se insertaron con su costo en esa columna, así que se registra acá en la tabla
+  -- (idempotente). Va antes del Combo: sync_combo_cost calcula su costo de esta tabla.
+  INSERT INTO public.product_costs (product_id, store_id, cost)
+  SELECT p.id, p.store_id, p.cost
+  FROM public.products p
+  WHERE p.store_id = v_store AND p.cost > 0
+  ON CONFLICT DO NOTHING;
+
   -- ── Combo: 2 hamburguesas + pan + gaseosa ──────────────────────────────
   -- Muestra la composición fija del catálogo (is_combo + combo_components).
   -- El costo lo recalcula el trigger sync_combo_cost a partir de los

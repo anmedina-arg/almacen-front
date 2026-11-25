@@ -32,7 +32,7 @@ VALUES (
   1,
   'market-del-cevil',
   'Market del Cevil',
-  '{"pos": true, "pagos": true, "stock": true, "combos": true, "ranking": true, "clientes": true, "informes": true, "dashboard": true}'::jsonb
+  '{"pos": true, "pagos": true, "stock": true, "combos": true, "ranking": true, "clientes": true, "informes": true, "dashboard": true, "costos": true}'::jsonb
 )
 ON CONFLICT (slug) DO NOTHING;
 
@@ -59,7 +59,7 @@ VALUES (
   'Demo Store',
   '5491100000000',
   true,
-  '{"pos": true, "pagos": true, "stock": false, "ranking": true, "clientes": true, "informes": true, "dashboard": true}'::jsonb
+  '{"pos": true, "pagos": true, "stock": false, "ranking": true, "clientes": true, "informes": true, "dashboard": true, "costos": true}'::jsonb
 )
 ON CONFLICT (slug) DO NOTHING;
 

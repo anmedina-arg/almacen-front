@@ -9,7 +9,8 @@ export const productCreateSchema = z
     sale_type: z.enum(['unit', '100gr', 'kg'], {
       errorMap: () => ({ message: 'Tipo de venta inválido' }),
     }).default('unit'),
-    cost: z.number().min(0, 'El costo no puede ser negativo').optional().default(0),
+    // #183: dejarlo vacío es "sin costo registrado" (null), no 0.
+    cost: z.number().min(0, 'El costo no puede ser negativo').nullable().optional(),
     is_combo: z.boolean().optional().default(false),
     max_stock: z.number().min(0).nullable().optional().default(null),
     category_id: z.number().int().positive().nullable().optional(),

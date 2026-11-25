@@ -13,11 +13,14 @@ import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils/formatPrice';
 import { formatCategoryName } from '@/utils/formatCategoryName';
+import { useFeatureFlags } from '../context/FeatureFlagsContext';
 
 export function AdminProductList() {
   const { data: products, isLoading, error } = useProducts({ includeInactive: true });
   const toggleMutation = useToggleProductActive();
   const deleteMutation = useDeleteProduct();
+  // #183: el costo solo se muestra en las Stores con el módulo `costos`.
+  const { costos } = useFeatureFlags();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
@@ -149,7 +152,7 @@ export function AdminProductList() {
                 <tr className="border-b border-gray-200 bg-gray-50">
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">Producto</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">Categoría</th>
-                  <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>
+                  {costos && <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>}
                   <th className="text-right py-3 px-4 font-semibold text-gray-600">Precio</th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">Activo</th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">Acciones</th>
@@ -198,12 +201,14 @@ export function AdminProductList() {
                       {formatCategoryName(product.category_name)}
                     </td>
 
-                    {/* Costo */}
-                    <td className="py-3 px-4 text-right font-mono text-gray-500">
-                      {product.cost != null && product.cost > 0
-                        ? `${formatPrice(product.cost)}`
-                        : <span className="text-gray-300">—</span>}
-                    </td>
+                    {/* Costo: sin fila es "sin costo registrado" (#183) */}
+                    {costos && (
+                      <td className="py-3 px-4 text-right font-mono text-gray-500">
+                        {product.cost != null
+                          ? `${formatPrice(product.cost)}`
+                          : <span className="text-gray-300">—</span>}
+                      </td>
+                    )}
 
                     {/* Precio */}
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-700">
@@ -284,7 +289,7 @@ export function AdminProductList() {
                       <span className="text-xs font-medium text-green-600">
                         {formatPrice(product.price)}
                       </span>
-                      {product.cost != null && product.cost > 0 && (
+                      {costos && product.cost != null && product.cost > 0 && (
                         <>
                           <span className="text-xs text-gray-400">|</span>
                           <span className="text-xs text-gray-500">

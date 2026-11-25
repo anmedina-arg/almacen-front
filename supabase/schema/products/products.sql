@@ -82,6 +82,13 @@ CREATE TABLE IF NOT EXISTS public.products (
     min_variedades IS NULL OR (min_variedades >= 1 AND max_variedades >= min_variedades)
   ),
 
+  -- UNIQUE (id, store_id), no solo la PK: sostiene la FK compuesta de
+  -- product_costs (#183), que garantiza a nivel de schema que el costo de un
+  -- producto es de su misma Store. En producción se agregó con un ALTER TABLE
+  -- (CREATE TABLE IF NOT EXISTS no toca una tabla existente):
+  --   ALTER TABLE public.products ADD CONSTRAINT products_id_store_id_key UNIQUE (id, store_id);
+  CONSTRAINT products_id_store_id_key UNIQUE (id, store_id),
+
   -- FK compuesta, no una FK simple a familia_id: garantiza que un Producto
   -- Surtido no pueda referenciar una Familia de otra Store a nivel de
   -- schema (ver la nota en producto-surtido/familias.sql).

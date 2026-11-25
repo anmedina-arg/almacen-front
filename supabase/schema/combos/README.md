@@ -22,7 +22,7 @@ Ninguna en este dominio.
 
 | Archivo | Cuándo dispara |
 |---|---|
-| `sync_combo_cost.sql` | Al INSERT/UPDATE/DELETE en `combo_components` — recalcula `products.cost` del combo como suma de (cantidad × costo) de cada componente. |
+| `sync_combo_cost.sql` | Al INSERT/UPDATE/DELETE en `combo_components` — recalcula el Costo del combo como suma de (cantidad × costo) de cada componente con Costo registrado. Desde #183 lee y escribe `product_costs` (sin componentes con costo, el combo queda sin fila); `products.cost` lo actualiza el espejo de esa tabla. |
 
 ## Funciones auxiliares (no son RPC ni trigger)
 

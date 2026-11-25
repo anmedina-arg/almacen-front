@@ -20,7 +20,7 @@ No hay nada que hacer: `npm run db:reset` la deja lista. `supabase/seed.sql` ins
      --slug=demo-store --name="Demo Store" \
      --owner-email=<email del Platform admin> --operator-email=<el mismo> \
      --whatsapp=<número propio de la demo, con código de país, sin +> \
-     --flags=clientes,pagos,ranking,pos,dashboard,informes --demo
+     --flags=clientes,pagos,ranking,pos,dashboard,informes,costos --demo
    ```
    El número es distinto al de Market del Cevil y no se escribe en el repo. El flag `stock` va **apagado** a propósito: el control de stock es por Store (`is_stock_tracked()` lee `feature_flags->>'stock'`) y la demo no tiene filas en `product_stock`; con el flag prendido, `reserve_order_stock()` rechazaría todos los pedidos con `insufficient_stock`. Si algún día se quiere mostrar el módulo de stock en la demo, hay que cargar stock para cada producto antes de prender el flag.
 4. **Contenido**: pegar `supabase/seed/demo-store.sql` entero en el SQL Editor (un solo bloque `DO`, un solo Run). Es idempotente: correrlo dos veces no duplica nada. No crea filas en `product_stock` (ver el punto anterior).

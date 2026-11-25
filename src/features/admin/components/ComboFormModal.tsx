@@ -12,6 +12,7 @@ import { ImageUploadField } from './ImageUploadField';
 import type { Product } from '@/types';
 import type { ComboComponent } from '../types/combo.types';
 import { formatPrice } from '@/utils/formatPrice';
+import { useFeatureFlags } from '../context/FeatureFlagsContext';
 
 interface ComboFormModalProps {
   mode: 'create' | 'edit';
@@ -29,6 +30,8 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
   );
   const { uploadFile, uploading, uploadError } = useCloudinaryUpload();
   const { data: categories = [] } = useCategories();
+  // #183: costo y margen solo en las Stores con el módulo `costos`.
+  const { costos } = useFeatureFlags();
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [componentSearch, setComponentSearch] = useState('');
@@ -149,7 +152,7 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
     const productPayload = {
       name: formData.name.trim(),
       price: formData.price,
-      cost: calculatedCost,
+      // El costo de un combo no se manda: lo calcula la base a partir de sus componentes (sync_combo_cost).
       image: finalImage,
       active: formData.active,
       sale_type: 'unit' as const,
@@ -243,10 +246,12 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
 
           {/* Costo, precio sugerido y margen */}
           <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-sm space-y-1">
-            <p className="text-gray-600">
-              Costo calculado:{' '}
-              <span className="font-semibold text-gray-800">{formatPrice(calculatedCost)}</span>
-            </p>
+            {costos && (
+              <p className="text-gray-600">
+                Costo calculado:{' '}
+                <span className="font-semibold text-gray-800">{formatPrice(calculatedCost)}</span>
+              </p>
+            )}
             {components.length > 0 && (
               <p className="text-gray-600">
                 Precio sugerido:{' '}
@@ -261,9 +266,11 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                 <span className="text-gray-400 ml-1 text-xs">(suma de precios de componentes)</span>
               </p>
             )}
-            <p className={`font-semibold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              Margen: {formatPrice(margin)}
-            </p>
+            {costos && (
+              <p className={`font-semibold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                Margen: {formatPrice(margin)}
+              </p>
+            )}
           </div>
 
           {/* Imagen */}
@@ -378,9 +385,11 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                       <span className="flex-1 text-sm text-gray-800 truncate font-medium">
                         {prod?.name ?? `Producto #${comp.component_product_id}`}
                       </span>
-                      <span className="text-xs text-gray-400 whitespace-nowrap">
-                        costo: {formatPrice(compCost)}
-                      </span>
+                      {costos && (
+                        <span className="text-xs text-gray-400 whitespace-nowrap">
+                          costo: {formatPrice(compCost)}
+                        </span>
+                      )}
                       <input
                         type="number"
                         step="0.01"
@@ -432,7 +441,7 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                       disabled={isPending}
                     >
                       <span className="font-medium text-gray-800">{p.name}</span>
-                      {p.cost != null && p.cost > 0 && (
+                      {costos && p.cost != null && p.cost > 0 && (
                         <span className="text-gray-400 ml-2 text-xs">
                           costo: {formatPrice(p.cost)}
                         </span>

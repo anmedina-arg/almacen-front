@@ -2,12 +2,19 @@ import { describe, expect, it } from 'vitest';
 import { FEATURE_FLAG_KEYS, resolveFeatureFlags } from './featureFlags';
 
 describe('resolveFeatureFlags', () => {
-  it('devuelve las 7 keys en true cuando el JSONB las tiene todas en true', () => {
+  it('devuelve todas las keys en true cuando el JSONB las tiene todas en true', () => {
     const raw = Object.fromEntries(FEATURE_FLAG_KEYS.map((key) => [key, true]));
     const flags = resolveFeatureFlags(raw);
     for (const key of FEATURE_FLAG_KEYS) {
       expect(flags[key]).toBe(true);
     }
+  });
+
+  it('costos es una flag del catálogo (#183): apagada si falta, encendida solo con true', () => {
+    expect(FEATURE_FLAG_KEYS).toContain('costos');
+    expect(resolveFeatureFlags({}).costos).toBe(false);
+    expect(resolveFeatureFlags({ costos: true }).costos).toBe(true);
+    expect(resolveFeatureFlags({ costos: 'true' }).costos).toBe(false);
   });
 
   it('resuelve a false cualquier key faltante', () => {
