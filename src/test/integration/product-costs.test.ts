@@ -1,20 +1,15 @@
-import { spawnSync } from 'node:child_process';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 // Spec #179, ticket #183: el Costo de un Producto vive en su propia tabla
 // (`product_costs`, una fila por producto y Store; sin fila = "sin costo
-// registrado"). Hasta que los tickets de costos migren a los demás consumidores
-// (#186, #187) y se borre la columna vieja (#189), un trigger espeja el costo a
-// `products.cost`, así que lo que ya leía esa columna no se rompe.
+// registrado"). Desde #189 es la única fuente: la columna vieja `products.cost` y su
+// espejo ya no existen.
 const url = process.env.TEST_SUPABASE_URL;
 const anonKey = process.env.TEST_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
 const hasCredentials = Boolean(url && anonKey && serviceRoleKey);
-const dbUrl = process.env.TEST_DB_URL;
-const psql = process.env.PSQL_PATH ?? 'psql';
-const canRunPsql = Boolean(dbUrl) && spawnSync(psql, ['--version'], { encoding: 'utf8' }).status === 0;
 
 type Fixture = { storeId: number; userId: string; client: SupabaseClient; productId: number };
 
@@ -67,9 +62,6 @@ describe.skipIf(!hasCredentials)('product_costs — tabla de costos del Producto
     await admin.from('stores').delete().eq('id', f.storeId);
   }
 
-  const mirrorOf = async (productId: number) =>
-    Number((await admin.from('products').select('cost').eq('id', productId).single()).data!.cost);
-
   beforeAll(async () => {
     storeA = await createFixture('costs-a');
     storeB = await createFixture('costs-b');
@@ -79,11 +71,10 @@ describe.skipIf(!hasCredentials)('product_costs — tabla de costos del Producto
     for (const f of [storeA, storeB]) if (f) await deleteFixture(f);
   });
 
-  describe('fuente de verdad y espejo', () => {
+  describe('fuente única del costo', () => {
     it('un producto nuevo no tiene costo registrado', async () => {
       const { data } = await admin.from('product_costs').select('cost').eq('product_id', storeA.productId);
       expect(data).toEqual([]);
-      expect(await mirrorOf(storeA.productId)).toBe(0);
     });
 
     it('el admin de la Store registra, cambia y quita el costo de su producto', async () => {
@@ -91,18 +82,15 @@ describe.skipIf(!hasCredentials)('product_costs — tabla de costos del Producto
         .from('product_costs')
         .upsert({ product_id: storeA.productId, store_id: storeA.storeId, cost: 1500.5 }, { onConflict: 'product_id,store_id' });
       expect(set.error).toBeNull();
-      expect(await mirrorOf(storeA.productId)).toBe(1500.5);
 
       const change = await storeA.client.from('product_costs').update({ cost: 1800 }).eq('product_id', storeA.productId);
       expect(change.error).toBeNull();
-      expect(await mirrorOf(storeA.productId)).toBe(1800);
 
       const { data } = await storeA.client.from('product_costs').select('cost').eq('product_id', storeA.productId).single();
       expect(Number(data!.cost)).toBe(1800);
 
       const remove = await storeA.client.from('product_costs').delete().eq('product_id', storeA.productId);
       expect(remove.error).toBeNull();
-      expect(await mirrorOf(storeA.productId)).toBe(0);
     });
 
     it('un costo en cero registrado a propósito es distinto de no tener costo', async () => {
@@ -112,7 +100,7 @@ describe.skipIf(!hasCredentials)('product_costs — tabla de costos del Producto
       await admin.from('product_costs').delete().eq('product_id', storeA.productId);
     });
 
-    it('el espejo conserva el historial de costos: cada cambio queda en product_price_history', async () => {
+    it('cada cambio de costo queda en el historial de precios (product_price_history)', async () => {
       await admin.from('product_costs').upsert({ product_id: storeA.productId, store_id: storeA.storeId, cost: 70 }, { onConflict: 'product_id,store_id' });
       await admin.from('product_costs').update({ cost: 75 }).eq('product_id', storeA.productId);
       const { data } = await admin
@@ -123,15 +111,6 @@ describe.skipIf(!hasCredentials)('product_costs — tabla de costos del Producto
       const costs = (data ?? []).map((r) => Number(r.cost));
       expect(costs).toContain(70);
       expect(costs).toContain(75);
-      await admin.from('product_costs').delete().eq('product_id', storeA.productId);
-    });
-
-    it('registrar un costo que no cambia nada no toca el producto (no pisa updated_at)', async () => {
-      await admin.from('product_costs').insert({ product_id: storeA.productId, store_id: storeA.storeId, cost: 10 });
-      const before = (await admin.from('products').select('updated_at').eq('id', storeA.productId).single()).data!.updated_at;
-      await admin.from('product_costs').update({ cost: 10 }).eq('product_id', storeA.productId);
-      const after = (await admin.from('products').select('updated_at').eq('id', storeA.productId).single()).data!.updated_at;
-      expect(after).toBe(before);
       await admin.from('product_costs').delete().eq('product_id', storeA.productId);
     });
 
@@ -208,40 +187,9 @@ describe.skipIf(!hasCredentials)('product_costs — tabla de costos del Producto
       const comboCost = async () =>
         (await admin.from('product_costs').select('cost').eq('product_id', combo)).data!.map((r) => Number(r.cost));
       expect(await comboCost()).toEqual([25]);
-      expect(await mirrorOf(combo)).toBe(25);
 
       await admin.from('combo_components').delete().eq('combo_product_id', combo);
       expect(await comboCost()).toEqual([]);
-      expect(await mirrorOf(combo)).toBe(0);
-    });
-  });
-
-  describe('migración: copiar los costos actuales desde products.cost', () => {
-    // La misma sentencia que se corre una vez en producción (ver el comentario de
-    // product_costs.sql). Solo copia costos mayores a cero: un cero en la columna
-    // vieja es "sin costo registrado", no un costo.
-    const COPY_SQL = `INSERT INTO public.product_costs (product_id, store_id, cost)
-      SELECT id, store_id, cost FROM public.products WHERE cost > 0
-      ON CONFLICT DO NOTHING`;
-
-    it.skipIf(!canRunPsql)('copia solo los productos con costo mayor a cero, con su valor', async () => {
-      const { data: a } = await admin.from('products').insert({ name: 'con costo', price: 9, cost: 33.25, image: '', store_id: storeA.storeId }).select('id').single();
-      const { data: b } = await admin.from('products').insert({ name: 'sin costo', price: 9, cost: 0, image: '', store_id: storeA.storeId }).select('id').single();
-      // La columna vieja se escribió directo: todavía no hay fila en la tabla.
-      expect((await admin.from('product_costs').select('product_id').in('product_id', [a!.id, b!.id])).data).toEqual([]);
-
-      const run = spawnSync(psql, [dbUrl as string, '-X', '-q', '-v', 'ON_ERROR_STOP=1', '-c', COPY_SQL], { encoding: 'utf8' });
-      expect(run.status, run.stderr).toBe(0);
-
-      const { data } = await admin.from('product_costs').select('product_id, cost').in('product_id', [a!.id, b!.id]);
-      expect(data).toHaveLength(1);
-      expect(data![0].product_id).toBe(a!.id);
-      expect(Number(data![0].cost)).toBe(33.25);
-
-      // Correrla de nuevo no duplica ni cambia nada.
-      const again = spawnSync(psql, [dbUrl as string, '-X', '-q', '-v', 'ON_ERROR_STOP=1', '-c', COPY_SQL], { encoding: 'utf8' });
-      expect(again.status, again.stderr).toBe(0);
-      expect((await admin.from('product_costs').select('product_id').in('product_id', [a!.id, b!.id])).data).toHaveLength(1);
     });
   });
 });

@@ -56,7 +56,7 @@ export async function getComboComponents(
       combo_product_id,
       component_product_id,
       quantity,
-      products!combo_components_component_product_id_fkey(name, price:effective_price${options.costsEnabled ? ', cost' : ''})
+      products!combo_components_component_product_id_fkey(name, price:effective_price${options.costsEnabled ? ', cost_row:product_costs!product_costs_product_store_fk(cost)' : ''})
     `
     )
     .eq('combo_product_id', comboId)
@@ -65,7 +65,7 @@ export async function getComboComponents(
   if (error) throw new Error(error.message);
 
   return (data ?? []).map((row) => {
-    const product = row.products as unknown as { name: string; price: number; cost?: number } | null;
+    const product = row.products as unknown as { name: string; price: number; cost_row?: { cost: number | string } | null } | null;
     return {
       id: row.id,
       combo_product_id: row.combo_product_id,
@@ -73,7 +73,7 @@ export async function getComboComponents(
       quantity: row.quantity,
       component_product_name: product?.name ?? null,
       component_product_price: product?.price ?? null,
-      ...(options.costsEnabled && { component_product_cost: product?.cost ?? null }),
+      ...(options.costsEnabled && { component_product_cost: product?.cost_row ? Number(product.cost_row.cost) : null }),
     };
   });
 }

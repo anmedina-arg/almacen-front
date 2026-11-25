@@ -16,7 +16,7 @@
 -- No es pública: solo la llama un trigger que dispara con la sesión de un Store
 -- admin (o service_role). Nace sin EXECUTE para anon ni PUBLIC por los privilegios
 -- por defecto (#154); el REVOKE queda explícito y no lleva GRANT (authenticated y
--- service_role ya lo conservan, mismo criterio que sync_product_cost_mirror).
+-- service_role ya lo conservan, mismo criterio que las demás funciones trigger).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.is_costs_enabled(p_store_id INTEGER)

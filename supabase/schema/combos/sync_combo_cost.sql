@@ -13,8 +13,8 @@
 -- Desde #183 el Costo vive en product_costs (ver products/product_costs.sql):
 -- esta función lee los costos de los componentes de esa tabla y escribe el del
 -- combo ahí. Si la suma da 0 (ningún componente con costo), el combo queda
--- "sin costo registrado": se borra su fila en vez de guardar un cero. El
--- espejo hacia products.cost lo mantiene el trigger de product_costs.
+-- "sin costo registrado": se borra su fila en vez de guardar un cero. (Hasta #189 un
+-- trigger espejaba el costo a products.cost; esa columna se borró.)
 --
 -- Desde #187 el cálculo depende de la flag `costos` (ADR-0018): con la flag apagada
 -- no corre y el combo no tiene fila de costo. Apagar la flag nunca borra una fila

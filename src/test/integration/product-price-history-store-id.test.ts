@@ -46,7 +46,7 @@ describe('log_price_change() setea store_id en product_price_history (#46)', () 
   it.skipIf(!hasCredentials)('el INSERT de un producto deja store_id seteado en product_price_history', async () => {
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: 'test-price-history-producto', price: 100, cost: 50, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: 'test-price-history-producto', price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(productError).toBeNull();

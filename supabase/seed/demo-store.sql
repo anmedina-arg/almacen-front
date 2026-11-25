@@ -57,9 +57,15 @@ BEGIN
   SELECT id INTO v_snacks   FROM public.categories WHERE store_id = v_store AND name = 'Snacks';
   SELECT id INTO v_hamb     FROM public.categories WHERE store_id = v_store AND name = 'Hamburguesas';
 
-  -- ── Gaseosas ───────────────────────────────────────────────────────────
-  INSERT INTO public.products (name, price, cost, image, categories, category_id, store_id)
-  SELECT v.name, v.price, v.cost, v_img || v.img, 'Gaseosas', v_gaseosas, v_store
+  -- ── Productos (#153) y Costos (#183, #189) ───────────────────────────────
+  -- Se arman en una tabla temporal (nombre, precio, costo, imagen, categoría) y de ahí salen
+  -- los productos y sus costos. El Costo vive en product_costs (products.cost se borró en
+  -- #189). Los costos van antes del Combo: sync_combo_cost calcula su costo de esa tabla.
+  CREATE TEMP TABLE _demo_products (name TEXT, price NUMERIC, cost NUMERIC, img TEXT, category_id INTEGER) ON COMMIT DROP;
+
+  -- Gaseosas
+  INSERT INTO _demo_products (name, price, cost, img, category_id)
+  SELECT v.name, v.price, v.cost, v.img, v_gaseosas
   FROM (VALUES
     ('Coca Cola 2.25 L',        4500, 3400, 'coca-cola-coca-cola-thumbnail_j5ikdn.png'),
     ('Coca Cola Zero 2.25 L',   4500, 3400, 'cocazero_wnwiti.webp'),
@@ -70,12 +76,11 @@ BEGIN
     ('Pepsi Black 2 L',         3200, 2400, 'black_utktlz.webp'),
     ('7up 2 L',                 3000, 2200, '7up_yqcefo.jpg'),
     ('Mirinda Manzana 2 L',     3000, 2200, 'Mirinda_qacu7d.webp')
-  ) AS v(name, price, cost, img)
-  WHERE NOT EXISTS (SELECT 1 FROM public.products p WHERE p.store_id = v_store AND p.name = v.name);
+  ) AS v(name, price, cost, img);
 
-  -- ── Snacks ─────────────────────────────────────────────────────────────
-  INSERT INTO public.products (name, price, cost, image, categories, category_id, store_id)
-  SELECT v.name, v.price, v.cost, v_img || v.img, 'Snacks', v_snacks, v_store
+  -- Snacks
+  INSERT INTO _demo_products (name, price, cost, img, category_id)
+  SELECT v.name, v.price, v.cost, v.img, v_snacks
   FROM (VALUES
     ('Papas Lays Clásicas x 134 g',  5000, 3700, 'iowhb1hefkihvtcinpmu.webp'),
     ('Papas Lays Clásicas x 85 g',   3500, 2600, 'ffbprwd4w4akeqd9vsgt.jpg'),
@@ -87,36 +92,36 @@ BEGIN
     ('Conitos Twister x 79 g',       2500, 1800, 'xzypjadftn6gveh6omsm.png'),
     ('Maní frito salado x 150 g',    2000, 1400, 'transparent-Photoroom__2_-removebg-preview_nmxjoz.png'),
     ('Palitos salados x 90 g',       1500, 1000, 'qcl2obd4rdu6xjcjflsx.jpg')
-  ) AS v(name, price, cost, img)
-  WHERE NOT EXISTS (SELECT 1 FROM public.products p WHERE p.store_id = v_store AND p.name = v.name);
+  ) AS v(name, price, cost, img);
 
-  -- ── Hamburguesas ───────────────────────────────────────────────────────
-  INSERT INTO public.products (name, price, cost, image, categories, category_id, store_id)
-  SELECT v.name, v.price, v.cost, v_img || v.img, 'Hamburguesas', v_hamb, v_store
+  -- Hamburguesas
+  INSERT INTO _demo_products (name, price, cost, img, category_id)
+  SELECT v.name, v.price, v.cost, v.img, v_hamb
   FROM (VALUES
     ('Hamburguesas Swift Clásicas x 2',  3500, 2500, 'hamburguesa-clasica-swift-80-gr-x-2-un_d2ohqj.webp'),
     ('Hamburguesas Swift XL x 2',        5000, 3600, 'Swift-XL_imyowr.jpg'),
     ('Pan de hamburguesa Albertus x 4',  2000, 1300, 'hamburguesa-albertus_krvffo.webp')
-  ) AS v(name, price, cost, img)
-  WHERE NOT EXISTS (SELECT 1 FROM public.products p WHERE p.store_id = v_store AND p.name = v.name);
+  ) AS v(name, price, cost, img);
 
-  -- ── Costos (#183) ───────────────────────────────────────────────────────
-  -- El Costo vive en product_costs; products.cost es solo su espejo. Los productos de
-  -- arriba se insertaron con su costo en esa columna, así que se registra acá en la tabla
-  -- (idempotente). Va antes del Combo: sync_combo_cost calcula su costo de esta tabla.
+  INSERT INTO public.products (name, price, image, category_id, store_id)
+  SELECT d.name, d.price, v_img || d.img, d.category_id, v_store
+  FROM _demo_products d
+  WHERE NOT EXISTS (SELECT 1 FROM public.products p WHERE p.store_id = v_store AND p.name = d.name);
+
   INSERT INTO public.product_costs (product_id, store_id, cost)
-  SELECT p.id, p.store_id, p.cost
-  FROM public.products p
-  WHERE p.store_id = v_store AND p.cost > 0
+  SELECT p.id, p.store_id, d.cost
+  FROM _demo_products d
+  JOIN public.products p ON p.store_id = v_store AND p.name = d.name
+  WHERE d.cost > 0
   ON CONFLICT DO NOTHING;
 
   -- ── Combo: 2 hamburguesas + pan + gaseosa ──────────────────────────────
   -- Muestra la composición fija del catálogo (is_combo + combo_components).
   -- El costo lo recalcula el trigger sync_combo_cost a partir de los
   -- componentes; el precio es de ejemplo, un poco menor que la suma.
-  INSERT INTO public.products (name, price, image, categories, category_id, store_id, is_combo)
+  INSERT INTO public.products (name, price, image, category_id, store_id, is_combo)
   SELECT 'Combo Hamburguesas para 2', 9500, v_img || 'hamburguesa-clasica-swift-80-gr-x-2-un_d2ohqj.webp',
-         'Hamburguesas', v_hamb, v_store, TRUE
+         v_hamb, v_store, TRUE
   WHERE NOT EXISTS (
     SELECT 1 FROM public.products p WHERE p.store_id = v_store AND p.name = 'Combo Hamburguesas para 2'
   );

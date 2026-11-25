@@ -56,8 +56,6 @@ describe.skipIf(!hasCredentials)('flag costos — independencia y datos (#183)',
 
   const costRows = async (productId: number) =>
     (await admin.from('product_costs').select('cost').eq('product_id', productId)).data!.map((r) => Number(r.cost));
-  const mirror = async (productId: number) =>
-    Number((await admin.from('products').select('cost').eq('id', productId).single()).data!.cost);
 
   afterAll(async () => {
     if (orderIds.length > 0) {
@@ -85,7 +83,6 @@ describe.skipIf(!hasCredentials)('flag costos — independencia y datos (#183)',
       productIds.push(product.id);
       expect(product.cost).toBe(12.5);
       expect(await costRows(product.id)).toEqual([12.5]);
-      expect(await mirror(product.id)).toBe(12.5);
     });
 
     it('crear sin costo no registra nada: sin costo registrado, no cero', async () => {
@@ -113,7 +110,6 @@ describe.skipIf(!hasCredentials)('flag costos — independencia y datos (#183)',
       const cleared = await updateProduct(admin, store.storeId, product.id, { cost: null }, { costsEnabled: true });
       expect(cleared.cost).toBeNull();
       expect(await costRows(product.id)).toEqual([]);
-      expect(await mirror(product.id)).toBe(0);
     });
 
     it('editar otro dato no toca el costo', async () => {
@@ -171,7 +167,6 @@ describe.skipIf(!hasCredentials)('flag costos — independencia y datos (#183)',
       const { combo } = await comboConComponentes(off.storeId, off.categoryId, false, 'combo-off');
       expect(combo.is_combo).toBe(true);
       expect(await costRows(combo.id)).toEqual([]);
-      expect(await mirror(combo.id)).toBe(0);
     });
 
     it('con la flag apagada editar la composición funciona y sigue sin costo', async () => {
@@ -230,7 +225,6 @@ describe.skipIf(!hasCredentials)('flag costos — independencia y datos (#183)',
       productIds.push(product.id);
       expect(product).not.toHaveProperty('cost');
       expect(await costRows(product.id)).toEqual([]);
-      expect(await mirror(product.id)).toBe(0);
     });
 
     it('sin indicar nada se trata como flag apagada', async () => {

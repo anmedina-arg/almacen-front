@@ -78,7 +78,7 @@ describe('contract — store_id NOT NULL + puente permisivo removido (#22)', () 
   it.skipIf(!hasCredentials)('INSERT en products con store_id NULL falla por constraint NOT NULL', async () => {
     const { error } = await admin
       .from('products')
-      .insert({ name: 'test-contract-producto', price: 100, image: '', categories: '', store_id: null, active: false });
+      .insert({ name: 'test-contract-producto', price: 100, image: '', store_id: null, active: false });
 
     expect(error).not.toBeNull();
     expect(error?.code).toBe('23502');

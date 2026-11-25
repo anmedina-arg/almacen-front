@@ -1,4 +1,3 @@
-import { spawnSync } from 'node:child_process';
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -13,9 +12,6 @@ const url = process.env.TEST_SUPABASE_URL;
 const anonKey = process.env.TEST_SUPABASE_ANON_KEY;
 const serviceRoleKey = process.env.TEST_SUPABASE_SERVICE_ROLE_KEY;
 const hasCredentials = Boolean(url && anonKey && serviceRoleKey);
-const dbUrl = process.env.TEST_DB_URL;
-const psql = process.env.PSQL_PATH ?? 'psql';
-const canRunPsql = Boolean(dbUrl) && spawnSync(psql, ['--version'], { encoding: 'utf8' }).status === 0;
 
 type Fixture = { storeId: number; categoryId: number; userId: string; client: SupabaseClient };
 
@@ -104,8 +100,6 @@ describe.skipIf(!hasCredentials)('máximo de stock dentro del módulo stock (#18
     const { error } = await admin.from('product_stock').update({ quantity, updated_by: userId }).eq('product_id', productId);
     expect(error).toBeNull();
   };
-  const legacyColumn = async (productId: number) =>
-    (await admin.from('products').select('max_stock').eq('id', productId).single()).data!.max_stock;
 
   afterAll(async () => {
     if (productIds.length > 0) {
@@ -146,47 +140,6 @@ describe.skipIf(!hasCredentials)('máximo de stock dentro del módulo stock (#18
       });
       expect(error).toBeNull();
       expect(await stockRow(componentId)).toEqual([{ quantity: 20, max_stock: 8 }]);
-    });
-  });
-
-  describe('migración: copiar los máximos actuales desde products.max_stock', () => {
-    let store: Fixture;
-    beforeAll(async () => {
-      store = await createFixture('max-migracion', { stock: true });
-    });
-
-    // La misma sentencia que se corre una vez en producción (ver product_stock.sql).
-    const COPY_SQL = `INSERT INTO public.product_stock (product_id, store_id, quantity, max_stock)
-      SELECT id, store_id, 0, max_stock FROM public.products WHERE max_stock IS NOT NULL
-      ON CONFLICT (product_id) DO UPDATE SET max_stock = EXCLUDED.max_stock`;
-
-    it.skipIf(!canRunPsql)('copia el máximo sin tocar el stock existente ni crear filas de más', async () => {
-      const mk = async (name: string, max: number | null) => {
-        const { data } = await admin
-          .from('products')
-          .insert({ name, price: 9, image: '', store_id: store.storeId, active: false, max_stock: max })
-          .select('id')
-          .single();
-        productIds.push(data!.id);
-        return data!.id as number;
-      };
-      const conFila = await mk('con fila de stock', 5);
-      const sinFila = await mk('sin fila de stock', 3);
-      const sinMaximo = await mk('sin máximo', null);
-      await admin.from('product_stock').insert({ product_id: conFila, quantity: 7, store_id: store.storeId, updated_by: store.userId });
-
-      const run = spawnSync(psql, [dbUrl as string, '-X', '-q', '-v', 'ON_ERROR_STOP=1', '-c', COPY_SQL], { encoding: 'utf8' });
-      expect(run.status, run.stderr).toBe(0);
-
-      expect(await stockRow(conFila)).toEqual([{ quantity: 7, max_stock: 5 }]);
-      expect(await stockRow(sinFila)).toEqual([{ quantity: 0, max_stock: 3 }]);
-      expect(await stockRow(sinMaximo)).toEqual([]);
-
-      // Correrla de nuevo no duplica ni cambia nada.
-      const again = spawnSync(psql, [dbUrl as string, '-X', '-q', '-v', 'ON_ERROR_STOP=1', '-c', COPY_SQL], { encoding: 'utf8' });
-      expect(again.status, again.stderr).toBe(0);
-      expect(await stockRow(conFila)).toEqual([{ quantity: 7, max_stock: 5 }]);
-      expect(await stockRow(sinFila)).toEqual([{ quantity: 0, max_stock: 3 }]);
     });
   });
 
@@ -231,13 +184,6 @@ describe.skipIf(!hasCredentials)('máximo de stock dentro del módulo stock (#18
       expect(Number((await rowOf(combo)).quantity)).toBe(10);
     });
 
-    it('la columna vieja de products ya no se lee', async () => {
-      const component = await createComponent(store, 10);
-      const combo = await createCombo(store, component, { max_stock: 2 });
-      expect(Number((await rowOf(combo)).quantity)).toBe(10);
-      expect(Number((await exportOf(combo)).stock_actual)).toBe(10);
-    });
-
     it('la fila de un combo con cantidad 0 no cambia su Disponible en el catálogo', async () => {
       const component = await createComponent(store, 6);
       const combo = await createCombo(store, component);
@@ -256,7 +202,7 @@ describe.skipIf(!hasCredentials)('máximo de stock dentro del módulo stock (#18
       store = await createFixture('max-on', { stock: true });
     });
 
-    it('crear con máximo lo guarda en product_stock, lo devuelve y no escribe la columna vieja', async () => {
+    it('crear con máximo lo guarda en product_stock y lo devuelve', async () => {
       const component = await createComponent(store, 10);
       const product = await createProduct(
         admin,
@@ -267,7 +213,6 @@ describe.skipIf(!hasCredentials)('máximo de stock dentro del módulo stock (#18
       productIds.push(product.id);
       expect(product.max_stock).toBe(6);
       expect(await stockRow(product.id)).toEqual([{ quantity: 0, max_stock: 6 }]);
-      expect(await legacyColumn(product.id)).toBeNull();
     });
 
     it('crear sin máximo no crea fila de stock', async () => {
@@ -322,12 +267,11 @@ describe.skipIf(!hasCredentials)('máximo de stock dentro del módulo stock (#18
       store = await createFixture('max-off', { stock: false });
     });
 
-    it('crear y editar con máximo lo ignoran: ni fila, ni columna vieja, ni respuesta', async () => {
+    it('crear y editar con máximo lo ignoran: ni fila ni respuesta', async () => {
       const product = await createProduct(admin, store.storeId, input(store.categoryId, 'sin módulo', { max_stock: 7 }), off);
       productIds.push(product.id);
       expect(product.max_stock ?? null).toBeNull();
       expect(await stockRow(product.id)).toEqual([]);
-      expect(await legacyColumn(product.id)).toBeNull();
 
       const updated = await updateProduct(admin, store.storeId, product.id, { max_stock: 9, price: 55 }, off);
       expect(updated.price).toBe(55); // el resto de la edición sigue funcionando

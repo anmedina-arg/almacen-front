@@ -80,7 +80,6 @@ describe('store scoping — ranking: get_top_seller_ids (#142)', () => {
         name: `${slug}-producto`,
         price: 100,
         image: '',
-        categories: '',
         store_id: storeId,
         active: true,
         category_id: categoryId,

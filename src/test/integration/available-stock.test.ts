@@ -47,7 +47,7 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
   async function createProduct(storeId: number, fields: Record<string, unknown> = {}): Promise<number> {
     const { data, error } = await admin
       .from('products')
-      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, image: '', categories: '', store_id: storeId, active: true, ...fields })
+      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, image: '', store_id: storeId, active: true, ...fields })
       .select('id')
       .single();
     expect(error).toBeNull();

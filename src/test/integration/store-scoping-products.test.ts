@@ -82,7 +82,7 @@ describe('store scoping — products & categories (#15)', () => {
       // exclusivamente "Admins can view all products" (la que este ticket
       // scopea) — la lectura pública de productos activos NO se aísla por
       // RLS a propósito (ver el comment en supabase_store_scoping_products.sql).
-      .insert({ name: `${slug}-producto`, price: 100, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-producto`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(productError).toBeNull();

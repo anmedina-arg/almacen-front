@@ -49,7 +49,7 @@ describe('log_initial_stock()/log_stock_change() setean store_id en stock_moveme
 
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: 'test-movement-log-producto', price: 100, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: 'test-movement-log-producto', price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(productError).toBeNull();

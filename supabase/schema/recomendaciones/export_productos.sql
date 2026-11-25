@@ -22,6 +22,9 @@
 --
 -- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
 --
+-- #189 (spec #179): el costo sale de product_costs (LEFT JOIN: sin fila = 0), no de la
+-- columna products.cost, que se borra. Misma firma.
+--
 -- #184 (spec #179): el tope de un combo sale de product_stock.max_stock, no de
 -- products.max_stock. Misma firma, así que no hace falta DROP.
 -- ============================================================================
@@ -63,15 +66,15 @@ BEGIN
     COALESCE(sub.name,  ''),
 
     COALESCE(public.effective_price(p), 0),
-    COALESCE(p.cost,  0),
+    COALESCE(pc.cost, 0),
 
     -- Margen absoluto
-    COALESCE(public.effective_price(p), 0) - COALESCE(p.cost, 0),
+    COALESCE(public.effective_price(p), 0) - COALESCE(pc.cost, 0),
 
     -- Margen porcentual sobre costo (NULL si costo = 0)
     CASE
-      WHEN COALESCE(p.cost, 0) > 0
-      THEN ROUND(((public.effective_price(p) - p.cost) / p.cost * 100)::NUMERIC, 1)
+      WHEN COALESCE(pc.cost, 0) > 0
+      THEN ROUND(((public.effective_price(p) - pc.cost) / pc.cost * 100)::NUMERIC, 1)
       ELSE NULL
     END,
 
@@ -101,6 +104,7 @@ BEGIN
   LEFT JOIN categories    cat ON cat.id = p.category_id
   LEFT JOIN subcategories sub ON sub.id = p.subcategory_id
   LEFT JOIN product_stock ps  ON ps.product_id = p.id
+  LEFT JOIN product_costs pc  ON pc.product_id = p.id
 
   WHERE p.store_id = p_store_id
 

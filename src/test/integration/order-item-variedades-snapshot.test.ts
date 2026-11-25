@@ -63,7 +63,6 @@ describe('order_item_variedades — snapshot sobrevive a la Variedad original (#
         name: `${slug}-producto`,
         price: 100,
         image: '',
-        categories: '',
         store_id: storeId,
         active: true,
         is_producto_surtido: true,

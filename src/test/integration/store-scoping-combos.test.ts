@@ -65,14 +65,14 @@ describe('store scoping — combo_components (#18)', () => {
 
     const { data: comboProduct, error: comboError } = await admin
       .from('products')
-      .insert({ name: `${slug}-combo`, price: 100, image: '', categories: '', store_id: storeId, active: false, is_combo: true })
+      .insert({ name: `${slug}-combo`, price: 100, image: '', store_id: storeId, active: false, is_combo: true })
       .select('id')
       .single();
     expect(comboError).toBeNull();
 
     const { data: componentProduct, error: componentError } = await admin
       .from('products')
-      .insert({ name: `${slug}-componente`, price: 50, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-componente`, price: 50, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(componentError).toBeNull();

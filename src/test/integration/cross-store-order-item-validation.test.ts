@@ -48,7 +48,7 @@ describe('cross-store order_items validation (#103)', () => {
     const productName = `${slug}-producto`;
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: productName, price: 100, image: '', categories: '', store_id: storeId, active: true })
+      .insert({ name: productName, price: 100, image: '', store_id: storeId, active: true })
       .select('id')
       .single();
     expect(productError).toBeNull();

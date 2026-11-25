@@ -9,7 +9,7 @@ import { createOrder } from '@/features/orders/services/orderService';
 // diferencia del carrito público), así que el unit_cost recalculado
 // server-side por createOrder() (unit_price * cost/price) da el mismo
 // resultado que el unit_cost crudo que POS mandaba antes directo
-// (product.cost). Se prueba armando el input tal como lo arma la ruta de
+// (el costo del producto). Se prueba armando el input tal como lo arma la ruta de
 // POS (sin campo unit_cost, is_by_weight/from_suggestion explícitos) y
 // llamando a createOrder() directo — no vía HTTP, mismo criterio que
 // require-flag.test.ts: simular una sesión admin real por curl es más
@@ -31,14 +31,16 @@ describe('creación de pedido vía POS (#121)', () => {
     expect(storeError).toBeNull();
     storeId = store!.id;
 
-    // price=100, cost=60 -> ratio cost/price = 0.6
+    // price=100, cost=60 -> ratio cost/price = 0.6 (el costo vive en product_costs, #189)
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: `${slug}-producto`, price: 100, cost: 60, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-producto`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(productError).toBeNull();
     productId = product!.id;
+    const { error: costError } = await admin.from('product_costs').insert({ product_id: productId, store_id: storeId, cost: 60 });
+    expect(costError).toBeNull();
     await admin.from('product_price_history').delete().eq('product_id', productId);
   });
 
@@ -48,6 +50,7 @@ describe('creación de pedido vía POS (#121)', () => {
       await admin.from('order_items').delete().eq('order_id', orderId);
       await admin.from('orders').delete().eq('id', orderId);
     }
+    await admin.from('product_costs').delete().eq('product_id', productId);
     await admin.from('product_price_history').delete().eq('product_id', productId);
     await admin.from('products').delete().eq('id', productId);
     await admin.from('stores').delete().eq('id', storeId);
@@ -78,7 +81,7 @@ describe('creación de pedido vía POS (#121)', () => {
 
     const { data: items } = await admin.from('order_items').select('unit_cost, unit_price, quantity').eq('order_id', orderId);
     expect(items).toHaveLength(1);
-    // unit_price(100) * (cost(60)/price(100)) = 60 — igual al product.cost
+    // unit_price(100) * (cost(60)/price(100)) = 60 — igual al costo
     // crudo que POS mandaba directo antes de #121.
     expect(Number(items![0].unit_cost)).toBe(60);
   });

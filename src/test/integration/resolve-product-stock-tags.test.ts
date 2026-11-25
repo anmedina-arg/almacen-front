@@ -38,7 +38,7 @@ describe('resolveProductStockTags (#146, #158)', () => {
 
     const { data: plain, error: plainError } = await admin
       .from('products')
-      .insert({ name: `${slug}-plain`, price: 100, image: '', categories: '', store_id: storeId, active: true })
+      .insert({ name: `${slug}-plain`, price: 100, image: '', store_id: storeId, active: true })
       .select('id')
       .single();
     expect(plainError).toBeNull();
@@ -46,7 +46,7 @@ describe('resolveProductStockTags (#146, #158)', () => {
 
     const { data: combo, error: comboError } = await admin
       .from('products')
-      .insert({ name: `${slug}-combo`, price: 200, image: '', categories: '', store_id: storeId, active: true, is_combo: true })
+      .insert({ name: `${slug}-combo`, price: 200, image: '', store_id: storeId, active: true, is_combo: true })
       .select('id')
       .single();
     expect(comboError).toBeNull();
@@ -54,7 +54,7 @@ describe('resolveProductStockTags (#146, #158)', () => {
 
     const { data: componentA, error: componentAError } = await admin
       .from('products')
-      .insert({ name: `${slug}-comp-a`, price: 50, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-comp-a`, price: 50, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(componentAError).toBeNull();
@@ -62,7 +62,7 @@ describe('resolveProductStockTags (#146, #158)', () => {
 
     const { data: componentB, error: componentBError } = await admin
       .from('products')
-      .insert({ name: `${slug}-comp-b`, price: 30, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-comp-b`, price: 30, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(componentBError).toBeNull();
@@ -70,7 +70,7 @@ describe('resolveProductStockTags (#146, #158)', () => {
 
     const { data: otherCombo, error: otherComboError } = await admin
       .from('products')
-      .insert({ name: `${slug}-combo-2`, price: 150, image: '', categories: '', store_id: storeId, active: true, is_combo: true })
+      .insert({ name: `${slug}-combo-2`, price: 150, image: '', store_id: storeId, active: true, is_combo: true })
       .select('id')
       .single();
     expect(otherComboError).toBeNull();

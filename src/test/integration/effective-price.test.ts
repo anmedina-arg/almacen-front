@@ -33,8 +33,8 @@ describe.skipIf(!hasCredentials)('effective_price — punto único de lectura de
     const { data: products, error: productsError } = await admin
       .from('products')
       .insert([
-        { name: `${slug}-activo`, price: 1234.56, cost: 0, image: '', categories: '', store_id: storeId, active: true },
-        { name: `${slug}-inactivo`, price: 99, cost: 0, image: '', categories: '', store_id: storeId, active: false },
+        { name: `${slug}-activo`, price: 1234.56, image: '', store_id: storeId, active: true },
+        { name: `${slug}-inactivo`, price: 99, image: '', store_id: storeId, active: false },
       ])
       .select('id, active');
     expect(productsError).toBeNull();

@@ -65,7 +65,7 @@ describe('store scoping — product_price_history (#100)', () => {
     // product_price_history sola, con store_id ya seteado (#46).
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: `${slug}-producto`, price: 100, cost: 50, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-producto`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(productError).toBeNull();

@@ -46,7 +46,7 @@ describe('increment_product_stock_batch (#122)', () => {
 
     const { data: productA, error: aError } = await admin
       .from('products')
-      .insert({ name: `${slug}-a`, price: 100, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-a`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(aError).toBeNull();
@@ -54,7 +54,7 @@ describe('increment_product_stock_batch (#122)', () => {
 
     const { data: productB, error: bError } = await admin
       .from('products')
-      .insert({ name: `${slug}-b`, price: 100, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-b`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(bError).toBeNull();

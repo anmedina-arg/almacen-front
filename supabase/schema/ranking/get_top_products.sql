@@ -18,6 +18,9 @@
 -- (fetchPublicProducts.ts), no /admin/ranking; su scoping por Store se
 -- resolvió después, en #142.
 --
+-- #189 (spec #179): el costo sale de product_costs (LEFT JOIN: sin fila = sin costo
+-- registrado = 0), no de la columna products.cost, que se borra. Misma firma.
+--
 -- Aplicada y confirmada en producción el 2026-08-25: DROP FUNCTION de los
 -- 2 overloads viejos (4 y 5 params, ver Gaps/hallazgo en el README de este
 -- dominio) + CREATE OR REPLACE de esta versión — verificado con
@@ -64,25 +67,26 @@ BEGIN
     SUM(oi.quantity)                              AS units_sold,
     SUM(oi.quantity * oi.unit_price)              AS revenue,
     public.effective_price(p)                     AS current_price,
-    COALESCE(p.cost, 0)                           AS current_cost,
+    COALESCE(pc.cost, 0)                          AS current_cost,
     CASE
-      WHEN COALESCE(p.cost, 0) = 0 THEN public.effective_price(p)
-      ELSE public.effective_price(p) - p.cost
+      WHEN COALESCE(pc.cost, 0) = 0 THEN public.effective_price(p)
+      ELSE public.effective_price(p) - pc.cost
     END                                           AS margin,
     CASE
-      WHEN COALESCE(p.cost, 0) = 0 THEN NULL
-      ELSE ROUND(((public.effective_price(p) - p.cost) / p.cost * 100)::NUMERIC, 1)
+      WHEN COALESCE(pc.cost, 0) = 0 THEN NULL
+      ELSE ROUND(((public.effective_price(p) - pc.cost) / pc.cost * 100)::NUMERIC, 1)
     END                                           AS margin_pct
   FROM order_items oi
   JOIN orders    o   ON oi.order_id   = o.id
   JOIN products  p   ON oi.product_id = p.id
   LEFT JOIN categories cat ON p.category_id = cat.id
+  LEFT JOIN product_costs pc ON pc.product_id = p.id
   WHERE o.status IN ('pending', 'confirmed')
     AND o.store_id = p_store_id
     AND (p_start_date  IS NULL OR o.created_at >= p_start_date)
     AND (p_end_date    IS NULL OR o.created_at <= p_end_date)
     AND (p_category_id IS NULL OR p.category_id = p_category_id)
-  GROUP BY p.id, p.name, p.image, p.sale_type, public.effective_price(p), p.cost, cat.name
+  GROUP BY p.id, p.name, p.image, p.sale_type, public.effective_price(p), pc.cost, cat.name
   ORDER BY
     CASE WHEN p_metric = 'revenue' THEN SUM(oi.quantity * oi.unit_price)
          ELSE SUM(oi.quantity)

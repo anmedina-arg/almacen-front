@@ -14,6 +14,7 @@ import { getArgentinaTodayUtc } from '@/lib/date/argentinaTime';
 import { NotFoundError } from '@/lib/api/errors';
 import { orderCostFields } from '@/features/orders/utils/orderMargin';
 import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
+import { listProductCosts } from '@/features/products/services/productCostService';
 
 /**
  * Service del dominio Dashboard (#126) — ver ADR-0013, dominio delgado
@@ -200,9 +201,11 @@ export async function getStockByCategory(supabase: SupabaseClient, storeId: numb
   // vienen filtrados, y filtrar product_stock.store_id directamente
   // ocultaría stock legacy cuyo store_id todavía no se backfilleó (mismo
   // motivo documentado en get_all_products_with_stock.sql, Stock #17).
-  const [{ data: products, error: productsError }, { data: stockData }] = await Promise.all([
-    supabase.from('products').select('id, cost, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
+  // El Costo sale de product_costs (#189): sin fila el producto no tiene costo y no suma valor.
+  const [{ data: products, error: productsError }, { data: stockData }, costs] = await Promise.all([
+    supabase.from('products').select('id, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
     supabase.from('product_stock').select('product_id, quantity'),
+    listProductCosts(supabase, storeId),
   ]);
 
   if (productsError || !products) throw new Error('Error fetching products');
@@ -214,7 +217,7 @@ export async function getStockByCategory(supabase: SupabaseClient, storeId: numb
     const cat = product.cat as unknown as { name: string } | null;
     const categoryName = formatCategoryName(cat?.name);
     const stockGrams = stockMap.get(product.id) ?? 0;
-    const cost = product.cost ?? 0;
+    const cost = costs.get(product.id) ?? 0;
     const value = calculateLineTotal(stockGrams, product.sale_type, cost);
     totals.set(categoryName, (totals.get(categoryName) ?? 0) + value);
   }
@@ -230,9 +233,10 @@ export async function getStockProducts(supabase: SupabaseClient, storeId: number
   // por store_id (lectura pública sin restricción de Store), product_stock
   // sin filtrar (evita ocultar stock legacy no backfilleado — ver
   // get_all_products_with_stock.sql, Stock #17).
-  const [{ data: products, error }, { data: stockData }] = await Promise.all([
-    supabase.from('products').select('id, name, cost, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
+  const [{ data: products, error }, { data: stockData }, costs] = await Promise.all([
+    supabase.from('products').select('id, name, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
     supabase.from('product_stock').select('product_id, quantity'),
+    listProductCosts(supabase, storeId),
   ]);
 
   if (error || !products) throw new Error('Error fetching products');
@@ -246,7 +250,7 @@ export async function getStockProducts(supabase: SupabaseClient, storeId: number
     })
     .map((p) => {
       const stock_raw = stockMap.get(p.id) ?? 0;
-      const cost = p.cost ?? 0;
+      const cost = costs.get(p.id) ?? 0;
       const stock_value = calculateLineTotal(stock_raw, p.sale_type, cost);
       return { id: p.id, name: p.name, sale_type: p.sale_type, stock_raw, cost, stock_value: Math.round(stock_value) };
     })

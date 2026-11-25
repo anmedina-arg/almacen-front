@@ -32,7 +32,7 @@ describe('Eliminar un pedido y el stock (#164)', () => {
   async function createProduct(store = storeId, fields: Record<string, unknown> = {}): Promise<number> {
     const { data, error } = await admin
       .from('products')
-      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, cost: 50, image: '', categories: '', store_id: store, active: false, ...fields })
+      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, image: '', store_id: store, active: false, ...fields })
       .select('id')
       .single();
     expect(error).toBeNull();

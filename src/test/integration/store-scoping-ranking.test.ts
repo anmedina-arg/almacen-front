@@ -83,7 +83,6 @@ describe('store scoping — ranking: get_top_products / get_top_categories (#20)
         name: productName,
         price: 100,
         image: '',
-        categories: '',
         store_id: storeId,
         active: true,
         category_id: category!.id,

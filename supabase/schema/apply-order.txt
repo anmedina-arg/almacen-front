@@ -40,6 +40,7 @@ products/subcategories.sql
 producto-surtido/familias.sql
 orders/log_price_change.sql
 orders/sync_order_items_unit_cost.sql
+orders/set_order_item_unit_cost.sql
 products/products.sql
 products/effective_price.sql
 products/product_costs.sql

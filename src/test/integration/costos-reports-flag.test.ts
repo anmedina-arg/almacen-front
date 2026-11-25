@@ -64,7 +64,7 @@ describe.skipIf(!hasCredentials)('flag costos — pedidos, ranking e informes (#
       (await admin.from('products').insert({ name, price, image: '', store_id: storeId, category_id: category!.id }).select('id').single()).data!.id as number;
     const conCosto = await mk('Con costo', 100);
     const sinCosto = await mk('Sin costo', 80);
-    // Costo registrado solo para uno (el espejo lo copia a products.cost).
+    // Costo registrado solo para uno (product_costs es la única fuente del costo).
     await admin.from('product_costs').insert({ product_id: conCosto, store_id: storeId, cost: 60 });
 
     const item = (product_id: number, product_name: string, unit_price: number) => ({

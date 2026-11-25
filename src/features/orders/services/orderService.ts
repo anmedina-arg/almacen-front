@@ -88,44 +88,24 @@ export async function createOrder(
 ): Promise<{ order_id: number; total: number; status: string; items_count: number }> {
   const { notes, whatsapp_message, items } = input;
 
-  // unit_cost se calcula server-side a partir del precio/costo vigente del
-  // producto — el cliente solo manda unit_price (normalizado a
-  // precio-por-unidad-base en el carrito). .eq('store_id', storeId): un
-  // product_id de otra Store no matchea acá, así que cae al mismo fallback
-  // (unit_cost 0) que un product_id inexistente.
-  const productIds = items.map((i) => i.product_id);
-  const { data: productsData } = await supabase
-    .from('products')
-    .select('id, price:effective_price, cost')
-    .eq('store_id', storeId)
-    .in('id', productIds);
-  const productMap = new Map<number, { price: number; cost: number }>(
-    (productsData ?? []).map((p) => [p.id, { price: Number(p.price ?? 0), cost: Number(p.cost ?? 0) }])
-  );
-
+  // El cliente solo manda unit_price (normalizado a precio-por-unidad-base en el carrito).
+  // unit_cost lo fija la base al insertar el ítem (trigger set_order_item_unit_cost, #189): el
+  // Costo ya no es público, y este checkout corre con la sesión del visitante, que no lo puede
+  // leer. Un product_id de otra Store o inexistente queda con unit_cost 0.
   const { data, error } = await supabase.rpc('create_order', {
     p_user_id: null,
     p_notes: notes || null,
     p_whatsapp_message: whatsapp_message,
-    p_items: items.map((item) => {
-      const prod = productMap.get(item.product_id);
-      // price=0 (ej. promocional/regalo con costo real cargado) -> unit_cost
-      // 0, no el costo real — así se comportaba ya el checkout de WhatsApp
-      // antes de #121. POS antes mandaba el costo crudo del producto
-      // directo (sin este guard), pero unificarlo acá es el objetivo del
-      // ticket: mismo cálculo para las dos entradas al mismo dominio
-      // (code review de #121, aceptado a propósito, no es un bug nuevo).
-      const unit_cost = prod && prod.price > 0 ? item.unit_price * (prod.cost / prod.price) : 0;
-      return {
-        product_id: item.product_id,
-        product_name: item.product_name,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        unit_cost,
-        is_by_weight: item.is_by_weight,
-        from_suggestion: item.from_suggestion ?? false,
-      };
-    }),
+    // price=0 (ej. promocional/regalo con costo real cargado) -> unit_cost 0, no el costo real
+    // (decidido en #121, ahora lo resuelve el trigger).
+    p_items: items.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      is_by_weight: item.is_by_weight,
+      from_suggestion: item.from_suggestion ?? false,
+    })),
     p_store_id: storeId,
   });
 
@@ -306,13 +286,11 @@ export async function addOrderItem(
   // code review de #120.
   const [, productResult] = await Promise.all([
     assertOrderIsPending(supabase, storeId, orderId),
-    supabase.from('products').select('price:effective_price, cost').eq('id', input.product_id).eq('store_id', storeId).maybeSingle(),
+    supabase.from('products').select('id').eq('id', input.product_id).eq('store_id', storeId).maybeSingle(),
   ]);
-  const product = productResult.data;
-  if (!product) throw new ValidationError('Producto no encontrado en esta Store');
+  if (!productResult.data) throw new ValidationError('Producto no encontrado en esta Store');
 
-  const unit_cost = Number(product.price) > 0 ? input.unit_price * (Number(product.cost ?? 0) / Number(product.price)) : 0;
-
+  // unit_cost lo fija la base al insertar el ítem (trigger set_order_item_unit_cost, #189).
   const { data, error } = await supabase
     .from('order_items')
     .insert({
@@ -321,7 +299,6 @@ export async function addOrderItem(
       product_name: input.product_name,
       quantity: input.quantity,
       unit_price: input.unit_price,
-      unit_cost,
       is_by_weight: input.is_by_weight,
       store_id: storeId,
     })
@@ -351,10 +328,14 @@ export async function updateOrderItem(
 
   let unit_cost: number | undefined;
   if (existingItem) {
-    const { data: product } = await supabase.from('products').select('price:effective_price, cost').eq('id', existingItem.product_id).eq('store_id', storeId).maybeSingle();
+    // El costo sale de product_costs (#189): sin fila es "sin costo registrado" y el ítem queda en 0.
+    const [{ data: product }, { data: costRow }] = await Promise.all([
+      supabase.from('products').select('price:effective_price').eq('id', existingItem.product_id).eq('store_id', storeId).maybeSingle(),
+      supabase.from('product_costs').select('cost').eq('product_id', existingItem.product_id).eq('store_id', storeId).maybeSingle(),
+    ]);
     if (product && Number(product.price) > 0) {
       const effectiveUnitPrice = input.unit_price ?? existingItem.unit_price;
-      unit_cost = effectiveUnitPrice * (Number(product.cost ?? 0) / Number(product.price));
+      unit_cost = effectiveUnitPrice * (Number(costRow?.cost ?? 0) / Number(product.price));
     } else {
       unit_cost = 0;
     }

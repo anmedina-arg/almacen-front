@@ -12,19 +12,16 @@
 -- El Costo es dato del Store admin, no del catálogo público: RLS solo deja
 -- verlo y cambiarlo a quien administra la Store dueña, y anon no tiene acceso.
 --
--- ── Espejo transitorio hacia products.cost ──────────────────────────────────
--- Hasta que los tickets de costos (#186 pedidos, ranking, informes y dashboard;
--- #187 combos y widgets) migren a sus consumidores a esta tabla, esos
--- consumidores siguen leyendo `products.cost`. El trigger de abajo
--- (sync_product_cost_mirror) mantiene esa columna igual al costo de la tabla
--- (0 si no hay fila), así que los triggers y funciones que ya dependen de ella
--- (historial de precios, costo en los ítems de pedido, margen de ranking y
--- exports) siguen funcionando sin tocarlos. La columna y el espejo se borran
--- juntos en el ticket de limpieza (#189). Escribir directo en `products.cost` ya
--- no es la vía: la fuente de verdad es esta tabla.
+-- ── Costo del producto: única fuente (#189) ─────────────────────────────────
+-- Esta tabla es la única fuente del Costo. Hasta #189 un trigger espejaba el costo a
+-- `products.cost` para los consumidores que todavía leían esa columna (historial de
+-- precios, costo en los ítems de pedido, margen de ranking y exports); en #189 esos
+-- consumidores pasaron a leer esta tabla y la columna y el espejo se borraron. Los
+-- triggers de abajo (log_cost_change, sync_order_items_unit_cost) ocupan su lugar.
 --
--- ── Paso operativo único en producción (copiar los costos actuales) ─────────
--- Se corre UNA vez al aplicar este archivo, después de crear la tabla. Solo
+-- ── Paso operativo único en producción (copiar los costos actuales) — YA APLICADO (#183) ─
+-- Histórico: copiaba desde la columna products.cost, que #189 borró. Se corrió UNA vez al
+-- crear la tabla, y no se puede repetir. Solo
 -- copia costos mayores a cero: un 0 en la columna vieja es "sin costo
 -- registrado", no un costo. No toca products (el espejo ya coincide, así que no
 -- dispara triggers ni pisa updated_at). Es idempotente.
@@ -66,37 +63,19 @@ CREATE TRIGGER trg_product_costs_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- Espejo hacia products.cost (ver arriba). El filtro `IS DISTINCT FROM` evita
--- tocar el producto cuando el costo ya coincide: no dispara los triggers de
--- products (updated_at, historial de precios, costo en ítems) sin un cambio real.
--- SECURITY INVOKER: corre con la sesión de quien cambia el costo, que ya es admin
--- de la Store (RLS de products lo exige igual).
-CREATE OR REPLACE FUNCTION public.sync_product_cost_mirror()
-RETURNS TRIGGER
-LANGUAGE plpgsql
-SECURITY INVOKER
-SET search_path = public
-AS $$
-BEGIN
-  IF TG_OP = 'DELETE' THEN
-    UPDATE public.products SET cost = 0 WHERE id = OLD.product_id AND cost IS DISTINCT FROM 0;
-    RETURN OLD;
-  END IF;
-
-  UPDATE public.products SET cost = NEW.cost WHERE id = NEW.product_id AND cost IS DISTINCT FROM NEW.cost;
-  RETURN NEW;
-END;
-$$;
-
--- Función trigger: no necesita EXECUTE para nadie (el privilegio se chequea al
--- crear el trigger, no al dispararse).
-REVOKE EXECUTE ON FUNCTION public.sync_product_cost_mirror() FROM PUBLIC, anon;
-
-DROP TRIGGER IF EXISTS trg_sync_product_cost_mirror ON public.product_costs;
-CREATE TRIGGER trg_sync_product_cost_mirror
+-- Historial de precios y costo en los ítems de pedido: antes colgaban de products.cost
+-- (#189). Funciones en orders/log_price_change.sql y orders/sync_order_items_unit_cost.sql.
+DROP TRIGGER IF EXISTS trg_log_cost_change ON public.product_costs;
+CREATE TRIGGER trg_log_cost_change
   AFTER INSERT OR UPDATE OR DELETE ON public.product_costs
   FOR EACH ROW
-  EXECUTE FUNCTION public.sync_product_cost_mirror();
+  EXECUTE FUNCTION log_cost_change();
+
+DROP TRIGGER IF EXISTS trg_sync_order_items_cost ON public.product_costs;
+CREATE TRIGGER trg_sync_order_items_cost
+  AFTER INSERT OR UPDATE ON public.product_costs
+  FOR EACH ROW
+  EXECUTE FUNCTION sync_order_items_unit_cost();
 
 -- ── RLS ──────────────────────────────────────────────────────────────────
 ALTER TABLE public.product_costs ENABLE ROW LEVEL SECURITY;
