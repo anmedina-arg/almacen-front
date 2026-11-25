@@ -43,8 +43,10 @@ export async function buildImportTemplate(format: TemplateFormat): Promise<Buffe
   sheet.addRow([...TEMPLATE_HEADERS]);
 
   if (format === 'csv') {
-    // BOM para que Excel abra las tildes bien.
-    const csv = await workbook.csv.writeBuffer();
+    // `;` y BOM: Excel en español separa por `;` y necesita el BOM para las
+    // tildes. El lector de archivos detecta el separador, así que la planilla
+    // vuelve a subirse igual.
+    const csv = await workbook.csv.writeBuffer({ formatterOptions: { delimiter: ';' } });
     return Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from(csv)]);
   }
 

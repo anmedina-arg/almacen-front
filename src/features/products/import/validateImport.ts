@@ -17,6 +17,8 @@ export interface ImportSheet {
 }
 
 export interface ImportContext {
+  /** Si `next/image` puede mostrar esa URL (ver src/lib/images/imageHosts.ts). */
+  isAllowedImageUrl: (url: string) => boolean;
   existingProductNames: string[];
   categories: { name: string; subcategories: string[] }[];
 }
@@ -42,6 +44,8 @@ export interface PreviewRow {
    * omite por defecto al confirmar; el usuario puede incluirla.
    */
   duplicate: boolean;
+  /** Celdas tal como vinieron en el archivo, para devolver las filas rechazadas sin alterarlas. */
+  source: Record<string, CellValue>;
 }
 
 export interface IgnoredColumn {
@@ -52,6 +56,8 @@ export interface IgnoredColumn {
 
 export interface ImportPreview {
   fileError: string | null;
+  /** Encabezados del archivo, para armar el CSV de filas rechazadas. */
+  headers: string[];
   rows: PreviewRow[];
   counts: Record<RowStatus, number>;
   /** Categorías que no existen en la Store, a confirmar antes de crearlas. */
@@ -151,6 +157,7 @@ function parsePrice(raw: string): number {
 export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPreview {
   const emptyPreview = (fileError: string): ImportPreview => ({
     fileError,
+    headers: sheet.headers,
     rows: [],
     counts: { valid: 0, warning: 0, error: 0 },
     newCategories: [],
@@ -227,9 +234,15 @@ export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPr
     const imageUrl = cell(row, 'imageUrl');
     if (imageUrl && !/^https?:\/\/\S+$/i.test(imageUrl)) {
       errors.push('La imagen debe ser una URL que empiece con http:// o https://');
+    } else if (imageUrl && !ctx.isAllowedImageUrl(imageUrl)) {
+      errors.push(
+        'La imagen tiene que estar en Supabase Storage, Cloudinary o Google. Dejá la celda vacía para usar la imagen genérica'
+      );
     }
 
-    if (errors.length > 0) return { rowNumber, status: 'error', messages: errors, product: null, duplicate: false };
+    if (errors.length > 0) {
+      return { rowNumber, status: 'error', messages: errors, product: null, duplicate: false, source: row };
+    }
 
     const warnings: string[] = [];
 
@@ -272,6 +285,7 @@ export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPr
       status: warnings.length > 0 ? 'warning' : 'valid',
       messages: warnings,
       duplicate,
+      source: row,
       product: {
         name,
         categoryName: category.name,
@@ -286,5 +300,5 @@ export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPr
 
   const counts = { valid: 0, warning: 0, error: 0 };
   for (const row of rows) counts[row.status]++;
-  return { fileError: null, rows, counts, newCategories, newSubcategories, ignoredColumns };
+  return { fileError: null, headers: sheet.headers, rows, counts, newCategories, newSubcategories, ignoredColumns };
 }

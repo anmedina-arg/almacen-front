@@ -1,50 +1,17 @@
 import type { NextConfig } from 'next';
+import { getImageHostRules } from './src/lib/images/imageHosts';
 
-// Extraer el hostname exacto de la URL de Supabase para que Next.js
-// pueda optimizar imágenes servidas desde Supabase Storage.
-// El wildcard *.supabase.co no matchea correctamente en todos los entornos.
-const supabaseHostname = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : '*.supabase.co';
-
-// Las imágenes nunca se duplican entre entornos — en TEST, los product_stock/
-// categories seedeados siguen apuntando al bucket de storage de producción.
-// NEXT_PUBLIC_IMAGE_STORAGE_URL (opcional, ver .env.test.example) whitelistea
-// ese segundo host solo cuando está seteada; en producción no hace falta
-// (supabaseHostname ya es el mismo bucket real).
-const imageStorageHostname = process.env.NEXT_PUBLIC_IMAGE_STORAGE_URL
-  ? new URL(process.env.NEXT_PUBLIC_IMAGE_STORAGE_URL).hostname
-  : undefined;
-
-const imageRemotePatterns: NonNullable<NonNullable<NextConfig['images']>['remotePatterns']> = [
-  {
-    protocol: 'https',
-    hostname: supabaseHostname,
+// Los hosts desde los que next/image muestra imágenes remotas viven en una
+// sola lista (src/lib/images/imageHosts.ts): la Importación masiva la usa para
+// rechazar una imagen_url que rompería el render. Ahí está el detalle de por
+// qué se extrae el hostname exacto de Supabase y del bucket compartido en TEST.
+const imageRemotePatterns: NonNullable<NonNullable<NextConfig['images']>['remotePatterns']> =
+  getImageHostRules().map((rule) => ({
+    protocol: 'https' as const,
+    hostname: rule.hostname,
     port: '',
-    pathname: '/storage/v1/object/public/**',
-  },
-  {
-    protocol: 'https',
-    hostname: 'res.cloudinary.com',
-    port: '',
-    pathname: '/**',
-  },
-  {
-    protocol: 'https',
-    hostname: 'lh3.googleusercontent.com',
-    port: '',
-    pathname: '/**',
-  },
-];
-
-if (imageStorageHostname && imageStorageHostname !== supabaseHostname) {
-  imageRemotePatterns.push({
-    protocol: 'https',
-    hostname: imageStorageHostname,
-    port: '',
-    pathname: '/storage/v1/object/public/**',
-  });
-}
+    pathname: `${rule.pathPrefix}**`,
+  }));
 
 const nextConfig: NextConfig = {
   /* config options here */

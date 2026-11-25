@@ -5,6 +5,7 @@ import { validateImport, type ImportContext, type ImportSheet } from './validate
 // vista previa. Módulo puro: sin base, sin HTTP, sin archivos.
 const ctx: ImportContext = {
   existingProductNames: [],
+  isAllowedImageUrl: (url) => !url.includes('prohibido'),
   categories: [
     { name: 'Gaseosas', subcategories: ['Cola', 'Lima limón'] },
     { name: 'Snacks', subcategories: [] },
@@ -178,6 +179,15 @@ describe('validateImport — activo e imagen', () => {
 
   it('un activo que no es sí/no es un error', () => {
     expect(one({ activo: 'quizás' }).messages).toContain('Activo debe ser sí o no');
+  });
+
+  it('una imagen de un host que la Store no puede mostrar es un error, y se puede dejar vacía', () => {
+    const row = one({ imagen_url: 'https://prohibido.com/a.jpg' });
+    expect(row.status).toBe('error');
+    expect(row.messages).toContain(
+      'La imagen tiene que estar en Supabase Storage, Cloudinary o Google. Dejá la celda vacía para usar la imagen genérica'
+    );
+    expect(one({ imagen_url: '' }).status).toBe('valid');
   });
 
   it('una imagen que no es una URL http(s) es un error', () => {

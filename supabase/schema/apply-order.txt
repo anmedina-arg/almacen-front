@@ -42,6 +42,7 @@ orders/log_price_change.sql
 orders/sync_order_items_unit_cost.sql
 products/products.sql
 products/effective_price.sql
+products/import_products.sql
 producto-surtido/variedades.sql
 
 # ── Stock (tablas + triggers) ────────────────────────────────────────────

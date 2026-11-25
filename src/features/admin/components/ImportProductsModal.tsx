@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useStoreSlug } from '@/hooks/useStoreSlug';
 import {
   MAX_IMPORT_ROWS,
@@ -8,7 +8,10 @@ import {
   type PreviewRow,
   type RowStatus,
 } from '@/features/products/import/validateImport';
+import { buildRejectedRowsCsv, planImport, type ImportPlan } from '@/features/products/import/planImport';
+import type { ImportResult } from '@/features/products/services/importPreviewService';
 import { formatPrice } from '@/utils/formatPrice';
+import { useImportProducts } from '../hooks/useImportProducts';
 import { importApiClient } from '../services/importApiClient';
 
 interface ImportProductsModalProps {
@@ -27,32 +30,79 @@ const STATUS_STYLE: Record<RowStatus, string> = {
   error: 'bg-red-100 text-red-800',
 };
 
+function downloadCsv(content: string, filename: string) {
+  const url = URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  link.click();
+  URL.revokeObjectURL(url);
+}
 
 /**
- * Importación masiva de Productos, primera mitad (#182): descarga de la
- * Plantilla, carga del archivo y vista previa. Todavía no crea nada: la
- * confirmación llega en el ticket siguiente.
+ * Importación masiva de Productos (#182, #185): descarga de la Plantilla,
+ * carga del archivo, vista previa y confirmación. Las categorías nuevas y los
+ * posibles duplicados se deciden acá; recién al confirmar se crea algo.
  */
 export function ImportProductsModal({ onClose }: ImportProductsModalProps) {
   const slug = useStoreSlug();
+  const importMutation = useImportProducts();
+  const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<ImportPreview | null>(null);
-  const [fileName, setFileName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [includedDuplicates, setIncludedDuplicates] = useState<Set<number>>(new Set());
+  const [confirmNewCategories, setConfirmNewCategories] = useState(false);
+  const [result, setResult] = useState<ImportResult | null>(null);
 
-  const handleFile = async (file: File | undefined) => {
-    if (!file) return;
-    setFileName(file.name);
+  const selection = useMemo(
+    () => ({ includeDuplicateRows: Array.from(includedDuplicates) }),
+    [includedDuplicates]
+  );
+  const plan = useMemo(() => (preview ? planImport(preview, selection) : null), [preview, selection]);
+  const needsCategoryConfirmation = plan ? plan.newCategories.length + plan.newSubcategories.length > 0 : false;
+  const canConfirm =
+    !!plan && plan.products.length > 0 && (!needsCategoryConfirmation || confirmNewCategories) && !importMutation.isPending;
+
+  const handleFile = async (selected: File | undefined) => {
+    if (!selected) return;
+    setFile(selected);
     setError(null);
     setPreview(null);
+    setResult(null);
+    setIncludedDuplicates(new Set());
+    setConfirmNewCategories(false);
     setLoading(true);
     try {
-      setPreview(await importApiClient.preview(file));
+      setPreview(await importApiClient.preview(selected));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'No se pudo leer el archivo');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleConfirm = async () => {
+    if (!file || !plan) return;
+    setError(null);
+    try {
+      setResult(await importMutation.mutateAsync({ file, options: { ...selection, confirmNewCategories } }));
+      setPreview(null);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'No se pudieron crear los productos');
+    }
+  };
+
+  const toggleDuplicate = (rowNumber: number) =>
+    setIncludedDuplicates((current) => {
+      const next = new Set(current);
+      if (next.has(rowNumber)) next.delete(rowNumber);
+      else next.add(rowNumber);
+      return next;
+    });
+
+  const downloadRejected = () => {
+    if (preview && plan) downloadCsv(buildRejectedRowsCsv(preview, plan.skipped), 'filas-rechazadas.csv');
   };
 
   const templateHref = (format: 'xlsx' | 'csv') => `/${slug}/api/products/import/template?format=${format}`;
@@ -64,8 +114,8 @@ export function ImportProductsModal({ onClose }: ImportProductsModalProps) {
           <div>
             <h3 className="text-lg font-bold text-gray-800">Importar productos</h3>
             <p className="text-sm text-gray-500">
-              Descargá la plantilla, completala en Excel o Google Sheets y subila como .xlsx o .csv. Máximo {MAX_IMPORT_ROWS}
-              filas por archivo.
+              Descargá la plantilla, completala en Excel o Google Sheets y subila como .xlsx o .csv. Máximo{' '}
+              {MAX_IMPORT_ROWS} filas por archivo. Solo crea productos nuevos.
             </p>
           </div>
           <button onClick={onClose} aria-label="Cerrar" className="text-gray-500 hover:text-gray-700 text-xl leading-none">
@@ -104,16 +154,38 @@ export function ImportProductsModal({ onClose }: ImportProductsModalProps) {
             }}
             className="block w-full text-sm text-gray-600"
           />
-          {fileName && <p className="text-xs text-gray-500 mt-1">{fileName}</p>}
+          {file && <p className="text-xs text-gray-500 mt-1">{file.name}</p>}
         </div>
 
         {loading && <p className="text-sm text-gray-500">Leyendo el archivo...</p>}
         {error && <p className="text-sm text-red-600">{error}</p>}
         {preview?.fileError && <p className="text-sm text-red-600">{preview.fileError}</p>}
 
-        {preview && !preview.fileError && <PreviewSection preview={preview} />}
+        {result && <ResultSection result={result} />}
 
-        <div className="flex justify-end">
+        {preview && plan && !preview.fileError && (
+          <PreviewSection
+            preview={preview}
+            plan={plan}
+            includedDuplicates={includedDuplicates}
+            onToggleDuplicate={toggleDuplicate}
+            confirmNewCategories={confirmNewCategories}
+            onConfirmNewCategories={setConfirmNewCategories}
+            needsCategoryConfirmation={needsCategoryConfirmation}
+            onDownloadRejected={downloadRejected}
+          />
+        )}
+
+        <div className="flex flex-wrap justify-end gap-2">
+          {preview && plan && !preview.fileError && (
+            <button
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {importMutation.isPending ? 'Creando...' : `Crear ${plan.products.length} producto${plan.products.length === 1 ? '' : 's'}`}
+            </button>
+          )}
           <button
             onClick={onClose}
             className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 font-medium"
@@ -126,12 +198,46 @@ export function ImportProductsModal({ onClose }: ImportProductsModalProps) {
   );
 }
 
-function PreviewSection({ preview }: { preview: ImportPreview }) {
+function ResultSection({ result }: { result: ImportResult }) {
+  return (
+    <div className="text-sm bg-green-50 border border-green-200 rounded-md p-3 text-green-900">
+      Se crearon <strong>{result.productsCreated}</strong> producto{result.productsCreated === 1 ? '' : 's'}
+      {result.categoriesCreated > 0 && <>, {result.categoriesCreated} categoría{result.categoriesCreated === 1 ? '' : 's'}</>}
+      {result.subcategoriesCreated > 0 && (
+        <>, {result.subcategoriesCreated} subcategoría{result.subcategoriesCreated === 1 ? '' : 's'}</>
+      )}
+      . Las filas omitidas: {result.skippedCount}.
+    </div>
+  );
+}
+
+interface PreviewSectionProps {
+  preview: ImportPreview;
+  plan: ImportPlan;
+  includedDuplicates: Set<number>;
+  onToggleDuplicate: (rowNumber: number) => void;
+  confirmNewCategories: boolean;
+  onConfirmNewCategories: (value: boolean) => void;
+  needsCategoryConfirmation: boolean;
+  onDownloadRejected: () => void;
+}
+
+function PreviewSection({
+  preview,
+  plan,
+  includedDuplicates,
+  onToggleDuplicate,
+  confirmNewCategories,
+  onConfirmNewCategories,
+  needsCategoryConfirmation,
+  onDownloadRejected,
+}: PreviewSectionProps) {
   return (
     <div className="space-y-3">
       <p className="text-sm text-gray-700">
         <strong>{preview.counts.valid}</strong> válidas · <strong>{preview.counts.warning}</strong> con advertencia ·{' '}
-        <strong>{preview.counts.error}</strong> con error. Todavía no se creó ningún producto.
+        <strong>{preview.counts.error}</strong> con error. Se van a crear <strong>{plan.products.length}</strong>; las
+        demás se omiten.
       </p>
 
       {preview.ignoredColumns.length > 0 && (
@@ -143,17 +249,27 @@ function PreviewSection({ preview }: { preview: ImportPreview }) {
         </div>
       )}
 
-      {preview.newCategories.length > 0 && (
-        <div className="text-sm bg-yellow-50 border border-yellow-200 rounded-md p-3">
-          Categorías nuevas a confirmar: {preview.newCategories.join(', ')}
+      {needsCategoryConfirmation && (
+        <div className="text-sm bg-yellow-50 border border-yellow-200 rounded-md p-3 space-y-2">
+          {plan.newCategories.length > 0 && <p>Categorías nuevas: {plan.newCategories.join(', ')}</p>}
+          {plan.newSubcategories.length > 0 && (
+            <p>Subcategorías nuevas: {plan.newSubcategories.map((s) => `${s.name} (en ${s.categoryName})`).join(', ')}</p>
+          )}
+          <label className="flex items-center gap-2 font-medium">
+            <input
+              type="checkbox"
+              checked={confirmNewCategories}
+              onChange={(e) => onConfirmNewCategories(e.target.checked)}
+            />
+            Confirmo que se creen. Revisá que no sean errores de tipeo de una categoría que ya existe.
+          </label>
         </div>
       )}
 
-      {preview.newSubcategories.length > 0 && (
-        <div className="text-sm bg-yellow-50 border border-yellow-200 rounded-md p-3">
-          Subcategorías nuevas a confirmar:{' '}
-          {preview.newSubcategories.map((s) => `${s.name} (en ${s.categoryName})`).join(', ')}
-        </div>
+      {plan.skipped.length > 0 && (
+        <button onClick={onDownloadRejected} className="text-sm text-blue-700 underline">
+          Descargar las {plan.skipped.length} filas omitidas con su motivo (.csv)
+        </button>
       )}
 
       <div className="overflow-x-auto border border-gray-200 rounded-md">
@@ -170,7 +286,12 @@ function PreviewSection({ preview }: { preview: ImportPreview }) {
           </thead>
           <tbody>
             {preview.rows.map((row) => (
-              <PreviewTableRow key={row.rowNumber} row={row} />
+              <PreviewTableRow
+                key={row.rowNumber}
+                row={row}
+                included={includedDuplicates.has(row.rowNumber)}
+                onToggleDuplicate={onToggleDuplicate}
+              />
             ))}
           </tbody>
         </table>
@@ -179,7 +300,15 @@ function PreviewSection({ preview }: { preview: ImportPreview }) {
   );
 }
 
-function PreviewTableRow({ row }: { row: PreviewRow }) {
+function PreviewTableRow({
+  row,
+  included,
+  onToggleDuplicate,
+}: {
+  row: PreviewRow;
+  included: boolean;
+  onToggleDuplicate: (rowNumber: number) => void;
+}) {
   const { product } = row;
   return (
     <tr className="border-t border-gray-100 align-top">
@@ -188,7 +317,12 @@ function PreviewTableRow({ row }: { row: PreviewRow }) {
         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLE[row.status]}`}>
           {STATUS_LABEL[row.status]}
         </span>
-        {row.duplicate && <span className="block text-xs text-gray-500 mt-1">Se omite por defecto</span>}
+        {row.duplicate && (
+          <label className="flex items-center gap-1 text-xs text-gray-600 mt-1">
+            <input type="checkbox" checked={included} onChange={() => onToggleDuplicate(row.rowNumber)} />
+            Crear igual
+          </label>
+        )}
       </td>
       <td className="px-3 py-2">{product?.name ?? '—'}</td>
       <td className="px-3 py-2">

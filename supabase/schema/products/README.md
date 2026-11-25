@@ -13,7 +13,11 @@ Catálogo: productos, categorías y subcategorías. Consolidado en #85 (spec
 
 ## Funciones RPC (las que llama la API)
 
-Ninguna en este dominio — `is_store_admin()` no es RPC (no se llama vía `supabase.rpc()` desde la app, solo se usa dentro de expresiones de policy RLS). Ver "Funciones auxiliares" abajo.
+| Archivo | Qué hace |
+|---|---|
+| `import_products.sql` | Creación transaccional de la Importación masiva (#179, ticket #185): crea los Productos y las categorías y subcategorías nuevas en una sola transacción, todas o ninguna. `SECURITY INVOKER`: corre con la sesión del Store admin, así que las policies de RLS son la barrera contra crear en una Store ajena. Función de admin, sin `GRANT` a `anon`. La llama `POST /api/products/import/confirm`. |
+
+`is_store_admin()` no es RPC (no se llama vía `supabase.rpc()` desde la app, solo se usa dentro de expresiones de policy RLS). Ver la sección de funciones auxiliares.
 
 ## Funciones trigger (no se llaman directo)
 
