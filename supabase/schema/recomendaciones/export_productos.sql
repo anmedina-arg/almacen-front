@@ -21,6 +21,9 @@
 -- falta el DROP FUNCTION exacto de nuevo): export_productos().
 --
 -- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
+--
+-- #184 (spec #179): el tope de un combo sale de product_stock.max_stock, no de
+-- products.max_stock. Misma firma, así que no hace falta DROP.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION export_productos(p_store_id INTEGER)
@@ -76,8 +79,8 @@ BEGIN
     CASE
       WHEN COALESCE(p.is_combo, FALSE) THEN
         CASE
-          WHEN p.max_stock IS NOT NULL
-          THEN LEAST(get_combo_effective_stock(p.id), p.max_stock)
+          WHEN ps.max_stock IS NOT NULL
+          THEN LEAST(get_combo_effective_stock(p.id), ps.max_stock)
           ELSE get_combo_effective_stock(p.id)
         END
       ELSE COALESCE(ps.quantity, 0)

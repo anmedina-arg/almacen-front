@@ -7,6 +7,7 @@ import { updateProductSchema } from '@/features/products/schemas/productSchemas'
 import { getProductById, updateProduct, deleteProduct } from '@/features/products/services/productService';
 import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
 import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
+import { getStockEnabled } from '@/lib/store/getStockEnabled';
 
 /**
  * GET /api/products/[id]
@@ -64,7 +65,10 @@ export const PUT = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const product = await updateProduct(ctx.supabase, ctx.storeId, id, parsed.data, { costsEnabled: await getCostsEnabled(ctx) });
+    const product = await updateProduct(ctx.supabase, ctx.storeId, id, parsed.data, {
+      costsEnabled: await getCostsEnabled(ctx),
+      stockEnabled: await getStockEnabled(ctx),
+    });
     // Invalida el Data Cache de Next (#145, spec #139) que sirve el
     // catálogo público (SSR + este mismo GET). No toca el
     // Cache-Control de CDN de GET /api/products sin filtros (otra capa,

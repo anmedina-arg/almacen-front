@@ -30,8 +30,8 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
   );
   const { uploadFile, uploading, uploadError } = useCloudinaryUpload();
   const { data: categories = [] } = useCategories();
-  // #183: costo y margen solo en las Stores con el módulo `costos`.
-  const { costos } = useFeatureFlags();
+  // #183: costo y margen solo en las Stores con el módulo `costos`. #184: el máximo de stock, con `stock`.
+  const { costos, stock } = useFeatureFlags();
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [componentSearch, setComponentSearch] = useState('');
@@ -157,7 +157,8 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
       active: formData.active,
       sale_type: 'unit' as const,
       is_combo: true,
-      max_stock: formData.max_stock,
+      // Sin el módulo `stock` el máximo no se manda (el servidor tampoco lo guardaría).
+      ...(stock ? { max_stock: formData.max_stock } : {}),
       category_id: formData.category_id,
       subcategory_id: formData.subcategory_id,
     };
@@ -281,27 +282,29 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
             error={uploadError ?? errors.image}
           />
 
-          {/* Stock máximo */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Stock máximo (opcional)
-            </label>
-            <input
-              type="number"
-              step="1"
-              min="0"
-              value={formData.max_stock ?? ''}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  max_stock: e.target.value ? parseFloat(e.target.value) : null,
-                })
-              }
-              placeholder="Sin límite"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isPending}
-            />
-          </div>
+          {/* Stock máximo: solo con el módulo `stock` (#184) */}
+          {stock && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stock máximo (opcional)
+              </label>
+              <input
+                type="number"
+                step="1"
+                min="0"
+                value={formData.max_stock ?? ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    max_stock: e.target.value ? parseFloat(e.target.value) : null,
+                  })
+                }
+                placeholder="Sin límite"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={isPending}
+              />
+            </div>
+          )}
 
           {/* Activo */}
           <div className="flex items-center gap-2">

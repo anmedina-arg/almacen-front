@@ -6,7 +6,9 @@ import { handleServiceError } from '@/lib/api/handleServiceError';
 import { createProductSchema } from '@/features/products/schemas/productSchemas';
 import { createProduct } from '@/features/products/services/productService';
 import { listProductCosts } from '@/features/products/services/productCostService';
+import { listProductMaxStocks } from '@/features/products/services/productStockService';
 import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
+import { getStockEnabled } from '@/lib/store/getStockEnabled';
 import { fetchPublicProducts } from '@/features/catalog/services/fetchPublicProducts';
 import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
 
@@ -40,6 +42,13 @@ export const GET = createApiRoute()(async (ctx) => {
       products = products.map((product) => ({ ...product, cost: costs.get(product.id) ?? null }));
     }
 
+    // #184: el máximo de stock es del módulo `stock`, no del catálogo público. Solo la lista del
+    // admin lo trae, y solo si la Store tiene el módulo.
+    if (includeInactive && (await getStockEnabled(ctx))) {
+      const maxes = await listProductMaxStocks(ctx.supabase, ctx.storeId);
+      products = products.map((product) => ({ ...product, max_stock: maxes.get(product.id) ?? null }));
+    }
+
     // Catálogo público completo: cacheable en CDN (Vercel Edge) por 5 min,
     // stale-while-revalidate por 1 hora.
     // Requests con search, categoryId o includeInactive no se cachean.
@@ -71,7 +80,10 @@ export const POST = createApiRoute(requireAdmin)(async (ctx) => {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const product = await createProduct(ctx.supabase, ctx.storeId, parsed.data, { costsEnabled: await getCostsEnabled(ctx) });
+    const product = await createProduct(ctx.supabase, ctx.storeId, parsed.data, {
+      costsEnabled: await getCostsEnabled(ctx),
+      stockEnabled: await getStockEnabled(ctx),
+    });
     // Invalida el cache de metadata (#145, spec #139) para que el
     // catálogo público refleje el alta al instante, no recién cuando
     // expire un TTL (no hay TTL — solo se invalida por evento).

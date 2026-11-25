@@ -39,7 +39,7 @@ Catálogo: productos, categorías y subcategorías. Consolidado en #85 (spec
 
 ## Archivos compartidos entre dominios
 
-`supabase_combos.sql` ya no es compartido — de acá se extrajeron las columnas `is_combo`/`max_stock` de `products`; Orders (#84) y Combos (#86) confirmaron después sus partes, así que el archivo se archivó completo en #86.
+`supabase_combos.sql` ya no es compartido — de acá se extrajeron las columnas `is_combo`/`max_stock` de `products` (desde #184 el máximo vive en `product_stock.max_stock`; la columna vieja de `products` queda sin uso hasta #189); Orders (#84) y Combos (#86) confirmaron después sus partes, así que el archivo se archivó completo en #86.
 
 `supabase_pricing.sql` tampoco es compartido — Orders (#84) y Products (#85) confirmaron ambas sus partes, así que se archivó completo en este ticket.
 

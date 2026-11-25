@@ -72,7 +72,6 @@ export async function fetchProductMetadata(
       active,
       sale_type,
       is_combo,
-      max_stock,
       category_id,
       subcategory_id,
       is_producto_surtido,
