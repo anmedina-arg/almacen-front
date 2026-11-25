@@ -8,6 +8,7 @@ import { useDeleteProduct } from '../hooks/useDeleteProduct';
 import { ProductFormModal } from './ProductFormModal';
 import { ComboFormModal } from './ComboFormModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
+import { ImportProductsModal } from './ImportProductsModal';
 import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils/formatPrice';
@@ -23,6 +24,7 @@ export function AdminProductList() {
   const [filterType, setFilterType] = useState<'all' | 'products' | 'combos'>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreateComboModalOpen, setIsCreateComboModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
@@ -83,6 +85,12 @@ export function AdminProductList() {
           <p className="text-sm text-gray-500">Gestión del catálogo de productos</p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
+          <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm"
+          >
+            Importar
+          </button>
           <button
             onClick={() => setIsCreateComboModalOpen(true)}
             className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
@@ -328,6 +336,7 @@ export function AdminProductList() {
       )}
 
       {/* Modales */}
+      {isImportModalOpen && <ImportProductsModal onClose={() => setIsImportModalOpen(false)} />}
       {isCreateModalOpen && (
         <ProductFormModal
           mode="create"
