@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { createProduct, updateProduct } from '@/features/products/services/productService';
 import { listProductCosts } from '@/features/products/services/productCostService';
+import { getComboComponents, updateComboComponents } from '@/features/products/services/comboService';
 import { fetchProductMetadata } from '@/features/catalog/services/fetchProductMetadata';
 import { getOrders } from '@/features/orders/services/orderService';
 
@@ -25,10 +26,10 @@ describe.skipIf(!hasCredentials)('flag costos — independencia y datos (#183)',
   const productIds: number[] = [];
   const orderIds: number[] = [];
 
-  async function createStore(slug: string, costos: boolean) {
+  async function createStore(slug: string, costos: boolean, stock?: boolean) {
     const { data: store, error } = await admin
       .from('stores')
-      .insert({ slug: `${slug}-${tag}`, name: slug, feature_flags: { costos } })
+      .insert({ slug: `${slug}-${tag}`, name: slug, feature_flags: stock === undefined ? { costos } : { costos, stock } })
       .select('id')
       .single();
     expect(error).toBeNull();
@@ -132,6 +133,89 @@ describe.skipIf(!hasCredentials)('flag costos — independencia y datos (#183)',
       // 'sin costo' no aparece
       const sinCosto = (await admin.from('products').select('id').eq('store_id', store.storeId).eq('name', 'sin costo').single()).data!.id;
       expect(costs.has(sinCosto)).toBe(false);
+    });
+  });
+
+  // #187 (ADR-0018): con la flag apagada el cálculo del costo del combo no corre y el combo
+  // no tiene fila de costo; encendida, se calcula de sus componentes. Apagar la flag no
+  // borra el costo que un combo ya tenía.
+  describe('combos y costos', () => {
+    async function comboConComponentes(storeId: number, categoryId: number, costsEnabled: boolean, name: string) {
+      const a = await createProduct(admin, storeId, input(categoryId, `${name} a`, { cost: 10 }), { costsEnabled: true });
+      const b = await createProduct(admin, storeId, input(categoryId, `${name} b`, { cost: 5 }), { costsEnabled: true });
+      productIds.push(a.id, b.id);
+      const combo = await createProduct(
+        admin,
+        storeId,
+        input(categoryId, name, {
+          is_combo: true,
+          components: [
+            { component_product_id: a.id, quantity: 2 },
+            { component_product_id: b.id, quantity: 1 },
+          ],
+        }),
+        { costsEnabled }
+      );
+      productIds.push(combo.id);
+      return { a, b, combo };
+    }
+
+    it('con la flag encendida el costo del combo se calcula de sus componentes', async () => {
+      const on = await createStore('combos-on', true);
+      const { combo } = await comboConComponentes(on.storeId, on.categoryId, true, 'combo-on');
+      expect(await costRows(combo.id)).toEqual([25]);
+    });
+
+    it('con la flag apagada el combo se crea sin fila de costo, aunque sus componentes tengan costo', async () => {
+      const off = await createStore('combos-off', false);
+      const { combo } = await comboConComponentes(off.storeId, off.categoryId, false, 'combo-off');
+      expect(combo.is_combo).toBe(true);
+      expect(await costRows(combo.id)).toEqual([]);
+      expect(await mirror(combo.id)).toBe(0);
+    });
+
+    it('con la flag apagada editar la composición funciona y sigue sin costo', async () => {
+      const off = await createStore('combos-off-edit', false);
+      const { combo, a } = await comboConComponentes(off.storeId, off.categoryId, false, 'combo-off-edit');
+      await updateComboComponents(admin, off.storeId, combo.id, { components: [{ component_product_id: a.id, quantity: 3 }] });
+      expect(await costRows(combo.id)).toEqual([]);
+    });
+
+    it('apagar la flag no borra ni recalcula el costo que el combo ya tenía', async () => {
+      const toggle = await createStore('combos-toggle', true);
+      const { combo, a } = await comboConComponentes(toggle.storeId, toggle.categoryId, true, 'combo-toggle');
+      expect(await costRows(combo.id)).toEqual([25]);
+
+      await admin.from('stores').update({ feature_flags: { costos: false } }).eq('id', toggle.storeId);
+      await updateComboComponents(admin, toggle.storeId, combo.id, { components: [{ component_product_id: a.id, quantity: 1 }] });
+      expect(await costRows(combo.id)).toEqual([25]); // intacto
+
+      await admin.from('stores').update({ feature_flags: { costos: true } }).eq('id', toggle.storeId);
+      await updateComboComponents(admin, toggle.storeId, combo.id, { components: [{ component_product_id: a.id, quantity: 1 }] });
+      expect(await costRows(combo.id)).toEqual([10]); // vuelve a calcularse
+    });
+
+    // ADR-0012: `costos` y `stock` son independientes. El costo del combo no depende del stock, y
+    // el stock del combo no depende del costo.
+    it.each([
+      [true, false],
+      [false, true],
+      [false, false],
+      [true, true],
+    ])('costos=%s, stock=%s: el combo se crea y su costo sigue la flag de costos', async (costos, stock) => {
+      const store = await createStore(`combos-${costos ? 'c' : 'x'}${stock ? 's' : 'x'}`, costos, stock);
+      const { combo } = await comboConComponentes(store.storeId, store.categoryId, costos, `combo-${costos}-${stock}`);
+      expect(combo.is_combo).toBe(true);
+      expect(await costRows(combo.id)).toEqual(costos ? [25] : []);
+    });
+
+    it('los componentes del combo no devuelven su costo sin el módulo', async () => {
+      const off = await createStore('combos-resp', false);
+      const { combo } = await comboConComponentes(off.storeId, off.categoryId, false, 'combo-resp');
+      const sin = await getComboComponents(admin, off.storeId, combo.id, { costsEnabled: false });
+      for (const component of sin) expect(component).not.toHaveProperty('component_product_cost');
+      const con = await getComboComponents(admin, off.storeId, combo.id, { costsEnabled: true });
+      expect(con.map((c) => c.component_product_cost)).toEqual([10, 5]);
     });
   });
 

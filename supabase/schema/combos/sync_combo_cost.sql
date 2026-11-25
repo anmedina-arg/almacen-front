@@ -16,7 +16,9 @@
 -- "sin costo registrado": se borra su fila en vez de guardar un cero. El
 -- espejo hacia products.cost lo mantiene el trigger de product_costs.
 --
--- Hasta #187 el cálculo corre siempre; ahí pasa a depender de la flag `costos`.
+-- Desde #187 el cálculo depende de la flag `costos` (ADR-0018): con la flag apagada
+-- no corre y el combo no tiene fila de costo. Apagar la flag nunca borra una fila
+-- que ya existía: simplemente deja de recalcularse hasta que se vuelva a encender.
 --
 -- Verificado con pg_get_functiondef contra producción el 2026-08-22 (versión
 -- anterior, que escribía products.cost directo).
@@ -26,9 +28,17 @@ CREATE OR REPLACE FUNCTION sync_combo_cost()
 RETURNS TRIGGER AS $$
 DECLARE
   v_combo_id INTEGER;
+  v_store_id INTEGER;
   v_cost     NUMERIC;
 BEGIN
   v_combo_id := COALESCE(NEW.combo_product_id, OLD.combo_product_id);
+
+  -- Sin el módulo `costos` no se calcula ni se guarda costo. Si el combo ya no existe
+  -- (borrado en cascada) no hay Store que consultar y tampoco hay nada que calcular.
+  SELECT store_id INTO v_store_id FROM products WHERE id = v_combo_id;
+  IF NOT public.is_costs_enabled(v_store_id) THEN
+    RETURN COALESCE(NEW, OLD);
+  END IF;
 
   SELECT COALESCE(SUM(cc.quantity * pc.cost), 0)
   INTO v_cost

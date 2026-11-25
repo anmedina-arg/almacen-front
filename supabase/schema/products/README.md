@@ -25,6 +25,7 @@ Catálogo: productos, categorías y subcategorías. Consolidado en #85 (spec
 | Archivo | Cuándo dispara |
 |---|---|
 | `product_costs.sql` (`sync_product_cost_mirror`) | Al INSERT/UPDATE/DELETE en `product_costs`: mantiene `products.cost` igual al costo de la tabla (0 si no hay fila), sin tocar el producto si ya coincide. Transitorio, hasta #189. |
+| `is_costs_enabled.sql` | Si la Store tiene el módulo `costos` (#187): función dedicada, mismo criterio que `is_stock_tracked()`. La usa `sync_combo_cost`; sin la flag no se calcula el costo de un combo. Sin `GRANT` a `anon`. |
 | `update_updated_at_column.sql` | Genérico, usado por `products`/`categories`/`subcategories` (este dominio), `stores` (#87) y `product_stock` (Stock #83). No confundir con `handle_updated_at()` (#87, distinta función, específica de `profiles`). |
 
 `products.sql` también declara `trg_log_price_change` y `trg_sync_order_items_cost` — sus funciones (`log_price_change()`, `sync_order_items_unit_cost()`) son de Orders (#84), viven en `supabase/schema/orders/`. Se declaran acá porque `products` es la tabla a la que están atadas (el trigger se declara junto a la tabla, la función junto a quien la posee semánticamente).

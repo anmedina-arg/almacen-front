@@ -8,6 +8,7 @@ import { StockProductsTable } from './StockProductsTable';
 import { InventoryRotationDashboard } from './InventoryRotationDashboard';
 import { PendingPaymentsTable } from './PendingPaymentsTable';
 import { useFeatureFlags } from '../../context/FeatureFlagsContext';
+import { STOCK_VALUE_FLAGS, allFlagsOn } from '@/lib/store/featureFlags';
 
 const StockByCategoryChart = dynamic(
   () => import('./StockByCategoryChart').then((m) => ({ default: m.StockByCategoryChart })),
@@ -31,10 +32,13 @@ function ChartSkeleton() {
 
 export function DashboardPanel() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const { pagos: pagosEnabled, stock: stockEnabled } = useFeatureFlags();
+  const flags = useFeatureFlags();
+  const { pagos: pagosEnabled, stock: stockEnabled } = flags;
+  // Widget compuesto (ADR-0018, #187): el valor del stock al costo exige `stock` y `costos`.
+  const stockValueEnabled = allFlagsOn(flags, STOCK_VALUE_FLAGS);
 
-  const { data: categoryData, isLoading: isCategoryLoading, isError: isCategoryError } = useStockByCategory(stockEnabled);
-  const { data: productData, isLoading: isProductLoading } = useStockProducts(selectedCategory, stockEnabled);
+  const { data: categoryData, isLoading: isCategoryLoading, isError: isCategoryError } = useStockByCategory(stockValueEnabled);
+  const { data: productData, isLoading: isProductLoading } = useStockProducts(selectedCategory, stockValueEnabled);
 
   const handleCategoryClick = (category: string) => {
     setSelectedCategory((prev) => (prev === category ? null : category));
@@ -49,12 +53,14 @@ export function DashboardPanel() {
           con apariencia legítima, no un estado vacío. Ver ADR-0012. */}
       {pagosEnabled && <PendingPaymentsTable />}
 
-      {/* #126: los 3 widgets de acá abajo pegan a rutas que ahora exigen la
-          flag 'stock' server-side — sin este chequeo, una Store con
+      {/* #126: los widgets de acá abajo pegan a rutas que ahora exigen la
+          flag 'stock' server-side (los de valor al costo, también 'costos', #187) — sin este chequeo, una Store con
           stock:false vería un estado de error en vez de que el widget
           simplemente no aparezca (mismo criterio que pagosEnabled arriba). */}
       {stockEnabled && (
         <div className="mt-6 space-y-6">
+          {stockValueEnabled && (
+            <>
           <StockValueHistoryChart />
 
           <div>
@@ -97,6 +103,8 @@ export function DashboardPanel() {
               />
             )}
           </div>
+            </>
+          )}
 
           <InventoryRotationDashboard />
         </div>
