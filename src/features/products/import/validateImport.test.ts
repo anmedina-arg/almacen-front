@@ -6,6 +6,7 @@ import { validateImport, type ImportContext, type ImportSheet } from './validate
 const ctx: ImportContext = {
   existingProductNames: [],
   isAllowedImageUrl: (url) => !url.includes('prohibido'),
+  modules: { costos: false, stock: false },
   categories: [
     { name: 'Gaseosas', subcategories: ['Cola', 'Lima limón'] },
     { name: 'Snacks', subcategories: [] },
@@ -46,6 +47,8 @@ describe('validateImport — filas válidas', () => {
       price: 3500,
       imageUrl: 'https://example.com/coca.jpg',
       active: true,
+      cost: null,
+      initialStock: null,
     });
     expect(preview.counts).toEqual({ valid: 1, warning: 0, error: 0 });
   });
@@ -336,5 +339,105 @@ describe('validateImport — columnas ignoradas', () => {
 
   it('sin columnas de más no hay nada ignorado', () => {
     expect(validateImport(sheet([{ ...base }]), ctx).ignoredColumns).toEqual([]);
+  });
+});
+
+// #188 (spec #179): las columnas `costo` y `stock_inicial` existen solo si la Store tiene
+// el módulo. Con el módulo apagado se ignoran y la vista previa lo avisa.
+describe('validateImport — columnas de módulos (#188)', () => {
+  const withModules = (modules: { costos: boolean; stock: boolean }): ImportContext => ({ ...ctx, modules });
+  const MODULE_HEADERS = [...HEADERS, 'costo', 'stock_inicial'];
+  const run = (row: Record<string, unknown>, modules: { costos: boolean; stock: boolean }, headers = MODULE_HEADERS) =>
+    validateImport(sheet([{ ...base, ...row }], headers), withModules(modules));
+
+  describe.each([
+    [true, true],
+    [true, false],
+    [false, true],
+    [false, false],
+  ])('costos=%s, stock=%s', (costos, stock) => {
+    it('toma las columnas de los módulos encendidos e ignora, con aviso, las de los apagados', () => {
+      const preview = run({ costo: '12,5', stock_inicial: '4' }, { costos, stock });
+      expect(preview.rows[0].status).toBe('valid');
+      expect(preview.rows[0].product).toMatchObject({
+        cost: costos ? 12.5 : null,
+        initialStock: stock ? 4 : null,
+      });
+      expect(preview.ignoredColumns).toEqual([
+        ...(costos ? [] : [{ name: 'costo', reason: 'module' }]),
+        ...(stock ? [] : [{ name: 'stock_inicial', reason: 'module' }]),
+      ]);
+    });
+  });
+
+  describe('costo', () => {
+    const on = { costos: true, stock: false };
+    it('vacío es "sin costo registrado", no cero', () => {
+      expect(run({ costo: '' }, on).rows[0].product?.cost).toBeNull();
+    });
+    it('un cero escrito a propósito se conserva', () => {
+      expect(run({ costo: 0 }, on).rows[0].product?.cost).toBe(0);
+    });
+    it('acepta coma o punto decimal, y miles', () => {
+      expect(run({ costo: '1.234,5' }, on).rows[0].product?.cost).toBe(1234.5);
+      expect(run({ costo: '99.9' }, on).rows[0].product?.cost).toBe(99.9);
+    });
+    it.each(['abc', '-5', '12,3,4', '1000000000'])('"%s" es un error de la fila', (costo) => {
+      const row = run({ costo }, on).rows[0];
+      expect(row.status).toBe('error');
+      expect(row.messages).toEqual(['El costo debe ser un número entre 0 y 999.999.999']);
+      expect(row.product).toBeNull();
+    });
+    it('con el módulo apagado un costo inválido no rompe la fila: se ignora', () => {
+      const row = run({ costo: 'abc' }, { costos: false, stock: false }).rows[0];
+      expect(row.status).toBe('valid');
+      expect(row.product?.cost).toBeNull();
+    });
+  });
+
+  describe('stock inicial', () => {
+    const on = { costos: false, stock: true };
+    it('vacío no carga stock', () => {
+      expect(run({ stock_inicial: '' }, on).rows[0].product?.initialStock).toBeNull();
+    });
+    it('acepta cero y decimales (productos por kg)', () => {
+      expect(run({ stock_inicial: 0 }, on).rows[0].product?.initialStock).toBe(0);
+      expect(run({ stock_inicial: '2,5' }, on).rows[0].product?.initialStock).toBe(2.5);
+    });
+    it.each(['abc', '-1', '1000000000'])('"%s" es un error de la fila', (stock_inicial) => {
+      const row = run({ stock_inicial }, on).rows[0];
+      expect(row.status).toBe('error');
+      expect(row.messages).toEqual(['El stock inicial debe ser un número entre 0 y 999.999.999']);
+    });
+    it.each(['stock inicial', 'stock', 'Stock Inicial'])('reconoce el encabezado "%s"', (header) => {
+      const preview = validateImport(
+        sheet([{ ...base, [header]: 7 }], [...HEADERS, header]),
+        withModules({ costos: false, stock: true })
+      );
+      expect(preview.rows[0].product?.initialStock).toBe(7);
+      expect(preview.ignoredColumns).toEqual([]);
+    });
+  });
+
+  it('una columna repetida del módulo encendido no se avisa como módulo no incluido', () => {
+    const preview = validateImport(
+      sheet([{ ...base, stock: 3, stock_inicial: 5 }], [...HEADERS, 'stock', 'stock_inicial']),
+      withModules({ costos: false, stock: true })
+    );
+    expect(preview.rows[0].product?.initialStock).toBe(3);
+    expect(preview.ignoredColumns).toEqual([{ name: 'stock_inicial', reason: 'unknown' }]);
+  });
+
+  it('el máximo de stock nunca se importa, con ningún módulo', () => {
+    const preview = run({ 'máximo de stock': 9 }, { costos: true, stock: true }, [...MODULE_HEADERS, 'máximo de stock']);
+    expect(preview.ignoredColumns).toEqual([{ name: 'máximo de stock', reason: 'module' }]);
+  });
+
+  it('un error en el costo no impide que otras filas se validen', () => {
+    const preview = validateImport(
+      sheet([{ ...base, nombre: 'A', costo: 'x' }, { ...base, nombre: 'B', costo: '5' }], MODULE_HEADERS),
+      withModules({ costos: true, stock: false })
+    );
+    expect(preview.counts).toEqual({ valid: 1, warning: 0, error: 1 });
   });
 });

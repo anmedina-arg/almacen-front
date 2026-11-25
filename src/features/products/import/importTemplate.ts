@@ -1,13 +1,13 @@
 import ExcelJS from 'exceljs';
-import { MAX_IMPORT_ROWS } from './validateImport';
+import { MAX_IMPORT_ROWS, type ImportModules } from './validateImport';
 
 /**
- * Plantilla de importación (#179, ticket #182): la planilla vacía que el
- * Store admin descarga, completa y vuelve a subir. Columnas fijas del
- * Producto; las de módulos (costo, stock inicial) las suman tickets
- * posteriores según las flags de la Store.
+ * Plantilla de importación (#179, tickets #182 y #188): la planilla vacía que el
+ * Store admin descarga, completa y vuelve a subir. Siempre trae las columnas del
+ * Producto y el Precio; suma `costo` con el módulo `costos` y `stock_inicial` con
+ * el módulo `stock`. Nunca trae el máximo de stock, Combos ni Productos Surtidos.
  */
-export const TEMPLATE_HEADERS = [
+const BASE_HEADERS = [
   'nombre',
   'categoría',
   'subcategoría',
@@ -17,6 +17,11 @@ export const TEMPLATE_HEADERS = [
   'activo',
 ] as const;
 
+/** Encabezados de la Plantilla de una Store, según los módulos que tiene. */
+export function templateHeaders(modules: ImportModules): string[] {
+  return [...BASE_HEADERS, ...(modules.costos ? ['costo'] : []), ...(modules.stock ? ['stock_inicial'] : [])];
+}
+
 export type TemplateFormat = 'xlsx' | 'csv';
 
 export const TEMPLATE_CONTENT_TYPES: Record<TemplateFormat, string> = {
@@ -24,7 +29,7 @@ export const TEMPLATE_CONTENT_TYPES: Record<TemplateFormat, string> = {
   csv: 'text/csv; charset=utf-8',
 };
 
-const INSTRUCTIONS = [
+const BASE_INSTRUCTIONS = [
   ['Columna', 'Qué poner'],
   ['nombre', 'Obligatoria. Hasta 100 caracteres.'],
   ['categoría', 'Obligatoria. Si no existe en la Store, se avisa en la vista previa y se crea al confirmar.'],
@@ -33,14 +38,25 @@ const INSTRUCTIONS = [
   ['precio', 'Obligatoria. Número mayor a 0, con coma o punto decimal.'],
   ['imagen_url', 'Opcional. Link que empiece con http:// o https://. Sin imagen se usa una genérica.'],
   ['activo', 'sí o no. Si queda vacía, sí.'],
-  ['', ''],
-  [`Máximo ${MAX_IMPORT_ROWS} filas por archivo.`, ''],
 ];
 
-export async function buildImportTemplate(format: TemplateFormat): Promise<Buffer> {
+const COST_INSTRUCTION = ['costo', 'Opcional. Número igual o mayor a 0, con coma o punto decimal. Vacío = sin costo registrado.'];
+const STOCK_INSTRUCTION = ['stock_inicial', 'Opcional. Número igual o mayor a 0 (admite decimales). Vacío = no se carga stock.'];
+
+function instructionRows(modules: ImportModules): string[][] {
+  return [
+    ...BASE_INSTRUCTIONS,
+    ...(modules.costos ? [COST_INSTRUCTION] : []),
+    ...(modules.stock ? [STOCK_INSTRUCTION] : []),
+    ['', ''],
+    [`Máximo ${MAX_IMPORT_ROWS} filas por archivo.`, ''],
+  ];
+}
+
+export async function buildImportTemplate(format: TemplateFormat, modules: ImportModules): Promise<Buffer> {
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('Productos');
-  sheet.addRow([...TEMPLATE_HEADERS]);
+  sheet.addRow(templateHeaders(modules));
 
   if (format === 'csv') {
     // `;` y BOM: Excel en español separa por `;` y necesita el BOM para las
@@ -56,7 +72,7 @@ export async function buildImportTemplate(format: TemplateFormat): Promise<Buffe
   });
   sheet.views = [{ state: 'frozen', ySplit: 1 }];
   const instructions = workbook.addWorksheet('Instrucciones');
-  instructions.addRows(INSTRUCTIONS);
+  instructions.addRows(instructionRows(modules));
   instructions.getColumn(1).width = 30;
   instructions.getColumn(2).width = 90;
   return Buffer.from(await workbook.xlsx.writeBuffer());

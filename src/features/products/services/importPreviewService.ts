@@ -3,7 +3,7 @@ import { ConflictError, ValidationError } from '@/lib/api/errors';
 import { parseImportFile } from '../import/parseImportFile';
 import { planImport, type ConfirmImportOptions } from '../import/planImport';
 import { getImageHostRules, isAllowedImageUrl } from '@/lib/images/imageHosts';
-import { validateImport, type ImportContext, type ImportPreview } from '../import/validateImport';
+import { validateImport, type ImportContext, type ImportModules, type ImportPreview } from '../import/validateImport';
 
 const PAGE_SIZE = 1000;
 /** Códigos de Postgres que `import_products` puede devolver. */
@@ -27,7 +27,11 @@ export interface ImportResult {
  * Contexto de la Store para validar: nombres de producto existentes (activos
  * e inactivos, para detectar duplicados) y sus categorías con subcategorías.
  */
-async function loadImportContext(supabase: SupabaseClient, storeId: number): Promise<ImportContext> {
+async function loadImportContext(
+  supabase: SupabaseClient,
+  storeId: number,
+  modules: ImportModules
+): Promise<ImportContext> {
   const existingProductNames: string[] = [];
   for (let from = 0; ; from += PAGE_SIZE) {
     const { data, error } = await supabase
@@ -49,6 +53,7 @@ async function loadImportContext(supabase: SupabaseClient, storeId: number): Pro
 
   const imageHostRules = getImageHostRules();
   return {
+    modules,
     isAllowedImageUrl: (url) => isAllowedImageUrl(url, imageHostRules),
     existingProductNames,
     categories: (categories ?? []).map((c) => ({
@@ -58,18 +63,27 @@ async function loadImportContext(supabase: SupabaseClient, storeId: number): Pro
   };
 }
 
-async function buildPreview(supabase: SupabaseClient, storeId: number, file: ImportFile): Promise<ImportPreview> {
+async function buildPreview(
+  supabase: SupabaseClient,
+  storeId: number,
+  file: ImportFile,
+  modules: ImportModules
+): Promise<ImportPreview> {
   const sheet = await parseImportFile(file.buffer, file.filename);
-  return validateImport(sheet, await loadImportContext(supabase, storeId));
+  return validateImport(sheet, await loadImportContext(supabase, storeId, modules));
 }
 
-/** Importación masiva, primera mitad (#182): lee el archivo y arma la vista previa. No escribe nada. */
+/**
+ * Importación masiva, primera mitad (#182): lee el archivo y arma la vista previa. No escribe nada.
+ * `modules` son los de la Store (#188): deciden qué columnas se leen y cuáles se ignoran con aviso.
+ */
 export async function previewImport(
   supabase: SupabaseClient,
   storeId: number,
-  file: ImportFile
+  file: ImportFile,
+  modules: ImportModules
 ): Promise<ImportPreview> {
-  return buildPreview(supabase, storeId, file);
+  return buildPreview(supabase, storeId, file, modules);
 }
 
 /**
@@ -83,9 +97,10 @@ export async function confirmImport(
   supabase: SupabaseClient,
   storeId: number,
   file: ImportFile,
-  options: ConfirmImportOptions
+  options: ConfirmImportOptions,
+  modules: ImportModules
 ): Promise<ImportResult> {
-  const preview = await buildPreview(supabase, storeId, file);
+  const preview = await buildPreview(supabase, storeId, file, modules);
   if (preview.fileError) throw new ValidationError(preview.fileError);
 
   const plan = planImport(preview, options);
@@ -104,6 +119,8 @@ export async function confirmImport(
       price: p.price,
       image: p.imageUrl,
       active: p.active,
+      cost: p.cost,
+      initial_stock: p.initialStock,
     })),
   });
   if (error) {

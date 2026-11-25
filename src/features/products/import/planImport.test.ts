@@ -8,6 +8,7 @@ import { validateImport, type ImportContext, type ImportSheet } from './validate
 const ctx: ImportContext = {
   existingProductNames: ['Papas'],
   isAllowedImageUrl: () => true,
+  modules: { costos: false, stock: false },
   categories: [{ name: 'Gaseosas', subcategories: ['Cola'] }, { name: 'Snacks', subcategories: [] }],
 };
 const HEADERS = ['nombre', 'categoría', 'subcategoría', 'tipo de venta', 'precio', 'imagen_url', 'activo'];

@@ -16,7 +16,15 @@ export interface ImportSheet {
   rows: Record<string, CellValue>[];
 }
 
+/** Módulos de la Store que suman columnas a la Plantilla (#188). Los demás datos del Producto son siempre los mismos. */
+export interface ImportModules {
+  costos: boolean;
+  stock: boolean;
+}
+
 export interface ImportContext {
+  /** Qué módulos tiene la Store: decide qué columnas se leen y cuáles se ignoran con aviso. */
+  modules: ImportModules;
   /** Si `next/image` puede mostrar esa URL (ver src/lib/images/imageHosts.ts). */
   isAllowedImageUrl: (url: string) => boolean;
   existingProductNames: string[];
@@ -31,6 +39,10 @@ export interface ImportProduct {
   price: number;
   imageUrl: string | null;
   active: boolean;
+  /** Costo (módulo `costos`, #188). `null` = sin costo registrado; solo viene con el módulo encendido. */
+  cost: number | null;
+  /** Stock inicial (módulo `stock`, #188). `null` = no cargar stock; solo viene con el módulo encendido. */
+  initialStock: number | null;
 }
 
 export interface PreviewRow {
@@ -66,9 +78,9 @@ export interface ImportPreview {
   ignoredColumns: IgnoredColumn[];
 }
 
-type Field = 'name' | 'category' | 'subcategory' | 'saleType' | 'price' | 'imageUrl' | 'active';
+type Field = 'name' | 'category' | 'subcategory' | 'saleType' | 'price' | 'imageUrl' | 'active' | 'cost' | 'initialStock';
 
-const FIELD_BY_HEADER: Record<string, Field> = {
+const BASE_FIELD_BY_HEADER: Record<string, Field> = {
   nombre: 'name',
   categoria: 'category',
   subcategoria: 'subcategory',
@@ -77,6 +89,18 @@ const FIELD_BY_HEADER: Record<string, Field> = {
   imagenurl: 'imageUrl',
   activo: 'active',
 };
+
+/** Columnas de cada módulo: solo se leen si la Store lo tiene; si no, caen en MODULE_COLUMNS y se ignoran. */
+const COST_FIELD_BY_HEADER: Record<string, Field> = { costo: 'cost' };
+const STOCK_FIELD_BY_HEADER: Record<string, Field> = { stockinicial: 'initialStock', stock: 'initialStock' };
+
+function fieldsByHeader(modules: ImportModules): Record<string, Field> {
+  return {
+    ...BASE_FIELD_BY_HEADER,
+    ...(modules.costos ? COST_FIELD_BY_HEADER : {}),
+    ...(modules.stock ? STOCK_FIELD_BY_HEADER : {}),
+  };
+}
 
 const foldCase = (value: string): string =>
   value
@@ -100,12 +124,11 @@ const SALE_TYPES: Record<string, SaleType> = {
 };
 
 /**
- * Columnas de módulos (costos, stock). La Plantilla de este ticket no trae
- * ninguna, así que siempre se ignoran con aviso. Cuando los tickets de costos
- * y stock las sumen según las flags de la Store, esta lista pasa a depender
- * del contexto: una Store con `costos` encendida no debe verla ignorada.
+ * Columnas que son de un módulo. Las de un módulo que la Store tiene se leen (ver
+ * `fieldsByHeader`); las que quedan acá se ignoran con aviso. El máximo de stock nunca
+ * se importa (spec #179): ninguna Store lo ve en la Plantilla.
  */
-const MODULE_COLUMNS = new Set(['costo', 'stock', 'stockinicial', 'maxstock', 'stockmaximo']);
+const MODULE_COLUMNS = new Set(['costo', 'stock', 'stockinicial', 'maxstock', 'stockmaximo', 'maximodestock']);
 
 /** Clave de comparación de nombres de producto y categorías: sin tildes, mayúsculas ni espacios de más. */
 const nameKey = (value: string): string => foldCase(value).replace(/\s+/g, ' ').trim();
@@ -133,9 +156,9 @@ const REQUIRED: { field: Field; label: string }[] = [
  * Acepta coma o punto como decimal. Con los dos a la vez, el último es el
  * decimal y el otro separa miles ("1.234,56" y "1,234.56"). Con un solo
  * tipo, repetido es inválido ("12,3,4") y una sola vez es el decimal.
- * Devuelve NaN si no es un número o no es mayor a 0.
+ * Devuelve NaN si no es un número o es negativo; 0 es un número válido.
  */
-function parsePrice(raw: string): number {
+function parseAmount(raw: string): number {
   const cleaned = raw.replace(/[\s$]/g, '');
   if (!/^[0-9.,]+$/.test(cleaned)) return NaN;
   const lastDot = cleaned.lastIndexOf('.');
@@ -151,8 +174,24 @@ function parsePrice(raw: string): number {
     normalized = cleaned.replace(separator, '.');
   }
   const value = Number(normalized);
-  return Number.isFinite(value) && value > 0 ? value : NaN;
+  return Number.isFinite(value) && value >= 0 ? value : NaN;
 }
+
+/** El Precio tiene que ser mayor a 0. */
+const parsePrice = (raw: string): number => {
+  const value = parseAmount(raw);
+  return value > 0 ? value : NaN;
+};
+
+/** Tope de costo y stock inicial: lo que entra en las columnas de la base (NUMERIC(12,3) del stock) sin desbordar. */
+const MAX_MODULE_AMOUNT = 999_999_999;
+
+/** Campo numérico opcional de un módulo: vacío es `null`, y un valor inválido o fuera de rango es `NaN`. */
+const parseOptionalAmount = (raw: string): number | null => {
+  if (raw === '') return null;
+  const value = parseAmount(raw);
+  return value > MAX_MODULE_AMOUNT ? NaN : value;
+};
 
 export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPreview {
   const emptyPreview = (fileError: string): ImportPreview => ({
@@ -165,9 +204,10 @@ export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPr
     ignoredColumns: [],
   });
 
+  const fieldByHeader = fieldsByHeader(ctx.modules);
   const headerByField = new Map<Field, string>();
   for (const header of sheet.headers) {
-    const field = FIELD_BY_HEADER[compactKey(header)];
+    const field = fieldByHeader[compactKey(header)];
     if (field && !headerByField.has(field)) headerByField.set(field, header);
   }
 
@@ -194,7 +234,13 @@ export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPr
   const selectedHeaders = new Set(headerByField.values());
   const ignoredColumns: IgnoredColumn[] = sheet.headers
     .filter((header) => cellText(header) !== '' && !selectedHeaders.has(header))
-    .map((header) => ({ name: header, reason: MODULE_COLUMNS.has(compactKey(header)) ? 'module' : 'unknown' }));
+    .map((header) => {
+      const key = compactKey(header);
+      // Una columna de un módulo que la Store sí tiene y quedó afuera es una repetida (p. ej. `stock` y
+      // `stock_inicial` a la vez): no es "módulo no incluido".
+      const moduleOff = MODULE_COLUMNS.has(key) && !(key in fieldByHeader);
+      return { name: header, reason: moduleOff ? 'module' : 'unknown' };
+    });
 
   const existingNames = new Set(ctx.existingProductNames.map(nameKey));
   const firstRowByName = new Map<string, number>();
@@ -230,6 +276,14 @@ export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPr
 
     const active = ACTIVE_VALUES[compactKey(cell(row, 'active'))];
     if (active === undefined) errors.push('Activo debe ser sí o no');
+
+    const cost = parseOptionalAmount(cell(row, 'cost'));
+    if (cost !== null && Number.isNaN(cost)) errors.push('El costo debe ser un número entre 0 y 999.999.999');
+
+    const initialStock = parseOptionalAmount(cell(row, 'initialStock'));
+    if (initialStock !== null && Number.isNaN(initialStock)) {
+      errors.push('El stock inicial debe ser un número entre 0 y 999.999.999');
+    }
 
     const imageUrl = cell(row, 'imageUrl');
     if (imageUrl && !/^https?:\/\/\S+$/i.test(imageUrl)) {
@@ -294,6 +348,8 @@ export function validateImport(sheet: ImportSheet, ctx: ImportContext): ImportPr
         price,
         imageUrl: imageUrl || null,
         active,
+        cost,
+        initialStock,
       },
     };
   });

@@ -4,6 +4,7 @@ import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { ValidationError } from '@/lib/api/errors';
+import { getImportModules } from '@/features/products/import/getImportModules';
 import { readImportUpload } from '@/features/products/import/readImportUpload';
 import { confirmImport } from '@/features/products/services/importPreviewService';
 
@@ -31,7 +32,7 @@ export const POST = createApiRoute(requireAdmin)(async (ctx) => {
     const options = optionsSchema.safeParse(rawOptions);
     if (!options.success) throw new ValidationError('Las opciones de la importación no son válidas');
 
-    const result = await confirmImport(ctx.supabase, ctx.storeId, file, options.data);
+    const result = await confirmImport(ctx.supabase, ctx.storeId, file, options.data, await getImportModules(ctx));
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
     return handleServiceError(error, 'POST /api/products/import/confirm');

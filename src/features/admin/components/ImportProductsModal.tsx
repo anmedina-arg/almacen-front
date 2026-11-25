@@ -222,6 +222,14 @@ interface PreviewSectionProps {
   onDownloadRejected: () => void;
 }
 
+/** Las columnas de costo y stock inicial solo se muestran si alguna fila las trae (módulo encendido y celda cargada). */
+function moduleColumns(preview: ImportPreview) {
+  return {
+    showCost: preview.rows.some((row) => row.product?.cost != null),
+    showStock: preview.rows.some((row) => row.product?.initialStock != null),
+  };
+}
+
 function PreviewSection({
   preview,
   plan,
@@ -232,6 +240,7 @@ function PreviewSection({
   needsCategoryConfirmation,
   onDownloadRejected,
 }: PreviewSectionProps) {
+  const { showCost, showStock } = moduleColumns(preview);
   return (
     <div className="space-y-3">
       <p className="text-sm text-gray-700">
@@ -281,6 +290,8 @@ function PreviewSection({
               <th className="px-3 py-2">Nombre</th>
               <th className="px-3 py-2">Categoría</th>
               <th className="px-3 py-2 text-right">Precio</th>
+              {showCost && <th className="px-3 py-2 text-right">Costo</th>}
+              {showStock && <th className="px-3 py-2 text-right">Stock inicial</th>}
               <th className="px-3 py-2">Detalle</th>
             </tr>
           </thead>
@@ -291,6 +302,8 @@ function PreviewSection({
                 row={row}
                 included={includedDuplicates.has(row.rowNumber)}
                 onToggleDuplicate={onToggleDuplicate}
+                showCost={showCost}
+                showStock={showStock}
               />
             ))}
           </tbody>
@@ -304,10 +317,14 @@ function PreviewTableRow({
   row,
   included,
   onToggleDuplicate,
+  showCost,
+  showStock,
 }: {
   row: PreviewRow;
   included: boolean;
   onToggleDuplicate: (rowNumber: number) => void;
+  showCost: boolean;
+  showStock: boolean;
 }) {
   const { product } = row;
   return (
@@ -329,6 +346,10 @@ function PreviewTableRow({
         {product ? (product.subcategoryName ? `${product.categoryName} / ${product.subcategoryName}` : product.categoryName) : '—'}
       </td>
       <td className="px-3 py-2 text-right">{product ? formatPrice(product.price) : '—'}</td>
+      {showCost && (
+        <td className="px-3 py-2 text-right">{product?.cost != null ? formatPrice(product.cost) : '—'}</td>
+      )}
+      {showStock && <td className="px-3 py-2 text-right">{product?.initialStock ?? '—'}</td>}
       <td className="px-3 py-2 text-gray-600">
         {row.messages.length > 0 ? (
           <ul className="list-disc pl-4 space-y-0.5">
