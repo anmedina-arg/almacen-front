@@ -3,6 +3,7 @@ import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateOrderItemSchema } from '@/features/orders/schemas/orderSchemas';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 import { updateOrderItem, removeOrderItem } from '@/features/orders/services/orderService';
 import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
@@ -54,7 +55,7 @@ export const PUT = createApiRoute<{ orderId: string; itemId: string }>(requireAd
       );
     }
 
-    const item = await updateOrderItem(ctx.supabase, ctx.storeId, orderId, itemId, parsed.data);
+    const item = await updateOrderItem(ctx.supabase, ctx.storeId, orderId, itemId, parsed.data, { costsEnabled: await getCostsEnabled(ctx) });
     // trg_adjust_stock_on_item_update dispara "BEFORE UPDATE OF quantity"
     // (order_items.sql) — un cambio de unit_price solo nunca toca stock.
     // Invalidar igual sería una query + eviction de cache desperdiciada en

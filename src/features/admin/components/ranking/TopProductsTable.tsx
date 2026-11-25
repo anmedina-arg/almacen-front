@@ -7,6 +7,7 @@ import { useTopCategories } from '../../hooks/useTopCategories';
 import { useCategories } from '../../hooks/useCategories';
 import { Spinner } from '@/components/ui/Spinner';
 import { formatPrice } from '@/utils/formatPrice';
+import { useFeatureFlags } from '../../context/FeatureFlagsContext';
 import type {
   RankingLevel,
   RankingMetric,
@@ -65,6 +66,7 @@ function RankBadge({ idx }: { idx: number }) {
 }
 
 export function TopProductsTable() {
+  const { costos } = useFeatureFlags();
   const [level, setLevel] = useState<RankingLevel>('product');
   const [period, setPeriod] = useState<RankingPeriod>('month');
   const [customStart, setCustomStart] = useState('');
@@ -228,7 +230,7 @@ export function TopProductsTable() {
                       <th className="text-right py-3 px-4 font-semibold text-gray-600">
                         {metric === 'units' ? 'Unidades vendidas' : 'Facturación'}
                       </th>
-                      <th className="text-right py-3 px-4 font-semibold text-gray-600">Margen</th>
+                      {costos && <th className="text-right py-3 px-4 font-semibold text-gray-600">Margen</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -253,18 +255,22 @@ export function TopProductsTable() {
                             ? formatUnits(product.units_sold, product.sale_type)
                             : formatPrice(product.revenue)}
                         </td>
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex flex-col items-end">
-                            <span className="font-mono font-semibold text-gray-800">{formatPrice(product.margin)}</span>
-                            {product.margin_pct !== null ? (
-                              <span className={`text-xs font-medium ${product.margin_pct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                {product.margin_pct > 0 ? '+' : ''}{product.margin_pct}%
-                              </span>
-                            ) : (
-                              <span className="text-xs text-amber-500">sin costo</span>
-                            )}
-                          </div>
-                        </td>
+                        {costos && (
+                          <td className="py-3 px-4 text-right">
+                            <div className="flex flex-col items-end">
+                              {product.margin != null && product.margin_pct != null ? (
+                                <>
+                                  <span className="font-mono font-semibold text-gray-800">{formatPrice(product.margin)}</span>
+                                  <span className={`text-xs font-medium ${product.margin_pct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                    {product.margin_pct > 0 ? '+' : ''}{product.margin_pct}%
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-xs text-amber-500">sin costo</span>
+                              )}
+                            </div>
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
@@ -290,16 +296,20 @@ export function TopProductsTable() {
                       <p className="font-mono font-bold text-gray-800 text-sm">
                         {metric === 'units' ? formatUnits(product.units_sold, product.sale_type) : formatPrice(product.revenue)}
                       </p>
-                      <div className="flex items-center gap-1 justify-end">
-                        <span className="font-mono text-xs text-gray-600">{formatPrice(product.margin)}</span>
-                        {product.margin_pct !== null ? (
-                          <span className={`text-xs font-medium ${product.margin_pct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                            {product.margin_pct > 0 ? '+' : ''}{product.margin_pct}%
-                          </span>
-                        ) : (
-                          <span className="text-xs text-amber-500">sin costo</span>
-                        )}
-                      </div>
+                      {costos && (
+                        <div className="flex items-center gap-1 justify-end">
+                          {product.margin != null && product.margin_pct != null ? (
+                            <>
+                              <span className="font-mono text-xs text-gray-600">{formatPrice(product.margin)}</span>
+                              <span className={`text-xs font-medium ${product.margin_pct >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                {product.margin_pct > 0 ? '+' : ''}{product.margin_pct}%
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-xs text-amber-500">sin costo</span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 ))}

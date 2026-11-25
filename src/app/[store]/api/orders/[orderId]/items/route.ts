@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { addOrderItemSchema } from '@/features/orders/schemas/orderSchemas';
 import { addOrderItem } from '@/features/orders/services/orderService';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 
 /**
  * POST /api/orders/[orderId]/items
@@ -26,7 +27,7 @@ export const POST = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx
       );
     }
 
-    const item = await addOrderItem(ctx.supabase, ctx.storeId, orderId, parsed.data);
+    const item = await addOrderItem(ctx.supabase, ctx.storeId, orderId, parsed.data, { costsEnabled: await getCostsEnabled(ctx) });
     return NextResponse.json(item, { status: 201 });
   } catch (error) {
     return handleServiceError(error, 'POST /api/orders/[orderId]/items');

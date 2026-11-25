@@ -107,8 +107,8 @@ export type UpdateOrderItemSchemaInput = z.infer<typeof updateOrderItemSchema>;
 /**
  * POS (#121): mismo dominio de negocio que el checkout de WhatsApp, otro
  * punto de entrada (ADR-0013) — no un schema propio de un dominio aparte.
- * unit_cost queda en el schema porque el frontend (POSView.tsx) lo sigue
- * mandando, pero el service ya no lo usa: recalcula unit_cost server-side
+ * unit_cost queda en el schema (con default 0) por compatibilidad con clientes
+ * viejos, pero el service lo ignora: recalcula unit_cost server-side
  * con el mismo criterio que el resto de Orders (createOrder en
  * orderService.ts), matemáticamente equivalente acá porque POS manda
  * unit_price = product.price sin escalar (a diferencia del carrito público,

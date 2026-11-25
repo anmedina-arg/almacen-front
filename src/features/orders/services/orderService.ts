@@ -6,6 +6,8 @@ import type { CreateOrderSchemaInput, UpdateOrderSchemaInput, AddOrderItemSchema
 import type { SetPaymentsSchema } from '../schemas/paymentSchemas';
 import type { AssignClientSchema } from '../schemas/clientSchemas';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
+import { omitItemCost, orderCostFields, type CostCoverage } from '../utils/orderMargin';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
 
 /**
  * Service de Orders (#119 núcleo + #120 items/payments/client) — ver
@@ -14,48 +16,55 @@ import { NotFoundError, ValidationError } from '@/lib/api/errors';
  * cuenta, sin pasar por acá todavía.
  */
 
-type OrderWithMargin = Order & { total_cost: number; margin: number; margin_pct: number; has_pending_shortfall: boolean };
-type ListedOrderItem = { unit_cost: number; unit_price: number; subtotal: number; product_name: string; shortfall: number | null };
+/**
+ * Costo y margen de un pedido (#186): solo con el módulo `costos`. Sin él la
+ * respuesta no trae `total_cost`, `margin`, `margin_pct` ni `cost_coverage`.
+ */
+type OrderWithMargin = Order & {
+  total_cost?: number | null;
+  margin?: number | null;
+  margin_pct?: number | null;
+  cost_coverage?: CostCoverage;
+  has_pending_shortfall: boolean;
+};
 
-export async function getOrders(supabase: SupabaseClient, storeId: number): Promise<OrderWithMargin[]> {
+type ListedOrderItem = { unit_cost?: number; unit_price: number; subtotal: number; product_name: string; shortfall: number | null };
+
+export async function getOrders(
+  supabase: SupabaseClient,
+  storeId: number,
+  options: CostOptions = NO_COSTS
+): Promise<OrderWithMargin[]> {
   const { data, error } = await supabase
     .from('orders')
     // Trae los ítems en la misma query (evita un segundo round-trip que
     // pueda fallar/devolver vacío de forma independiente del principal).
-    .select('*, order_items(unit_cost, unit_price, subtotal, product_name, shortfall), clients(id, barrio, manzana_lote, display_code, created_at), order_payments(id, method, amount)')
+    .select(`*, order_items(${options.costsEnabled ? 'unit_cost, ' : ''}unit_price, subtotal, product_name, shortfall), clients(id, barrio, manzana_lote, display_code, created_at), order_payments(id, method, amount)`)
     .eq('store_id', storeId)
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
 
-  // Margen por orden a partir de sus ítems anidados. subtotal * (unit_cost /
-  // unit_price) en vez de quantity * unit_cost — evita el error de 100x en
-  // productos por peso, donde quantity está en gramos crudos pero
-  // unit_price/unit_cost son por 100gr.
+  // Margen por orden a partir de sus ítems anidados, solo con el módulo `costos`
+  // y solo con los ítems que tienen costo registrado (ver computeOrderMargin).
   return (data ?? []).map((order) => {
     const { order_items, clients: client, order_payments, ...orderFields } = order;
     const items = (order_items as unknown as ListedOrderItem[]) ?? [];
-    const total_cost = items.reduce((acc, item) => {
-      const unitPrice = Number(item.unit_price);
-      const itemCost = unitPrice > 0 ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice) : 0;
-      return acc + itemCost;
-    }, 0);
     const product_names = items.map((i) => i.product_name).filter(Boolean);
-    const total = Number(orderFields.total);
-    const margin = total - total_cost;
-    const margin_pct = total > 0 ? (margin / total) * 100 : 0;
+    const costFields = orderCostFields(items, options.costsEnabled);
     // Marca "con faltante" (#162): solo pendientes, que es cuando el Store
     // admin todavía tiene que resolverlo. El Faltante en sí queda en el
     // detalle en cualquier estado. Sin Control de stock shortfall es NULL.
     const has_pending_shortfall = orderFields.status === 'pending' && items.some((i) => Number(i.shortfall) > 0);
-    return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names, has_pending_shortfall } as OrderWithMargin;
+    return { ...orderFields, ...costFields, client: client ?? null, order_payments: order_payments ?? [], product_names, has_pending_shortfall } as OrderWithMargin;
   });
 }
 
 export async function getOrderById(
   supabase: SupabaseClient,
   storeId: number,
-  orderId: number
+  orderId: number,
+  options: CostOptions = NO_COSTS
 ): Promise<OrderWithItems | null> {
   const { data, error } = await supabase
     .from('orders')
@@ -67,7 +76,9 @@ export async function getOrderById(
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  return (data as unknown as OrderWithItems) ?? null;
+  const order = (data as unknown as OrderWithItems) ?? null;
+  if (!order || options.costsEnabled) return order;
+  return { ...order, order_items: order.order_items.map((item) => omitItemCost(item) as OrderItem) };
 }
 
 export async function createOrder(
@@ -285,7 +296,8 @@ export async function addOrderItem(
   supabase: SupabaseClient,
   storeId: number,
   orderId: number,
-  input: AddOrderItemSchemaInput
+  input: AddOrderItemSchemaInput,
+  options: CostOptions = NO_COSTS
 ): Promise<OrderItem> {
   // #103: el producto tiene que pertenecer a esta Store — el trigger
   // validate_order_item_store ya lo bloquearía a nivel de base, pero acá
@@ -317,7 +329,7 @@ export async function addOrderItem(
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+  return options.costsEnabled ? data : (omitItemCost(data) as OrderItem);
 }
 
 export async function updateOrderItem(
@@ -325,7 +337,8 @@ export async function updateOrderItem(
   storeId: number,
   orderId: number,
   itemId: number,
-  input: UpdateOrderItemSchemaInput
+  input: UpdateOrderItemSchemaInput,
+  options: CostOptions = NO_COSTS
 ): Promise<OrderItem> {
   // Recalcula unit_cost desde el costo vigente del producto (corrige ítems
   // agregados sin costo en su momento). En paralelo con el chequeo de la
@@ -362,7 +375,7 @@ export async function updateOrderItem(
     if (error.code === 'PGRST116') throw new NotFoundError('Item no encontrado');
     throw new Error(error.message);
   }
-  return data;
+  return options.costsEnabled ? data : (omitItemCost(data) as OrderItem);
 }
 
 /**

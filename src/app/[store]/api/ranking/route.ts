@@ -3,6 +3,7 @@ import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { getTopProducts } from '@/features/ranking/services/rankingService';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 
 export const GET = createApiRoute(requireAdmin)(async (ctx) => {
   try {
@@ -13,7 +14,12 @@ export const GET = createApiRoute(requireAdmin)(async (ctx) => {
     const categoryId = searchParams.get('category_id') ? parseInt(searchParams.get('category_id')!) : null;
     const metric = searchParams.get('metric') === 'revenue' ? 'revenue' : 'units';
 
-    const products = await getTopProducts(ctx.supabase, ctx.storeId, { startDate, endDate, limit, categoryId, metric });
+    const products = await getTopProducts(
+      ctx.supabase,
+      ctx.storeId,
+      { startDate, endDate, limit, categoryId, metric },
+      { costsEnabled: await getCostsEnabled(ctx) }
+    );
     return NextResponse.json(products);
   } catch (error) {
     return handleServiceError(error, 'GET /api/ranking');

@@ -12,6 +12,8 @@ import type { Order } from '@/features/admin/types/order.types';
 import { calculateLineTotal } from '@/utils/productUtils';
 import { getArgentinaTodayUtc } from '@/lib/date/argentinaTime';
 import { NotFoundError } from '@/lib/api/errors';
+import { orderCostFields } from '@/features/orders/utils/orderMargin';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
 
 /**
  * Service del dominio Dashboard (#126) — ver ADR-0013, dominio delgado
@@ -31,7 +33,13 @@ function orderDebe(total: number, payments: { amount: number | null }[]): boolea
   return total - paid > 0;
 }
 
-export async function getPendingPayments(supabase: SupabaseClient, storeId: number, page: number): Promise<PendingPaymentsResponse> {
+/** Costo y margen de cada pedido salen solo con el módulo `costos` (#186). */
+export async function getPendingPayments(
+  supabase: SupabaseClient,
+  storeId: number,
+  page: number,
+  options: CostOptions = NO_COSTS
+): Promise<PendingPaymentsResponse> {
   // Query 1 — lightweight: only what's needed to evaluate the DEBE condition.
   // Filtro desde el 20/03/2026 — pedidos anteriores no se muestran en el dashboard.
   const { data: lightweight, error: lwErr } = await supabase
@@ -60,7 +68,7 @@ export async function getPendingPayments(supabase: SupabaseClient, storeId: numb
   // Query 2 — full data for this page only.
   const { data, error } = await supabase
     .from('orders')
-    .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
+    .select(`*, order_items(${options.costsEnabled ? 'unit_cost, ' : ''}unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)`)
     .eq('store_id', storeId)
     .in('id', pageIds)
     .order('created_at', { ascending: false });
@@ -69,16 +77,9 @@ export async function getPendingPayments(supabase: SupabaseClient, storeId: numb
 
   const orders: Order[] = (data ?? []).map((order) => {
     const { order_items, clients: client, order_payments, ...orderFields } = order;
-    const items = (order_items as { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
-    const total_cost = items.reduce((acc, item) => {
-      const unitPrice = Number(item.unit_price);
-      return acc + (unitPrice > 0 ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice) : 0);
-    }, 0);
+    const items = (order_items as { unit_cost?: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
     const product_names = items.map((i) => i.product_name).filter(Boolean);
-    const orderTotal = Number(orderFields.total);
-    const margin = orderTotal - total_cost;
-    const margin_pct = orderTotal > 0 ? (margin / orderTotal) * 100 : 0;
-    return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names };
+    return { ...orderFields, ...orderCostFields(items, options.costsEnabled), client: client ?? null, order_payments: order_payments ?? [], product_names };
   });
 
   // Preserve original sort order (newest first per debeIds).

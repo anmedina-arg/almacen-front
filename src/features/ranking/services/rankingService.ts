@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { TopProduct, TopCategory, RankingMetric } from '@/features/admin/types/ranking.types';
+import { applyRankingCosts } from '../utils/rankingCosts';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
 
 /**
  * Service del dominio Ranking (#124) — ver ADR-0013. Dominio delgado sin
@@ -15,10 +17,15 @@ export interface GetTopProductsParams {
   metric: RankingMetric;
 }
 
+/**
+ * Costo y margen salen solo con el módulo `costos` (#186). Sin indicación se trata
+ * como apagado.
+ */
 export async function getTopProducts(
   supabase: SupabaseClient,
   storeId: number,
-  params: GetTopProductsParams
+  params: GetTopProductsParams,
+  options: CostOptions = NO_COSTS
 ): Promise<TopProduct[]> {
   const { data, error } = await supabase.rpc('get_top_products', {
     p_store_id: storeId,
@@ -30,7 +37,7 @@ export async function getTopProducts(
   });
 
   if (error) throw new Error(error.message);
-  return data;
+  return applyRankingCosts(data as TopProduct[], options.costsEnabled);
 }
 
 export interface GetTopCategoriesParams {

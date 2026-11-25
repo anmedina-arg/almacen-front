@@ -10,9 +10,10 @@ export interface TopProduct {
   units_sold: number;
   revenue: number;
   current_price: number;
-  current_cost: number;
-  margin: number;
-  margin_pct: number | null;
+  // Solo con el módulo `costos` (#186); null = producto sin costo registrado.
+  current_cost?: number | null;
+  margin?: number | null;
+  margin_pct?: number | null;
 }
 
 export type RankingLevel = 'product' | 'category';

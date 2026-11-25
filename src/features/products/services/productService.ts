@@ -5,6 +5,7 @@ import { NotFoundError, ValidationError } from '@/lib/api/errors';
 import { COMBO_NEEDS_COMPONENTS } from '../schemas/comboSchemas';
 import { updateComboComponents } from './comboService';
 import { setProductCost } from './productCostService';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
 
 /**
  * Service del dominio Products — ver ADR-0013, mismo patrón que
@@ -40,13 +41,6 @@ const COST_EMBED = 'cost_row:product_costs!product_costs_product_store_fk(cost)'
 
 const productColumns = (withCost: boolean): string => (withCost ? `${BASE_COLUMNS}, ${COST_EMBED}` : BASE_COLUMNS);
 
-/** Si la Store tiene el módulo `costos`, resuelto por quien llama (la ruta lee la flag). */
-export interface ProductCostOptions {
-  costsEnabled: boolean;
-}
-
-/** Sin indicación se trata como una Store sin el módulo: el costo ni se escribe ni se devuelve. */
-const NO_COSTS: ProductCostOptions = { costsEnabled: false };
 
 type JoinedRow = Record<string, unknown> & {
   cat?: { id: number; name: string } | null;
@@ -128,7 +122,7 @@ export async function createProduct(
   supabase: SupabaseClient,
   storeId: number,
   input: CreateProductInput,
-  options: ProductCostOptions = NO_COSTS
+  options: CostOptions = NO_COSTS
 ): Promise<Product> {
   // #167: createProductSchema ya lo exige; esto cubre a un caller que arme el
   // input sin pasar por el esquema.
@@ -217,7 +211,7 @@ export async function updateProduct(
   storeId: number,
   id: number,
   input: UpdateProductInput,
-  options: ProductCostOptions = NO_COSTS
+  options: CostOptions = NO_COSTS
 ): Promise<Product> {
   await assertOwnership(supabase, storeId, input);
 
