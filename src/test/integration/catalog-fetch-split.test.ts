@@ -94,7 +94,6 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
         name: `${slug}-producto`,
         price: 100,
         image: '',
-        categories: '',
         store_id: storeId,
         active: true,
         category_id: categoryId,
@@ -111,7 +110,6 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
         name: `${slug}-combo`,
         price: 200,
         image: '',
-        categories: '',
         store_id: storeId,
         active: true,
         is_combo: true,
@@ -123,7 +121,7 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
 
     const { data: component, error: componentError } = await admin
       .from('products')
-      .insert({ name: componentName, price: 50, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: componentName, price: 50, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(componentError).toBeNull();
@@ -154,7 +152,7 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
 
     const { data: otherProduct, error: otherProductError } = await admin
       .from('products')
-      .insert({ name: `${otherSlug}-producto`, price: 100, image: '', categories: '', store_id: otherStoreId, active: true })
+      .insert({ name: `${otherSlug}-producto`, price: 100, image: '', store_id: otherStoreId, active: true })
       .select('id')
       .single();
     expect(otherProductError).toBeNull();
@@ -169,7 +167,7 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
 
     const { data: noRowProduct, error: noRowProductError } = await admin
       .from('products')
-      .insert({ name: `${slug}-sin-fila`, price: 100, image: '', categories: '', store_id: storeId, active: true })
+      .insert({ name: `${slug}-sin-fila`, price: 100, image: '', store_id: storeId, active: true })
       .select('id')
       .single();
     expect(noRowProductError).toBeNull();
@@ -187,7 +185,7 @@ describe('catalog fetch split — fetchProductMetadata/fetchProductStock/fetchTo
 
     const { data: untrackedProduct, error: untrackedProductError } = await admin
       .from('products')
-      .insert({ name: `${untrackedSlug}-producto`, price: 100, image: '', categories: '', store_id: untrackedStoreId, active: true })
+      .insert({ name: `${untrackedSlug}-producto`, price: 100, image: '', store_id: untrackedStoreId, active: true })
       .select('id')
       .single();
     expect(untrackedProductError).toBeNull();

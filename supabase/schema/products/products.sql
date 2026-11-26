@@ -11,17 +11,27 @@
 -- agregadas después SÍ tienen fuente: category_id/subcategory_id
 -- (supabase_categories_phase2.sql), sale_type (supabase_sale_type.sql),
 -- cost (supabase_pricing.sql — Orders #84, ya extraído por ese ticket),
--- is_combo/max_stock (supabase_combos.sql — Combos #86, no se descarta
--- hasta que confirme su parte), store_id
+-- is_combo (supabase_combos.sql — Combos #86), store_id
 -- (supabase_multitenant_schema_expand.sql), is_producto_surtido/familia_id/
 -- min_variedades/max_variedades (#92, dominio nuevo Producto Surtido).
 --
--- COLUMNA LEGACY SIN DOCUMENTAR: `categories` (texto libre, NOT NULL, sin
--- default) — distinta de la tabla `categories` y de `category_id`. Sigue en
--- uso activo (ProductFormModal, ProductList, /api/products) como campo de
--- texto libre complementario, no reemplazado todavía por el sistema
--- normalizado de category_id/subcategory_id. No se toca ni se elimina acá
--- — solo se documenta por primera vez.
+-- COLUMNAS RETIRADAS en #189 (spec #179): `categories`, `cost` y `max_stock`.
+--   - `categories` (texto libre, distinta de la tabla `categories` y de `category_id`):
+--     salió del flujo en #181 y nada la leía ni escribía.
+--   - `cost`: el Costo vive en `product_costs` (#183). Sus lectores (ranking, informes,
+--     valor del stock, historial de precios, costo en ítems de pedido) pasaron a esa tabla.
+--   - `max_stock`: vive en `product_stock.max_stock` (#184).
+-- Antes de borrarlas en producción se verifica (paso 3 de
+-- supabase/backfills/supabase_cleanup_products_legacy_columns.sql) que ninguna función,
+-- vista, policy, trigger, índice ni constraint las nombra; el DROP aborta si queda alguna.
+-- Valores que tenían registrados, relevados contra producción el 2026-11-25 (748 productos):
+--   - `categories`: 360 vacíos y el resto texto libre con el nombre de una categoría (Almacén 52,
+--     combos 29, Gaseosas 26, Cervezas 23, Galletas y variedades 21, galletas 19, jugos y aguas
+--     saborizadas 15, Fideos y arroz 14, Enlatados 12, ...). Ya no se leía desde #181.
+--   - `cost`: 649 productos con costo mayor a 0 y 99 en cero (cero = "sin costo registrado").
+--     Los 649 ya estaban en `product_costs` con el mismo valor (relevado antes del deploy).
+--   - `max_stock`: ningún producto lo tenía cargado.
+-- La tabla legacy products_backup conserva una copia vieja de la estructura anterior.
 --
 -- COLUMNA LEGACY `main_category` (+ CHECK `main_category_check`): RETIRADA el
 -- 2026-11-10. Era la categoría fija pre-sistema de categorías. Desde #133 la
@@ -48,16 +58,13 @@ CREATE TABLE IF NOT EXISTS public.products (
   price           NUMERIC NOT NULL,
   image           TEXT NOT NULL,
   active          BOOLEAN NOT NULL DEFAULT true,
-  categories      TEXT NOT NULL,
   created_at      TIMESTAMPTZ DEFAULT NOW(),
   updated_at      TIMESTAMPTZ DEFAULT NOW(),
   sale_type       TEXT NOT NULL DEFAULT 'unit'
     CONSTRAINT products_sale_type_check CHECK (sale_type IN ('unit', '100gr', 'kg')),
   category_id     INTEGER REFERENCES public.categories(id) ON DELETE SET NULL,
   subcategory_id  INTEGER REFERENCES public.subcategories(id) ON DELETE SET NULL,
-  cost            NUMERIC(12, 2) NOT NULL DEFAULT 0,
   is_combo        BOOLEAN NOT NULL DEFAULT FALSE,
-  max_stock       NUMERIC(12, 3),
   store_id        INTEGER NOT NULL REFERENCES public.stores(id),
   is_producto_surtido BOOLEAN NOT NULL DEFAULT FALSE,
   familia_id      INTEGER,
@@ -76,6 +83,13 @@ CREATE TABLE IF NOT EXISTS public.products (
   CONSTRAINT products_variedades_range_check CHECK (
     min_variedades IS NULL OR (min_variedades >= 1 AND max_variedades >= min_variedades)
   ),
+
+  -- UNIQUE (id, store_id), no solo la PK: sostiene la FK compuesta de
+  -- product_costs (#183), que garantiza a nivel de schema que el costo de un
+  -- producto es de su misma Store. En producción se agregó con un ALTER TABLE
+  -- (CREATE TABLE IF NOT EXISTS no toca una tabla existente):
+  --   ALTER TABLE public.products ADD CONSTRAINT products_id_store_id_key UNIQUE (id, store_id);
+  CONSTRAINT products_id_store_id_key UNIQUE (id, store_id),
 
   -- FK compuesta, no una FK simple a familia_id: garantiza que un Producto
   -- Surtido no pueda referenciar una Familia de otra Store a nivel de
@@ -97,24 +111,16 @@ CREATE TRIGGER update_products_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at_column();
 
--- Estas dos disparan sobre products pero sus funciones son del dominio
--- Orders (#84) — escriben en product_price_history/order_items, tablas que
--- Orders posee. La sentencia CREATE TRIGGER vive acá porque products es la
--- tabla a la que están atadas (mismo criterio que Stock/Orders: el trigger
--- se declara junto a la tabla que dispara, la función junto a quien la
--- posee semánticamente). Ver supabase/schema/orders/log_price_change.sql y
--- sync_order_items_unit_cost.sql.
+-- Este trigger dispara sobre products pero su función es del dominio Orders (#84):
+-- escribe en product_price_history, tabla que Orders posee. La sentencia CREATE TRIGGER
+-- vive acá porque products es la tabla a la que está atada. Ver
+-- supabase/schema/orders/log_price_change.sql. Desde #189 el costo ya no es de products:
+-- sus triggers (historial de costo y costo en ítems de pedido) cuelgan de product_costs.
 DROP TRIGGER IF EXISTS trg_log_price_change ON public.products;
 CREATE TRIGGER trg_log_price_change
   AFTER INSERT OR UPDATE ON public.products
   FOR EACH ROW
   EXECUTE FUNCTION log_price_change();
-
-DROP TRIGGER IF EXISTS trg_sync_order_items_cost ON public.products;
-CREATE TRIGGER trg_sync_order_items_cost
-  AFTER UPDATE ON public.products
-  FOR EACH ROW
-  EXECUTE FUNCTION sync_order_items_unit_cost();
 
 -- ── RLS ──────────────────────────────────────────────────────────────────
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;

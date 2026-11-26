@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 import type { OrderItem, OrderStatus } from '../../types/order.types';
-import { computeMargin, MarginDisplay } from './MarginDisplay';
+import { MarginDisplay } from './MarginDisplay';
+import { computeOrderMargin } from '@/features/orders/utils/orderMargin';
 import { useRemoveOrderItem } from '../../hooks/useRemoveOrderItem';
 import { useUpdateOrderItem } from '../../hooks/useUpdateOrderItem';
 import { useAddOrderItem } from '../../hooks/useAddOrderItem';
@@ -26,7 +27,7 @@ export function OrderItemsEditor({
   const updateItem = useUpdateOrderItem();
   const addItem = useAddOrderItem();
   const { data: products } = useProducts({ includeInactive: true });
-  const { stock: stockEnabled } = useFeatureFlags();
+  const { stock: stockEnabled, costos: costosEnabled } = useFeatureFlags();
 
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
   const [editQuantity, setEditQuantity] = useState<string>('');
@@ -231,11 +232,14 @@ export function OrderItemsEditor({
                       <p className="text-xs font-medium text-orange-700">⚠ {shortfallText}</p>
                     ) : null;
                   })()}
-                  {(() => {
-                    const { margin, marginPct } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.subtotal));
+                  {costosEnabled && (() => {
+                    // Sin costo registrado (unit_cost 0) no hay margen que mostrar (#186).
+                    const { margin, margin_pct } = computeOrderMargin([
+                      { unit_price: item.unit_price, unit_cost: item.unit_cost ?? 0, subtotal: item.subtotal },
+                    ]);
                     return (
                       <p className="text-xs">
-                        <MarginDisplay margin={margin} marginPct={marginPct} />
+                        <MarginDisplay margin={margin} marginPct={margin_pct} />
                       </p>
                     );
                   })()}

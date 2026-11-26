@@ -1,5 +1,5 @@
-const CACHE_NAME = 'market-cevil-v8';
-const RUNTIME_CACHE = 'market-cevil-runtime-v8';
+const CACHE_NAME = 'market-cevil-v9';
+const RUNTIME_CACHE = 'market-cevil-runtime-v9';
 
 // Static assets that never change: precache on install.
 // NOTE: Do NOT add HTML pages here — pages are SSR and must be fetched fresh
@@ -75,13 +75,19 @@ self.addEventListener('fetch', (event) => {
 
   // HTML navigation requests (pages): network-first.
   // SSR pages contain prices and stock — must always be fresh.
-  // Fall back to cache only when offline.
+  // Fall back to cache when offline OR when the server answers 5xx/404 (#190):
+  // if the backend is down, the last good copy of the catalog beats an error page.
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).then((response) => {
         // Optionally cache for offline fallback
         if (response.status === 200) {
           caches.open(RUNTIME_CACHE).then((cache) => cache.put(event.request, response.clone()));
+          return response;
+        }
+        // Never for the admin panel: its pages are per-user and must not be replayed.
+        if ((response.status >= 500 || response.status === 404) && !event.request.url.includes('/admin')) {
+          return caches.match(event.request).then((cached) => cached || response);
         }
         return response;
       }).catch(() => {

@@ -27,9 +27,9 @@ export const createProductSchema = z
   .object({
     name: z.string().min(1, 'El nombre es requerido').max(100),
     price: z.number().positive('El precio debe ser positivo'),
-    cost: z.number().min(0, 'El costo no puede ser negativo').optional().default(0),
+    // #183: sin costo es null o ausente ("sin costo registrado"), nunca 0 por defecto.
+    cost: z.number().min(0, 'El costo no puede ser negativo').nullable().optional(),
     image: z.string().nullable().optional().transform((v) => v || ''),
-    categories: z.string().optional().default(''),
     active: z.boolean().optional().default(true),
     sale_type: z.enum(SALE_TYPES, { errorMap: () => ({ message: 'Tipo de venta inválido' }) }).optional().default('unit'),
     is_combo: z.boolean().optional().default(false),
@@ -93,9 +93,8 @@ export const createProductSchema = z
 export const updateProductSchema = z.object({
   name: z.string().min(1, 'El nombre es requerido').max(100).optional(),
   price: z.number().positive('El precio debe ser positivo').optional(),
-  cost: z.number().min(0, 'El costo no puede ser negativo').optional(),
+  cost: z.number().min(0, 'El costo no puede ser negativo').nullable().optional(),
   image: z.string().nullable().optional().transform((v) => v ?? undefined),
-  categories: z.string().optional(),
   active: z.boolean().optional(),
   sale_type: z.enum(SALE_TYPES, { errorMap: () => ({ message: 'Tipo de venta inválido' }) }).optional(),
   is_combo: z.boolean().optional(),

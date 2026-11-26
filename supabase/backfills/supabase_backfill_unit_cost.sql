@@ -1,5 +1,7 @@
 -- ============================================================================
 -- BACKFILL: recalcular unit_cost en order_items históricos
+-- HISTÓRICO, NO RE-EJECUTAR (#189): usa la columna products.cost, que se borró. El costo de los
+-- ítems lo fija ahora el trigger set_order_item_unit_cost y lo corrige sync_order_items_unit_cost.
 -- ============================================================================
 --
 -- CONTEXTO

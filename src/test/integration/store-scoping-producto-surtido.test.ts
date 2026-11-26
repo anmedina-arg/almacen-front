@@ -274,7 +274,6 @@ describe('store scoping — familias/variedades (#92)', () => {
           name: 'surtido-bloquea-delete',
           price: 100,
           image: '',
-          categories: '',
           store_id: storeA.storeId,
           active: false,
           is_producto_surtido: true,

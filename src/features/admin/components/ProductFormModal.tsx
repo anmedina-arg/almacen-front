@@ -11,6 +11,7 @@ import { ImageUploadField } from './ImageUploadField';
 import type { Product } from '@/types';
 import type { ProductCreateInput } from '../schemas/productCreateSchema';
 import { formatPrice } from '@/utils/formatPrice';
+import { useFeatureFlags } from '../context/FeatureFlagsContext';
 
 interface ProductFormModalProps {
   mode: 'create' | 'edit';
@@ -24,6 +25,8 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
   const { data: categories = [] } = useCategories();
   const { data: familias = [] } = useFamilias();
   const { uploadFile, uploading, uploadError } = useCloudinaryUpload();
+  // #183: el campo de costo solo existe en las Stores con el módulo `costos`.
+  const { costos } = useFeatureFlags();
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(product?.category_id ?? null);
@@ -31,13 +34,11 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
   const [formData, setFormData] = useState<ProductCreateInput>({
     name: product?.name || '',
     price: product?.price || 0,
-    cost: product?.cost ?? 0,
+    cost: product?.cost ?? null,
     image: product?.image || '',
-    categories: product?.categories || '',
     active: product?.active ?? true,
     sale_type: product?.sale_type || 'unit',
     is_combo: false,
-    max_stock: null,
     category_id: product?.category_id ?? null,
     subcategory_id: product?.subcategory_id ?? null,
     is_producto_surtido: product?.is_producto_surtido ?? false,
@@ -55,13 +56,11 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
       setFormData({
         name: product.name,
         price: product.price,
-        cost: product.cost ?? 0,
+        cost: product.cost ?? null,
         image: product.image,
-        categories: product.categories,
         active: product.active,
         sale_type: product.sale_type,
         is_combo: false,
-        max_stock: null,
         category_id: product.category_id ?? null,
         subcategory_id: product.subcategory_id ?? null,
         is_producto_surtido: product.is_producto_surtido ?? false,
@@ -181,7 +180,8 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
             {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
           </div>
 
-          {/* Precio de compra (costo) */}
+          {/* Precio de compra (costo): solo con el módulo `costos` (#183) */}
+          {costos && (
           <div>
             <label htmlFor="cost" className="block text-sm font-medium text-gray-700 mb-1">
               Precio de compra (costo)
@@ -191,15 +191,19 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
               type="number"
               step="0.01"
               min="0"
-              value={formData.cost ?? 0}
-              onChange={(e) => setFormData({ ...formData, cost: parseFloat(e.target.value) || 0 })}
+              value={formData.cost ?? ''}
+              placeholder="Sin costo registrado"
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                setFormData({ ...formData, cost: Number.isNaN(value) ? null : value });
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               disabled={isPending}
             />
             {errors.cost && <p className="mt-1 text-sm text-red-600">{errors.cost}</p>}
-            {/* Margen en tiempo real */}
-            {(() => {
-              const margin = formData.price - (formData.cost ?? 0);
+            {/* Margen en tiempo real: solo con un costo cargado */}
+            {formData.cost != null && (() => {
+              const margin = formData.price - formData.cost;
               return (
                 <p className={`mt-1 text-sm font-medium ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
                   Margen: {formatPrice(margin)}
@@ -207,6 +211,7 @@ export function ProductFormModal({ mode, product, onClose }: ProductFormModalPro
               );
             })()}
           </div>
+          )}
 
           {/* Imagen */}
           <ImageUploadField

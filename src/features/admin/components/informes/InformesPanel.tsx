@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { apiFetch } from '@/lib/api/apiFetch';
+import { useFeatureFlags } from '../../context/FeatureFlagsContext';
 
 async function downloadCsv(path: string, fallbackName: string) {
   const res = await apiFetch(path);
@@ -20,6 +21,7 @@ async function downloadCsv(path: string, fallbackName: string) {
 }
 
 export function InformesPanel() {
+  const { costos } = useFeatureFlags();
   const today = new Date().toISOString().slice(0, 10);
 
   // Ventas state
@@ -92,7 +94,7 @@ export function InformesPanel() {
         <h2 className="text-sm font-semibold text-gray-700">Detalle de ventas</h2>
         <p className="text-xs text-gray-500">
           Órdenes e ítems con cliente, método de pago, saldo pendiente,
-          categoría, cantidad, subtotal, costo y margen.
+          categoría, cantidad, subtotal{costos ? ', costo y margen' : ''}.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3">
@@ -135,7 +137,7 @@ export function InformesPanel() {
       <div className="border border-gray-200 rounded-lg p-4 flex flex-col gap-4">
         <h2 className="text-sm font-semibold text-gray-700">Catálogo de productos</h2>
         <p className="text-xs text-gray-500">
-          Todos los productos con precio de venta, costo, márgenes,
+          Todos los productos con precio de venta{costos ? ', costo, márgenes,' : ','}
           categoría, subcategoría y stock actual.
         </p>
 

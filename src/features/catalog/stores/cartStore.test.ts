@@ -14,7 +14,6 @@ function makeSurtidoProduct(overrides: Partial<Product> = {}): Product {
     price: 3000,
     image: '',
     active: true,
-    categories: '',
     sale_type: 'unit',
     is_producto_surtido: true,
     familia_id: 10,

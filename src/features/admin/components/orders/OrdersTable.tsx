@@ -7,6 +7,7 @@ import { OrderStatusBadge } from './OrderStatusBadge';
 import { ShortfallBadge } from './ShortfallBadge';
 import { OrderDetailModal } from './OrderDetailModal';
 import { MarginDisplay } from './MarginDisplay';
+import { CostCoverageNotice } from './CostCoverageNotice';
 import { ClientAssignCell } from './ClientAssignCell';
 import { PaymentCell } from './PaymentCell';
 import { SalesFilters } from '../sales/SalesFilters';
@@ -22,7 +23,7 @@ import { useFeatureFlags } from '../../context/FeatureFlagsContext';
  */
 export function OrdersTable() {
   const { data: orders, isLoading, error } = useOrders();
-  const { clientes: clientesEnabled, pagos: pagosEnabled, stock: stockEnabled } = useFeatureFlags();
+  const { clientes: clientesEnabled, pagos: pagosEnabled, stock: stockEnabled, costos: costosEnabled } = useFeatureFlags();
 
   const { quickFilter, dateFrom, dateTo, setQuickFilter, setDateFrom, setDateTo, filteredOrders: dateFilteredOrders } =
     useSalesFilters(orders);
@@ -257,6 +258,9 @@ export function OrdersTable() {
         Mostrando {filteredOrders.length} de {dateFilteredOrders.length} pedidos
       </p>
 
+      {/* Aviso: los costos rigen desde que se cargan (#186) */}
+      {costosEnabled && orders && <CostCoverageNotice orders={orders} />}
+
       {/* Table Desktop */}
       {filteredOrders.length > 0 ? (
         <>
@@ -273,9 +277,11 @@ export function OrdersTable() {
                   <th className="text-right py-3 px-4 font-semibold text-gray-600">
                     Total
                   </th>
-                  <th className="text-right py-3 px-4 font-semibold text-gray-600">
-                    Margen
-                  </th>
+                  {costosEnabled && (
+                    <th className="text-right py-3 px-4 font-semibold text-gray-600">
+                      Margen
+                    </th>
+                  )}
                   {clientesEnabled && (
                     <th className="text-left py-3 px-4 font-semibold text-gray-600">
                       Cliente
@@ -313,16 +319,15 @@ export function OrdersTable() {
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-800">
                       {formatPrice(order.total)}
                     </td>
-                    <td className="py-3 px-4 text-right">
-                      {order.margin === undefined ? (
-                        <span className="text-gray-400 text-xs">—</span>
-                      ) : (
+                    {costosEnabled && (
+                      <td className="py-3 px-4 text-right">
                         <MarginDisplay
                           margin={order.margin}
-                          marginPct={order.margin_pct ?? 0}
+                          marginPct={order.margin_pct}
+                          partial={order.cost_coverage === 'partial'}
                         />
-                      )}
-                    </td>
+                      </td>
+                    )}
                     {clientesEnabled && (
                       <td className="py-3 px-4">
                         <ClientAssignCell orderId={order.id} client={order.client} />
@@ -404,16 +409,15 @@ export function OrdersTable() {
                     <span className="text-lg font-bold text-gray-800">
                       {formatPrice(order.total)}
                     </span>
-                    <div className="mt-0.5">
-                      {order.margin === undefined ? (
-                        <span className="text-gray-400 text-xs">—</span>
-                      ) : (
+                    {costosEnabled && (
+                      <div className="mt-0.5">
                         <MarginDisplay
                           margin={order.margin}
-                          marginPct={order.margin_pct ?? 0}
+                          marginPct={order.margin_pct}
+                          partial={order.cost_coverage === 'partial'}
                         />
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <button

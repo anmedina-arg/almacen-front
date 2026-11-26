@@ -28,10 +28,12 @@ export interface Order {
   updated_at: string;
   confirmed_at: string | null;
   confirmed_by: string | null;
-  // Computed margin fields (undefined when no cost data available)
-  total_cost?: number;
-  margin?: number;
-  margin_pct?: number;
+  // Costo y margen: solo con el módulo `costos` (#186). Se calculan con los ítems que
+  // tienen costo registrado; null = el pedido no tiene ningún ítem con costo ("sin costo").
+  total_cost?: number | null;
+  margin?: number | null;
+  margin_pct?: number | null;
+  cost_coverage?: 'complete' | 'partial' | 'none';
   // Client assignment (nullable — orders can exist without a client)
   client_id?: number | null;
   client?: Client | null;
@@ -65,7 +67,8 @@ export interface OrderItem {
   product_name: string;
   quantity: number;
   unit_price: number;
-  unit_cost: number;
+  // Solo con el módulo `costos` (#186). 0 = el ítem no tiene costo registrado.
+  unit_cost?: number;
   subtotal: number;
   is_by_weight: boolean;
   created_at: string;

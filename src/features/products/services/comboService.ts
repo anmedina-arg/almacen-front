@@ -1,5 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
 import { COMBO_NEEDS_COMPONENTS, type UpdateComboComponentsInput } from '../schemas/comboSchemas';
 
 export interface ComboComponent {
@@ -9,7 +10,7 @@ export interface ComboComponent {
   quantity: number;
   component_product_name: string | null;
   component_product_price: number | null;
-  component_product_cost: number | null;
+  component_product_cost?: number | null;
 }
 
 /**
@@ -33,10 +34,12 @@ async function comboBelongsToStore(
   return data != null;
 }
 
+/** El costo de cada componente sale solo con el módulo `costos` (#187). Sin indicación se trata como apagado. */
 export async function getComboComponents(
   supabase: SupabaseClient,
   storeId: number,
-  comboId: number
+  comboId: number,
+  options: CostOptions = NO_COSTS
 ): Promise<ComboComponent[]> {
   if (!(await comboBelongsToStore(supabase, comboId, storeId))) {
     throw new NotFoundError('Combo not found in this store');
@@ -53,7 +56,7 @@ export async function getComboComponents(
       combo_product_id,
       component_product_id,
       quantity,
-      products!combo_components_component_product_id_fkey(name, price, cost)
+      products!combo_components_component_product_id_fkey(name, price:effective_price${options.costsEnabled ? ', cost_row:product_costs!product_costs_product_store_fk(cost)' : ''})
     `
     )
     .eq('combo_product_id', comboId)
@@ -62,7 +65,7 @@ export async function getComboComponents(
   if (error) throw new Error(error.message);
 
   return (data ?? []).map((row) => {
-    const product = row.products as unknown as { name: string; price: number; cost: number } | null;
+    const product = row.products as unknown as { name: string; price: number; cost_row?: { cost: number | string } | null } | null;
     return {
       id: row.id,
       combo_product_id: row.combo_product_id,
@@ -70,7 +73,7 @@ export async function getComboComponents(
       quantity: row.quantity,
       component_product_name: product?.name ?? null,
       component_product_price: product?.price ?? null,
-      component_product_cost: product?.cost ?? null,
+      ...(options.costsEnabled && { component_product_cost: product?.cost_row ? Number(product.cost_row.cost) : null }),
     };
   });
 }

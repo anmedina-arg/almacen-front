@@ -33,7 +33,7 @@ describe('combos: nunca sin componentes (#167)', () => {
   async function insertProduct(store: number, name: string, fields: Record<string, unknown> = {}): Promise<number> {
     const { data, error } = await admin
       .from('products')
-      .insert({ name: `${name}-${randomUUID().slice(0, 8)}`, price: 100, cost: 50, image: '', categories: '', store_id: store, active: false, ...fields })
+      .insert({ name: `${name}-${randomUUID().slice(0, 8)}`, price: 100, image: '', store_id: store, active: false, ...fields })
       .select('id')
       .single();
     expect(error).toBeNull();

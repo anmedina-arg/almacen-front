@@ -4,7 +4,7 @@ import { resolveFeatureFlags, type FeatureFlags } from './featureFlags';
 
 /**
  * Resuelve las feature flags de una Store por slug (#23). Envuelta en
- * cache() (mismo patrón que getStoreBySlug/getStoreIdBySlug): dentro de un
+ * cache() (mismo patrón que getStoreIdBySlug): dentro de un
  * mismo request, el layout de [store]/admin y cada page.tsx gateado llaman
  * esto con el mismo client (supabaseServer, singleton) y el mismo slug, así
  * que comparten una sola query.

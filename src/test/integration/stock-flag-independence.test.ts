@@ -34,7 +34,7 @@ describe('stock flag independence — create_order/adjust/cancel/delete (#97)', 
 
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: `${slug}-producto`, price: 100, cost: 50, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-producto`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(productError).toBeNull();

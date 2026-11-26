@@ -5,14 +5,15 @@ import { handleServiceError } from '@/lib/api/handleServiceError';
 import { createOrderSchema } from '@/features/orders/schemas/orderSchemas';
 import { getOrders, createOrder } from '@/features/orders/services/orderService';
 import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 
 /**
  * GET /api/orders
- * List all orders with computed margin. Admin only.
+ * List all orders. Con el módulo `costos`, con costo y margen calculados. Admin only.
  */
 export const GET = createApiRoute(requireAdmin)(async (ctx) => {
   try {
-    const orders = await getOrders(ctx.supabase, ctx.storeId);
+    const orders = await getOrders(ctx.supabase, ctx.storeId, { costsEnabled: await getCostsEnabled(ctx) });
     return NextResponse.json(orders, {
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0',

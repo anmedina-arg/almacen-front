@@ -62,7 +62,7 @@ describe('store scoping — product_stock & stock_movement_log (#17)', () => {
 
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: `${slug}-producto`, price: 100, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `${slug}-producto`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(productError).toBeNull();

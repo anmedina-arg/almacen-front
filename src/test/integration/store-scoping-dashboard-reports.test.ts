@@ -43,7 +43,7 @@ describe('store scoping — dashboard & informes: stock/export/afinidad (#21)', 
   async function createFixture(slug: string): Promise<StoreFixture> {
     const { data: store, error: storeError } = await admin
       .from('stores')
-      .insert({ slug, name: slug })
+      .insert({ slug, name: slug, feature_flags: { costos: true } })
       .select('id')
       .single();
     expect(storeError).toBeNull();
@@ -84,9 +84,7 @@ describe('store scoping — dashboard & informes: stock/export/afinidad (#21)', 
       .insert({
         name: productAName,
         price: 100,
-        cost: 50,
         image: '',
-        categories: '',
         store_id: storeId,
         active: true,
         category_id: category!.id,
@@ -101,9 +99,7 @@ describe('store scoping — dashboard & informes: stock/export/afinidad (#21)', 
       .insert({
         name: productBName,
         price: 50,
-        cost: 20,
         image: '',
-        categories: '',
         store_id: storeId,
         active: true,
         category_id: category!.id,
@@ -111,6 +107,13 @@ describe('store scoping — dashboard & informes: stock/export/afinidad (#21)', 
       .select('id')
       .single();
     expect(productBError).toBeNull();
+
+    // El valor del stock al costo exige el módulo `costos` y lee el costo de product_costs (#189).
+    const { error: costsError } = await admin.from('product_costs').insert([
+      { product_id: productA!.id, store_id: storeId, cost: 50 },
+      { product_id: productB!.id, store_id: storeId, cost: 20 },
+    ]);
+    expect(costsError).toBeNull();
 
     await admin.from('product_price_history').delete().eq('product_id', productA!.id);
     await admin.from('product_price_history').delete().eq('product_id', productB!.id);

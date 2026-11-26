@@ -16,7 +16,7 @@
 --   - Combo: cuántos combos completos alcanzan con el stock de sus
 --     componentes, FLOOR(MIN(stock_componente / cantidad_componente)). Un
 --     componente sin fila cuenta como 0, y un combo sin componentes también
---     da 0. products.max_stock NO entra en la regla, a propósito (decisión
+--     da 0. product_stock.max_stock (#184) NO entra en la regla, a propósito (decisión
 --     de Andrés en #159): hoy solo lo muestra /admin/stock y el CSV de
 --     informes, y no tiene efecto en la venta.
 --   - Nunca negativo. Desde #160 product_stock admite negativos (el

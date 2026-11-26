@@ -6,12 +6,15 @@ import { MarginDisplay } from '../orders/MarginDisplay';
 import { PAYMENT_EMOJI } from '../../types/payment.types';
 import { formatAdminDate } from '../../utils/formatDate';
 import { formatPrice } from '@/utils/formatPrice';
+import { useFeatureFlags } from '../../context/FeatureFlagsContext';
 
 interface SalesTableProps {
   orders: Order[];
 }
 
 export function SalesTable({ orders }: SalesTableProps) {
+  const { costos } = useFeatureFlags();
+
   if (orders.length === 0) {
     return (
       <div className="text-center py-12">
@@ -32,9 +35,9 @@ export function SalesTable({ orders }: SalesTableProps) {
               <th className="text-left py-3 px-4 font-semibold text-gray-600">Pago</th>
               <th className="text-left py-3 px-4 font-semibold text-gray-600">Fecha</th>
               <th className="text-center py-3 px-4 font-semibold text-gray-600">Estado</th>
-              <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>
+              {costos && <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>}
               <th className="text-right py-3 px-4 font-semibold text-gray-600">Precio de venta</th>
-              <th className="text-right py-3 px-4 font-semibold text-gray-600">Margen</th>
+              {costos && <th className="text-right py-3 px-4 font-semibold text-gray-600">Margen</th>}
             </tr>
           </thead>
           <tbody>
@@ -63,19 +66,19 @@ export function SalesTable({ orders }: SalesTableProps) {
                 <td className="py-3 px-4 text-center">
                   <OrderStatusBadge status={order.status} />
                 </td>
-                <td className="py-3 px-4 text-right font-mono text-gray-700">
-                  {order.total_cost !== undefined ? formatPrice(order.total_cost) : <span className="text-gray-400 text-xs">—</span>}
-                </td>
+                {costos && (
+                  <td className="py-3 px-4 text-right font-mono text-gray-700">
+                    {order.total_cost != null ? formatPrice(order.total_cost) : <span className="text-amber-500 text-xs font-sans">sin costo</span>}
+                  </td>
+                )}
                 <td className="py-3 px-4 text-right font-mono font-semibold text-gray-800">
                   {formatPrice(order.total)}
                 </td>
-                <td className="py-3 px-4 text-right">
-                  {order.margin !== undefined ? (
-                    <MarginDisplay margin={order.margin} marginPct={order.margin_pct ?? 0} />
-                  ) : (
-                    <span className="text-gray-400 text-xs">—</span>
-                  )}
-                </td>
+                {costos && (
+                  <td className="py-3 px-4 text-right">
+                    <MarginDisplay margin={order.margin} marginPct={order.margin_pct} partial={order.cost_coverage === 'partial'} />
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -109,21 +112,23 @@ export function SalesTable({ orders }: SalesTableProps) {
               )}
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              <div>
-                <p className="text-xs text-gray-400">Costo</p>
-                <p className="font-mono font-medium text-gray-700">
-                  {order.total_cost !== undefined ? formatPrice(order.total_cost) : '—'}
-                </p>
-              </div>
+              {costos && (
+                <div>
+                  <p className="text-xs text-gray-400">Costo</p>
+                  <p className="font-mono font-medium text-gray-700">
+                    {order.total_cost != null ? formatPrice(order.total_cost) : <span className="text-amber-500 text-xs font-sans">sin costo</span>}
+                  </p>
+                </div>
+              )}
               <div>
                 <p className="text-xs text-gray-400">Precio de venta</p>
                 <p className="font-mono font-semibold text-gray-800">{formatPrice(order.total)}</p>
               </div>
             </div>
-            {order.margin !== undefined && (
+            {costos && (
               <div>
                 <p className="text-xs text-gray-400">Margen</p>
-                <MarginDisplay margin={order.margin} marginPct={order.margin_pct ?? 0} />
+                <MarginDisplay margin={order.margin} marginPct={order.margin_pct} partial={order.cost_coverage === 'partial'} />
               </div>
             )}
           </div>

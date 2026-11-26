@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateComboComponentsSchema } from '@/features/products/schemas/comboSchemas';
 import { getComboComponents, updateComboComponents } from '@/features/products/services/comboService';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 import { productMetadataTag, productStockTag } from '@/lib/cache/tags';
 
 /**
@@ -18,7 +19,7 @@ export const GET = createApiRoute<{ id: string }>(requireAdmin)(async (ctx, { id
       return NextResponse.json({ error: 'Invalid combo ID' }, { status: 400 });
     }
 
-    const components = await getComboComponents(ctx.supabase, ctx.storeId, id);
+    const components = await getComboComponents(ctx.supabase, ctx.storeId, id, { costsEnabled: await getCostsEnabled(ctx) });
     return NextResponse.json(components);
   } catch (error) {
     return handleServiceError(error, 'GET /api/combos/[id]/components');

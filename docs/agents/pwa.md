@@ -8,7 +8,7 @@ No hay `public/manifest.json` — cada Store sirve el suyo dinámicamente desde 
 
 ## Service Worker (`public/sw.js`)
 
-Estrategia cache-first, versión en `CACHE_NAME` (`market-cevil-v8` al momento de escribir esto). Para forzar que los clientes tomen una versión nueva: incrementar `CACHE_NAME`. `src/components/ServiceWorkerRegistration.tsx` chequea updates cada 60s (`registration.update()`) y, si detecta una versión instalada nueva, pide confirmación (`confirm()`) antes de recargar — no es un reload silencioso.
+Páginas network-first con copia cacheada de respaldo (si el servidor responde 5xx/404 o no hay red, sirve la última copia buena — #190, ver `docs/ops/disponibilidad-catalogo.md`); assets estáticos cache-first. Versión en `CACHE_NAME` (`market-cevil-v9` al momento de escribir esto). Para forzar que los clientes tomen una versión nueva: incrementar `CACHE_NAME`. `src/components/ServiceWorkerRegistration.tsx` chequea updates cada 60s (`registration.update()`) y, si detecta una versión instalada nueva, pide confirmación (`confirm()`) antes de recargar — no es un reload silencioso.
 
 ## Íconos
 

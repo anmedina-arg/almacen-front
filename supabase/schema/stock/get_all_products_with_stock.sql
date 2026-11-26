@@ -27,6 +27,9 @@
 -- RETURNS TABLE, `CREATE OR REPLACE` falla con "cannot change return type":
 -- paso operativo, una vez por base, antes de aplicar este archivo:
 --   DROP FUNCTION public.get_all_products_with_stock(integer);
+--
+-- #184 (spec #179): el tope de un combo sale de product_stock.max_stock, no de
+-- products.max_stock. Misma firma, así que no hace falta DROP.
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_all_products_with_stock(p_store_id INTEGER)
@@ -60,14 +63,14 @@ BEGIN
     ps.id AS stock_id,
     p.id AS product_id,
     p.name AS product_name,
-    p.price AS product_price,
+    public.effective_price(p) AS product_price,
     c.name AS category_name,
     p.active AS product_active,
     p.image AS product_image,
     CASE
       WHEN p.is_combo THEN
-        CASE WHEN p.max_stock IS NOT NULL
-          THEN LEAST(public.get_combo_effective_stock(p.id), p.max_stock)
+        CASE WHEN ps.max_stock IS NOT NULL
+          THEN LEAST(public.get_combo_effective_stock(p.id), ps.max_stock)
           ELSE public.get_combo_effective_stock(p.id)
         END
       ELSE ps.quantity

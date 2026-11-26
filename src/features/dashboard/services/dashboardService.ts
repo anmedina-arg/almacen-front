@@ -12,6 +12,9 @@ import type { Order } from '@/features/admin/types/order.types';
 import { calculateLineTotal } from '@/utils/productUtils';
 import { getArgentinaTodayUtc } from '@/lib/date/argentinaTime';
 import { NotFoundError } from '@/lib/api/errors';
+import { orderCostFields } from '@/features/orders/utils/orderMargin';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
+import { listProductCosts } from '@/features/products/services/productCostService';
 
 /**
  * Service del dominio Dashboard (#126) — ver ADR-0013, dominio delgado
@@ -31,7 +34,13 @@ function orderDebe(total: number, payments: { amount: number | null }[]): boolea
   return total - paid > 0;
 }
 
-export async function getPendingPayments(supabase: SupabaseClient, storeId: number, page: number): Promise<PendingPaymentsResponse> {
+/** Costo y margen de cada pedido salen solo con el módulo `costos` (#186). */
+export async function getPendingPayments(
+  supabase: SupabaseClient,
+  storeId: number,
+  page: number,
+  options: CostOptions = NO_COSTS
+): Promise<PendingPaymentsResponse> {
   // Query 1 — lightweight: only what's needed to evaluate the DEBE condition.
   // Filtro desde el 20/03/2026 — pedidos anteriores no se muestran en el dashboard.
   const { data: lightweight, error: lwErr } = await supabase
@@ -60,7 +69,7 @@ export async function getPendingPayments(supabase: SupabaseClient, storeId: numb
   // Query 2 — full data for this page only.
   const { data, error } = await supabase
     .from('orders')
-    .select('*, order_items(unit_cost, unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)')
+    .select(`*, order_items(${options.costsEnabled ? 'unit_cost, ' : ''}unit_price, subtotal, product_name), clients(id, barrio, manzana_lote, display_code), order_payments(id, method, amount)`)
     .eq('store_id', storeId)
     .in('id', pageIds)
     .order('created_at', { ascending: false });
@@ -69,16 +78,9 @@ export async function getPendingPayments(supabase: SupabaseClient, storeId: numb
 
   const orders: Order[] = (data ?? []).map((order) => {
     const { order_items, clients: client, order_payments, ...orderFields } = order;
-    const items = (order_items as { unit_cost: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
-    const total_cost = items.reduce((acc, item) => {
-      const unitPrice = Number(item.unit_price);
-      return acc + (unitPrice > 0 ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice) : 0);
-    }, 0);
+    const items = (order_items as { unit_cost?: number; unit_price: number; subtotal: number; product_name: string }[]) ?? [];
     const product_names = items.map((i) => i.product_name).filter(Boolean);
-    const orderTotal = Number(orderFields.total);
-    const margin = orderTotal - total_cost;
-    const margin_pct = orderTotal > 0 ? (margin / orderTotal) * 100 : 0;
-    return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names };
+    return { ...orderFields, ...orderCostFields(items, options.costsEnabled), client: client ?? null, order_payments: order_payments ?? [], product_names };
   });
 
   // Preserve original sort order (newest first per debeIds).
@@ -199,9 +201,11 @@ export async function getStockByCategory(supabase: SupabaseClient, storeId: numb
   // vienen filtrados, y filtrar product_stock.store_id directamente
   // ocultaría stock legacy cuyo store_id todavía no se backfilleó (mismo
   // motivo documentado en get_all_products_with_stock.sql, Stock #17).
-  const [{ data: products, error: productsError }, { data: stockData }] = await Promise.all([
-    supabase.from('products').select('id, cost, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
+  // El Costo sale de product_costs (#189): sin fila el producto no tiene costo y no suma valor.
+  const [{ data: products, error: productsError }, { data: stockData }, costs] = await Promise.all([
+    supabase.from('products').select('id, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
     supabase.from('product_stock').select('product_id, quantity'),
+    listProductCosts(supabase, storeId),
   ]);
 
   if (productsError || !products) throw new Error('Error fetching products');
@@ -213,7 +217,7 @@ export async function getStockByCategory(supabase: SupabaseClient, storeId: numb
     const cat = product.cat as unknown as { name: string } | null;
     const categoryName = formatCategoryName(cat?.name);
     const stockGrams = stockMap.get(product.id) ?? 0;
-    const cost = product.cost ?? 0;
+    const cost = costs.get(product.id) ?? 0;
     const value = calculateLineTotal(stockGrams, product.sale_type, cost);
     totals.set(categoryName, (totals.get(categoryName) ?? 0) + value);
   }
@@ -229,9 +233,10 @@ export async function getStockProducts(supabase: SupabaseClient, storeId: number
   // por store_id (lectura pública sin restricción de Store), product_stock
   // sin filtrar (evita ocultar stock legacy no backfilleado — ver
   // get_all_products_with_stock.sql, Stock #17).
-  const [{ data: products, error }, { data: stockData }] = await Promise.all([
-    supabase.from('products').select('id, name, cost, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
+  const [{ data: products, error }, { data: stockData }, costs] = await Promise.all([
+    supabase.from('products').select('id, name, sale_type, cat:categories!products_category_id_fkey(name)').eq('active', true).eq('store_id', storeId),
     supabase.from('product_stock').select('product_id, quantity'),
+    listProductCosts(supabase, storeId),
   ]);
 
   if (error || !products) throw new Error('Error fetching products');
@@ -245,7 +250,7 @@ export async function getStockProducts(supabase: SupabaseClient, storeId: number
     })
     .map((p) => {
       const stock_raw = stockMap.get(p.id) ?? 0;
-      const cost = p.cost ?? 0;
+      const cost = costs.get(p.id) ?? 0;
       const stock_value = calculateLineTotal(stock_raw, p.sale_type, cost);
       return { id: p.id, name: p.name, sale_type: p.sale_type, stock_raw, cost, stock_value: Math.round(stock_value) };
     })

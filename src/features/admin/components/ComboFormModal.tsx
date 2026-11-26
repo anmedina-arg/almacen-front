@@ -12,6 +12,7 @@ import { ImageUploadField } from './ImageUploadField';
 import type { Product } from '@/types';
 import type { ComboComponent } from '../types/combo.types';
 import { formatPrice } from '@/utils/formatPrice';
+import { useFeatureFlags } from '../context/FeatureFlagsContext';
 
 interface ComboFormModalProps {
   mode: 'create' | 'edit';
@@ -29,6 +30,8 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
   );
   const { uploadFile, uploading, uploadError } = useCloudinaryUpload();
   const { data: categories = [] } = useCategories();
+  // #183: costo y margen solo en las Stores con el módulo `costos`. #184: el máximo de stock, con `stock`.
+  const { costos, stock } = useFeatureFlags();
 
   const [pendingFile, setPendingFile] = useState<File | null>(null);
   const [componentSearch, setComponentSearch] = useState('');
@@ -149,13 +152,13 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
     const productPayload = {
       name: formData.name.trim(),
       price: formData.price,
-      cost: calculatedCost,
+      // El costo de un combo no se manda: lo calcula la base a partir de sus componentes (sync_combo_cost).
       image: finalImage,
       active: formData.active,
-      categories: 'combos',
       sale_type: 'unit' as const,
       is_combo: true,
-      max_stock: formData.max_stock,
+      // Sin el módulo `stock` el máximo no se manda (el servidor tampoco lo guardaría).
+      ...(stock ? { max_stock: formData.max_stock } : {}),
       category_id: formData.category_id,
       subcategory_id: formData.subcategory_id,
     };
@@ -244,10 +247,12 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
 
           {/* Costo, precio sugerido y margen */}
           <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-sm space-y-1">
-            <p className="text-gray-600">
-              Costo calculado:{' '}
-              <span className="font-semibold text-gray-800">{formatPrice(calculatedCost)}</span>
-            </p>
+            {costos && (
+              <p className="text-gray-600">
+                Costo calculado:{' '}
+                <span className="font-semibold text-gray-800">{formatPrice(calculatedCost)}</span>
+              </p>
+            )}
             {components.length > 0 && (
               <p className="text-gray-600">
                 Precio sugerido:{' '}
@@ -262,9 +267,11 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                 <span className="text-gray-400 ml-1 text-xs">(suma de precios de componentes)</span>
               </p>
             )}
-            <p className={`font-semibold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              Margen: {formatPrice(margin)}
-            </p>
+            {costos && (
+              <p className={`font-semibold ${margin >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                Margen: {formatPrice(margin)}
+              </p>
+            )}
           </div>
 
           {/* Imagen */}
@@ -275,27 +282,29 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
             error={uploadError ?? errors.image}
           />
 
-          {/* Stock máximo */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Stock máximo (opcional)
-            </label>
-            <input
-              type="number"
-              step="1"
-              min="0"
-              value={formData.max_stock ?? ''}
-              onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  max_stock: e.target.value ? parseFloat(e.target.value) : null,
-                })
-              }
-              placeholder="Sin límite"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={isPending}
-            />
-          </div>
+          {/* Stock máximo: solo con el módulo `stock` (#184) */}
+          {stock && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Stock máximo (opcional)
+              </label>
+              <input
+                type="number"
+                step="1"
+                min="0"
+                value={formData.max_stock ?? ''}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    max_stock: e.target.value ? parseFloat(e.target.value) : null,
+                  })
+                }
+                placeholder="Sin límite"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={isPending}
+              />
+            </div>
+          )}
 
           {/* Activo */}
           <div className="flex items-center gap-2">
@@ -379,9 +388,11 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                       <span className="flex-1 text-sm text-gray-800 truncate font-medium">
                         {prod?.name ?? `Producto #${comp.component_product_id}`}
                       </span>
-                      <span className="text-xs text-gray-400 whitespace-nowrap">
-                        costo: {formatPrice(compCost)}
-                      </span>
+                      {costos && (
+                        <span className="text-xs text-gray-400 whitespace-nowrap">
+                          costo: {formatPrice(compCost)}
+                        </span>
+                      )}
                       <input
                         type="number"
                         step="0.01"
@@ -433,7 +444,7 @@ export function ComboFormModal({ mode, product, onClose }: ComboFormModalProps) 
                       disabled={isPending}
                     >
                       <span className="font-medium text-gray-800">{p.name}</span>
-                      {p.cost != null && p.cost > 0 && (
+                      {costos && p.cost != null && p.cost > 0 && (
                         <span className="text-gray-400 ml-2 text-xs">
                           costo: {formatPrice(p.cost)}
                         </span>

@@ -77,7 +77,9 @@ function getCachedProductMetadata(
     ? fetchProductMetadata(supabase, storeId, options)
     : unstable_cache(
         () => fetchProductMetadata(supabase, storeId, options),
-        ['product-metadata', String(storeId), String(options?.categoryId ?? ''), String(options?.includeInactive ?? false)],
+        // 'sin-costo' versiona la clave (#183): la caché de datos persiste entre deploys, y las
+        // entradas anteriores traían el costo de cada producto. Con otra clave dejan de servirse.
+        ['product-metadata', 'sin-costo', String(storeId), String(options?.categoryId ?? ''), String(options?.includeInactive ?? false)],
         { tags: [productMetadataTag(storeId)] }
       )();
 

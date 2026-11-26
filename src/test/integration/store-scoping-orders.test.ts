@@ -60,7 +60,7 @@ describe('store scoping — orders & order_items & order_payments (#16)', () => 
 
     const { data: product, error: productError } = await admin
       .from('products')
-      .insert({ name: `${slug}-producto`, price: 100, image: '', categories: '', store_id: storeId, active: true })
+      .insert({ name: `${slug}-producto`, price: 100, image: '', store_id: storeId, active: true })
       .select('id')
       .single();
     expect(productError).toBeNull();

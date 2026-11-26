@@ -17,6 +17,17 @@
 --   ALTER TABLE public.product_stock DROP CONSTRAINT chk_product_stock_quantity;
 -- Una carga manual negativa desde /admin/stock la sigue frenando la API
 -- (stockUpdateSchema, >= 0), ya no la base.
+--
+-- #184 (spec #179): el máximo de stock pasa a ser del módulo `stock`, junto con el
+-- stock real: columna `max_stock`. Hasta ahora era de products; esa columna se borra
+-- en #189 y mientras tanto nada la lee ni la escribe. Solo aplica a combos (tope del
+-- Disponible que muestran /admin/stock y el CSV de catálogo); un combo no tiene stock
+-- propio, así que con tope lleva una fila con quantity = 0. Pasos operativos, una vez
+-- por base (idempotentes), en este orden y ANTES de desplegar el código:
+--   ALTER TABLE public.product_stock ADD COLUMN IF NOT EXISTS max_stock NUMERIC(12, 3) DEFAULT NULL;
+--   ALTER TABLE public.product_stock ADD CONSTRAINT chk_product_stock_max_stock
+--     CHECK (max_stock IS NULL OR max_stock >= 0);
+--   (después, supabase/backfills/supabase_backfill_product_stock_max_stock.sql)
 -- ============================================================================
 
 CREATE TABLE IF NOT EXISTS public.product_stock (
@@ -24,6 +35,7 @@ CREATE TABLE IF NOT EXISTS public.product_stock (
   product_id    INTEGER NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
   quantity      NUMERIC(12, 3) NOT NULL DEFAULT 0,
   min_stock     NUMERIC(12, 3) DEFAULT NULL,
+  max_stock     NUMERIC(12, 3) DEFAULT NULL,
   updated_by    UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
   notes         TEXT DEFAULT NULL,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -31,12 +43,14 @@ CREATE TABLE IF NOT EXISTS public.product_stock (
   store_id      INTEGER NOT NULL REFERENCES public.stores(id),
 
   CONSTRAINT uq_product_stock_product_id UNIQUE (product_id),
-  CONSTRAINT chk_product_stock_min_stock CHECK (min_stock IS NULL OR min_stock >= 0)
+  CONSTRAINT chk_product_stock_min_stock CHECK (min_stock IS NULL OR min_stock >= 0),
+  CONSTRAINT chk_product_stock_max_stock CHECK (max_stock IS NULL OR max_stock >= 0)
 );
 
 COMMENT ON TABLE public.product_stock IS 'Stock actual de cada producto. Control manual de inventario.';
 COMMENT ON COLUMN public.product_stock.quantity IS 'Cantidad actual en stock. NUMERIC(12,3) para soportar unidades y pesos. Puede ser negativa: un pedido nunca se rechaza por stock (#160, ADR-0016).';
 COMMENT ON COLUMN public.product_stock.min_stock IS 'Umbral minimo para alertas de stock bajo. NULL = sin alerta.';
+COMMENT ON COLUMN public.product_stock.max_stock IS 'Tope del Disponible de un combo en /admin/stock y en el CSV de catalogo (#184). NULL = sin tope. No entra en el Disponible del catalogo (#159).';
 COMMENT ON COLUMN public.product_stock.updated_by IS 'UUID del admin que realizo la ultima actualizacion.';
 COMMENT ON COLUMN public.product_stock.notes IS 'Nota opcional sobre la ultima actualizacion (ej: motivo del ajuste).';
 

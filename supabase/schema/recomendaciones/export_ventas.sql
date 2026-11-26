@@ -105,7 +105,7 @@ BEGIN
       ELSE 'unid'
     END,
 
-    COALESCE(p.price, 0),
+    COALESCE(public.effective_price(p), 0),
     oi.subtotal,
     ROUND(oi.quantity * oi.unit_cost, 2),
     ROUND(oi.subtotal - (oi.quantity * oi.unit_cost), 2),
@@ -132,7 +132,7 @@ BEGIN
     o.id, o.status, o.created_at, o.confirmed_at, o.total,
     c.display_code, c.barrio, c.manzana_lote,
     oi.id, oi.product_name, oi.quantity, oi.unit_price, oi.unit_cost, oi.subtotal, oi.from_suggestion,
-    p.sale_type, p.is_combo, p.price,
+    p.sale_type, p.is_combo, public.effective_price(p),
     cat.name
 
   ORDER BY o.created_at DESC, o.id, oi.id;

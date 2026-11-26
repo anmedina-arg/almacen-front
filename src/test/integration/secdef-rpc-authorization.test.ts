@@ -84,7 +84,7 @@ describe('RPC SECURITY DEFINER: quién puede llamar a qué (#154)', () => {
   async function createProduct(storeId: number) {
     const { data, error } = await admin
       .from('products')
-      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, cost: 50, image: '', categories: '', store_id: storeId, active: false })
+      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, image: '', store_id: storeId, active: false })
       .select('id')
       .single();
     expect(error).toBeNull();

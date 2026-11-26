@@ -7,7 +7,7 @@
 -- (día actual: product_stock.quantity; días anteriores: último
 -- stock_movement_log.new_qty conocido). Fórmula de valorización según
 -- sale_type: kg → (qty/1000)*cost, 100gr → (qty/100)*cost, unit → qty*cost.
--- Solo incluye productos con cost > 0 y snapshots con valor > 0.
+-- Solo incluye productos con costo > 0 y snapshots con valor > 0.
 --
 -- Usada por /admin/dashboard (src/app/[store]/api/dashboard/stock-value-history).
 --
@@ -25,6 +25,11 @@
 -- falta el DROP FUNCTION exacto de nuevo): get_stock_value_per_day(date, date).
 --
 -- Aplicada y confirmada en producción el 2026-08-24 (pg_get_function_identity_arguments).
+--
+-- #189 (spec #179): el costo sale de product_costs, no de la columna products.cost, que se
+-- borra (misma firma). Y sin el módulo `costos` no hay valor al costo que calcular: la
+-- función no devuelve filas, así un admin que la llame directo por RPC no obtiene costos
+-- de una Store que no los tiene (cierra el límite que dejó #187).
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.get_stock_value_per_day(
@@ -48,6 +53,10 @@ BEGIN
     RAISE EXCEPTION 'Forbidden: Store admin access required';
   END IF;
 
+  IF NOT public.is_costs_enabled(p_store_id) THEN
+    RETURN;
+  END IF;
+
   CREATE TEMP TABLE IF NOT EXISTS _sv_snapshots (
     product_id INTEGER,
     day_date   DATE,
@@ -65,7 +74,8 @@ BEGIN
       SELECT ps.product_id, v_day, ps.quantity
       FROM product_stock ps
       JOIN products p ON p.id = ps.product_id
-      WHERE p.active = true AND p.cost > 0
+      JOIN product_costs pc ON pc.product_id = p.id AND pc.cost > 0
+      WHERE p.active = true
         AND p.store_id = p_store_id;
 
     ELSE
@@ -74,8 +84,8 @@ BEGIN
         sml.product_id, v_day, sml.new_qty
       FROM stock_movement_log sml
       JOIN products p ON p.id = sml.product_id
+      JOIN product_costs pc ON pc.product_id = p.id AND pc.cost > 0
       WHERE p.active = true
-        AND p.cost > 0
         AND p.store_id = p_store_id
         AND sml.created_at < (v_day + INTERVAL '1 day')
       ORDER BY sml.product_id, sml.created_at DESC;
@@ -90,20 +100,21 @@ BEGIN
     COALESCE(c.name, 'Sin categoría')::TEXT AS category_name,
     ROUND(SUM(
       CASE p.sale_type
-        WHEN 'kg'    THEN (s.qty / 1000) * p.cost
-        WHEN '100gr' THEN (s.qty / 100)  * p.cost
-        ELSE              s.qty           * p.cost
+        WHEN 'kg'    THEN (s.qty / 1000) * pc.cost
+        WHEN '100gr' THEN (s.qty / 100)  * pc.cost
+        ELSE              s.qty           * pc.cost
       END
     ))::NUMERIC AS total_value
   FROM _sv_snapshots s
   JOIN products p ON p.id = s.product_id
+  JOIN product_costs pc ON pc.product_id = p.id
   LEFT JOIN categories c ON c.id = p.category_id
   GROUP BY s.day_date, COALESCE(c.name, 'Sin categoría')
   HAVING SUM(
     CASE p.sale_type
-      WHEN 'kg'    THEN (s.qty / 1000) * p.cost
-      WHEN '100gr' THEN (s.qty / 100)  * p.cost
-      ELSE              s.qty           * p.cost
+      WHEN 'kg'    THEN (s.qty / 1000) * pc.cost
+      WHEN '100gr' THEN (s.qty / 100)  * pc.cost
+      ELSE              s.qty           * pc.cost
     END
   ) > 0
   ORDER BY s.day_date, category_name;

@@ -3,6 +3,7 @@ import { createApiRoute } from '@/lib/api/createApiRoute';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { exportVentas, rowsToCsv } from '@/features/recomendaciones/services/reportsService';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 
 /**
  * GET /api/reports/ventas
@@ -16,7 +17,7 @@ export const GET = createApiRoute(requireAdmin)(async (ctx) => {
     const startDate = searchParams.get('start_date');
     const endDate = searchParams.get('end_date');
 
-    const rows = await exportVentas(ctx.supabase, ctx.storeId, { startDate, endDate });
+    const rows = await exportVentas(ctx.supabase, ctx.storeId, { startDate, endDate }, { costsEnabled: await getCostsEnabled(ctx) });
     const csv = rowsToCsv(rows);
     const filename = `ventas_${(startDate ?? 'inicio').slice(0, 10)}_a_${(endDate ?? 'hoy').slice(0, 10)}.csv`;
 

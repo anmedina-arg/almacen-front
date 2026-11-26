@@ -10,7 +10,8 @@ import { useFeatureFlags } from '../../context/FeatureFlagsContext';
 import type { OrderStatus } from '../../types/order.types';
 import { OrderStatusBadge } from './OrderStatusBadge';
 import { OrderItemsEditor } from './OrderItemsEditor';
-import { computeMargin, MarginDisplay } from './MarginDisplay';
+import { MarginDisplay } from './MarginDisplay';
+import { computeOrderMargin } from '@/features/orders/utils/orderMargin';
 import { formatAdminDate } from '../../utils/formatDate';
 import { Spinner } from '@/components/ui/Spinner';
 import { formatPrice } from '@/utils/formatPrice';
@@ -35,7 +36,7 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
   const cancelOrder = useCancelOrder();
   const deleteOrder = useDeleteOrder();
   const updateOrder = useUpdateOrder();
-  const { stock: stockEnabled } = useFeatureFlags();
+  const { stock: stockEnabled, costos: costosEnabled } = useFeatureFlags();
 
   const [showWhatsAppMessage, setShowWhatsAppMessage] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
@@ -120,11 +121,12 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
               {/* Order info */}
               <div className="space-y-3">
                 {(() => {
-                  const margin = order.order_items.reduce((sum, item) => {
-                    const { margin: m } = computeMargin(Number(item.unit_price), Number(item.unit_cost), Number(item.subtotal));
-                    return sum + m;
-                  }, 0);
-                  const marginPct = Number(order.total) > 0 ? (margin / Number(order.total)) * 100 : 0;
+                  // Solo con el módulo `costos` (#186) y solo con los ítems que tienen costo.
+                  const orderMargin = costosEnabled
+                    ? computeOrderMargin(
+                        order.order_items.map((item) => ({ unit_price: item.unit_price, unit_cost: item.unit_cost ?? 0, subtotal: item.subtotal }))
+                      )
+                    : null;
                   return (
                     <div className="flex items-start justify-between">
                       <OrderStatusBadge status={order.status} />
@@ -132,9 +134,16 @@ export function OrderDetailModal({ orderId, onClose }: OrderDetailModalProps) {
                         <p className="text-2xl font-bold text-gray-800">
                           {formatPrice(order.total)}
                         </p>
-                        <p className="text-sm mt-0.5">
-                          <MarginDisplay label="Margen" margin={margin} marginPct={marginPct} />
-                        </p>
+                        {orderMargin && (
+                          <p className="text-sm mt-0.5">
+                            <MarginDisplay
+                              label="Margen"
+                              margin={orderMargin.margin}
+                              marginPct={orderMargin.margin_pct}
+                              partial={orderMargin.cost_coverage === 'partial'}
+                            />
+                          </p>
+                        )}
                       </div>
                     </div>
                   );

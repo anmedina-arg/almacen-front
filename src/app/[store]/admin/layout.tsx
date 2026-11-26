@@ -25,12 +25,11 @@ export default async function AdminLayout({
   //
   // getStoreBySlug/getStoreFeatureFlags no dependen del resultado de la
   // auth (solo necesitan el slug) — se corren en paralelo con
-  // verifyStoreAdminAuth en vez de esperarla (#144, spec #139). Siguen
-  // recibiendo supabaseServer (no el cliente cookie-based de la auth) a
-  // propósito: cache() de React memoiza por identidad del cliente, y
-  // supabaseServer es el mismo objeto que ya usa [store]/layout.tsx para
-  // el mismo slug — cambiarlo acá duplicaría esa query en vez de seguir
-  // compartiéndola.
+  // verifyStoreAdminAuth en vez de esperarla (#144, spec #139).
+  // getStoreFeatureFlags sigue recibiendo supabaseServer (no el cliente
+  // cookie-based de la auth) a propósito: cache() de React memoiza por
+  // identidad del cliente, y así comparte la query con el resto de las pages.
+  // getStoreBySlug (#190) ya no recibe cliente: usa supabaseServer por dentro.
   // .catch() individuales acá a propósito (code review de #144): sin
   // esto, Promise.all falla atómico — un error transitorio en
   // getStoreBySlug/getStoreFeatureFlags tiraría abajo el resultado de
@@ -42,7 +41,7 @@ export default async function AdminLayout({
   // silencioso sería peor (2da pasada de code review de #144).
   //
   // Cobertura parcial, documentada a propósito en vez de asumida:
-  // getStoreBySlug comparte el mismo cache() (mismo client + slug) que
+  // getStoreBySlug comparte el mismo cache() (mismo slug) que
   // [store]/layout.tsx, el layout padre que envuelve a este — si esa
   // llamada de más arriba falla, revienta ahí antes de que este .catch()
   // llegue a correr. Y getStoreFeatureFlags también se llama sin guarda
@@ -52,7 +51,7 @@ export default async function AdminLayout({
   // de auth admin" (#144); queda como hallazgo para un ticket aparte.
   const [{ isStoreAdmin, userId }, storeData, flags] = await Promise.all([
     verifyStoreAdminAuth(store),
-    getStoreBySlug(supabaseServer, store).catch((err) => {
+    getStoreBySlug(store).catch((err) => {
       console.error('[AdminLayout] getStoreBySlug error:', err instanceof Error ? err.message : err);
       return null;
     }),

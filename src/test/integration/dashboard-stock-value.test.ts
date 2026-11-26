@@ -48,7 +48,7 @@ describe('conversión kg/100gr/unit en stock-by-category y stock-products (#126)
     // kg: cost=1000 (por kg), stock=2500g -> valor esperado 2500 (2.5kg * 1000)
     const { data: productKg, error: kgError } = await admin
       .from('products')
-      .insert({ name: `${slug}-kg`, price: 2000, cost: 1000, image: '', categories: '', store_id: storeId, active: true, sale_type: 'kg', category_id: categoryId })
+      .insert({ name: `${slug}-kg`, price: 2000, image: '', store_id: storeId, active: true, sale_type: 'kg', category_id: categoryId })
       .select('id')
       .single();
     expect(kgError).toBeNull();
@@ -57,7 +57,7 @@ describe('conversión kg/100gr/unit en stock-by-category y stock-products (#126)
     // 100gr: cost=50 (por 100gr), stock=250g -> valor esperado 125 (2.5 * 50)
     const { data: product100gr, error: gError } = await admin
       .from('products')
-      .insert({ name: `${slug}-100gr`, price: 100, cost: 50, image: '', categories: '', store_id: storeId, active: true, sale_type: '100gr', category_id: categoryId })
+      .insert({ name: `${slug}-100gr`, price: 100, image: '', store_id: storeId, active: true, sale_type: '100gr', category_id: categoryId })
       .select('id')
       .single();
     expect(gError).toBeNull();
@@ -66,11 +66,19 @@ describe('conversión kg/100gr/unit en stock-by-category y stock-products (#126)
     // unit: cost=10 (por unidad), stock=5 -> valor esperado 50
     const { data: productUnit, error: uError } = await admin
       .from('products')
-      .insert({ name: `${slug}-unit`, price: 20, cost: 10, image: '', categories: '', store_id: storeId, active: true, sale_type: 'unit', category_id: categoryId })
+      .insert({ name: `${slug}-unit`, price: 20, image: '', store_id: storeId, active: true, sale_type: 'unit', category_id: categoryId })
       .select('id')
       .single();
     expect(uError).toBeNull();
     productUnitId = productUnit!.id;
+
+    // El costo vive en product_costs (#189).
+    const { error: costError } = await admin.from('product_costs').insert([
+      { product_id: productKgId, store_id: storeId, cost: 1000 },
+      { product_id: product100grId, store_id: storeId, cost: 50 },
+      { product_id: productUnitId, store_id: storeId, cost: 10 },
+    ]);
+    expect(costError).toBeNull();
 
     await admin.from('product_price_history').delete().in('product_id', [productKgId, product100grId, productUnitId]);
 
@@ -86,6 +94,7 @@ describe('conversión kg/100gr/unit en stock-by-category y stock-products (#126)
     if (!hasCredentials) return;
     await admin.from('stock_movement_log').delete().in('product_id', [productKgId, product100grId, productUnitId]);
     await admin.from('product_stock').delete().in('product_id', [productKgId, product100grId, productUnitId]);
+    await admin.from('product_costs').delete().in('product_id', [productKgId, product100grId, productUnitId]);
     await admin.from('product_price_history').delete().in('product_id', [productKgId, product100grId, productUnitId]);
     await admin.from('products').delete().in('id', [productKgId, product100grId, productUnitId]);
     await admin.from('categories').delete().eq('id', categoryId);

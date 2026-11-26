@@ -6,6 +6,8 @@ import type { CreateOrderSchemaInput, UpdateOrderSchemaInput, AddOrderItemSchema
 import type { SetPaymentsSchema } from '../schemas/paymentSchemas';
 import type { AssignClientSchema } from '../schemas/clientSchemas';
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
+import { omitItemCost, orderCostFields, type CostCoverage } from '../utils/orderMargin';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
 
 /**
  * Service de Orders (#119 núcleo + #120 items/payments/client) — ver
@@ -14,48 +16,55 @@ import { NotFoundError, ValidationError } from '@/lib/api/errors';
  * cuenta, sin pasar por acá todavía.
  */
 
-type OrderWithMargin = Order & { total_cost: number; margin: number; margin_pct: number; has_pending_shortfall: boolean };
-type ListedOrderItem = { unit_cost: number; unit_price: number; subtotal: number; product_name: string; shortfall: number | null };
+/**
+ * Costo y margen de un pedido (#186): solo con el módulo `costos`. Sin él la
+ * respuesta no trae `total_cost`, `margin`, `margin_pct` ni `cost_coverage`.
+ */
+type OrderWithMargin = Order & {
+  total_cost?: number | null;
+  margin?: number | null;
+  margin_pct?: number | null;
+  cost_coverage?: CostCoverage;
+  has_pending_shortfall: boolean;
+};
 
-export async function getOrders(supabase: SupabaseClient, storeId: number): Promise<OrderWithMargin[]> {
+type ListedOrderItem = { unit_cost?: number; unit_price: number; subtotal: number; product_name: string; shortfall: number | null };
+
+export async function getOrders(
+  supabase: SupabaseClient,
+  storeId: number,
+  options: CostOptions = NO_COSTS
+): Promise<OrderWithMargin[]> {
   const { data, error } = await supabase
     .from('orders')
     // Trae los ítems en la misma query (evita un segundo round-trip que
     // pueda fallar/devolver vacío de forma independiente del principal).
-    .select('*, order_items(unit_cost, unit_price, subtotal, product_name, shortfall), clients(id, barrio, manzana_lote, display_code, created_at), order_payments(id, method, amount)')
+    .select(`*, order_items(${options.costsEnabled ? 'unit_cost, ' : ''}unit_price, subtotal, product_name, shortfall), clients(id, barrio, manzana_lote, display_code, created_at), order_payments(id, method, amount)`)
     .eq('store_id', storeId)
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);
 
-  // Margen por orden a partir de sus ítems anidados. subtotal * (unit_cost /
-  // unit_price) en vez de quantity * unit_cost — evita el error de 100x en
-  // productos por peso, donde quantity está en gramos crudos pero
-  // unit_price/unit_cost son por 100gr.
+  // Margen por orden a partir de sus ítems anidados, solo con el módulo `costos`
+  // y solo con los ítems que tienen costo registrado (ver computeOrderMargin).
   return (data ?? []).map((order) => {
     const { order_items, clients: client, order_payments, ...orderFields } = order;
     const items = (order_items as unknown as ListedOrderItem[]) ?? [];
-    const total_cost = items.reduce((acc, item) => {
-      const unitPrice = Number(item.unit_price);
-      const itemCost = unitPrice > 0 ? Number(item.subtotal) * (Number(item.unit_cost) / unitPrice) : 0;
-      return acc + itemCost;
-    }, 0);
     const product_names = items.map((i) => i.product_name).filter(Boolean);
-    const total = Number(orderFields.total);
-    const margin = total - total_cost;
-    const margin_pct = total > 0 ? (margin / total) * 100 : 0;
+    const costFields = orderCostFields(items, options.costsEnabled);
     // Marca "con faltante" (#162): solo pendientes, que es cuando el Store
     // admin todavía tiene que resolverlo. El Faltante en sí queda en el
     // detalle en cualquier estado. Sin Control de stock shortfall es NULL.
     const has_pending_shortfall = orderFields.status === 'pending' && items.some((i) => Number(i.shortfall) > 0);
-    return { ...orderFields, total_cost, margin, margin_pct, client: client ?? null, order_payments: order_payments ?? [], product_names, has_pending_shortfall } as OrderWithMargin;
+    return { ...orderFields, ...costFields, client: client ?? null, order_payments: order_payments ?? [], product_names, has_pending_shortfall } as OrderWithMargin;
   });
 }
 
 export async function getOrderById(
   supabase: SupabaseClient,
   storeId: number,
-  orderId: number
+  orderId: number,
+  options: CostOptions = NO_COSTS
 ): Promise<OrderWithItems | null> {
   const { data, error } = await supabase
     .from('orders')
@@ -67,7 +76,9 @@ export async function getOrderById(
     .maybeSingle();
 
   if (error) throw new Error(error.message);
-  return (data as unknown as OrderWithItems) ?? null;
+  const order = (data as unknown as OrderWithItems) ?? null;
+  if (!order || options.costsEnabled) return order;
+  return { ...order, order_items: order.order_items.map((item) => omitItemCost(item) as OrderItem) };
 }
 
 export async function createOrder(
@@ -77,44 +88,24 @@ export async function createOrder(
 ): Promise<{ order_id: number; total: number; status: string; items_count: number }> {
   const { notes, whatsapp_message, items } = input;
 
-  // unit_cost se calcula server-side a partir del precio/costo vigente del
-  // producto — el cliente solo manda unit_price (normalizado a
-  // precio-por-unidad-base en el carrito). .eq('store_id', storeId): un
-  // product_id de otra Store no matchea acá, así que cae al mismo fallback
-  // (unit_cost 0) que un product_id inexistente.
-  const productIds = items.map((i) => i.product_id);
-  const { data: productsData } = await supabase
-    .from('products')
-    .select('id, price, cost')
-    .eq('store_id', storeId)
-    .in('id', productIds);
-  const productMap = new Map<number, { price: number; cost: number }>(
-    (productsData ?? []).map((p) => [p.id, { price: Number(p.price ?? 0), cost: Number(p.cost ?? 0) }])
-  );
-
+  // El cliente solo manda unit_price (normalizado a precio-por-unidad-base en el carrito).
+  // unit_cost lo fija la base al insertar el ítem (trigger set_order_item_unit_cost, #189): el
+  // Costo ya no es público, y este checkout corre con la sesión del visitante, que no lo puede
+  // leer. Un product_id de otra Store o inexistente queda con unit_cost 0.
   const { data, error } = await supabase.rpc('create_order', {
     p_user_id: null,
     p_notes: notes || null,
     p_whatsapp_message: whatsapp_message,
-    p_items: items.map((item) => {
-      const prod = productMap.get(item.product_id);
-      // price=0 (ej. promocional/regalo con costo real cargado) -> unit_cost
-      // 0, no el costo real — así se comportaba ya el checkout de WhatsApp
-      // antes de #121. POS antes mandaba el costo crudo del producto
-      // directo (sin este guard), pero unificarlo acá es el objetivo del
-      // ticket: mismo cálculo para las dos entradas al mismo dominio
-      // (code review de #121, aceptado a propósito, no es un bug nuevo).
-      const unit_cost = prod && prod.price > 0 ? item.unit_price * (prod.cost / prod.price) : 0;
-      return {
-        product_id: item.product_id,
-        product_name: item.product_name,
-        quantity: item.quantity,
-        unit_price: item.unit_price,
-        unit_cost,
-        is_by_weight: item.is_by_weight,
-        from_suggestion: item.from_suggestion ?? false,
-      };
-    }),
+    // price=0 (ej. promocional/regalo con costo real cargado) -> unit_cost 0, no el costo real
+    // (decidido en #121, ahora lo resuelve el trigger).
+    p_items: items.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.product_name,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      is_by_weight: item.is_by_weight,
+      from_suggestion: item.from_suggestion ?? false,
+    })),
     p_store_id: storeId,
   });
 
@@ -285,7 +276,8 @@ export async function addOrderItem(
   supabase: SupabaseClient,
   storeId: number,
   orderId: number,
-  input: AddOrderItemSchemaInput
+  input: AddOrderItemSchemaInput,
+  options: CostOptions = NO_COSTS
 ): Promise<OrderItem> {
   // #103: el producto tiene que pertenecer a esta Store — el trigger
   // validate_order_item_store ya lo bloquearía a nivel de base, pero acá
@@ -294,13 +286,11 @@ export async function addOrderItem(
   // code review de #120.
   const [, productResult] = await Promise.all([
     assertOrderIsPending(supabase, storeId, orderId),
-    supabase.from('products').select('price, cost').eq('id', input.product_id).eq('store_id', storeId).maybeSingle(),
+    supabase.from('products').select('id').eq('id', input.product_id).eq('store_id', storeId).maybeSingle(),
   ]);
-  const product = productResult.data;
-  if (!product) throw new ValidationError('Producto no encontrado en esta Store');
+  if (!productResult.data) throw new ValidationError('Producto no encontrado en esta Store');
 
-  const unit_cost = Number(product.price) > 0 ? input.unit_price * (Number(product.cost ?? 0) / Number(product.price)) : 0;
-
+  // unit_cost lo fija la base al insertar el ítem (trigger set_order_item_unit_cost, #189).
   const { data, error } = await supabase
     .from('order_items')
     .insert({
@@ -309,7 +299,6 @@ export async function addOrderItem(
       product_name: input.product_name,
       quantity: input.quantity,
       unit_price: input.unit_price,
-      unit_cost,
       is_by_weight: input.is_by_weight,
       store_id: storeId,
     })
@@ -317,7 +306,7 @@ export async function addOrderItem(
     .single();
 
   if (error) throw new Error(error.message);
-  return data;
+  return options.costsEnabled ? data : (omitItemCost(data) as OrderItem);
 }
 
 export async function updateOrderItem(
@@ -325,7 +314,8 @@ export async function updateOrderItem(
   storeId: number,
   orderId: number,
   itemId: number,
-  input: UpdateOrderItemSchemaInput
+  input: UpdateOrderItemSchemaInput,
+  options: CostOptions = NO_COSTS
 ): Promise<OrderItem> {
   // Recalcula unit_cost desde el costo vigente del producto (corrige ítems
   // agregados sin costo en su momento). En paralelo con el chequeo de la
@@ -338,10 +328,14 @@ export async function updateOrderItem(
 
   let unit_cost: number | undefined;
   if (existingItem) {
-    const { data: product } = await supabase.from('products').select('price, cost').eq('id', existingItem.product_id).eq('store_id', storeId).maybeSingle();
+    // El costo sale de product_costs (#189): sin fila es "sin costo registrado" y el ítem queda en 0.
+    const [{ data: product }, { data: costRow }] = await Promise.all([
+      supabase.from('products').select('price:effective_price').eq('id', existingItem.product_id).eq('store_id', storeId).maybeSingle(),
+      supabase.from('product_costs').select('cost').eq('product_id', existingItem.product_id).eq('store_id', storeId).maybeSingle(),
+    ]);
     if (product && Number(product.price) > 0) {
       const effectiveUnitPrice = input.unit_price ?? existingItem.unit_price;
-      unit_cost = effectiveUnitPrice * (Number(product.cost ?? 0) / Number(product.price));
+      unit_cost = effectiveUnitPrice * (Number(costRow?.cost ?? 0) / Number(product.price));
     } else {
       unit_cost = 0;
     }
@@ -362,7 +356,7 @@ export async function updateOrderItem(
     if (error.code === 'PGRST116') throw new NotFoundError('Item no encontrado');
     throw new Error(error.message);
   }
-  return data;
+  return options.costsEnabled ? data : (omitItemCost(data) as OrderItem);
 }
 
 /**

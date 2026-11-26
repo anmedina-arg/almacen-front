@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { updateOrderSchema } from '@/features/orders/schemas/orderSchemas';
 import { getOrderById, updateOrder, deleteOrder } from '@/features/orders/services/orderService';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 import { invalidateProductStockTags } from '@/features/products/services/invalidateProductStock';
 
 /**
@@ -17,7 +18,7 @@ export const GET = createApiRoute<{ orderId: string }>(requireAdmin)(async (ctx,
       return NextResponse.json({ error: 'ID de orden invalido' }, { status: 400 });
     }
 
-    const order = await getOrderById(ctx.supabase, ctx.storeId, orderId);
+    const order = await getOrderById(ctx.supabase, ctx.storeId, orderId, { costsEnabled: await getCostsEnabled(ctx) });
     if (!order) {
       return NextResponse.json({ error: 'Orden no encontrada' }, { status: 404 });
     }

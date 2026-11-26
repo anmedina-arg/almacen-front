@@ -62,6 +62,13 @@ CREATE TRIGGER trg_validate_order_item_store
   FOR EACH ROW
   EXECUTE FUNCTION validate_order_item_store();
 
+-- #189: el costo del ítem se fija al insertarlo, desde product_costs (ver set_order_item_unit_cost.sql).
+DROP TRIGGER IF EXISTS trg_set_order_item_unit_cost ON public.order_items;
+CREATE TRIGGER trg_set_order_item_unit_cost
+  BEFORE INSERT ON public.order_items
+  FOR EACH ROW
+  EXECUTE FUNCTION set_order_item_unit_cost();
+
 DROP TRIGGER IF EXISTS trg_recalculate_order_total ON public.order_items;
 CREATE TRIGGER trg_recalculate_order_total
   AFTER INSERT OR UPDATE OR DELETE ON public.order_items

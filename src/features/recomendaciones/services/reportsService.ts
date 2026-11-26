@@ -1,5 +1,7 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { NotFoundError } from '@/lib/api/errors';
+import { applyExportCosts } from '../utils/exportCosts';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
 
 /**
  * Service de Informes (CSV exports) — parte del dominio Recomendaciones/
@@ -7,11 +9,16 @@ import { NotFoundError } from '@/lib/api/errors';
  * copiada, sin variar, en las dos rutas de export.
  */
 
-export async function exportProductos(supabase: SupabaseClient, storeId: number): Promise<Record<string, unknown>[]> {
+/** Costo y margen de los informes salen solo con el módulo `costos` (#186). */
+export async function exportProductos(
+  supabase: SupabaseClient,
+  storeId: number,
+  options: CostOptions = NO_COSTS
+): Promise<Record<string, unknown>[]> {
   const { data, error } = await supabase.rpc('export_productos', { p_store_id: storeId });
   if (error) throw new Error(error.message);
   if (!data || data.length === 0) throw new NotFoundError('Sin productos para exportar');
-  return data as Record<string, unknown>[];
+  return applyExportCosts(data as Record<string, unknown>[], 'productos', options.costsEnabled);
 }
 
 export interface ExportVentasParams {
@@ -22,7 +29,8 @@ export interface ExportVentasParams {
 export async function exportVentas(
   supabase: SupabaseClient,
   storeId: number,
-  params: ExportVentasParams
+  params: ExportVentasParams,
+  options: CostOptions = NO_COSTS
 ): Promise<Record<string, unknown>[]> {
   const { data, error } = await supabase.rpc('export_ventas', {
     p_store_id: storeId,
@@ -31,7 +39,7 @@ export async function exportVentas(
   });
   if (error) throw new Error(error.message);
   if (!data || data.length === 0) throw new NotFoundError('Sin datos para el período seleccionado');
-  return data as Record<string, unknown>[];
+  return applyExportCosts(data as Record<string, unknown>[], 'ventas', options.costsEnabled);
 }
 
 function escapeCsvValue(val: unknown): string {

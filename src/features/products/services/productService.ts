@@ -4,6 +4,16 @@ import type { CreateProductInput, UpdateProductInput } from '../schemas/productS
 import { NotFoundError, ValidationError } from '@/lib/api/errors';
 import { COMBO_NEEDS_COMPONENTS } from '../schemas/comboSchemas';
 import { updateComboComponents } from './comboService';
+import { setProductCost } from './productCostService';
+import { setProductMaxStock } from './productStockService';
+import { NO_COSTS, type CostOptions } from '@/lib/store/costOptions';
+import type { StockOptions } from '@/lib/store/stockOptions';
+
+/**
+ * Módulos de la Store que cambian lo que el producto guarda y devuelve: `costos` (#183)
+ * y `stock` (#184, el máximo de stock). Ambos fallan cerrado si el caller no los indica.
+ */
+export type ProductModuleOptions = CostOptions & Partial<StockOptions>;
 
 /**
  * Service del dominio Products — ver ADR-0013, mismo patrón que
@@ -11,17 +21,20 @@ import { updateComboComponents } from './comboService';
  * único lugar que filtra `store_id` para su operación.
  */
 
-const PRODUCT_COLUMNS = `
+/**
+ * Columnas del producto. El Costo (#183) no es una columna del producto: vive en
+ * `product_costs` y se pide solo cuando la flag `costos` está encendida y quien
+ * lee es el Store admin (ver `productColumns`). El máximo de stock (#184) tampoco:
+ * vive en `product_stock.max_stock` y lo trae `listProductMaxStocks`.
+ */
+const BASE_COLUMNS = `
   id,
   name,
   price,
-  cost,
   image,
   active,
-  categories,
   sale_type,
   is_combo,
-  max_stock,
   category_id,
   subcategory_id,
   is_producto_surtido,
@@ -32,18 +45,27 @@ const PRODUCT_COLUMNS = `
   sub:subcategories!products_subcategory_id_fkey(id, name)
 `;
 
+const COST_EMBED = 'cost_row:product_costs!product_costs_product_store_fk(cost)';
+
+const productColumns = (withCost: boolean): string => (withCost ? `${BASE_COLUMNS}, ${COST_EMBED}` : BASE_COLUMNS);
+
+
 type JoinedRow = Record<string, unknown> & {
   cat?: { id: number; name: string } | null;
   sub?: { id: number; name: string } | null;
+  cost_row?: { cost: number | string } | null;
 };
 
 function flatten(row: JoinedRow): Product {
-  const { cat, sub, ...rest } = row;
-  return {
+  const { cat, sub, cost_row, ...rest } = row;
+  const product = {
     ...rest,
     category_name: cat?.name ?? null,
     subcategory_name: sub?.name ?? null,
   } as Product;
+  // `cost_row` solo viene si se pidió el costo; sin fila, el producto no tiene costo registrado.
+  if ('cost_row' in row) product.cost = cost_row ? Number(cost_row.cost) : null;
+  return product;
 }
 
 /**
@@ -94,7 +116,7 @@ export async function getProductById(
 ): Promise<Product | null> {
   const { data, error } = await supabase
     .from('products')
-    .select(PRODUCT_COLUMNS)
+    .select(productColumns(false))
     .eq('id', id)
     .eq('store_id', storeId)
     .maybeSingle();
@@ -107,7 +129,8 @@ export async function getProductById(
 export async function createProduct(
   supabase: SupabaseClient,
   storeId: number,
-  input: CreateProductInput
+  input: CreateProductInput,
+  options: ProductModuleOptions = NO_COSTS
 ): Promise<Product> {
   // #167: createProductSchema ya lo exige; esto cubre a un caller que arme el
   // input sin pasar por el esquema.
@@ -123,15 +146,10 @@ export async function createProduct(
     .insert({
       name: input.name,
       price: input.price,
-      cost: input.cost,
       image: input.image,
-      // main_category (legacy) ya no se escribe desde #133: queda el DEFAULT
-      // 'otros' de la columna hasta que se dropee (paso separado, post-deploy).
-      categories: input.categories,
       active: input.active,
       sale_type: input.sale_type,
       is_combo: input.is_combo,
-      max_stock: input.max_stock ?? null,
       category_id: input.category_id,
       subcategory_id: input.subcategory_id ?? null,
       is_producto_surtido: input.is_producto_surtido,
@@ -140,7 +158,7 @@ export async function createProduct(
       max_variedades: input.max_variedades ?? null,
       store_id: storeId,
     })
-    .select(PRODUCT_COLUMNS)
+    .select(productColumns(false))
     .single();
 
   if (error) {
@@ -153,6 +171,35 @@ export async function createProduct(
   }
 
   const product = flatten(data as unknown as JoinedRow);
+
+  // #183: el Costo va a su tabla, y solo si la Store tiene el módulo. Mismo criterio de
+  // atomicidad que el alta de combos: si el costo no se puede guardar, no queda un
+  // producto a medias.
+  if (options.costsEnabled) {
+    product.cost = input.cost ?? null;
+    if (input.cost != null) {
+      try {
+        await setProductCost(supabase, storeId, product.id, input.cost);
+      } catch (costError) {
+        await supabase.from('products').delete().eq('id', product.id).eq('store_id', storeId);
+        throw costError;
+      }
+    }
+  }
+
+  // #184: el máximo va a product_stock, y solo si la Store tiene el módulo `stock`. Mismo
+  // criterio de atomicidad que el Costo: si no se puede guardar, no queda un producto a medias.
+  if (options.stockEnabled) {
+    product.max_stock = input.max_stock ?? null;
+    if (input.max_stock != null) {
+      try {
+        await setProductMaxStock(supabase, storeId, product.id, input.max_stock);
+      } catch (stockError) {
+        await supabase.from('products').delete().eq('id', product.id).eq('store_id', storeId);
+        throw stockError;
+      }
+    }
+  }
 
   // #167: el alta de un combo es atómica. Antes eran dos pedidos (producto y
   // después componentes) y, si el segundo fallaba, quedaba un combo huérfano
@@ -184,7 +231,8 @@ export async function updateProduct(
   supabase: SupabaseClient,
   storeId: number,
   id: number,
-  input: UpdateProductInput
+  input: UpdateProductInput,
+  options: ProductModuleOptions = NO_COSTS
 ): Promise<Product> {
   await assertOwnership(supabase, storeId, input);
 
@@ -215,13 +263,10 @@ export async function updateProduct(
   const updates: Record<string, unknown> = {};
   if (input.name !== undefined) updates.name = input.name;
   if (input.price !== undefined) updates.price = input.price;
-  if (input.cost !== undefined) updates.cost = input.cost;
   if (input.image !== undefined) updates.image = input.image;
-  if (input.categories !== undefined) updates.categories = input.categories;
   if (input.active !== undefined) updates.active = input.active;
   if (input.sale_type !== undefined) updates.sale_type = input.sale_type;
   if (input.is_combo !== undefined) updates.is_combo = input.is_combo;
-  if ('max_stock' in input) updates.max_stock = input.max_stock ?? null;
   if ('category_id' in input) updates.category_id = input.category_id ?? null;
   if ('subcategory_id' in input) updates.subcategory_id = input.subcategory_id ?? null;
   if (input.is_producto_surtido !== undefined) updates.is_producto_surtido = input.is_producto_surtido;
@@ -229,12 +274,14 @@ export async function updateProduct(
   if ('min_variedades' in input) updates.min_variedades = input.min_variedades ?? null;
   if ('max_variedades' in input) updates.max_variedades = input.max_variedades ?? null;
 
-  const { data, error } = await supabase
-    .from('products')
-    .update(updates)
+  // Un cambio que solo toca el Costo no actualiza ninguna columna del producto.
+  const productQuery = supabase.from('products');
+  const { data, error } = await (Object.keys(updates).length > 0
+    ? productQuery.update(updates)
+    : productQuery.select())
     .eq('id', id)
     .eq('store_id', storeId)
-    .select(PRODUCT_COLUMNS)
+    .select(productColumns(options.costsEnabled))
     .single();
 
   if (error) {
@@ -251,7 +298,15 @@ export async function updateProduct(
   // no filtra `orders` por store_id — product_id ya acota correctamente qué
   // order_items se tocan; scopear orders/order_items en serio es de Orders
   // (#119), no de este ticket.
-  if (input.cost !== undefined && input.cost > 0) {
+  // #183: con la flag `costos` apagada el costo no se escribe (ni se devuelve).
+  const costToWrite = options.costsEnabled ? input.cost : undefined;
+  if (costToWrite !== undefined) await setProductCost(supabase, storeId, id, costToWrite);
+
+  // #184: con la flag `stock` apagada el máximo no se escribe (ni se devuelve).
+  const maxToWrite = options.stockEnabled && 'max_stock' in input ? (input.max_stock ?? null) : undefined;
+  if (maxToWrite !== undefined) await setProductMaxStock(supabase, storeId, id, maxToWrite);
+
+  if (costToWrite != null && costToWrite > 0) {
     const { data: activeOrders } = await supabase
       .from('orders')
       .select('id')
@@ -261,14 +316,17 @@ export async function updateProduct(
       const orderIds = activeOrders.map((o: { id: number }) => o.id);
       await supabase
         .from('order_items')
-        .update({ unit_cost: input.cost })
+        .update({ unit_cost: costToWrite })
         .eq('product_id', id)
         .in('order_id', orderIds)
         .or('unit_cost.eq.0,unit_cost.is.null');
     }
   }
 
-  return flatten(data as unknown as JoinedRow);
+  const product = flatten(data as unknown as JoinedRow);
+  if (options.costsEnabled && costToWrite !== undefined) product.cost = costToWrite;
+  if (maxToWrite !== undefined) product.max_stock = maxToWrite;
+  return product;
 }
 
 export async function deleteProduct(supabase: SupabaseClient, storeId: number, id: number): Promise<void> {

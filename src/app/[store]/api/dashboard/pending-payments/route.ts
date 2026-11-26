@@ -4,6 +4,7 @@ import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { requireFlag } from '@/lib/store/requireFlag';
 import { handleServiceError } from '@/lib/api/handleServiceError';
 import { getPendingPayments } from '@/features/dashboard/services/dashboardService';
+import { getCostsEnabled } from '@/lib/store/getCostsEnabled';
 
 /**
  * GET /api/dashboard/pending-payments
@@ -15,7 +16,7 @@ export const GET = createApiRoute(requireAdmin, requireFlag('pagos'))(async (ctx
     const { searchParams } = new URL(ctx.request.url);
     const page = Math.max(1, Number(searchParams.get('page') ?? 1));
 
-    const result = await getPendingPayments(ctx.supabase, ctx.storeId, page);
+    const result = await getPendingPayments(ctx.supabase, ctx.storeId, page, { costsEnabled: await getCostsEnabled(ctx) });
     return NextResponse.json(result, {
       headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate, max-age=0', Pragma: 'no-cache', Expires: '0' },
     });

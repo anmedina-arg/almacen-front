@@ -47,7 +47,7 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
   async function createProduct(storeId: number, fields: Record<string, unknown> = {}): Promise<number> {
     const { data, error } = await admin
       .from('products')
-      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, image: '', categories: '', store_id: storeId, active: true, ...fields })
+      .insert({ name: `p-${randomUUID().slice(0, 8)}`, price: 100, image: '', store_id: storeId, active: true, ...fields })
       .select('id')
       .single();
     expect(error).toBeNull();
@@ -96,7 +96,7 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
     componentBId = await createProduct(trackedStoreId, { active: false });
     comboId = await createProduct(trackedStoreId, { is_combo: true });
     comboMissingRowId = await createProduct(trackedStoreId, { is_combo: true });
-    cappedComboId = await createProduct(trackedStoreId, { is_combo: true, max_stock: 2 });
+    cappedComboId = await createProduct(trackedStoreId, { is_combo: true });
     negativeId = await createProduct(trackedStoreId);
     comboNegativeComponentId = await createProduct(trackedStoreId, { is_combo: true });
 
@@ -113,6 +113,13 @@ describe('get_available_stock — Disponible del catálogo (#159)', () => {
     await addComponent(trackedStoreId, comboMissingRowId, noRowId, 1);
     // Alcanza para 3; el stock máximo (2) no entra en la regla (#159).
     await addComponent(trackedStoreId, cappedComboId, componentBId, 3);
+    // #184: el máximo vive en product_stock (fila con cantidad 0, un combo no tiene stock propio).
+    {
+      const { error } = await admin
+        .from('product_stock')
+        .insert({ product_id: cappedComboId, quantity: 0, max_stock: 2, store_id: trackedStoreId });
+      expect(error).toBeNull();
+    }
     // Un componente con stock negativo deja al combo en 0.
     await addComponent(trackedStoreId, comboNegativeComponentId, componentAId, 1);
     await addComponent(trackedStoreId, comboNegativeComponentId, negativeId, 1);

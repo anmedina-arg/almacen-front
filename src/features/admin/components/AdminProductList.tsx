@@ -8,21 +8,26 @@ import { useDeleteProduct } from '../hooks/useDeleteProduct';
 import { ProductFormModal } from './ProductFormModal';
 import { ComboFormModal } from './ComboFormModal';
 import { DeleteConfirmationModal } from './DeleteConfirmationModal';
+import { ImportProductsModal } from './ImportProductsModal';
 import { Spinner } from '@/components/ui/Spinner';
 import type { Product } from '@/types';
 import { formatPrice } from '@/utils/formatPrice';
 import { formatCategoryName } from '@/utils/formatCategoryName';
+import { useFeatureFlags } from '../context/FeatureFlagsContext';
 
 export function AdminProductList() {
   const { data: products, isLoading, error } = useProducts({ includeInactive: true });
   const toggleMutation = useToggleProductActive();
   const deleteMutation = useDeleteProduct();
+  // #183: el costo solo se muestra en las Stores con el módulo `costos`.
+  const { costos } = useFeatureFlags();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState<'all' | 'active' | 'inactive'>('all');
   const [filterType, setFilterType] = useState<'all' | 'products' | 'combos'>('all');
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isCreateComboModalOpen, setIsCreateComboModalOpen] = useState(false);
+  const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [deletingProduct, setDeletingProduct] = useState<Product | null>(null);
 
@@ -84,6 +89,12 @@ export function AdminProductList() {
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
           <button
+            onClick={() => setIsImportModalOpen(true)}
+            className="flex-1 sm:flex-none border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors font-medium text-sm"
+          >
+            Importar
+          </button>
+          <button
             onClick={() => setIsCreateComboModalOpen(true)}
             className="flex-1 sm:flex-none bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors font-medium text-sm"
           >
@@ -141,7 +152,7 @@ export function AdminProductList() {
                 <tr className="border-b border-gray-200 bg-gray-50">
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">Producto</th>
                   <th className="text-left py-3 px-4 font-semibold text-gray-600">Categoría</th>
-                  <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>
+                  {costos && <th className="text-right py-3 px-4 font-semibold text-gray-600">Costo</th>}
                   <th className="text-right py-3 px-4 font-semibold text-gray-600">Precio</th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">Activo</th>
                   <th className="text-center py-3 px-4 font-semibold text-gray-600">Acciones</th>
@@ -190,12 +201,14 @@ export function AdminProductList() {
                       {formatCategoryName(product.category_name)}
                     </td>
 
-                    {/* Costo */}
-                    <td className="py-3 px-4 text-right font-mono text-gray-500">
-                      {product.cost != null && product.cost > 0
-                        ? `${formatPrice(product.cost)}`
-                        : <span className="text-gray-300">—</span>}
-                    </td>
+                    {/* Costo: sin fila es "sin costo registrado" (#183) */}
+                    {costos && (
+                      <td className="py-3 px-4 text-right font-mono text-gray-500">
+                        {product.cost != null
+                          ? `${formatPrice(product.cost)}`
+                          : <span className="text-gray-300">—</span>}
+                      </td>
+                    )}
 
                     {/* Precio */}
                     <td className="py-3 px-4 text-right font-mono font-semibold text-gray-700">
@@ -276,7 +289,7 @@ export function AdminProductList() {
                       <span className="text-xs font-medium text-green-600">
                         {formatPrice(product.price)}
                       </span>
-                      {product.cost != null && product.cost > 0 && (
+                      {costos && product.cost != null && product.cost > 0 && (
                         <>
                           <span className="text-xs text-gray-400">|</span>
                           <span className="text-xs text-gray-500">
@@ -328,6 +341,7 @@ export function AdminProductList() {
       )}
 
       {/* Modales */}
+      {isImportModalOpen && <ImportProductsModal onClose={() => setIsImportModalOpen(false)} />}
       {isCreateModalOpen && (
         <ProductFormModal
           mode="create"
