@@ -2,7 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 import { DEFAULT_LOGO_URL } from '@/lib/store/defaultLogo';
 
@@ -12,8 +11,8 @@ export default async function RegisterPage({
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
-  const supabase = await createSupabaseServerClient();
-  const storeData = await getStoreBySlug(supabase, store);
+  // Si la consulta falla, la página sigue con el nombre genérico (#190).
+  const storeData = await getStoreBySlug(store).catch(() => null);
   const storeName = storeData?.name ?? 'la tienda';
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-12 bg-gray-50">

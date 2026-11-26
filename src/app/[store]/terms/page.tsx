@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 
 export default async function TermsPage({
@@ -8,8 +7,8 @@ export default async function TermsPage({
   params: Promise<{ store: string }>;
 }) {
   const { store } = await params;
-  const supabase = await createSupabaseServerClient();
-  const storeData = await getStoreBySlug(supabase, store);
+  // Si la consulta falla, la página sigue con el nombre genérico (#190).
+  const storeData = await getStoreBySlug(store).catch(() => null);
   const storeName = storeData?.name ?? 'la tienda';
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">

@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
-import { supabaseServer } from '@/lib/supabase/server';
 import { getStoreBySlug } from '@/lib/store/getStoreBySlug';
 
 type StoreLayoutProps = {
@@ -19,7 +18,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://chaskyapp.vercel.a
 // mostraban "Catálogo online" en vez de su propio nombre.
 export async function generateMetadata({ params }: StoreLayoutProps): Promise<Metadata> {
   const { store } = await params;
-  const data = await getStoreBySlug(supabaseServer, store);
+  // Si la consulta falla, la metadata cae a los valores genéricos en vez de
+  // tirar abajo el render: el layout (abajo) es quien decide qué mostrar.
+  const data = await getStoreBySlug(store).catch(() => null);
 
   const title = data?.name ?? 'Catálogo online';
   const logoUrl = data?.logo_url;
@@ -63,7 +64,7 @@ export async function generateMetadata({ params }: StoreLayoutProps): Promise<Me
 export default async function StoreLayout({ children, params }: StoreLayoutProps) {
   const { store } = await params;
 
-  const data = await getStoreBySlug(supabaseServer, store);
+  const data = await getStoreBySlug(store);
 
   if (!data) {
     notFound();

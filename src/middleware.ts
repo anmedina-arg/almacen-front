@@ -72,8 +72,16 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Verificar usuario autenticado (más seguro que getSession)
-  const { data: { user } } = await supabase.auth.getUser();
+  // Verificar usuario autenticado (más seguro que getSession). Si Supabase
+  // Auth falla (caída, timeout) se trata la request como anónima en vez de
+  // tirar un 500: así el catálogo público sigue disponible (#190). Es seguro
+  // para las rutas protegidas: sin usuario, abajo redirigen al login.
+  let user = null;
+  try {
+    ({ data: { user } } = await supabase.auth.getUser());
+  } catch (err) {
+    console.error('[middleware] auth.getUser falló:', err instanceof Error ? err.message : err);
+  }
 
   // Path relativo a la Store (sin el slug) para reusar la misma lógica de
   // rutas públicas/protegidas que había antes de mover todo bajo /[store].
