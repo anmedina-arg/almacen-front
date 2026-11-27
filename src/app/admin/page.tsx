@@ -1,6 +1,10 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { createSupabaseServerClient } from '@/lib/supabase/serverClient';
+import {
+  getPlatformAdminSession,
+  PLATFORM_ADMIN_LOGIN,
+} from '@/features/auth/utils/platformAdmin';
 import {
   getOrdersCountByStore,
   type StoreOrdersCount,
@@ -16,25 +20,18 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Panel del Platform admin (#151, ADR-0015). Primera pantalla: pedidos por
- * Store en una sola tabla. Cualquiera que no sea `super_admin` ve un 404,
- * igual que si la ruta no existiera — sin login propio de plataforma por
- * ahora: la sesión es la del login de cualquier Store.
+ * Store en una sola tabla. Sin sesión, el middleware manda a /admin/login
+ * (#194); con sesión pero sin rol `super_admin`, 404, igual que si la ruta
+ * no existiera.
  */
 export default async function PlatformAdminPage() {
   const supabase = await createSupabaseServerClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) notFound();
-
-  const { data: profile, error: profileError } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', user.id)
-    .maybeSingle();
-  if (profileError) console.error('[admin] no se pudo leer el perfil:', profileError.message);
-  if (profile?.role !== 'super_admin') notFound();
+  // Sin sesión el middleware ya manda a /admin/login (#194); esto cubre el
+  // caso de que la sesión no se pueda leer acá aunque haya pasado por él.
+  const { user, isSuperAdmin } = await getPlatformAdminSession(supabase);
+  if (!user) redirect(PLATFORM_ADMIN_LOGIN);
+  if (!isSuperAdmin) notFound();
 
   let stores: StoreOrdersCount[];
   try {

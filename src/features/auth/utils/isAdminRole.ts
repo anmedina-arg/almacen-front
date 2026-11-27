@@ -22,6 +22,11 @@
 // component that needs next/headers... not supported in the pages/
 // directory" — encontrado en #101 corriendo un build real, no solo tsc).
 export function isAdminRole(role: string | null | undefined, hasStoreMembership: boolean): boolean {
-  if (role === 'super_admin') return true;
+  if (isSuperAdminRole(role)) return true;
   return hasStoreMembership;
+}
+
+/** ¿El rol es el del Platform admin? Lo usa también el panel /admin (#194). */
+export function isSuperAdminRole(role: string | null | undefined): boolean {
+  return role === 'super_admin';
 }

@@ -36,7 +36,12 @@ export const authService = {
     if (error) throw error;
   },
 
-  async signInWithGoogle() {
+  /**
+   * @param callbackPath ruta del callback de OAuth en este mismo origen.
+   * Por defecto, el de la Store activa (`/<slug>/auth/callback`); el login
+   * de plataforma pasa `/admin/auth/callback` (#194).
+   */
+  async signInWithGoogle(callbackPath?: string) {
     // En preview/dev de Vercel, usar el origen actual
     // En producción, usar NEXT_PUBLIC_SITE_URL si está definida
     const isVercelPreview = typeof window !== 'undefined' &&
@@ -51,12 +56,13 @@ export const authService = {
     if (typeof window === 'undefined') {
       throw new Error('signInWithGoogle solo puede usarse del lado del cliente.');
     }
-    const slug = getSlugFromPathname(window.location.pathname);
+    const callback =
+      callbackPath ?? `/${getSlugFromPathname(window.location.pathname)}/auth/callback`;
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${baseUrl}/${slug}/auth/callback`,
+        redirectTo: `${baseUrl}${callback}`,
       },
     });
 

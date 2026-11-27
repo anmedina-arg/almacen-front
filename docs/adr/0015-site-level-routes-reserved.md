@@ -12,13 +12,13 @@ Son rutas de nivel de sitio, y sus nombres están reservados como slug de Store:
 
 - `/`: landing de marketing de chaskyapp.
 - `/stores`: listado público de las Stores que usan la plataforma.
-- `/admin`: panel del Platform admin (activar y desactivar feature flags por Store y ver métricas). **Primera pantalla desde #151**: una tabla de solo lectura con los pedidos de cada Store (total y desglose por estado), sin flags ni otras métricas todavía. Quien no sea `super_admin` (o no tenga sesión) recibe un 404, igual que si la ruta no existiera.
+- `/admin`: panel del Platform admin (activar y desactivar feature flags por Store y ver métricas). **Primera pantalla desde #151**: una tabla de solo lectura con los pedidos de cada Store (total y desglose por estado), sin flags ni otras métricas todavía. Sin sesión, redirige a `/admin/login` (desde #194); con sesión pero sin rol `super_admin`, 404, igual que si la ruta no existiera.
 - `/demo` (desde #153): la Demo Store dentro de un marco de celular, con el catálogo `/demo-store` embebido en un iframe; en pantallas angostas redirige directo a `/demo-store`.
 - Además de las que ya estaban: `api`, `robots.txt`, `sitemap.xml`.
 
 La reserva vive en dos lugares que hay que mantener en sync:
 
-- `SITE_LEVEL_ROUTES` en `src/middleware.ts`: estas rutas no se tratan como Store ni pasan por el control de sesión por Store.
+- `SITE_LEVEL_ROUTES` en `src/middleware.ts`: estas rutas no se tratan como Store ni pasan por el control de sesión por Store. `/admin` es la excepción parcial: no es Store, pero el middleware le refresca la sesión y la protege con su propio login (#194).
 - `RESERVED_SLUGS` en `src/features/store/services/provisionStore.ts`: dar de alta una Store con ese slug falla con "Slug reservado".
 
 ## Alternativas descartadas
@@ -28,5 +28,9 @@ La reserva vive en dos lugares que hay que mantener en sync:
 ## Consequences
 
 - Ningún negocio puede llamarse `stores`, `admin` ni `demo` en su URL. Si hay una Store existente con alguno de esos slugs, hay que renombrarla antes de desplegar la reserva (verificar en la tabla `stores`).
-- El panel de plataforma debe autenticar al Platform admin (rol `super_admin`). Decidido en #151: **no hay login propio de plataforma por ahora**. `/admin` lee la sesión de Supabase (las cookies valen para todo el host), así que el Platform admin entra iniciando sesión en el login de cualquier Store y yendo a `/admin`. La página comprueba `profiles.role = 'super_admin'` y responde 404 si no. El dato sale de la RPC `get_orders_count_by_store` (`supabase/schema/store/`), que revalida el rol por su cuenta. Un login propio de plataforma queda como mejora si esto resulta incómodo.
+- El panel de plataforma debe autenticar al Platform admin (rol `super_admin`). En #151 se decidió no tener login propio (entrar por el login de cualquier Store y después ir a `/admin`). En la práctica no funcionó: `/admin` no refrescaba la sesión (token vencido → 404) y las cookies son por dominio, así que estar logueado en el host legacy `market-del-cevil.vercel.app` no servía en `chaskyapp.vercel.app`. **Desde #194 hay login propio**:
+  - `chaskyapp.vercel.app/admin` es el dominio oficial del panel. El middleware redirige `/admin*` del host legacy hacia ahí.
+  - `/admin/login` (email y contraseña, o Google vía `/admin/auth/callback`). **Sin registro**: el rol `super_admin` se asigna en la base, nunca desde un formulario.
+  - El middleware refresca la sesión en `/admin/*` y, sin sesión, manda a `/admin/login?redirectTo=…` (destino validado para que quede dentro de `/admin`).
+  - Cada página comprueba `profiles.role = 'super_admin'` y responde 404 si no lo es. El dato sale de la RPC `get_orders_count_by_store` (`supabase/schema/store/`), que revalida el rol por su cuenta.
 - Cada ruta nueva de nivel de sitio exige agregar su nombre a las dos listas de arriba.
