@@ -85,8 +85,8 @@ export async function createOrder(
   supabase: SupabaseClient,
   storeId: number,
   input: CreateOrderSchemaInput
-): Promise<{ order_id: number; total: number; status: string; items_count: number }> {
-  const { notes, whatsapp_message, items } = input;
+): Promise<{ order_id: number; total: number; status: string; items_count: number; deduplicated?: boolean }> {
+  const { notes, whatsapp_message, items, idempotency_key } = input;
 
   // El cliente solo manda unit_price (normalizado a precio-por-unidad-base en el carrito).
   // unit_cost lo fija la base al insertar el ítem (trigger set_order_item_unit_cost, #189): el
@@ -107,6 +107,9 @@ export async function createOrder(
       from_suggestion: item.from_suggestion ?? false,
     })),
     p_store_id: storeId,
+    // #193: con clave repetida create_order() devuelve el pedido ya creado en
+    // vez de crear otro. Sin clave (POS, clientes viejos) se comporta como antes.
+    p_idempotency_key: idempotency_key ?? null,
   });
 
   // create_order() ya no rechaza por stock (#160, ADR-0016): un ítem que
@@ -122,7 +125,14 @@ export async function createOrder(
   // (sin reordenar/filtrar), que es el mismo orden en el que create_order()
   // insertó los order_items correspondientes.
   const orderId = (data as { order_id?: number } | null)?.order_id;
-  if (orderId != null) {
+  // #193: con la clave repetida el pedido ya existe y este paso ya corrió (o
+  // está corriendo) en la request que lo creó: repetirlo acá podría duplicar las
+  // Variedades, porque add_order_item_variedades() chequea y escribe sin lock.
+  // Lo único que se pierde es el caso de que aquella request muera justo entre
+  // create_order() y este paso, y ahí el pedido igual queda completo salvo el
+  // detalle de Variedades (ya es best-effort, ver arriba).
+  const deduplicated = (data as { deduplicated?: boolean } | null)?.deduplicated === true;
+  if (orderId != null && !deduplicated) {
     const { error: variedadesError } = await supabase.rpc('add_order_item_variedades', {
       p_order_id: orderId,
       p_store_id: storeId,

@@ -56,6 +56,17 @@
 --
 -- #162: también guarda la cantidad pedida en order_items.ordered_quantity
 -- (foto de la creación, como shortfall). Firma sin cambios.
+--
+-- #193: idempotencia. Parámetro nuevo p_idempotency_key (DEFAULT NULL, así un
+-- cliente viejo que no lo manda sigue funcionando igual). Con clave, si ya
+-- existe un pedido de esa Store con esa misma clave, NO se crea otro ni se
+-- toca el stock: se devuelve el pedido existente con 'deduplicated': true. El
+-- INSERT ... ON CONFLICT DO NOTHING cierra también la carrera de dos llamadas
+-- simultáneas con la misma clave (la segunda espera al commit de la primera).
+-- La firma cambia, así que antes de este CREATE OR REPLACE hay que correr una
+-- vez, contra cada base, el DROP FUNCTION de la firma vieja (paso 4 de
+-- docs/agents/schema-changes.md), o Postgres deja un overload silencioso (#70):
+--   DROP FUNCTION public.create_order(uuid, text, text, jsonb, integer);
 -- ============================================================================
 
 CREATE OR REPLACE FUNCTION public.create_order(
@@ -63,7 +74,8 @@ CREATE OR REPLACE FUNCTION public.create_order(
   p_notes text DEFAULT NULL::text,
   p_whatsapp_message text DEFAULT NULL::text,
   p_items jsonb DEFAULT '[]'::jsonb,
-  p_store_id integer DEFAULT NULL::integer
+  p_store_id integer DEFAULT NULL::integer,
+  p_idempotency_key uuid DEFAULT NULL::uuid
 )
  RETURNS jsonb
  LANGUAGE plpgsql
@@ -77,10 +89,35 @@ DECLARE
   v_needed           NUMERIC(12, 3);
   v_product_id       INTEGER;
   v_shortfall        NUMERIC(12, 3);
+  v_existing         RECORD;
 BEGIN
-  INSERT INTO orders (user_id, status, total, notes, whatsapp_message, store_id)
-  VALUES (p_user_id, 'pending', 0, p_notes, p_whatsapp_message, p_store_id)
+  INSERT INTO orders (user_id, status, total, notes, whatsapp_message, store_id, idempotency_key)
+  VALUES (p_user_id, 'pending', 0, p_notes, p_whatsapp_message, p_store_id, p_idempotency_key)
+  ON CONFLICT (store_id, idempotency_key) WHERE idempotency_key IS NOT NULL DO NOTHING
   RETURNING id INTO v_order_id;
+
+  -- #193: la clave ya tenía pedido. Devuelve ese, sin descontar stock ni
+  -- insertar ítems. Sin RETURNING es que hubo conflicto: solo puede pasar con
+  -- clave no nula (el índice es parcial).
+  IF v_order_id IS NULL THEN
+    SELECT o.id, o.total, o.status,
+           (SELECT count(*) FROM order_items oi WHERE oi.order_id = o.id) AS items_count
+    INTO v_existing
+    FROM orders o
+    WHERE o.store_id = p_store_id AND o.idempotency_key = p_idempotency_key;
+
+    IF v_existing.id IS NULL THEN
+      RAISE EXCEPTION 'create_order: la clave de idempotencia ya existía pero el pedido no se encontró';
+    END IF;
+
+    RETURN jsonb_build_object(
+      'order_id',     v_existing.id,
+      'total',        v_existing.total,
+      'status',       v_existing.status,
+      'items_count',  v_existing.items_count,
+      'deduplicated', true
+    );
+  END IF;
 
   PERFORM set_config('app.movement_type', 'sale', true);
 
@@ -127,4 +164,4 @@ $function$;
 
 -- #154: checkout público — anon a propósito. Antes dependía del grant implícito
 -- de Supabase; desde default_privileges.sql tiene que ser explícito.
-GRANT EXECUTE ON FUNCTION public.create_order(UUID, TEXT, TEXT, JSONB, INTEGER) TO anon, authenticated, service_role;
+GRANT EXECUTE ON FUNCTION public.create_order(UUID, TEXT, TEXT, JSONB, INTEGER, UUID) TO anon, authenticated, service_role;
