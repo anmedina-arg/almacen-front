@@ -29,7 +29,12 @@ CREATE TABLE IF NOT EXISTS public.orders (
   confirmed_at  TIMESTAMPTZ,
   confirmed_by  UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   client_id     INTEGER REFERENCES public.clients(id) ON DELETE SET NULL,
-  store_id      INTEGER NOT NULL REFERENCES public.stores(id)
+  store_id      INTEGER NOT NULL REFERENCES public.stores(id),
+  -- #193: clave que el cliente genera por intento de envío del checkout.
+  -- create_order() la usa para no crear dos pedidos cuando el mismo intento
+  -- llega dos veces. NULL = pedido sin clave (POS, integraciones, clientes
+  -- viejos): no participa de la deduplicación.
+  idempotency_key UUID
 );
 
 -- ── Índices ──────────────────────────────────────────────────────────────
@@ -38,6 +43,15 @@ CREATE INDEX IF NOT EXISTS idx_orders_created_at ON public.orders(created_at DES
 CREATE INDEX IF NOT EXISTS idx_orders_user_id ON public.orders(user_id);
 CREATE INDEX IF NOT EXISTS orders_client_id_idx ON public.orders(client_id);
 CREATE INDEX IF NOT EXISTS idx_orders_store_id ON public.orders(store_id);
+
+-- #193: una clave de idempotencia identifica un solo pedido por Store. Parcial
+-- porque los pedidos sin clave (NULL) son la mayoría y no deben chocar entre sí.
+-- Es el índice que usa el ON CONFLICT de create_order(); en una base existente la
+-- columna se agrega antes con ALTER TABLE ... ADD COLUMN IF NOT EXISTS (el CREATE
+-- TABLE IF NOT EXISTS de arriba no agrega columnas a una tabla que ya existe).
+CREATE UNIQUE INDEX IF NOT EXISTS orders_store_id_idempotency_key_uidx
+  ON public.orders(store_id, idempotency_key)
+  WHERE idempotency_key IS NOT NULL;
 
 -- ── Trigger: updated_at ──────────────────────────────────────────────────
 -- update_orders_updated_at() es específica de esta tabla (no la genérica

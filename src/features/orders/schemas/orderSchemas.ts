@@ -45,6 +45,9 @@ export const createOrderSchema = z.object({
   items: z
     .array(createOrderItemSchema)
     .min(1, 'Debe incluir al menos un item'),
+  // #193: UUID por intento de envío; create_order() no crea un segundo pedido
+  // con la misma clave en la misma Store. Opcional: un cliente viejo no lo manda.
+  idempotency_key: z.string().uuid('Clave de idempotencia invalida').optional(),
 });
 
 export type CreateOrderSchemaInput = z.infer<typeof createOrderSchema>;

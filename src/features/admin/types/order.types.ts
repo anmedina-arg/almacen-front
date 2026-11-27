@@ -112,6 +112,8 @@ export interface CreateOrderInput {
   notes?: string;
   whatsapp_message: string;
   items: CreateOrderItemInput[];
+  /** #193: UUID por intento de envío, para que un reintento no cree otro pedido. */
+  idempotency_key?: string;
 }
 
 /**
@@ -122,6 +124,8 @@ export interface CreateOrderResponse {
   total: number;
   status: OrderStatus;
   items_count: number;
+  /** #193: true si la clave de idempotencia ya tenía pedido y se devolvió ese. */
+  deduplicated?: boolean;
 }
 
 /**
