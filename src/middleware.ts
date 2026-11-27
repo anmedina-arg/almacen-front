@@ -1,6 +1,11 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import {
+  isPlatformAdminPath,
+  isPublicPlatformAdminPath,
+  PLATFORM_ADMIN_LOGIN,
+} from '@/features/auth/utils/platformAdmin';
 
 // Dominio bajo el que vivía la app entera antes de este PR (single-tenant).
 // Se mantiene como alias del mismo proyecto Vercel post-rename para no matar
@@ -13,6 +18,14 @@ import type { NextRequest } from 'next/server';
 const LEGACY_HOST = 'market-del-cevil.vercel.app';
 const LEGACY_STORE_SLUG = 'market-del-cevil';
 
+// Dominio oficial del panel del Platform admin (#194). Las cookies de sesión
+// son por dominio: si /admin respondiera en los dos hosts, el Platform admin
+// tendría que estar logueado en el que justo abrió. Este redirect sí es
+// cross-domain, pero solo toca /admin, que ninguna PWA de cliente usa.
+// Fijo a propósito y no NEXT_PUBLIC_SITE_URL: ese valor existe para el host
+// legacy (ver authService.signInWithGoogle) y no tiene por qué ser chaskyapp.
+const PLATFORM_ORIGIN = 'https://chaskyapp.vercel.app';
+
 export async function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
   const segments = pathname.split('/').filter(Boolean);
@@ -23,6 +36,14 @@ export async function middleware(request: NextRequest) {
   // no tienen slug de Store: no necesitan el header ni el auth-gating de
   // abajo, que asume rutas bajo /[store]/...
   const SITE_LEVEL_ROUTES = new Set(['api', 'robots.txt', 'sitemap.xml', 'stores', 'admin', 'demo']);
+
+  const isPanelPath = isPlatformAdminPath(pathname);
+
+  if (request.headers.get('host') === LEGACY_HOST && isPanelPath) {
+    const redirectUrl = new URL(pathname, PLATFORM_ORIGIN);
+    redirectUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(redirectUrl);
+  }
 
   // Request al host legacy sin el slug de su Store ya al frente (link viejo,
   // bookmark, o PWA instalada arrancando en start_url "/"): reinyectamos el
@@ -41,7 +62,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (!slug || SITE_LEVEL_ROUTES.has(slug)) {
+  // /admin es de nivel de sitio pero, a diferencia del resto, necesita la
+  // sesión refrescada (#194): sigue de largo hasta el bloque de Supabase.
+  if (!slug || (SITE_LEVEL_ROUTES.has(slug) && !isPanelPath)) {
     return NextResponse.next();
   }
 
@@ -88,6 +111,17 @@ export async function middleware(request: NextRequest) {
   // La validación de que `slug` sea una Store real la hace
   // src/app/[store]/layout.tsx (notFound() si no existe).
   const restPath = '/' + segments.slice(1).join('/');
+
+  // Panel del Platform admin: sin sesión, a su propio login. El rol
+  // super_admin lo comprueba cada página (404 si no lo tiene, ADR-0015).
+  if (isPanelPath) {
+    if (!user && !isPublicPlatformAdminPath(pathname)) {
+      const redirectUrl = new URL(PLATFORM_ADMIN_LOGIN, request.url);
+      redirectUrl.searchParams.set('redirectTo', pathname + request.nextUrl.search);
+      return NextResponse.redirect(redirectUrl);
+    }
+    return response;
+  }
 
   // Rutas protegidas que requieren auth
   const protectedRoutes = ['/admin', '/profile'];

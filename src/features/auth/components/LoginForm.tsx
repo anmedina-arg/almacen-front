@@ -8,7 +8,11 @@ import { getAuthErrorMessage } from '../utils/errorMessages';
 import type { LoginCredentials } from '../types/auth.types';
 import { useStoreSlug } from '@/hooks/useStoreSlug';
 
-export function LoginForm() {
+/**
+ * @param redirectTo destino después de loguearse. Por defecto, el catálogo
+ * de la Store activa; el login de plataforma pasa una ruta de /admin (#194).
+ */
+export function LoginForm({ redirectTo }: { redirectTo?: string } = {}) {
   const router = useRouter();
   const slug = useStoreSlug();
   const [credentials, setCredentials] = useState<LoginCredentials>({
@@ -38,7 +42,7 @@ export function LoginForm() {
     setErrors({});
     login(credentials, {
       onSuccess: () => {
-        router.push(`/${slug}`);
+        router.push(redirectTo ?? `/${slug}`);
       },
     });
   };

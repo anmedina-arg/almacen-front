@@ -2,8 +2,9 @@
 
 import { useGoogleAuth } from '../hooks/useGoogleAuth';
 
-export function GoogleAuthButton() {
-  const { mutate: signInWithGoogle, isPending } = useGoogleAuth();
+/** @param callbackPath ver `authService.signInWithGoogle`. */
+export function GoogleAuthButton({ callbackPath }: { callbackPath?: string } = {}) {
+  const { mutate: signInWithGoogle, isPending } = useGoogleAuth(callbackPath);
 
   return (
     <button
